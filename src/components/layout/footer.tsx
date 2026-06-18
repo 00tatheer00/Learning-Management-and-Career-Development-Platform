@@ -18,7 +18,7 @@ const footerLinks = {
   admissions: [
     { label: "How to Apply", href: "/admissions" },
     { label: "Eligibility", href: "/admissions#eligibility" },
-    { label: "Enrollment", href: "/admissions#enroll" },
+    { label: "Register", href: "/register" },
     { label: "Learning Paths", href: "/programs#learning-paths" },
   ],
   contact: [

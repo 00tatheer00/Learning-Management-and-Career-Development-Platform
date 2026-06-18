@@ -41,7 +41,7 @@ export function CTASection() {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button size="lg" asChild>
-                <Link href="/admissions#enroll">
+                <Link href="/register">
                   Apply Now
                   <ArrowRight className="w-5 h-5" aria-hidden="true" />
                 </Link>

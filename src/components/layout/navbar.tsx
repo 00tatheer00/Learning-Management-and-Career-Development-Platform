@@ -71,7 +71,7 @@ export function Navbar() {
             <Link href="/student-portal">Student Login</Link>
           </Button>
           <Button size="sm" asChild>
-            <Link href="/admissions#enroll">Apply Now</Link>
+            <Link href="/register">Apply Now</Link>
           </Button>
         </div>
 
@@ -111,7 +111,7 @@ export function Navbar() {
                   </Link>
                 </Button>
                 <Button asChild>
-                  <Link href="/admissions#enroll" onClick={() => setIsMobileOpen(false)}>
+                  <Link href="/register" onClick={() => setIsMobileOpen(false)}>
                     Apply Now
                   </Link>
                 </Button>

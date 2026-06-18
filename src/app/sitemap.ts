@@ -11,6 +11,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/programs",
     "/trainers",
     "/admissions",
+    "/register",
     "/student-portal",
     "/blog",
     "/events",

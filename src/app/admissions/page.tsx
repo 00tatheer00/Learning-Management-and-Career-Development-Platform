@@ -1,7 +1,6 @@
 import { PageHero } from "@/components/shared/page-hero";
 import { BreadcrumbSchema } from "@/components/seo/json-ld";
 import { AdmissionsSection } from "@/components/sections/admissions";
-import { EnrollmentFormSection } from "@/components/sections/enrollment-form";
 import { FAQSection } from "@/components/sections/faq";
 import { createMetadata } from "@/lib/seo/metadata";
 import { SITE_CONFIG } from "@/lib/constants";
@@ -28,7 +27,6 @@ export default function AdmissionsPage() {
         description="Free course — pay only PKR 1,000 one-time registration to join. Progress level by level with full support."
       />
       <AdmissionsSection />
-      <EnrollmentFormSection />
       <FAQSection />
     </>
   );

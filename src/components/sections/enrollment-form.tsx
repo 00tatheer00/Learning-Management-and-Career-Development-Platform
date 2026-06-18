@@ -1,13 +1,12 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
-import { Loader2, CheckCircle2, Copy, Check } from "lucide-react";
+import { Loader2, CheckCircle2 } from "lucide-react";
 import { GlobeHemisphereWest, DeviceMobile, WifiHigh } from "@phosphor-icons/react";
-import { SectionHeader } from "@/components/shared/section-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,7 +23,6 @@ import {
   type EnrollmentFormData,
 } from "@/lib/validations/enrollment";
 import { PAYMENT_CONFIG, ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
-import { FreeCoursePromo } from "@/components/shared/free-course-promo";
 import { programs } from "@/lib/data/programs";
 import { cn } from "@/lib/utils";
 
@@ -98,58 +96,11 @@ function YesNoField({
   );
 }
 
-function PaymentInfoCard() {
-  const [copied, setCopied] = useState(false);
-
-  const copyNumber = async () => {
-    await navigator.clipboard.writeText(PAYMENT_CONFIG.easypaisa.number);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  return (
-    <div className="space-y-4">
-      <FreeCoursePromo />
-
-      <div className="rounded-xl border border-primary/25 bg-white p-5 lg:p-6 shadow-sm">
-        <p className="text-sm font-semibold text-foreground mb-1">
-          How to pay your {PAYMENT_CONFIG.currency}{" "}
-          {PAYMENT_CONFIG.registrationFee.toLocaleString()} registration fee
-        </p>
-        <p className="text-xs text-muted mb-4">
-          Send payment via Easypaisa, then upload the screenshot below with your
-          registration form.
-        </p>
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-surface p-4">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-muted mb-1">
-              Easypaisa Account
-            </p>
-            <p className="font-bold text-xl text-primary">
-              {PAYMENT_CONFIG.easypaisa.number}
-            </p>
-            <p className="text-sm text-muted">{PAYMENT_CONFIG.easypaisa.accountName}</p>
-          </div>
-          <Button type="button" variant="outline" size="sm" onClick={copyNumber}>
-            {copied ? (
-              <>
-                <Check className="h-4 w-4" />
-                Copied
-              </>
-            ) : (
-              <>
-                <Copy className="h-4 w-4" />
-                Copy Number
-              </>
-            )}
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
+interface EnrollmentFormProps {
+  defaultProgram?: string;
 }
 
-export function EnrollmentFormSection() {
+export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -191,6 +142,12 @@ export function EnrollmentFormSection() {
   const activeProgram = programs.find((p) => p.slug === selectedProgram);
   const isEnrollable = (slug: string) =>
     ENROLLABLE_PROGRAM_SLUGS.includes(slug as (typeof ENROLLABLE_PROGRAM_SLUGS)[number]);
+
+  useEffect(() => {
+    if (defaultProgram && isEnrollable(defaultProgram)) {
+      setValue("program", defaultProgram as EnrollmentFormData["program"]);
+    }
+  }, [defaultProgram, setValue]);
 
   const handleScreenshotChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -259,45 +216,48 @@ export function EnrollmentFormSection() {
 
   if (isSuccess) {
     return (
-      <section id="enroll" className="section-padding" aria-live="polite">
-        <div className="container-custom max-w-2xl text-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="rounded-2xl border border-border bg-background p-10 shadow-sm"
-          >
-            <CheckCircle2 className="w-16 h-16 text-primary mx-auto mb-4" aria-hidden="true" />
-            <h2 className="text-2xl font-bold mb-2">Registration Submitted!</h2>
-            <p className="text-muted mb-6 leading-relaxed">
-              Thank you for registering. Our team will verify your payment screenshot
-              and contact you on WhatsApp within 2–3 business days.
-            </p>
-            <Button onClick={() => setIsSuccess(false)}>Submit Another Registration</Button>
-          </motion.div>
-        </div>
-      </section>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="rounded-2xl border border-border bg-background p-8 lg:p-10 shadow-sm text-center"
+        aria-live="polite"
+      >
+        <CheckCircle2 className="w-16 h-16 text-primary mx-auto mb-4" aria-hidden="true" />
+        <h2 className="text-2xl font-bold mb-2">Registration Submitted!</h2>
+        <p className="text-muted mb-6 leading-relaxed max-w-md mx-auto">
+          Thank you for registering. Our team will verify your payment screenshot
+          and contact you on WhatsApp within 2–3 business days. Once verified,
+          you will be added to the WhatsApp group and receive your online class
+          link, recorded lectures, quizzes, assignments, and projects.
+        </p>
+        <Button onClick={() => setIsSuccess(false)}>Submit Another Registration</Button>
+      </motion.div>
     );
   }
 
   return (
-    <section id="enroll" className="section-padding section-alt" aria-labelledby="enroll-heading">
-      <div className="container-custom max-w-3xl">
-        <SectionHeader
-          label="Register Now"
-          title="Student Registration Form"
-          description="The course is completely free. Pay only PKR 1,000 one-time registration to join — all levels ahead are free."
-        />
+    <div id="register-form-panel">
+      <div className="mb-6">
+        <p className="text-sm font-semibold uppercase tracking-wider text-primary mb-2">
+          Registration Form
+        </p>
+        <h2 id="register-heading" className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
+          Complete Your Application
+        </h2>
+        <p className="text-muted leading-relaxed">
+          Fill in your details below and upload your PKR 1,000 registration payment
+          screenshot to secure your seat.
+        </p>
+      </div>
 
-        <PaymentInfoCard />
-
-        <motion.form
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          onSubmit={handleSubmit(onSubmit)}
-          className="mt-8 rounded-2xl border border-border bg-background p-6 lg:p-8 space-y-8 shadow-sm"
-          noValidate
-        >
+      <motion.form
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        onSubmit={handleSubmit(onSubmit)}
+        className="rounded-2xl border border-border bg-background p-6 lg:p-8 space-y-8 shadow-sm"
+        noValidate
+      >
           <FormSection title="Personal Information">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="sm:col-span-2">
@@ -638,7 +598,6 @@ export function EnrollmentFormSection() {
             )}
           </Button>
         </motion.form>
-      </div>
-    </section>
+    </div>
   );
 }

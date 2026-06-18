@@ -34,11 +34,6 @@ const AdmissionsSection = dynamic(() =>
     default: m.AdmissionsSection,
   }))
 );
-const EnrollmentFormSection = dynamic(() =>
-  import("@/components/sections/enrollment-form").then((m) => ({
-    default: m.EnrollmentFormSection,
-  }))
-);
 const FAQSection = dynamic(() =>
   import("@/components/sections/faq").then((m) => ({ default: m.FAQSection }))
 );
@@ -58,7 +53,6 @@ export default function HomePage() {
       <TrainersSection />
       <TestimonialsSection />
       <AdmissionsSection />
-      <EnrollmentFormSection />
       <FAQSection />
       <CTASection />
     </>

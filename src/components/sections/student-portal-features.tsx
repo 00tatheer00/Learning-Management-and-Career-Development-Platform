@@ -59,7 +59,7 @@ export function StudentPortalFeatures() {
       <div className="text-center mt-12">
         <p className="text-muted mb-4">Not enrolled yet?</p>
         <Button asChild>
-          <Link href="/admissions#enroll">
+          <Link href="/register">
             Apply Now
             <ArrowRight className="w-4 h-4" />
           </Link>

@@ -12,29 +12,11 @@ import { SectionHeader } from "@/components/shared/section-header";
 import { FreeCoursePromo } from "@/components/shared/free-course-promo";
 import { PremiumIcon } from "@/components/shared/premium-icon";
 import { Button } from "@/components/ui/button";
-
-const eligibility = [
-  "Basic computer literacy and internet access",
-  "English language proficiency for instruction",
-  "Commitment to 10-15 hours per week minimum",
-  "No prior coding experience required for Foundations",
-  "Age 16+ (parental consent required for minors)",
-];
-
-const process = [
-  { step: "1", title: "Submit Application", desc: "Fill out the enrollment form with your details and program preference" },
-  { step: "2", title: "Admissions Review", desc: "Our team reviews your application within 2-3 business days" },
-  { step: "3", title: "Level Assessment", desc: "Optional assessment to determine your starting level" },
-  { step: "4", title: "Enrollment Confirmation", desc: "Receive welcome package and access to learning platform" },
-  { step: "5", title: "Begin Learning", desc: "Start your first level with live orientation session" },
-];
-
-const requirements = [
-  "Laptop or desktop computer (8GB RAM minimum)",
-  "Stable internet connection (10 Mbps+)",
-  "Webcam and microphone for live sessions",
-  "Dedicated study space and schedule",
-];
+import {
+  eligibility,
+  applicationProcess as process,
+  requirements,
+} from "@/lib/data/admissions";
 
 export function AdmissionsSection() {
   return (
@@ -117,7 +99,7 @@ export function AdmissionsSection() {
               ))}
             </ul>
             <Button className="w-full" asChild>
-              <Link href="/admissions">Learn More About Admissions</Link>
+              <Link href="/register">Register Now</Link>
             </Button>
           </motion.div>
         </div>

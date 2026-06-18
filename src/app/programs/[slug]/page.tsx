@@ -110,7 +110,7 @@ export default async function ProgramDetailPage({ params }: ProgramPageProps) {
 
           {program.category === "active" && (
             <Button size="lg" asChild>
-              <Link href="/admissions#enroll">
+              <Link href={`/register?program=${program.slug}`}>
                 Apply for This Program
                 <ArrowRight className="w-5 h-5" />
               </Link>

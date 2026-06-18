@@ -42,7 +42,7 @@ export function HeroSection() {
   return (
     <section
       ref={gridRef}
-      className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 bg-gradient-to-b from-surface to-background"
+      className="relative flex flex-col justify-center min-h-screen overflow-hidden pt-24 pb-28 lg:pt-28 lg:pb-36 bg-gradient-to-b from-surface to-background"
       aria-labelledby="hero-heading"
     >
       <div className="absolute inset-0 grid-pattern" aria-hidden="true" />
@@ -80,11 +80,12 @@ export function HeroSection() {
         </motion.div>
       ))}
 
-      <div className="container-custom relative z-10 px-4 sm:px-6 lg:px-8 text-center">
+      <div className="container-custom relative z-10 flex flex-col items-center px-4 sm:px-6 lg:px-8 text-center">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
+          className="w-full max-w-5xl"
         >
           <div className="flex flex-col items-center gap-3 mb-8">
             <div className="inline-flex items-center gap-2 bg-background border border-border shadow-sm px-4 py-2 rounded-full">
@@ -114,7 +115,7 @@ export function HeroSection() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button size="lg" asChild>
-              <Link href="/admissions#enroll">
+              <Link href="/register">
                 Apply Now
                 <ArrowRight className="w-5 h-5" aria-hidden="true" />
               </Link>
@@ -129,14 +130,14 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto"
+          className="mt-16 lg:mt-20 w-full max-w-4xl grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4"
         >
           {["Web Dev", "Flutter", "AI/ML", "UI/UX"].map((tech) => (
             <div
               key={tech}
-              className="bg-background border border-border shadow-sm rounded-xl p-4 text-center hover:border-primary/30 hover:shadow-md transition-all"
+              className="bg-background/90 border border-border shadow-sm rounded-xl px-4 py-3.5 sm:py-4 text-center hover:border-primary/30 hover:shadow-md transition-all"
             >
-              <span className="text-sm font-medium text-muted">{tech}</span>
+              <span className="text-sm font-medium text-foreground">{tech}</span>
             </div>
           ))}
         </motion.div>
