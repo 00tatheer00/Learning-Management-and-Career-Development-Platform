@@ -13,7 +13,7 @@ import { programs } from "@/lib/data/programs";
 export const metadata = createMetadata({
   title: "Programs",
   description:
-    "Explore our industry-focused training programs in Web Development, Flutter, AI, UI/UX, Digital Marketing, and Cyber Security.",
+    "Explore our industry-focused training programs in Web Development, App Development, AI, Video Editing, Digital Marketing, Graphics Designing, and UI/UX Designing.",
   path: "/programs",
 });
 

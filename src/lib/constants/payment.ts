@@ -6,28 +6,26 @@ export const PAYMENT_CONFIG = {
     number: "03275792600",
     accountName: "Syed Tatheer Hussain",
   },
-  headline: "The Course Is Completely Free",
-  registrationLabel: "One-Time Registration Fee",
-  registrationNote: "PKR 1,000 only — to register and join the course",
-  freeNote: "All course levels after registration are 100% free. No tuition. No hidden charges.",
+  headline: "Course is 100% FREE",
+  registrationLabel: "One-Time Fee",
+  registrationNote: "Only Rs 1,000 to join — pay once, learn free",
+  freeNote: "After Rs 1,000 registration, all classes and levels are free. No extra charges.",
   feeNote:
     "Pay PKR 1,000 once to register. The entire course ahead is fully free.",
   postRegistrationAccess: {
-    title: "What you get after registration fee is paid",
-    subtitle:
-      "Students whose PKR 1,000 registration fee is verified will receive full course access, including:",
+    title: "What you get after you pay Rs 1,000",
+    subtitle: "After we verify your payment, you will get:",
     items: [
-      "Added to the official WhatsApp group",
-      "Online live class link",
+      "Added to WhatsApp group",
+      "Live online class link",
       "Recorded lecture videos",
-      "Quizzes",
-      "Assignments",
-      "Projects",
+      "Quizzes & assignments",
+      "Projects to practice",
     ],
   },
 } as const;
 
 export const ENROLLABLE_PROGRAM_SLUGS = [
   "web-development",
-  "flutter-development",
+  "app-development",
 ] as const;

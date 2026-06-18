@@ -1,0 +1,23 @@
+[
+  {
+    "id": "ses-1",
+    "programSlug": "web-development",
+    "title": "Live Class — HTML & CSS",
+    "date": "2026-06-20",
+    "time": "07:00 PM",
+    "meetLink": "https://meet.google.com/eest-web-dev",
+    "trainerId": "trainer-1",
+    "trainerName": "Syed Tatheer Hussain",
+    "notes": "Join 5 minutes early. Keep your mic muted."
+  },
+  {
+    "id": "ses-2",
+    "programSlug": "app-development",
+    "title": "Live Class — Flutter Setup",
+    "date": "2026-06-22",
+    "time": "07:00 PM",
+    "meetLink": "https://meet.google.com/eest-flutter",
+    "trainerId": "trainer-1",
+    "trainerName": "Syed Tatheer Hussain"
+  }
+]

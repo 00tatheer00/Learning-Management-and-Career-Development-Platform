@@ -65,6 +65,10 @@ html.lenis body {
   overflow: hidden;
 }
 
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
@@ -124,6 +128,102 @@ body {
     linear-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px),
     linear-gradient(90deg, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
   background-size: 48px 48px;
+}
+
+.hero-grid-wrap {
+  contain: paint;
+  isolation: isolate;
+  pointer-events: none;
+  transform: translateZ(0);
+  mask-image: radial-gradient(ellipse 85% 72% at 50% 44%, black 18%, transparent 76%);
+  -webkit-mask-image: radial-gradient(ellipse 85% 72% at 50% 44%, black 18%, transparent 76%);
+}
+
+.hero-grid-lines {
+  background-image:
+    linear-gradient(rgba(15, 23, 42, 0.075) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.075) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.hero-grid-shimmer {
+  background: linear-gradient(
+    110deg,
+    transparent 38%,
+    rgba(234, 88, 12, 0.55) 46%,
+    rgba(255, 255, 255, 0.9) 50%,
+    rgba(234, 88, 12, 0.55) 54%,
+    transparent 62%
+  );
+  background-size: 280% 100%;
+  opacity: 0.55;
+  animation: hero-grid-shimmer 9s ease-in-out infinite;
+  mask-image:
+    linear-gradient(rgba(0, 0, 0, 1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 1) 1px, transparent 1px);
+  -webkit-mask-image:
+    linear-gradient(rgba(0, 0, 0, 1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 1) 1px, transparent 1px);
+  mask-size: 48px 48px;
+  -webkit-mask-size: 48px 48px;
+}
+
+.hero-glow {
+  pointer-events: none;
+  contain: strict;
+  animation: hero-glow-pulse 8s ease-in-out infinite;
+}
+
+.hero-section:not(.hero-in-view) .hero-grid-shimmer,
+.hero-section:not(.hero-in-view) .hero-glow,
+.hero-section:not(.hero-in-view) .hero-float {
+  animation-play-state: paused;
+}
+
+@keyframes hero-glow-pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: translate(-50%, 0) scale(1);
+  }
+  50% {
+    opacity: 0.65;
+    transform: translate(-50%, 0) scale(1.08);
+  }
+}
+
+@keyframes hero-float {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 0.55;
+    transform: translateY(-10px);
+  }
+}
+
+.hero-float {
+  animation: hero-float 5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-grid-shimmer,
+  .hero-glow,
+  .hero-float {
+    animation: none !important;
+  }
+}
+
+@keyframes hero-grid-shimmer {
+  0%,
+  100% {
+    background-position: 220% 0;
+  }
+  50% {
+    background-position: -220% 0;
+  }
 }
 
 .glow-orange {

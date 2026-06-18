@@ -5,30 +5,47 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { List, X, GraduationCap } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
+import { useLenis } from "@/components/providers/smooth-scroll";
 import { NAV_LINKS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const lenis = useLenis();
 
   useEffect(() => {
+    if (lenis) {
+      const onScroll = ({ scroll }: { scroll: number }) => {
+        setIsScrolled(scroll > 20);
+      };
+
+      lenis.on("scroll", onScroll);
+      return () => lenis.off("scroll", onScroll);
+    }
+
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [lenis]);
 
   useEffect(() => {
+    if (lenis) {
+      if (isMobileOpen) lenis.stop();
+      else lenis.start();
+      return;
+    }
+
     document.body.style.overflow = isMobileOpen ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
-  }, [isMobileOpen]);
+  }, [isMobileOpen, lenis]);
 
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
+        "fixed top-0 left-0 right-0 z-50 transition-[background-color,box-shadow,backdrop-filter] duration-300",
         isScrolled ? "glass-strong shadow-sm" : "bg-transparent"
       )}
     >

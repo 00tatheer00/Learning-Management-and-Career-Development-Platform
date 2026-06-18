@@ -1,0 +1,20 @@
+[
+  {
+    "id": "asg-1",
+    "programSlug": "web-development",
+    "title": "Build Your First Web Page",
+    "description": "Create a simple personal portfolio page using HTML and CSS.",
+    "dueDate": "2026-06-25",
+    "trainerId": "trainer-1",
+    "createdAt": "2026-06-18T19:30:09.029Z"
+  },
+  {
+    "id": "asg-2",
+    "programSlug": "web-development",
+    "title": "JavaScript Calculator",
+    "description": "Make a basic calculator using JavaScript.",
+    "dueDate": "2026-07-02",
+    "trainerId": "trainer-1",
+    "createdAt": "2026-06-18T19:30:09.030Z"
+  }
+]

@@ -2,10 +2,10 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
 import {
-  saveEnrollment,
   savePaymentScreenshot,
   createApiResponse,
 } from "@/lib/api/enrollment";
+import { saveEnrollment } from "@/lib/api/portal-data";
 
 const cnicRegex = /^\d{13}$/;
 const whatsappRegex = /^03\d{9}$/;

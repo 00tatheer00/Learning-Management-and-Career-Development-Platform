@@ -1,0 +1,38 @@
+[
+  {
+    "id": "admin-1",
+    "email": "admin@eest.com",
+    "role": "admin",
+    "name": "Admin User",
+    "phone": "03275792600",
+    "isActive": true,
+    "createdAt": "2026-06-18T19:30:09.133Z",
+    "avatarInitials": "AU",
+    "passwordHash": "93268aaae48b6695e6a1e81e2f8aa5e6:d5096026eb7b74e8a29de2dd26e4b7bf05e42e32d13b0960b7a337d14177b3183637ad9da55ca97442e020fef29060eca5e35cf76eebb31966b5429e69c8a7a0"
+  },
+  {
+    "id": "trainer-1",
+    "email": "trainer@eest.com",
+    "role": "trainer",
+    "name": "Syed Tatheer Hussain",
+    "phone": "03275792600",
+    "trainerId": "trainer-1",
+    "isActive": true,
+    "createdAt": "2026-06-18T19:30:09.137Z",
+    "avatarInitials": "ST",
+    "passwordHash": "2ce2f81b7f23c8b1cfba45adfaf75733:b461bf535e6da9d98890c0333f4e7efc90117c8c9da4dabeb99f863950940638c951a23ab6d890701f7e748a776baef581ce974c0e32bfd41a4898937ee1d9cf"
+  },
+  {
+    "id": "student-1",
+    "email": "student@eest.com",
+    "role": "student",
+    "name": "Demo Student",
+    "phone": "03001234567",
+    "programSlug": "web-development",
+    "level": "Foundations",
+    "isActive": true,
+    "createdAt": "2026-06-18T19:30:09.137Z",
+    "avatarInitials": "DS",
+    "passwordHash": "a5fde808898cd47ffbe2b9dbdb1ea9c4:40721417f782ccefd0af2d40f81cedd5c8d605b97dff76c98dcf45f4c57ac8d084d66619d38c793ed451bb50580ed4ca51f17d904caf69170f6706cfdc53a65c"
+  }
+]

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Geist_Mono } from "next/font/google";
-import { Navbar } from "@/components/layout/navbar";
-import { Footer } from "@/components/layout/footer";
+import { LayoutSwitcher } from "@/components/layout/layout-switcher";
 import { SmoothScroll } from "@/components/providers/smooth-scroll";
 import { OrganizationSchema } from "@/components/seo/json-ld";
 import { createMetadata } from "@/lib/seo/metadata";
@@ -40,9 +39,7 @@ export default function RootLayout({
         className={`${inter.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
         <SmoothScroll>
-          <Navbar />
-          <main id="main-content">{children}</main>
-          <Footer />
+          <LayoutSwitcher>{children}</LayoutSwitcher>
         </SmoothScroll>
       </body>
     </html>

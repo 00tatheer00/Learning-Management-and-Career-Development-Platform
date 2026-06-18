@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { PageHero } from "@/components/shared/page-hero";
 import { StudentPortalFeatures } from "@/components/sections/student-portal-features";
 import { BreadcrumbSchema } from "@/components/seo/json-ld";
@@ -35,8 +36,8 @@ export default function StudentPortalPage() {
               Enrolled students can access the full portal with their credentials.
               New students will receive login details after enrollment confirmation.
             </p>
-            <Button size="lg" disabled>
-              Student Login — Coming Soon
+            <Button size="lg" asChild>
+              <Link href="/login">Student Login</Link>
             </Button>
           </div>
 

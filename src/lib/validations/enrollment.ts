@@ -7,53 +7,53 @@ const whatsappRegex = /^03\d{9}$/;
 export const enrollmentSchema = z.object({
   fullName: z
     .string()
-    .min(2, "Full name must be at least 2 characters")
-    .max(100, "Full name is too long"),
+    .min(2, "Please write your full name")
+    .max(100, "Name is too long"),
   fatherName: z
     .string()
-    .min(2, "Father name is required")
-    .max(100, "Father name is too long"),
+    .min(2, "Please write father's name")
+    .max(100, "Name is too long"),
   institution: z
     .string()
-    .min(2, "School / college / university is required")
-    .max(150, "Institution name is too long"),
+    .min(2, "Please write your school/college name")
+    .max(150, "Name is too long"),
   classSemester: z
     .string()
-    .min(1, "Class or semester is required")
-    .max(50, "Class or semester is too long"),
+    .min(1, "Please write your class or semester")
+    .max(50, "Too long"),
   cnic: z
     .string()
     .transform((val) => val.replace(/[-\s]/g, ""))
-    .pipe(z.string().regex(cnicRegex, "CNIC must be exactly 13 digits (no dashes)")),
-  email: z.string().email("Please enter a valid email address"),
+    .pipe(z.string().regex(cnicRegex, "CNIC must be 13 numbers only (no dashes)")),
+  email: z.string().email("Please enter a valid email"),
   whatsapp: z
     .string()
     .transform((val) => val.replace(/[\s-]/g, ""))
     .pipe(
       z
         .string()
-        .regex(whatsappRegex, "Enter a valid WhatsApp number (e.g. 03001234567)")
+        .regex(whatsappRegex, "WhatsApp must start with 03 and be 11 digits (e.g. 03001234567)")
     ),
   fieldOfStudy: z
     .string()
-    .min(2, "Field of study is required")
-    .max(100, "Field of study is too long"),
+    .min(2, "Please write what you study")
+    .max(100, "Too long"),
   program: z.enum(ENROLLABLE_PROGRAM_SLUGS, {
-    message: "Please select a program",
+    message: "Please choose Web or App course",
   }),
-  level: z.string().min(1, "Please select a starting level"),
+  level: z.string().min(1, "Please choose a level"),
   learningMode: z.literal("online"),
   hasLaptop: z.enum(["yes", "no"], {
-    message: "Please indicate if you have a laptop",
+    message: "Please answer: do you have a laptop?",
   }),
   internetAvailable: z.enum(["yes", "no"], {
-    message: "Please indicate internet availability",
+    message: "Please answer: do you have internet?",
   }),
   confirmInfoCorrect: z.boolean().refine((v) => v === true, {
-    message: "You must confirm that all information provided is correct",
+    message: "Please tick the box to confirm your details are correct",
   }),
   agreeToPolicies: z.boolean().refine((v) => v === true, {
-    message: "You must agree to the rules, attendance policy, and code of conduct",
+    message: "Please tick the box to agree to class rules",
   }),
 });
 
@@ -61,7 +61,7 @@ export type EnrollmentFormData = z.infer<typeof enrollmentSchema>;
 
 export function validatePaymentScreenshot(file: File | undefined): string | null {
   if (!file || file.size === 0) {
-    return "Registration fee screenshot is required";
+    return "Please upload your Easypaisa payment screenshot";
   }
   if (!file.type.startsWith("image/")) {
     return "Screenshot must be an image (JPG, PNG, etc.)";

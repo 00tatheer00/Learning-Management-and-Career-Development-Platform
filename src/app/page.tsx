@@ -24,11 +24,6 @@ const LearningJourneySection = dynamic(() =>
 const TrainersSection = dynamic(() =>
   import("@/components/sections/trainers").then((m) => ({ default: m.TrainersSection }))
 );
-const TestimonialsSection = dynamic(() =>
-  import("@/components/sections/testimonials").then((m) => ({
-    default: m.TestimonialsSection,
-  }))
-);
 const AdmissionsSection = dynamic(() =>
   import("@/components/sections/admissions").then((m) => ({
     default: m.AdmissionsSection,
@@ -47,12 +42,11 @@ export default function HomePage() {
       <FAQSchema faqs={faqs} />
       <HeroSection />
       <StatsSection />
+      <AdmissionsSection />
       <ProgramsSection />
       <WhyChooseUsSection />
       <LearningJourneySection />
       <TrainersSection />
-      <TestimonialsSection />
-      <AdmissionsSection />
       <FAQSection />
       <CTASection />
     </>

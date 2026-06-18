@@ -5,9 +5,12 @@ import { SITE_CONFIG } from "@/lib/constants";
 const footerLinks = {
   programs: [
     { label: "Web Development", href: "/programs/web-development" },
-    { label: "Flutter Development", href: "/programs/flutter-development" },
+    { label: "App Development", href: "/programs/app-development" },
     { label: "Artificial Intelligence", href: "/programs/artificial-intelligence" },
-    { label: "UI/UX Design", href: "/programs/ui-ux-design" },
+    { label: "Video Editing", href: "/programs/video-editing" },
+    { label: "Digital Marketing", href: "/programs/digital-marketing" },
+    { label: "Graphics Designing", href: "/programs/graphics-designing" },
+    { label: "UI/UX Designing", href: "/programs/ui-ux-design" },
   ],
   resources: [
     { label: "Blog", href: "/blog" },

@@ -26,14 +26,12 @@ export function PaymentInfoCard({ className }: PaymentInfoCardProps) {
         className
       )}
     >
-      <p className="text-sm font-semibold text-foreground mb-1">
-        How to pay your {PAYMENT_CONFIG.currency}{" "}
-        {PAYMENT_CONFIG.registrationFee.toLocaleString()} registration fee
-      </p>
-      <p className="text-xs text-muted mb-4">
-        Send payment via Easypaisa, then upload the screenshot in the registration
-        form.
-      </p>
+        <p className="text-sm font-semibold text-foreground mb-1">
+          How to pay Rs {PAYMENT_CONFIG.registrationFee.toLocaleString()}
+        </p>
+        <p className="text-sm text-muted mb-4">
+          Open Easypaisa app → Send money → Take screenshot → Upload in the form below.
+        </p>
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-surface p-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-muted mb-1">

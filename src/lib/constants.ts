@@ -3,7 +3,7 @@ export const SITE_CONFIG = {
   shortName: "EEST",
   tagline: "Learn. Build. Lead.",
   description:
-    "Emerging Edge School of Technology is the educational and career development division of Emerging Edge. It provides industry-focused training programs in Web Development, Mobile App Development, Artificial Intelligence, UI/UX Design, Digital Marketing, and future technologies.",
+    "Emerging Edge School of Technology provides industry-focused training in Web Development, App Development, Artificial Intelligence, Video Editing, Digital Marketing, Graphics Designing, and UI/UX Designing.",
   url: "https://school.emergingedge.com",
   email: "admissions@emergingedge.com",
   phone: "+1 (555) 123-4567",
