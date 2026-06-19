@@ -4,7 +4,7 @@ import type { PortalUser } from "@/types/portal";
 export function getTrainerDesignation(programSlug?: string): string {
   switch (programSlug) {
     case "web-development":
-      return "Web Dev Trainer";
+      return "Web Development Trainer";
     case "app-development":
       return "Mobile App Development Trainer";
     default:

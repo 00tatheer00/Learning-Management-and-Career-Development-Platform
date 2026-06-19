@@ -4,11 +4,11 @@ export const trainers: Trainer[] = [
   {
     id: "trainer-tatheer",
     name: "S Tatheer Hussain",
-    designation: "Web Dev Trainer",
+    designation: "Web Development Trainer",
     expertise: ["HTML", "CSS", "JavaScript", "React", "Node.js"],
-    experience: "5+ years",
+    experience: "4+ years",
     bio: "Web Development trainer at EEST. Teaches students from basics to building real websites and full-stack projects.",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    image: "/trainers/tatheer-hussain.png",
     social: {
       linkedin: "https://linkedin.com",
       github: "https://github.com",
