@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { CheckCircle, XCircle, Clock } from "@phosphor-icons/react";
+import { CheckCircle, XCircle, Clock, CalendarBlank } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { PortalPageHeader } from "@/components/portal/portal-ui";
 import { getProgramBySlug } from "@/lib/data/programs";
+import { formatAppliedDate, formatAppliedDateTime, formatAppliedTime } from "@/lib/utils";
 
 interface Enrollment {
   id: string;
@@ -18,6 +19,7 @@ interface Enrollment {
   status: "pending" | "approved" | "rejected";
   paymentScreenshot?: string;
   createdAt: string;
+  reviewedAt?: string;
   institution: string;
 }
 
@@ -102,20 +104,32 @@ export default function AdminEnrollmentsPage() {
                 <div className="p-5 sm:p-6">
                   <div className="flex flex-col lg:flex-row gap-6">
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-3">
+                      <div className="mb-3 flex flex-wrap items-center gap-2">
                         <StatusBadge status={enrollment.status} />
-                        <span className="text-xs text-muted">
-                          {new Date(enrollment.createdAt).toLocaleDateString()}
+                        <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium text-muted">
+                          <CalendarBlank size={14} weight="duotone" className="text-primary" />
+                          Applied: {formatAppliedDateTime(enrollment.createdAt)}
                         </span>
                       </div>
                       <h2 className="text-xl font-bold">{enrollment.fullName}</h2>
                       <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                        <p>
+                          <strong>Applied On:</strong> {formatAppliedDate(enrollment.createdAt)}
+                        </p>
+                        <p>
+                          <strong>Applied At:</strong> {formatAppliedTime(enrollment.createdAt)}
+                        </p>
                         <p><strong>Email:</strong> {enrollment.email}</p>
                         <p><strong>WhatsApp:</strong> {enrollment.whatsapp}</p>
                         <p><strong>CNIC:</strong> {enrollment.cnic}</p>
                         <p><strong>Institution:</strong> {enrollment.institution}</p>
                         <p><strong>Course:</strong> {program?.title ?? enrollment.program}</p>
                         <p><strong>Module:</strong> {enrollment.level}</p>
+                        {enrollment.reviewedAt && enrollment.status !== "pending" && (
+                          <p className="sm:col-span-2">
+                            <strong>Reviewed:</strong> {formatAppliedDateTime(enrollment.reviewedAt)}
+                          </p>
+                        )}
                       </div>
                     </div>
 
