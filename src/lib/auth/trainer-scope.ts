@@ -6,7 +6,7 @@ export function getTrainerDesignation(programSlug?: string): string {
     case "web-development":
       return "Web Dev Trainer";
     case "app-development":
-      return "Flutter Trainer";
+      return "Mobile App Development Trainer";
     default:
       return "Trainer";
   }

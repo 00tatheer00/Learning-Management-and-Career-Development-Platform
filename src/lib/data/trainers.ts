@@ -17,11 +17,11 @@ export const trainers: Trainer[] = [
   {
     id: "trainer-talha",
     name: "Talha Iqbal",
-    designation: "Flutter Trainer",
+    designation: "Mobile App Development Trainer",
     expertise: ["Flutter", "Dart", "Firebase", "Mobile UI"],
     experience: "4+ years",
-    bio: "Flutter and mobile app development trainer. Helps students build and publish Android & iOS apps.",
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face",
+    bio: "Mobile app development trainer at EEST. Helps students build and publish Android & iOS apps with Flutter.",
+    image: "/trainers/talha-iqbal.png",
     social: {
       linkedin: "https://linkedin.com",
       github: "https://github.com",
