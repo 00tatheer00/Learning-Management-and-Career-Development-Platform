@@ -23,6 +23,7 @@ import {
   type EnrollmentFormData,
 } from "@/lib/validations/enrollment";
 import { PAYMENT_CONFIG, ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
+import { PaymentInfoCard } from "@/components/shared/payment-info-card";
 import { programs, formatModuleSchedule } from "@/lib/data/programs";
 import type { ProgramModule } from "@/types";
 import { cn } from "@/lib/utils";
@@ -761,15 +762,17 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                 payment only.
               </p>
             </div>
+
+            <PaymentInfoCard compact className="mb-5" />
+
             <div>
               <RequiredLabel htmlFor="paymentScreenshot">
-                Registration Payment Screenshot — PKR{" "}
+                Upload Payment Screenshot — PKR{" "}
                 {PAYMENT_CONFIG.registrationFee.toLocaleString()} only
               </RequiredLabel>
               <p className="text-xs text-muted mt-1 mb-2">
-                <strong>Required.</strong> Upload a clear screenshot of your Easypaisa payment to{" "}
-                <strong>{PAYMENT_CONFIG.easypaisa.number}</strong> (
-                {PAYMENT_CONFIG.easypaisa.accountName})
+                <strong>Required.</strong> Upload a clear screenshot after sending money to
+                the green Easypaisa number above.
               </p>
               <Input
                 id="paymentScreenshot"
