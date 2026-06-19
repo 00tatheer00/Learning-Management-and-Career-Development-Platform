@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { House, MagnifyingGlass, SignIn } from "@phosphor-icons/react";
 import { SiteLogo } from "@/components/shared/site-logo";
