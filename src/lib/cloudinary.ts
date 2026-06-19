@@ -70,3 +70,12 @@ export function getScreenshotUrl(paymentScreenshot?: string | null): string | nu
   if (paymentScreenshot.startsWith("http")) return paymentScreenshot;
   return null;
 }
+
+export async function deleteCloudinaryImage(publicId: string): Promise<void> {
+  try {
+    ensureCloudinary();
+    await cloudinary.uploader.destroy(publicId, { resource_type: "image" });
+  } catch (error) {
+    console.error("Cloudinary delete failed:", error);
+  }
+}

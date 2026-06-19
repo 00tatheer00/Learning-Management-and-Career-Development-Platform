@@ -65,6 +65,7 @@ export function ProgramModuleTimeline({
               </div>
             </div>
           </div>
+          </div>
         );
       })}
     </div>

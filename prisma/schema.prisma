@@ -31,6 +31,14 @@ enum SubmissionStatus {
   needs_revision
 }
 
+model PasswordResetToken {
+  id        String   @id @map("_id")
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
 model User {
   id             String   @id @map("_id")
   email          String   @unique
@@ -40,6 +48,7 @@ model User {
   phone          String?
   programSlug    String?
   level          String?
+  batch          String?  @default("Batch 1")
   trainerId      String?
   avatarInitials String?
   avatarUrl      String?
@@ -59,6 +68,7 @@ model Enrollment {
   fieldOfStudy              String
   program                   String
   level                     String
+  batch                     String           @default("Batch 1")
   learningMode              String
   hasLaptop                 String
   internetAvailable         String

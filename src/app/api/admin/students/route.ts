@@ -1,0 +1,124 @@
+import { NextResponse } from "next/server";
+import { getCurrentUser } from "@/lib/auth/session";
+import { createApiResponse } from "@/lib/api/enrollment";
+import { getUserById, updateUser, updateUserPasswordHash } from "@/lib/auth/users";
+import { hashPassword } from "@/lib/auth/password";
+import { generateStudentPassword } from "@/lib/auth/generate-password";
+import { sendPasswordResetNotifications } from "@/lib/notifications/password-reset-notice";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
+
+const patchSchema = z.discriminatedUnion("action", [
+  z.object({
+    id: z.string(),
+    action: z.literal("activate"),
+  }),
+  z.object({
+    id: z.string(),
+    action: z.literal("deactivate"),
+  }),
+  z.object({
+    id: z.string(),
+    action: z.literal("resetPassword"),
+  }),
+  z.object({
+    id: z.string(),
+    action: z.literal("update"),
+    level: z.string().min(1).optional(),
+    batch: z.string().min(1).optional(),
+  }),
+]);
+
+export async function PATCH(request: Request) {
+  const admin = await getCurrentUser();
+  if (!admin || admin.role !== "admin") {
+    return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), {
+      status: 403,
+    });
+  }
+
+  const body = await request.json();
+  const parsed = patchSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      createApiResponse(false, { message: parsed.error.issues[0]?.message }),
+      { status: 400 }
+    );
+  }
+
+  const student = await getUserById(parsed.data.id);
+  if (!student || student.role !== "student") {
+    return NextResponse.json(createApiResponse(false, { error: "Student not found" }), {
+      status: 404,
+    });
+  }
+
+  if (parsed.data.action === "activate") {
+    const updated = await updateUser(student.id, { isActive: true });
+    return NextResponse.json(
+      createApiResponse(true, { data: updated, message: "Student account activated." })
+    );
+  }
+
+  if (parsed.data.action === "deactivate") {
+    const updated = await updateUser(student.id, { isActive: false });
+    return NextResponse.json(
+      createApiResponse(true, { data: updated, message: "Student account deactivated." })
+    );
+  }
+
+  if (parsed.data.action === "resetPassword") {
+    const plainPassword = generateStudentPassword();
+    const passwordHash = await hashPassword(plainPassword);
+    await updateUserPasswordHash(student.id, passwordHash);
+
+    const enrollment = await prisma.enrollment.findFirst({
+      where: { email: student.email.toLowerCase(), status: "approved" },
+      orderBy: { createdAt: "desc" },
+    });
+
+    const whatsapp = student.phone ?? enrollment?.whatsapp ?? "";
+    const notifications = await sendPasswordResetNotifications({
+      fullName: student.name,
+      email: student.email,
+      whatsapp,
+      password: plainPassword,
+    });
+
+    const parts: string[] = [];
+    if (notifications.emailSent) parts.push("email");
+    if (notifications.whatsappSent) parts.push("WhatsApp");
+
+    const notificationSummary =
+      parts.length > 0
+        ? ` New password sent via ${parts.join(" and ")}.`
+        : notifications.warnings.length > 0
+          ? ` Password reset but notifications failed: ${notifications.warnings.join("; ")}`
+          : "";
+
+    return NextResponse.json(
+      createApiResponse(true, {
+        message: `Password reset.${notificationSummary}`,
+      })
+    );
+  }
+
+  if (!parsed.data.level && !parsed.data.batch) {
+    return NextResponse.json(
+      createApiResponse(false, { message: "Provide module or batch to update" }),
+      { status: 400 }
+    );
+  }
+
+  const updated = await updateUser(student.id, {
+    level: parsed.data.level ?? student.level,
+    batch: parsed.data.batch ?? student.batch,
+  });
+
+  return NextResponse.json(
+    createApiResponse(true, {
+      data: updated,
+      message: "Student module/batch updated.",
+    })
+  );
+}

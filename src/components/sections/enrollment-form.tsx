@@ -26,6 +26,10 @@ import { PAYMENT_CONFIG, ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/paymen
 import { programs, formatModuleSchedule } from "@/lib/data/programs";
 import type { ProgramModule } from "@/types";
 import { cn } from "@/lib/utils";
+import { Alert } from "@/components/ui/alert";
+import { useMediaQuery } from "@/hooks/use-media-query";
+import { toast } from "@/lib/ui/toast";
+import type { FieldPath } from "react-hook-form";
 
 function RequiredLabel({
   htmlFor,
@@ -202,6 +206,87 @@ interface EnrollmentFormProps {
   defaultProgram?: string;
 }
 
+const REGISTRATION_STEPS = [
+  {
+    id: "personal",
+    title: "Personal",
+    fields: ["fullName", "fatherName", "cnic", "whatsapp", "email"] as FieldPath<EnrollmentFormData>[],
+  },
+  {
+    id: "education",
+    title: "Education",
+    fields: ["institution", "classSemester", "fieldOfStudy"] as FieldPath<EnrollmentFormData>[],
+  },
+  {
+    id: "program",
+    title: "Program",
+    fields: ["program", "level"] as FieldPath<EnrollmentFormData>[],
+  },
+  {
+    id: "resources",
+    title: "Resources",
+    fields: ["hasLaptop", "internetAvailable"] as FieldPath<EnrollmentFormData>[],
+  },
+  { id: "payment", title: "Payment", fields: [] as FieldPath<EnrollmentFormData>[] },
+  {
+    id: "agreement",
+    title: "Agreement",
+    fields: ["confirmInfoCorrect", "agreeToPolicies"] as FieldPath<EnrollmentFormData>[],
+  },
+] as const;
+
+function RegistrationStepper({
+  currentStep,
+  onStepClick,
+}: {
+  currentStep: number;
+  onStepClick?: (step: number) => void;
+}) {
+  return (
+    <div className="mb-6 md:hidden">
+      <div className="flex items-center justify-between gap-1">
+        {REGISTRATION_STEPS.map((step, index) => {
+          const isActive = index === currentStep;
+          const isComplete = index < currentStep;
+          return (
+            <button
+              key={step.id}
+              type="button"
+              onClick={() => onStepClick?.(index)}
+              className="flex flex-1 flex-col items-center gap-1"
+            >
+              <span
+                className={cn(
+                  "flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-colors",
+                  isActive
+                    ? "bg-primary text-primary-foreground"
+                    : isComplete
+                      ? "bg-primary/15 text-primary"
+                      : "bg-surface text-muted border border-border"
+                )}
+              >
+                {index + 1}
+              </span>
+              <span
+                className={cn(
+                  "text-[10px] font-medium leading-tight text-center",
+                  isActive ? "text-primary" : "text-muted"
+                )}
+              >
+                {step.title}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+      <p className="mt-3 text-center text-sm font-semibold text-foreground">
+        Step {currentStep + 1} of {REGISTRATION_STEPS.length}:{" "}
+        {REGISTRATION_STEPS[currentStep]?.title}
+      </p>
+    </div>
+  );
+}
+
 export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -210,6 +295,8 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
   const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
+  const [currentStep, setCurrentStep] = useState(0);
+  const isMobileStepper = useMediaQuery("(max-width: 767px)");
 
   useEffect(() => {
     if (!isSuccess) return;
@@ -233,6 +320,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
     setValue,
     watch,
     reset,
+    trigger,
     formState: { errors },
   } = useForm<EnrollmentFormData>({
     resolver: zodResolver(enrollmentSchema),
@@ -289,10 +377,41 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
     setScreenshotPreview(URL.createObjectURL(file));
   };
 
+  const showStep = (stepIndex: number) => !isMobileStepper || currentStep === stepIndex;
+
+  const goToNextStep = async () => {
+    const step = REGISTRATION_STEPS[currentStep];
+    if (step.fields.length > 0) {
+      const valid = await trigger(step.fields);
+      if (!valid) {
+        toast.error("Please complete all required fields on this step");
+        return;
+      }
+    }
+
+    if (step.id === "payment") {
+      const fileValidation = validatePaymentScreenshot(screenshotFile ?? undefined);
+      if (fileValidation) {
+        setScreenshotError(fileValidation);
+        toast.error("Payment screenshot required", fileValidation);
+        return;
+      }
+    }
+
+    setCurrentStep((value) => Math.min(value + 1, REGISTRATION_STEPS.length - 1));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const goToPreviousStep = () => {
+    setCurrentStep((value) => Math.max(value - 1, 0));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const onSubmit = async (data: EnrollmentFormData) => {
     const fileValidation = validatePaymentScreenshot(screenshotFile ?? undefined);
     if (fileValidation) {
       setScreenshotError(fileValidation);
+      toast.error("Payment screenshot required", fileValidation);
       document.getElementById("paymentScreenshot")?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
@@ -321,12 +440,18 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
       }
 
       setIsSuccess(true);
+      toast.success(
+        "Registration submitted!",
+        "We will verify your payment and contact you within 2–3 business days."
+      );
       reset();
       setScreenshotFile(null);
       setScreenshotPreview(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      const message = err instanceof Error ? err.message : "Something went wrong";
+      setError(message);
+      toast.error("Registration failed", message);
     } finally {
       setIsSubmitting(false);
     }
@@ -378,6 +503,14 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
         className="rounded-2xl border border-border bg-background p-6 lg:p-8 space-y-8 shadow-sm"
         noValidate
       >
+          {isMobileStepper && (
+            <RegistrationStepper
+              currentStep={currentStep}
+              onStepClick={(step) => step <= currentStep && setCurrentStep(step)}
+            />
+          )}
+
+          {showStep(0) && (
           <FormSection title="Personal Information">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="sm:col-span-2">
@@ -450,7 +583,9 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
               </div>
             </div>
           </FormSection>
+          )}
 
+          {showStep(1) && (
           <FormSection title="Education Details">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="sm:col-span-2">
@@ -493,7 +628,9 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
               </div>
             </div>
           </FormSection>
+          )}
 
+          {showStep(2) && (
           <FormSection title="Program Selection">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="sm:col-span-2">
@@ -571,7 +708,9 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
               </div>
             </div>
           </FormSection>
+          )}
 
+          {showStep(3) && (
           <FormSection title="Resources &amp; Requirements">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <Controller
@@ -612,7 +751,9 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
               </span>
             </div>
           </FormSection>
+          )}
 
+          {showStep(4) && (
           <FormSection title="Payment Verification">
             <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 mb-4">
               <p className="text-sm font-semibold text-emerald-800">
@@ -655,7 +796,9 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
               )}
             </div>
           </FormSection>
+          )}
 
+          {showStep(5) && (
           <FormSection title="Agreement">
             <div className="space-y-4">
               <Controller
@@ -714,13 +857,24 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
               <FieldError message={errors.agreeToPolicies?.message} />
             </div>
           </FormSection>
-
-          {error && (
-            <p className="text-sm text-red-600 text-center" role="alert">
-              {error}
-            </p>
           )}
 
+          {error && (
+            <Alert variant="error">{error}</Alert>
+          )}
+
+          {isMobileStepper && currentStep < REGISTRATION_STEPS.length - 1 ? (
+            <div className="flex gap-3">
+              {currentStep > 0 && (
+                <Button type="button" variant="secondary" className="flex-1" onClick={goToPreviousStep}>
+                  Back
+                </Button>
+              )}
+              <Button type="button" className="flex-1" onClick={goToNextStep}>
+                Next
+              </Button>
+            </div>
+          ) : (
           <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
             {isSubmitting ? (
               <>
@@ -731,6 +885,13 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
               "Submit Registration"
             )}
           </Button>
+          )}
+
+          {isMobileStepper && currentStep === REGISTRATION_STEPS.length - 1 && currentStep > 0 && (
+            <Button type="button" variant="secondary" className="w-full" onClick={goToPreviousStep}>
+              Back
+            </Button>
+          )}
         </motion.form>
     </div>
   );

@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { requireTrainerProgram } from "@/lib/auth/trainer-scope";
 import { createLiveSession } from "@/lib/api/portal-data";
 import { createApiResponse } from "@/lib/api/enrollment";
+import { notifyStudentsOfLiveClass } from "@/lib/notifications/live-class-notice";
 
 const schema = z.object({
   title: z.string().min(2),
@@ -48,6 +49,14 @@ export async function POST(request: Request) {
       notes: parsed.data.notes,
       trainerId: user.trainerId ?? user.id,
       trainerName: user.name,
+    });
+
+    void notifyStudentsOfLiveClass({
+      programSlug,
+      title: session.title,
+      date: session.date,
+      time: session.time,
+      trainerName: session.trainerName,
     });
 
     return NextResponse.json(createApiResponse(true, { data: session }));

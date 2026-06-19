@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SITE_CONFIG } from "@/lib/constants";
+import { toast } from "@/lib/ui/toast";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -37,11 +38,25 @@ export function ContactContent() {
 
   const onSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log("Contact form:", data);
-    setIsSuccess(true);
-    reset();
-    setIsSubmitting(false);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const result = await res.json();
+      if (!res.ok) {
+        toast.error("Could not send message", result.message ?? "Try again later.");
+        return;
+      }
+      setIsSuccess(true);
+      toast.success("Message sent!", "We will reply within 1–2 business days.");
+      reset();
+    } catch {
+      toast.error("Something went wrong", "Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

@@ -16,6 +16,13 @@ export async function sendApprovalWhatsApp(
   phone: string,
   message: string
 ): Promise<{ sent: boolean; error?: string }> {
+  return sendWhatsAppMessage(phone, message);
+}
+
+export async function sendWhatsAppMessage(
+  phone: string,
+  message: string
+): Promise<{ sent: boolean; error?: string }> {
   const instanceId = process.env.ULTRAMSG_INSTANCE_ID;
   const token = process.env.ULTRAMSG_TOKEN;
 

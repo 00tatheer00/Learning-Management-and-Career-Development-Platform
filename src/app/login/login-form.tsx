@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { toast } from "@/lib/ui/toast";
 import type { UserRole } from "@/types/portal";
 
 const ROLES: {
@@ -39,14 +40,14 @@ const ROLES: {
     label: "Trainer",
     icon: ChalkboardTeacher,
     hint: "Manage students, classes & homework",
-    demo: "tatheer@eest.com / tatheer123",
+    demo: "tatheer@eest.com / tatheer@321",
   },
   {
     role: "admin",
     label: "Admin",
     icon: ShieldCheck,
     hint: "Approve registrations & manage portal",
-    demo: "admin@eest.com / admin123",
+    demo: "admin@eest.com / admin@321",
   },
 ];
 
@@ -79,20 +80,25 @@ export default function LoginForm() {
       });
 
       if (result?.error) {
-        setError(
+        const message =
           result.status === 500
             ? "Server error. Check Vercel env vars (NEXTAUTH_URL, DATABASE_URL)."
-            : "Wrong email or password. Try again."
-        );
+            : "Wrong email or password. Try again.";
+        setError(message);
+        toast.error("Login failed", message);
         return;
       }
+
+      toast.success("Welcome back!", "Redirecting to your portal...");
 
       const session = await getSession();
       const role = session?.user?.role ?? selectedRole;
       router.push(getPortalHome(role));
       router.refresh();
     } catch {
-      setError("Something went wrong. Check your internet and try again.");
+      const message = "Something went wrong. Check your internet and try again.";
+      setError(message);
+      toast.error("Login failed", message);
     } finally {
       setLoading(false);
     }
@@ -171,6 +177,14 @@ export default function LoginForm() {
                 >
                   {showPassword ? <EyeSlash size={20} /> : <Eye size={20} />}
                 </button>
+              </div>
+              <div className="mt-2 text-right">
+                <Link
+                  href="/forgot-password"
+                  className="text-sm text-primary font-medium hover:underline"
+                >
+                  Forgot password?
+                </Link>
               </div>
             </div>
 

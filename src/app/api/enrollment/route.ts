@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
+import { getBatchForProgram } from "@/lib/constants/batch";
 import { createApiResponse } from "@/lib/api/enrollment";
-import { saveEnrollment, getEnrollmentByEmail } from "@/lib/api/portal-data";
+import { saveEnrollment, getEnrollmentByEmail, getEnrollmentByCnic } from "@/lib/api/portal-data";
+import { sendAdminNewRegistrationAlert } from "@/lib/notifications/admin-registration-alert";
 import { uploadPaymentScreenshot } from "@/lib/cloudinary";
 
 const cnicRegex = /^\d{13}$/;
@@ -108,15 +110,47 @@ export async function POST(request: Request) {
       );
     }
 
+    const existingCnic = await getEnrollmentByCnic(validated.data.cnic);
+    if (
+      existingCnic &&
+      (existingCnic.status === "pending" || existingCnic.status === "approved")
+    ) {
+      return NextResponse.json(
+        createApiResponse(false, {
+          error: "CNIC already registered",
+          message:
+            existingCnic.status === "pending"
+              ? "This CNIC already has a pending registration. Please wait for admin approval."
+              : "This CNIC is already registered. Contact admin if you need help.",
+        }),
+        { status: 409 }
+      );
+    }
+
     const id = crypto.randomUUID();
     const paymentUpload = await uploadPaymentScreenshot(screenshot, id);
+    const createdAt = new Date().toISOString();
+    const batch = getBatchForProgram(validated.data.program);
 
     await saveEnrollment({
       ...validated.data,
+      batch,
       id,
       paymentScreenshot: paymentUpload.url,
       paymentScreenshotPublicId: paymentUpload.publicId,
-      createdAt: new Date().toISOString(),
+      createdAt,
+    });
+
+    void sendAdminNewRegistrationAlert({
+      fullName: validated.data.fullName,
+      email: validated.data.email,
+      whatsapp: validated.data.whatsapp,
+      program: validated.data.program,
+      level: validated.data.level,
+      batch,
+      institution: validated.data.institution,
+      createdAt,
+      enrollmentId: id,
     });
 
     return NextResponse.json(

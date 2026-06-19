@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PortalPageHeader } from "@/components/portal/portal-ui";
+import { toast } from "@/lib/ui/toast";
 
 interface TrainerInfo {
   programSlug: string;
@@ -30,7 +31,6 @@ export default function TrainerAssignmentsPage() {
   const [trainer, setTrainer] = useState<TrainerInfo | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
   const [form, setForm] = useState({ title: "", description: "", dueDate: "" });
   const [feedbackMap, setFeedbackMap] = useState<Record<string, string>>({});
 
@@ -60,24 +60,32 @@ export default function TrainerAssignmentsPage() {
     });
     const data = await res.json();
     if (data.success) {
-      setMessage("Assignment created! ✓");
+      toast.success("Assignment created!", "Students can now see it in their portal.");
       setShowForm(false);
       setForm({ title: "", description: "", dueDate: "" });
       load();
     } else {
-      setMessage(data.error || data.message || "Failed to create assignment.");
+      toast.error(data.error || data.message || "Failed to create assignment.");
     }
     setLoading(false);
   };
 
   const reviewSubmission = async (id: string, status: "approved" | "needs_revision") => {
-    await fetch("/api/trainer/submissions", {
+    const res = await fetch("/api/trainer/submissions", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id, status, feedback: feedbackMap[id] ?? "" }),
     });
-    setMessage(status === "approved" ? "Marked as approved ✓" : "Sent back for revision");
-    load();
+    const data = await res.json();
+    if (data.success) {
+      toast.success(
+        status === "approved" ? "Submission approved" : "Sent back for revision",
+        "Student notified by email and WhatsApp."
+      );
+      load();
+    } else {
+      toast.error(data.error || data.message || "Review failed.");
+    }
   };
 
   return (
@@ -94,12 +102,6 @@ export default function TrainerAssignmentsPage() {
           {showForm ? "Cancel" : "+ New Assignment"}
         </Button>
       </PortalPageHeader>
-
-      {message && (
-        <p className="mb-4 text-center font-medium text-emerald-700 bg-emerald-50 rounded-xl p-3">
-          {message}
-        </p>
-      )}
 
       {showForm && trainer && (
         <form

@@ -5,6 +5,7 @@ import { CheckCircle, Clock } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { PortalPageHeader } from "@/components/portal/portal-ui";
+import { toast } from "@/lib/ui/toast";
 
 interface Assignment {
   id: string;
@@ -27,7 +28,6 @@ export default function StudentAssignmentsPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
 
   useEffect(() => {
     fetch("/api/student/data")
@@ -45,11 +45,10 @@ export default function StudentAssignmentsPage() {
 
   const handleSubmit = async (assignmentId: string) => {
     if (!content.trim()) {
-      setMessage("Please write something before submitting.");
+      toast.warning("Please write something before submitting.");
       return;
     }
     setLoading(true);
-    setMessage("");
     try {
       const res = await fetch("/api/student/submissions", {
         method: "POST",
@@ -58,17 +57,17 @@ export default function StudentAssignmentsPage() {
       });
       const data = await res.json();
       if (data.success) {
-        setMessage("Assignment submitted successfully! ✓");
+        toast.success("Assignment submitted!", "Your trainer will review it soon.");
         setContent("");
         setSelectedId(null);
         const refresh = await fetch("/api/student/data");
         const refreshData = await refresh.json();
         if (refreshData.success) setSubmissions(refreshData.data.submissions ?? []);
       } else {
-        setMessage(data.message || "Failed to submit.");
+        toast.error(data.message || "Failed to submit.");
       }
     } catch {
-      setMessage("Error submitting. Try again.");
+      toast.error("Error submitting. Try again.");
     } finally {
       setLoading(false);
     }
@@ -80,12 +79,6 @@ export default function StudentAssignmentsPage() {
         title="Assignments"
         description="Read the task, write your answer, and click Submit. Your trainer will review it."
       />
-
-      {message && (
-        <p className="mb-4 text-center font-medium text-emerald-700 bg-emerald-50 rounded-xl p-3">
-          {message}
-        </p>
-      )}
 
       <div className="space-y-4">
         {assignments.map((assignment) => {

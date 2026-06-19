@@ -12,6 +12,7 @@ export interface User {
   phone?: string;
   programSlug?: string;
   level?: string;
+  batch?: string;
   trainerId?: string;
   avatarInitials?: string;
   avatarUrl?: string;
@@ -86,6 +87,7 @@ export interface PortalUser {
   phone?: string;
   programSlug?: string;
   level?: string;
+  batch?: string;
   trainerId?: string;
   avatarInitials?: string;
   avatarUrl?: string;

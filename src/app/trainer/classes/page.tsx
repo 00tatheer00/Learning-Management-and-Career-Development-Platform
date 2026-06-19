@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PortalPageHeader } from "@/components/portal/portal-ui";
+import { toast } from "@/lib/ui/toast";
 
 interface LiveSession {
   id: string;
@@ -27,7 +28,6 @@ export default function TrainerClassesPage() {
   const [trainer, setTrainer] = useState<TrainerInfo | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
   const [form, setForm] = useState({
     title: "",
     date: "",
@@ -54,7 +54,6 @@ export default function TrainerClassesPage() {
     e.preventDefault();
     if (!trainer) return;
     setLoading(true);
-    setMessage("");
     try {
       const res = await fetch("/api/trainer/sessions", {
         method: "POST",
@@ -63,15 +62,15 @@ export default function TrainerClassesPage() {
       });
       const data = await res.json();
       if (data.success) {
-        setMessage("Class scheduled! Students can see it now. ✓");
+        toast.success("Class scheduled!", "Students notified on WhatsApp.");
         setShowForm(false);
         setForm({ title: "", date: "", time: "07:00 PM", meetLink: "", notes: "" });
         load();
       } else {
-        setMessage(data.message || data.error || "Failed to create class.");
+        toast.error(data.message || data.error || "Failed to create class.");
       }
     } catch {
-      setMessage("Error. Try again.");
+      toast.error("Error. Try again.");
     } finally {
       setLoading(false);
     }
@@ -91,12 +90,6 @@ export default function TrainerClassesPage() {
           {showForm ? "Cancel" : "+ Add New Class"}
         </Button>
       </PortalPageHeader>
-
-      {message && (
-        <p className="mb-4 text-center font-medium text-emerald-700 bg-emerald-50 rounded-xl p-3">
-          {message}
-        </p>
-      )}
 
       {showForm && trainer && (
         <form

@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getUsersByRole } from "@/lib/auth/users";
+import { DEFAULT_BATCH_NAME } from "@/lib/constants/batch";
 import type {
   Assignment,
   AssignmentSubmission,
@@ -22,6 +23,7 @@ function mapEnrollment(record: {
   fieldOfStudy: string;
   program: string;
   level: string;
+  batch: string | null;
   learningMode: string;
   hasLaptop: string;
   internetAvailable: string;
@@ -48,6 +50,7 @@ function mapEnrollment(record: {
     fieldOfStudy: record.fieldOfStudy,
     program: record.program,
     level: record.level,
+    batch: record.batch ?? DEFAULT_BATCH_NAME,
     learningMode: record.learningMode,
     hasLaptop: record.hasLaptop as "yes" | "no",
     internetAvailable: record.internetAvailable as "yes" | "no",
@@ -67,6 +70,14 @@ export type LiveSessionPreview = Omit<LiveSession, "meetLink">;
 export async function getEnrollmentByEmail(email: string) {
   return prisma.enrollment.findFirst({
     where: { email: email.toLowerCase() },
+    orderBy: { createdAt: "desc" },
+  });
+}
+
+export async function getEnrollmentByCnic(cnic: string) {
+  const normalized = cnic.replace(/[-\s]/g, "");
+  return prisma.enrollment.findFirst({
+    where: { cnic: normalized },
     orderBy: { createdAt: "desc" },
   });
 }
@@ -103,6 +114,7 @@ export async function saveEnrollment(
       fieldOfStudy: enrollment.fieldOfStudy,
       program: enrollment.program,
       level: enrollment.level,
+      batch: enrollment.batch,
       learningMode: enrollment.learningMode,
       hasLaptop: enrollment.hasLaptop,
       internetAvailable: enrollment.internetAvailable,

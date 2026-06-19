@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/session";
-import { getEnrollments, updateEnrollmentStatus, getEnrollmentById } from "@/lib/api/portal-data";
-import { createUserWithPasswordHash, getUserByEmail, updateUserPasswordHash } from "@/lib/auth/users";
-import { hashPassword } from "@/lib/auth/password";
-import { generateStudentPassword } from "@/lib/auth/generate-password";
 import { createApiResponse } from "@/lib/api/enrollment";
-import { sendApprovalWelcomeNotifications } from "@/lib/notifications/approval-welcome";
+import {
+  approveEnrollmentAndCreateAccount,
+  rejectEnrollment,
+  deleteEnrollmentRegistration,
+} from "@/lib/api/admin-enrollment-actions";
+import { getAdminEnrollmentRows } from "@/lib/api/admin-enrollments";
 import { z } from "zod";
 
 export async function GET() {
@@ -15,7 +16,8 @@ export async function GET() {
       status: 403,
     });
   }
-  const enrollments = await getEnrollments();
+
+  const enrollments = await getAdminEnrollmentRows();
   return NextResponse.json(createApiResponse(true, { data: enrollments }));
 }
 
@@ -43,74 +45,107 @@ export async function PATCH(request: Request) {
     );
   }
 
-  const enrollment = await updateEnrollmentStatus(
-    parsed.data.id,
-    parsed.data.status,
-    user.id,
-    parsed.data.adminNotes
-  );
-
-  if (!enrollment) {
-    return NextResponse.json(createApiResponse(false, { error: "Not found" }), {
-      status: 404,
-    });
+  if (parsed.data.status === "rejected" && !parsed.data.adminNotes?.trim()) {
+    return NextResponse.json(
+      createApiResponse(false, { message: "Rejection reason is required" }),
+      { status: 400 }
+    );
   }
 
-  let notificationSummary = "";
+  const result =
+    parsed.data.status === "approved"
+      ? await approveEnrollmentAndCreateAccount(
+          parsed.data.id,
+          user.id,
+          parsed.data.adminNotes
+        )
+      : await rejectEnrollment(parsed.data.id, user.id, parsed.data.adminNotes);
 
-  if (parsed.data.status === "approved" && parsed.data.createStudentAccount) {
-    const enrollmentRecord = await getEnrollmentById(parsed.data.id);
-    if (enrollmentRecord) {
-      const plainPassword = generateStudentPassword();
-      const passwordHash = await hashPassword(plainPassword);
-      const avatarInitials = enrollment.fullName
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase();
-
-      const existing = await getUserByEmail(enrollment.email);
-      if (!existing) {
-        await createUserWithPasswordHash({
-          email: enrollment.email,
-          passwordHash,
-          role: "student",
-          name: enrollment.fullName,
-          phone: enrollment.whatsapp,
-          programSlug: enrollment.program,
-          level: enrollment.level,
-          isActive: true,
-          avatarInitials,
-        });
-      } else {
-        await updateUserPasswordHash(existing.id, passwordHash);
-      }
-
-      const notifications = await sendApprovalWelcomeNotifications({
-        fullName: enrollmentRecord.fullName,
-        email: enrollmentRecord.email,
-        whatsapp: enrollmentRecord.whatsapp,
-        program: enrollmentRecord.program,
-        level: enrollmentRecord.level,
-        password: plainPassword,
-      });
-
-      const parts: string[] = [];
-      if (notifications.emailSent) parts.push("email sent");
-      if (notifications.whatsappSent) parts.push("WhatsApp sent");
-      if (parts.length > 0) {
-        notificationSummary = ` Login details ${parts.join(" and ")}.`;
-      } else if (notifications.warnings.length > 0) {
-        notificationSummary = ` Account ready, but notifications failed: ${notifications.warnings.join("; ")}`;
-      }
-    }
+  if (!result.enrollment) {
+    return NextResponse.json(createApiResponse(false, { error: result.error ?? "Not found" }), {
+      status: result.error === "Enrollment not found" ? 404 : 400,
+    });
   }
 
   return NextResponse.json(
     createApiResponse(true, {
-      data: enrollment,
-      message: `Registration ${parsed.data.status}.${notificationSummary}`,
+      data: result.enrollment,
+      message: result.message,
     })
   );
+}
+
+const bulkSchema = z.object({
+  ids: z.array(z.string()).min(1).max(50),
+});
+
+export async function POST(request: Request) {
+  const user = await getCurrentUser();
+  if (!user || user.role !== "admin") {
+    return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), {
+      status: 403,
+    });
+  }
+
+  const body = await request.json();
+  const parsed = bulkSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      createApiResponse(false, { message: parsed.error.issues[0]?.message }),
+      { status: 400 }
+    );
+  }
+
+  const results: { id: string; success: boolean; message?: string; error?: string }[] = [];
+
+  for (const id of parsed.data.ids) {
+    const result = await approveEnrollmentAndCreateAccount(id, user.id);
+    results.push({
+      id,
+      success: Boolean(result.enrollment),
+      message: result.message,
+      error: result.error,
+    });
+  }
+
+  const approved = results.filter((item) => item.success).length;
+  const failed = results.length - approved;
+
+  return NextResponse.json(
+    createApiResponse(true, {
+      data: results,
+      message: `${approved} approved${failed > 0 ? `, ${failed} failed` : ""}.`,
+    })
+  );
+}
+
+const deleteSchema = z.object({
+  id: z.string(),
+});
+
+export async function DELETE(request: Request) {
+  const user = await getCurrentUser();
+  if (!user || user.role !== "admin") {
+    return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), {
+      status: 403,
+    });
+  }
+
+  const body = await request.json();
+  const parsed = deleteSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      createApiResponse(false, { message: parsed.error.issues[0]?.message }),
+      { status: 400 }
+    );
+  }
+
+  const result = await deleteEnrollmentRegistration(parsed.data.id);
+  if (!result.success) {
+    return NextResponse.json(createApiResponse(false, { error: result.error ?? "Delete failed" }), {
+      status: result.error === "Enrollment not found" ? 404 : 400,
+    });
+  }
+
+  return NextResponse.json(createApiResponse(true, { message: result.message }));
 }

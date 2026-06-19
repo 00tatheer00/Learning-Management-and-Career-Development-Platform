@@ -77,6 +77,7 @@ export interface EnrollmentPayload {
   fieldOfStudy: string;
   program: string;
   level: string;
+  batch: string;
   learningMode: string;
   hasLaptop: "yes" | "no";
   internetAvailable: "yes" | "no";

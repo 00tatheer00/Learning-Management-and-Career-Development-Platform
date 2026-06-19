@@ -4,6 +4,8 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { requireTrainerProgram } from "@/lib/auth/trainer-scope";
 import { getAssignments, updateSubmission } from "@/lib/api/portal-data";
 import { createApiResponse } from "@/lib/api/enrollment";
+import { prisma } from "@/lib/prisma";
+import { sendSubmissionReviewNotifications } from "@/lib/notifications/submission-review-notice";
 
 const schema = z.object({
   id: z.string(),
@@ -34,6 +36,23 @@ export async function PATCH(request: Request) {
       assignments.filter((a) => a.trainerId === trainerId).map((a) => a.id)
     );
 
+    const existing = await prisma.assignmentSubmission.findUnique({
+      where: { id: parsed.data.id },
+    });
+
+    if (!existing) {
+      return NextResponse.json(createApiResponse(false, { error: "Not found" }), {
+        status: 404,
+      });
+    }
+
+    if (!ownedIds.has(existing.assignmentId)) {
+      return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), {
+        status: 403,
+      });
+    }
+
+    const assignment = assignments.find((item) => item.id === existing.assignmentId);
     const submission = await updateSubmission(parsed.data.id, {
       status: parsed.data.status,
       feedback: parsed.data.feedback,
@@ -45,9 +64,15 @@ export async function PATCH(request: Request) {
       });
     }
 
-    if (!ownedIds.has(submission.assignmentId)) {
-      return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), {
-        status: 403,
+    const student = await prisma.user.findUnique({ where: { id: existing.studentId } });
+    if (student && assignment) {
+      void sendSubmissionReviewNotifications({
+        studentName: student.name,
+        email: student.email,
+        whatsapp: student.phone ?? undefined,
+        assignmentTitle: assignment.title,
+        status: parsed.data.status,
+        feedback: parsed.data.feedback,
       });
     }
 

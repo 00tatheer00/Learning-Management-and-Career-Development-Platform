@@ -144,8 +144,9 @@ npm run db:seed
 
 | Role | Email | Password |
 |------|-------|----------|
-| Admin | admin@eest.com | admin123 |
-| Trainer | trainer@eest.com | trainer123 |
+| Admin | admin@eest.com | admin@321 |
+| Trainer (Web) | tatheer@eest.com | tatheer@321 |
+| Trainer (App) | talha@eest.com | talha@321 |
 | Student | student@eest.com | student123 |
 
 ---

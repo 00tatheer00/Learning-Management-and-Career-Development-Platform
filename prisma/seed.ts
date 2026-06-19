@@ -7,7 +7,7 @@ const DEFAULT_USERS = [
   {
     id: "admin-1",
     email: "admin@eest.com",
-    password: "admin123",
+    password: "admin@321",
     role: "admin" as const,
     name: "Admin User",
     phone: "03275792600",
@@ -16,7 +16,7 @@ const DEFAULT_USERS = [
   {
     id: "trainer-tatheer",
     email: "tatheer@eest.com",
-    password: "tatheer123",
+    password: "tatheer@321",
     role: "trainer" as const,
     name: "S Tatheer Hussain",
     phone: "03275792600",
@@ -27,7 +27,7 @@ const DEFAULT_USERS = [
   {
     id: "trainer-talha",
     email: "talha@eest.com",
-    password: "talha123",
+    password: "talha@321",
     role: "trainer" as const,
     name: "Talha Iqbal",
     phone: "03001234567",
@@ -44,6 +44,7 @@ const DEFAULT_USERS = [
     phone: "03001234567",
     programSlug: "web-development",
     level: "HTML & CSS",
+    batch: "Batch 1",
     avatarInitials: "DS",
   },
 ];

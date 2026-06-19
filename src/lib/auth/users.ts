@@ -84,6 +84,7 @@ function mapUser(user: {
   phone: string | null;
   programSlug: string | null;
   level: string | null;
+  batch: string | null;
   trainerId: string | null;
   avatarInitials: string | null;
   avatarUrl: string | null;
@@ -99,6 +100,7 @@ function mapUser(user: {
     phone: user.phone ?? undefined,
     programSlug: user.programSlug ?? undefined,
     level: user.level ?? undefined,
+    batch: user.batch ?? undefined,
     trainerId: user.trainerId ?? undefined,
     avatarInitials: user.avatarInitials ?? undefined,
     avatarUrl: user.avatarUrl ?? undefined,
