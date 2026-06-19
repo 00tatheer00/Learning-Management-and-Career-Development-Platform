@@ -89,16 +89,12 @@ export function ProgramsSection() {
                   </ul>
                 </CardContent>
                 <CardFooter>
-                  {program.category === "active" ? (
+                  {program.category === "active" && (
                     <Button className="w-full" asChild>
                       <Link href={`/programs/${program.slug}`}>
                         View Program
                         <ArrowRight className="w-4 h-4" aria-hidden="true" />
                       </Link>
-                    </Button>
-                  ) : (
-                    <Button className="w-full" variant="secondary" disabled>
-                      Notify Me — Coming Soon
                     </Button>
                   )}
                 </CardFooter>

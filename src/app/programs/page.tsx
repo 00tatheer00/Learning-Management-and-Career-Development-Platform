@@ -83,16 +83,12 @@ export default function ProgramsPage() {
                   </ul>
                 </CardContent>
                 <CardFooter>
-                  {program.category === "active" ? (
+                  {program.category === "active" && (
                     <Button className="w-full" asChild>
                       <Link href={`/programs/${program.slug}`}>
                         View Details
                         <ArrowRight className="w-4 h-4" />
                       </Link>
-                    </Button>
-                  ) : (
-                    <Button className="w-full" variant="secondary" disabled>
-                      Coming Soon
                     </Button>
                   )}
                 </CardFooter>
