@@ -5,7 +5,7 @@ export const MODULE_SCHEDULE = {
   hoursPerDay: 1.5,
 } as const;
 
-function module(
+function createProgramModule(
   name: string,
   subtitle: string,
   duration: string,
@@ -37,22 +37,22 @@ export const programs: Program[] = [
       "Ship full-stack projects for your portfolio",
     ],
     modules: [
-      module(
+      createProgramModule(
         "HTML & CSS",
         "For very beginners learning web for the first time",
         "1 month"
       ),
-      module(
+      createProgramModule(
         "JavaScript",
         "For those who want to learn a programming language easily",
         "3 weeks"
       ),
-      module(
+      createProgramModule(
         "React",
         "To build websites with fast, modern UI",
         "3 weeks"
       ),
-      module(
+      createProgramModule(
         "Backend + Database",
         "Node.js, Express, and MongoDB for full-stack apps",
         "1 month"
@@ -75,9 +75,9 @@ export const programs: Program[] = [
       "Publish apps to the Play Store and App Store",
     ],
     modules: [
-      module("Dart & OOP", "Programming foundations for mobile development", "3 weeks"),
-      module("Flutter Frontend", "Widgets, layouts, and polished mobile UI", "3 weeks"),
-      module("Firebase & APIs", "Authentication, cloud data, and backend integration", "3 weeks"),
+      createProgramModule("Dart & OOP", "Programming foundations for mobile development", "3 weeks"),
+      createProgramModule("Flutter Frontend", "Widgets, layouts, and polished mobile UI", "3 weeks"),
+      createProgramModule("Firebase & APIs", "Authentication, cloud data, and backend integration", "3 weeks"),
     ],
   },
   {

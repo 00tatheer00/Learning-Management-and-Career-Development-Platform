@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
   ArrowRight,
@@ -45,7 +47,7 @@ export function ProgramCard({ program, className }: ProgramCardProps) {
         className
       )}
     >
-      <article className="flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-border/70 bg-background shadow-[0_12px_40px_-18px_rgba(15,23,42,0.35)] transition-all duration-500 group-hover:border-primary/25 group-hover:shadow-[0_28px_60px_-24px_rgba(234,88,12,0.28)]">
+      <div className="flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-border/70 bg-background shadow-[0_12px_40px_-18px_rgba(15,23,42,0.35)] transition-all duration-500 group-hover:border-primary/25 group-hover:shadow-[0_28px_60px_-24px_rgba(234,88,12,0.28)]">
         <div
           className={cn(
             "relative overflow-hidden bg-gradient-to-br px-6 pb-8 pt-6",
@@ -54,11 +56,7 @@ export function ProgramCard({ program, className }: ProgramCardProps) {
         >
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,0.2),transparent_45%)]" />
           <div className="relative z-10 flex items-start justify-between gap-3">
-            <span
-              className={cn(
-                "inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15 text-white backdrop-blur-sm"
-              )}
-            >
+            <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15 text-white backdrop-blur-sm">
               <Icon size={24} weight="duotone" aria-hidden="true" />
             </span>
             <span
@@ -132,7 +130,7 @@ export function ProgramCard({ program, className }: ProgramCardProps) {
             />
           </div>
         </div>
-      </article>
+      </div>
     </Link>
   );
 }

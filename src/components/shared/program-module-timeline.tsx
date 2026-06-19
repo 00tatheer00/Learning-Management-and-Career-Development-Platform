@@ -1,4 +1,4 @@
-import { CalendarDots, Clock } from "@phosphor-icons/react";
+import { CalendarDots, Clock } from "@phosphor-icons/react/ssr";
 import { formatModuleSchedule } from "@/lib/data/programs";
 import type { ProgramModule } from "@/types";
 
