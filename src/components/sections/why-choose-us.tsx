@@ -115,20 +115,19 @@ export function WhyChooseUsSection() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {features.map((item, index) => (
-              <motion.button
+              <motion.div
                 key={item.title}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.05 }}
-                onClick={() => setActiveIndex(index)}
+                onMouseEnter={() => setActiveIndex(index)}
                 className={cn(
                   "group text-left p-5 rounded-xl border transition-all duration-300",
                   activeIndex === index
                     ? "bg-background border-primary/40 shadow-lg shadow-primary/10 -translate-y-0.5"
                     : "border-border bg-background hover:border-primary/30 hover:shadow-md hover:-translate-y-1"
                 )}
-                aria-pressed={activeIndex === index}
               >
                 <PremiumIcon
                   icon={item.icon}
@@ -147,7 +146,7 @@ export function WhyChooseUsSection() {
                   {item.title}
                 </h3>
                 <p className="text-xs text-muted line-clamp-2">{item.description}</p>
-              </motion.button>
+              </motion.div>
             ))}
           </div>
 
