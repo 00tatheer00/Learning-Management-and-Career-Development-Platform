@@ -32,6 +32,11 @@ export function buildApprovalEmailHtml({
       <td align="center">
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;background:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 12px 40px rgba(15,23,42,0.08);">
           <tr>
+            <td style="padding:24px 28px 8px;text-align:center;background:#ffffff;">
+              <img src="${SITE_CONFIG.url}${SITE_CONFIG.logo}" alt="${SITE_CONFIG.shortName}" width="240" style="max-width:240px;height:auto;display:inline-block;" />
+            </td>
+          </tr>
+          <tr>
             <td style="background:linear-gradient(135deg,#ea580c,#f97316);padding:32px 28px;color:#ffffff;">
               <p style="margin:0 0 8px;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;opacity:0.9;">Emerging Edge School of Technology</p>
               <h1 style="margin:0;font-size:28px;line-height:1.2;">Congratulations, ${firstName}! 🎉</h1>

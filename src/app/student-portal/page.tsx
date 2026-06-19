@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PageHero } from "@/components/shared/page-hero";
+import { SiteLogo } from "@/components/shared/site-logo";
 import { StudentPortalFeatures } from "@/components/sections/student-portal-features";
 import { BreadcrumbSchema } from "@/components/seo/json-ld";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,9 @@ export default function StudentPortalPage() {
       <section className="section-padding pt-0">
         <div className="container-custom max-w-4xl">
           <div className="rounded-2xl border border-border bg-background p-8 lg:p-12 text-center mb-12 shadow-sm">
+            <div className="flex justify-center mb-6">
+              <SiteLogo variant="login" href={null} />
+            </div>
             <h2 className="text-2xl font-bold mb-4">Sign In to Continue</h2>
             <p className="text-muted mb-6 max-w-lg mx-auto">
               Enrolled students can access the full portal with their credentials.

@@ -13,7 +13,7 @@ export function createMetadata({
   title,
   description = SITE_CONFIG.description,
   path = "",
-  image = "/og-image.jpg",
+  image = "/eest-logo.png",
   noIndex = false,
 }: PageSEO): Metadata {
   const url = `${SITE_CONFIG.url}${path}`;
@@ -51,5 +51,9 @@ export function createMetadata({
     robots: noIndex
       ? { index: false, follow: false }
       : { index: true, follow: true },
+    icons: {
+      icon: "/eest-logo.png",
+      apple: "/eest-logo.png",
+    },
   };
 }

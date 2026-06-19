@@ -13,6 +13,7 @@ import {
   Eye,
   EyeSlash,
 } from "@phosphor-icons/react";
+import { SiteLogo } from "@/components/shared/site-logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -101,8 +102,8 @@ export default function LoginForm() {
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-surface via-background to-orange-50">
       <div className="w-full max-w-lg">
         <div className="text-center mb-8">
-          <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary mb-4">
-            <GraduationCap size={32} weight="duotone" />
+          <div className="flex justify-center mb-4">
+            <SiteLogo variant="login" href="/" />
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold">Portal Login</h1>
           <p className="text-muted mt-2">Choose who you are, then sign in</p>

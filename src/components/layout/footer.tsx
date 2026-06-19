@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { GraduationCap, Mail, Phone, MapPin } from "lucide-react";
+import { Mail, Phone, MapPin } from "lucide-react";
 import { SITE_CONFIG } from "@/lib/constants";
+import { SiteLogo } from "@/components/shared/site-logo";
 
 const footerLinks = {
   programs: [
@@ -39,19 +40,7 @@ export function Footer() {
       <div className="container-custom section-padding pb-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10 lg:gap-8">
           <div className="lg:col-span-2">
-            <Link href="/" className="flex items-center gap-2.5 mb-4 group/logo">
-              <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/25 transition-all duration-300 group-hover/logo:shadow-md group-hover/logo:shadow-primary/15">
-                <GraduationCap className="w-5 h-5 text-primary" strokeWidth={1.75} aria-hidden="true" />
-              </div>
-              <div>
-                <span className="text-sm font-bold tracking-tight block">
-                  EMERGING EDGE
-                </span>
-                <span className="text-[10px] text-muted tracking-widest uppercase">
-                  School of Technology
-                </span>
-              </div>
-            </Link>
+            <SiteLogo variant="footer" className="mb-4" />
             <p className="text-sm text-muted leading-relaxed mb-6 max-w-sm">
               {SITE_CONFIG.description.slice(0, 160)}...
             </p>

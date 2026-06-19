@@ -13,6 +13,7 @@ import {
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { PORTAL_COLORS, PORTAL_LABELS, PORTAL_NAV } from "@/lib/constants/portal-nav";
+import { SiteLogo } from "@/components/shared/site-logo";
 import { PortalAvatar } from "@/components/portal/portal-avatar";
 import type { PortalUser } from "@/types/portal";
 import { cn } from "@/lib/utils";
@@ -121,18 +122,16 @@ function SidebarContent({
     <div className="flex flex-col h-full">
       <div className={cn("p-5 bg-gradient-to-br text-white", gradient)}>
         <div className="flex items-center justify-between mb-4">
-          <div>
-            <p className="text-xs opacity-80 uppercase tracking-wider">
-              {PORTAL_LABELS[user.role]}
-            </p>
-            <p className="font-bold text-lg leading-tight">EEST</p>
-          </div>
+          <SiteLogo variant="portal" href="/" onDark />
           {onNavigate && (
             <button type="button" onClick={onNavigate} className="p-1 rounded-lg hover:bg-white/20">
               <X size={20} weight="bold" />
             </button>
           )}
         </div>
+        <p className="text-xs opacity-80 uppercase tracking-wider mb-3">
+          {PORTAL_LABELS[user.role]}
+        </p>
         <div className="flex items-center gap-3">
           <PortalAvatar
             name={user.name}

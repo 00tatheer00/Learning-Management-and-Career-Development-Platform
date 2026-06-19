@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { List, X, GraduationCap } from "@phosphor-icons/react";
+import { List, X } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
+import { SiteLogo } from "@/components/shared/site-logo";
 import { NAV_LINKS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
@@ -42,24 +43,7 @@ export function Navbar() {
         className="container-custom flex items-center justify-between h-16 lg:h-20 px-4 sm:px-6 lg:px-8"
         aria-label="Main navigation"
       >
-        <Link
-          href="/"
-          prefetch
-          className="flex items-center gap-2.5 group/logo relative z-10"
-          aria-label="Home"
-        >
-          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/25 shadow-sm transition-shadow duration-200 group-hover/logo:shadow-md">
-            <GraduationCap size={22} weight="duotone" className="text-primary" aria-hidden="true" />
-          </div>
-          <div className="hidden sm:block">
-            <span className="text-sm font-bold tracking-tight leading-tight block">
-              EMERGING EDGE
-            </span>
-            <span className="text-[10px] text-muted tracking-widest uppercase">
-              School of Technology
-            </span>
-          </div>
-        </Link>
+        <SiteLogo variant="navbar" priority className="relative z-10" />
 
         <div className="hidden lg:flex items-center gap-1 relative z-10">
           {NAV_LINKS.map((link) => (
