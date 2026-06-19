@@ -42,7 +42,7 @@ export default async function TrainerStudentsPage() {
                 <div className="space-y-2 text-sm text-muted">
                   <p className="flex items-center gap-2">
                     <GraduationCap size={16} weight="duotone" className="text-primary" />
-                    Level: {student.level ?? "—"}
+                    Module: {student.level ?? "—"}
                   </p>
                   <p className="flex items-center gap-2">
                     <Envelope size={16} weight="duotone" className="text-primary" />

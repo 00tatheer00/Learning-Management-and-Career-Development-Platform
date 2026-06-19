@@ -115,7 +115,7 @@ export default function AdminEnrollmentsPage() {
                         <p><strong>CNIC:</strong> {enrollment.cnic}</p>
                         <p><strong>Institution:</strong> {enrollment.institution}</p>
                         <p><strong>Course:</strong> {program?.title ?? enrollment.program}</p>
-                        <p><strong>Level:</strong> {enrollment.level}</p>
+                        <p><strong>Module:</strong> {enrollment.level}</p>
                       </div>
                     </div>
 

@@ -3,6 +3,7 @@ import { PlayCircle, LinkSimple, FileText } from "@phosphor-icons/react/ssr";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getMaterials } from "@/lib/api/portal-data";
 import { getProgramBySlug } from "@/lib/data/programs";
+import { ProgramModuleTimeline } from "@/components/shared/program-module-timeline";
 import { PortalPageHeader, EmptyState } from "@/components/portal/portal-ui";
 import { Button } from "@/components/ui/button";
 
@@ -24,8 +25,20 @@ export default async function StudentCoursePage() {
     <div>
       <PortalPageHeader
         title="My Course"
-        description={`${program?.title ?? "Your course"} — watch lessons in order`}
+        description={`${program?.title ?? "Your course"} — your modules and lessons`}
       />
+
+      {program && program.modules.length > 0 && (
+        <div className="mb-10">
+          <h2 className="text-lg font-bold mb-1">Your Program Modules</h2>
+          <p className="text-sm text-muted mb-5">
+            You are currently on: <strong className="text-foreground">{user.level ?? "—"}</strong>
+          </p>
+          <ProgramModuleTimeline modules={program.modules} activeModuleName={user.level ?? undefined} />
+        </div>
+      )}
+
+      <h2 className="text-lg font-bold mb-4">Lessons &amp; Materials</h2>
 
       {materials.length === 0 ? (
         <EmptyState

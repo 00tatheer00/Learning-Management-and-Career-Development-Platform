@@ -14,7 +14,7 @@ export default async function StudentProfilePage() {
     { icon: Envelope, label: "Email", value: user.email },
     { icon: Phone, label: "Phone / WhatsApp", value: user.phone ?? "—" },
     { icon: BookOpen, label: "Course", value: program?.title ?? "—" },
-    { icon: GraduationCap, label: "Level", value: user.level ?? "—" },
+    { icon: GraduationCap, label: "Current Module", value: user.level ?? "—" },
   ];
 
   return (

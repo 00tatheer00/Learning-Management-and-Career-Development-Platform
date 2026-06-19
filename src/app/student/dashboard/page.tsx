@@ -42,7 +42,7 @@ export default async function StudentDashboardPage() {
         <StatCard label="Video Lessons" value={materials.length} accent="orange" />
         <StatCard label="Assignments" value={assignments.length} accent="blue" />
         <StatCard label="Live Classes" value={sessions.length} accent="green" />
-        <StatCard label="Your Level" value={user.level ?? "—"} accent="slate" />
+        <StatCard label="Your Module" value={user.level ?? "—"} accent="slate" />
       </div>
 
       {nextSession && (

@@ -18,7 +18,7 @@ export default async function AdminStudentsPage() {
                 <th className="text-left px-5 py-3 font-semibold">Name</th>
                 <th className="text-left px-5 py-3 font-semibold hidden sm:table-cell">Email</th>
                 <th className="text-left px-5 py-3 font-semibold hidden md:table-cell">Course</th>
-                <th className="text-left px-5 py-3 font-semibold">Level</th>
+                <th className="text-left px-5 py-3 font-semibold">Module</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">

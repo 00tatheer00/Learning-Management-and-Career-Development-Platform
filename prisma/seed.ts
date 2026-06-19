@@ -43,7 +43,7 @@ const DEFAULT_USERS = [
     name: "Demo Student",
     phone: "03001234567",
     programSlug: "web-development",
-    level: "Foundations",
+    level: "HTML & CSS",
     avatarInitials: "DS",
   },
 ];

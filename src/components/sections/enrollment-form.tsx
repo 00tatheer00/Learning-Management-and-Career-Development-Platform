@@ -23,7 +23,7 @@ import {
   type EnrollmentFormData,
 } from "@/lib/validations/enrollment";
 import { PAYMENT_CONFIG, ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
-import { programs } from "@/lib/data/programs";
+import { programs, formatModuleSchedule } from "@/lib/data/programs";
 import { cn } from "@/lib/utils";
 
 function FormSection({
@@ -154,6 +154,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
   });
 
   const selectedProgram = watch("program");
+  const selectedModuleName = watch("level");
   const activeProgram = programs.find((p) => p.slug === selectedProgram);
   const isEnrollable = (slug: string) =>
     ENROLLABLE_PROGRAM_SLUGS.includes(slug as (typeof ENROLLABLE_PROGRAM_SLUGS)[number]);
@@ -434,9 +435,19 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                         <SelectValue placeholder="Select starting module" />
                       </SelectTrigger>
                       <SelectContent>
-                        {activeProgram?.modules.map((mod) => (
-                          <SelectItem key={mod.name} value={mod.name}>
-                            {mod.name}
+                        {activeProgram?.modules.map((mod, index) => (
+                          <SelectItem key={mod.name} value={mod.name} className="py-3">
+                            <div className="flex flex-col gap-0.5 text-left">
+                              <span className="font-medium">
+                                Module {index + 1}: {mod.name}
+                              </span>
+                              {mod.subtitle && (
+                                <span className="text-xs text-muted">{mod.subtitle}</span>
+                              )}
+                              <span className="text-xs text-primary">
+                                {mod.duration} · {formatModuleSchedule(mod)}
+                              </span>
+                            </div>
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -444,6 +455,38 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                   )}
                 />
                 <FieldError message={errors.level?.message} />
+
+                {activeProgram && activeProgram.modules.length > 0 && (
+                  <div className="mt-4 space-y-3 rounded-xl border border-border bg-surface/50 p-4">
+                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
+                      {activeProgram.title} — All Modules
+                    </p>
+                    {activeProgram.modules.map((mod, index) => {
+                      const isSelected = selectedModuleName === mod.name;
+                      return (
+                        <div
+                          key={mod.name}
+                          className={cn(
+                            "rounded-lg border bg-background p-3 transition-colors",
+                            isSelected
+                              ? "border-primary/40 bg-primary/5"
+                              : "border-border/70"
+                          )}
+                        >
+                          <p className="text-sm font-semibold">
+                            Module {index + 1}: {mod.name}
+                          </p>
+                          {mod.subtitle && (
+                            <p className="mt-1 text-xs leading-relaxed text-muted">{mod.subtitle}</p>
+                          )}
+                          <p className="mt-2 text-xs font-medium text-primary">
+                            {mod.duration} · {formatModuleSchedule(mod)}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
               <div className="sm:col-span-2">
