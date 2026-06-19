@@ -6,7 +6,7 @@ import { ArrowRight } from "lucide-react";
 import { SectionHeader } from "@/components/shared/section-header";
 import { TrainerCard } from "@/components/shared/trainer-card";
 import { Button } from "@/components/ui/button";
-import { trainers } from "@/lib/data/trainers";
+import { featuredTrainers } from "@/lib/data/trainers";
 
 export function TrainersSection() {
   return (
@@ -15,19 +15,19 @@ export function TrainersSection() {
         <SectionHeader
           label="Expert Mentors"
           title="Learn from Industry Leaders"
-          description="Our trainers bring real-world experience from top tech companies to guide your learning journey."
+          description="Meet the trainers and specialists guiding every EEST program — from web and mobile to AI, design, and media."
         />
 
-        <div className="mx-auto grid max-w-4xl grid-cols-1 gap-8 sm:grid-cols-2">
-          {trainers.map((trainer, index) => (
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
+          {featuredTrainers.map((trainer, index) => (
             <motion.div
               key={trainer.id}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
+              transition={{ delay: index * 0.08 }}
             >
-              <TrainerCard trainer={trainer} />
+              <TrainerCard trainer={trainer} skillLimit={3} />
             </motion.div>
           ))}
         </div>

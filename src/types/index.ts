@@ -22,11 +22,13 @@ export interface Trainer {
   name: string;
   designation: string;
   expertise: string[];
-  experience: string;
+  experience?: string;
   bio: string;
-  image: string;
+  image?: string;
   /** CSS object-position for cropping (e.g. "center 20%") */
   imagePosition?: string;
+  programSlug?: string;
+  featured?: boolean;
   social: {
     linkedin?: string;
     twitter?: string;
