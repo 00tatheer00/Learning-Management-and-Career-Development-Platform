@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
+import { NavigationProgress } from "@/components/providers/navigation-progress";
 
 const PORTAL_PREFIXES = ["/student", "/trainer", "/admin", "/login"];
 
@@ -12,15 +13,20 @@ export function LayoutSwitcher({ children }: { children: React.ReactNode }) {
     (prefix) => pathname === prefix || pathname?.startsWith(`${prefix}/`)
   );
 
-  if (isPortal) {
-    return <>{children}</>;
-  }
-
   return (
     <>
-      <Navbar />
-      <main id="main-content">{children}</main>
-      <Footer />
+      <NavigationProgress />
+      {isPortal ? (
+        children
+      ) : (
+        <>
+          <Navbar />
+          <main id="main-content" className="relative z-0">
+            {children}
+          </main>
+          <Footer />
+        </>
+      )}
     </>
   );
 }

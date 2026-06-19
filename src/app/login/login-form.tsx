@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { signIn, getSession } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { getPortalHome } from "@/lib/auth/portal-routes";
 import {
   GraduationCap,
   ChalkboardTeacher,
@@ -36,7 +38,7 @@ const ROLES: {
     label: "Trainer",
     icon: ChalkboardTeacher,
     hint: "Manage students, classes & homework",
-    demo: "trainer@eest.com / trainer123",
+    demo: "tatheer@eest.com / tatheer123",
   },
   {
     role: "admin",
@@ -69,20 +71,20 @@ export default function LoginForm() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
       });
-      const data = await res.json();
 
-      if (!res.ok) {
-        setError(data.message || "Login failed. Please try again.");
+      if (result?.error) {
+        setError("Wrong email or password. Try again.");
         return;
       }
 
-      const redirect = data.data?.redirect ?? "/student/dashboard";
-      router.push(redirect);
+      const session = await getSession();
+      const role = session?.user?.role ?? selectedRole;
+      router.push(getPortalHome(role));
       router.refresh();
     } catch {
       setError("Something went wrong. Check your internet and try again.");

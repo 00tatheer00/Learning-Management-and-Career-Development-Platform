@@ -1,105 +1,85 @@
-import { readJsonFile, writeJsonFile } from "@/lib/db/json-store";
+import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/auth/password";
 import type { User, UserRole } from "@/types/portal";
 
-const USERS_FILE = "users.json";
-
-const DEFAULT_USERS: Array<Omit<User, "passwordHash"> & { password: string }> = [
-  {
-    id: "admin-1",
-    email: "admin@eest.com",
-    password: "admin123",
-    role: "admin",
-    name: "Admin User",
-    phone: "03275792600",
-    isActive: true,
-    createdAt: new Date().toISOString(),
-    avatarInitials: "AU",
-  },
-  {
-    id: "trainer-1",
-    email: "trainer@eest.com",
-    password: "trainer123",
-    role: "trainer",
-    name: "Syed Tatheer Hussain",
-    phone: "03275792600",
-    trainerId: "trainer-1",
-    isActive: true,
-    createdAt: new Date().toISOString(),
-    avatarInitials: "ST",
-  },
-  {
-    id: "student-1",
-    email: "student@eest.com",
-    password: "student123",
-    role: "student",
-    name: "Demo Student",
-    phone: "03001234567",
-    programSlug: "web-development",
-    level: "Foundations",
-    isActive: true,
-    createdAt: new Date().toISOString(),
-    avatarInitials: "DS",
-  },
-];
-
-let seeded = false;
-
-export async function seedUsersIfNeeded(): Promise<void> {
-  if (seeded) return;
-  const users = await readJsonFile<User[]>(USERS_FILE, []);
-  if (users.length === 0) {
-    const hashed: User[] = [];
-    for (const u of DEFAULT_USERS) {
-      const { password, ...rest } = u;
-      hashed.push({ ...rest, passwordHash: await hashPassword(password) });
-    }
-    await writeJsonFile(USERS_FILE, hashed);
-  }
-  seeded = true;
-}
-
 export async function getUsers(): Promise<User[]> {
-  await seedUsersIfNeeded();
-  return readJsonFile<User[]>(USERS_FILE, []);
+  const users = await prisma.user.findMany();
+  return users.map(mapUser);
 }
 
 export async function getUserById(id: string): Promise<User | null> {
-  const users = await getUsers();
-  return users.find((u) => u.id === id) ?? null;
+  const user = await prisma.user.findUnique({ where: { id } });
+  return user ? mapUser(user) : null;
 }
 
 export async function getUserByEmail(email: string): Promise<User | null> {
-  const users = await getUsers();
-  return users.find((u) => u.email.toLowerCase() === email.toLowerCase()) ?? null;
+  const user = await prisma.user.findUnique({
+    where: { email: email.toLowerCase() },
+  });
+  return user ? mapUser(user) : null;
 }
 
 export async function getUsersByRole(role: UserRole): Promise<User[]> {
-  const users = await getUsers();
-  return users.filter((u) => u.role === role && u.isActive);
+  const users = await prisma.user.findMany({
+    where: { role, isActive: true },
+  });
+  return users.map(mapUser);
 }
 
 export async function createUser(
-  data: Omit<User, "id" | "passwordHash" | "createdAt"> & { password: string }
+  data: Omit<User, "id" | "passwordHash" | "createdAt"> & { password: string; id?: string }
 ): Promise<User> {
-  const users = await getUsers();
-  const { password, ...rest } = data;
-  const user: User = {
-    ...rest,
-    id: crypto.randomUUID(),
-    passwordHash: await hashPassword(password),
-    createdAt: new Date().toISOString(),
-  };
-  users.push(user);
-  await writeJsonFile(USERS_FILE, users);
-  return user;
+  const { password, id, ...rest } = data;
+  const user = await prisma.user.create({
+    data: {
+      ...rest,
+      id: id ?? crypto.randomUUID(),
+      email: rest.email.toLowerCase(),
+      passwordHash: await hashPassword(password),
+    },
+  });
+  return mapUser(user);
 }
 
 export async function updateUser(id: string, updates: Partial<User>): Promise<User | null> {
-  const users = await getUsers();
-  const index = users.findIndex((u) => u.id === id);
-  if (index === -1) return null;
-  users[index] = { ...users[index], ...updates };
-  await writeJsonFile(USERS_FILE, users);
-  return users[index];
+  try {
+    const { passwordHash: _ph, createdAt: _ca, id: _id, ...safe } = updates;
+    const user = await prisma.user.update({
+      where: { id },
+      data: safe,
+    });
+    return mapUser(user);
+  } catch {
+    return null;
+  }
+}
+
+function mapUser(user: {
+  id: string;
+  email: string;
+  passwordHash: string;
+  role: UserRole;
+  name: string;
+  phone: string | null;
+  programSlug: string | null;
+  level: string | null;
+  trainerId: string | null;
+  avatarInitials: string | null;
+  isActive: boolean;
+  createdAt: Date;
+}): User {
+  return {
+    id: user.id,
+    email: user.email,
+    passwordHash: user.passwordHash,
+    role: user.role,
+    name: user.name,
+    phone: user.phone ?? undefined,
+    programSlug: user.programSlug ?? undefined,
+    level: user.level ?? undefined,
+    trainerId: user.trainerId ?? undefined,
+    avatarInitials: user.avatarInitials ?? undefined,
+    isActive: user.isActive,
+    createdAt: user.createdAt.toISOString(),
+  };
 }

@@ -1,24 +1,39 @@
+import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { getPortalHome } from "@/lib/auth/portal-routes";
+import type { UserRole } from "@/types/portal";
 
-const PROTECTED = ["/student", "/trainer", "/admin"];
+export default withAuth(
+  function middleware(req) {
+    const token = req.nextauth.token;
+    const { pathname } = req.nextUrl;
 
-export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  const session = request.cookies.get("eest_session");
+    if (!token?.role) {
+      const loginUrl = new URL("/login", req.url);
+      loginUrl.searchParams.set("callbackUrl", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
 
-  const isProtected = PROTECTED.some(
-    (p) => pathname === p || pathname.startsWith(`${p}/`)
-  );
+    const role = token.role as UserRole;
 
-  if (isProtected && !session) {
-    const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("from", pathname);
-    return NextResponse.redirect(loginUrl);
+    if (pathname.startsWith("/admin") && role !== "admin") {
+      return NextResponse.redirect(new URL(getPortalHome(role), req.url));
+    }
+    if (pathname.startsWith("/trainer") && role !== "trainer") {
+      return NextResponse.redirect(new URL(getPortalHome(role), req.url));
+    }
+    if (pathname.startsWith("/student") && role !== "student") {
+      return NextResponse.redirect(new URL(getPortalHome(role), req.url));
+    }
+
+    return NextResponse.next();
+  },
+  {
+    callbacks: {
+      authorized: ({ token }) => !!token,
+    },
   }
-
-  return NextResponse.next();
-}
+);
 
 export const config = {
   matcher: ["/student/:path*", "/trainer/:path*", "/admin/:path*"],

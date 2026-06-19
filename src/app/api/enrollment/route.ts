@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
-import {
-  savePaymentScreenshot,
-  createApiResponse,
-} from "@/lib/api/enrollment";
+import { createApiResponse } from "@/lib/api/enrollment";
 import { saveEnrollment } from "@/lib/api/portal-data";
+import { uploadPaymentScreenshot } from "@/lib/cloudinary";
+import { checkRateLimit, enrollmentRateLimit } from "@/lib/security/rate-limit";
 
 const cnicRegex = /^\d{13}$/;
 const whatsappRegex = /^03\d{9}$/;
@@ -30,6 +29,22 @@ const enrollmentBodySchema = z.object({
 
 export async function POST(request: Request) {
   try {
+    const ip =
+      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+      request.headers.get("x-real-ip") ??
+      "unknown";
+
+    const rate = await checkRateLimit(enrollmentRateLimit, `enrollment:${ip}`);
+    if (!rate.success) {
+      return NextResponse.json(
+        createApiResponse(false, {
+          error: "Too many requests",
+          message: "Please wait before submitting another registration.",
+        }),
+        { status: 429 }
+      );
+    }
+
     const formData = await request.formData();
     const screenshot = formData.get("paymentScreenshot");
 
@@ -94,25 +109,25 @@ export async function POST(request: Request) {
     }
 
     const id = crypto.randomUUID();
-    const screenshotPath = await savePaymentScreenshot(id, screenshot);
+    const upload = await uploadPaymentScreenshot(screenshot, id);
 
-    const enrollment = {
+    await saveEnrollment({
       ...validated.data,
       id,
-      paymentScreenshot: screenshotPath,
+      paymentScreenshot: upload.url,
+      paymentScreenshotPublicId: upload.publicId,
       createdAt: new Date().toISOString(),
-    };
-
-    await saveEnrollment(enrollment);
+    });
 
     return NextResponse.json(
       createApiResponse(true, {
-        data: { id: enrollment.id },
+        data: { id },
         message: "Registration submitted successfully",
       }),
       { status: 201 }
     );
-  } catch {
+  } catch (error) {
+    console.error("Enrollment error:", error);
     return NextResponse.json(
       createApiResponse(false, { error: "Internal server error" }),
       { status: 500 }

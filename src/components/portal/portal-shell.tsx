@@ -1,7 +1,8 @@
 "use client";
 
+import { signOut } from "next-auth/react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import {
   List,
@@ -22,14 +23,11 @@ interface PortalShellProps {
 
 export function PortalShell({ user, children }: PortalShellProps) {
   const pathname = usePathname();
-  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navItems = PORTAL_NAV[user.role];
 
   const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/login");
-    router.refresh();
+    await signOut({ callbackUrl: "/login" });
   };
 
   return (

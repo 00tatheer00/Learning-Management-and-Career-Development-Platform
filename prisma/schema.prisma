@@ -1,0 +1,117 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  student
+  trainer
+  admin
+}
+
+enum EnrollmentStatus {
+  pending
+  approved
+  rejected
+}
+
+enum MaterialType {
+  video
+  link
+  document
+}
+
+enum SubmissionStatus {
+  submitted
+  approved
+  needs_revision
+}
+
+model User {
+  id             String   @id @map("_id")
+  email          String   @unique
+  passwordHash   String
+  role           UserRole
+  name           String
+  phone          String?
+  programSlug    String?
+  level          String?
+  trainerId      String?
+  avatarInitials String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+}
+
+model Enrollment {
+  id                        String           @id @map("_id")
+  fullName                  String
+  fatherName                String
+  institution               String
+  classSemester             String
+  cnic                      String
+  email                     String
+  whatsapp                  String
+  fieldOfStudy              String
+  program                   String
+  level                     String
+  learningMode              String
+  hasLaptop                 String
+  internetAvailable         String
+  confirmInfoCorrect        Boolean
+  agreeToPolicies           Boolean
+  paymentScreenshot         String?
+  paymentScreenshotPublicId String?
+  status                    EnrollmentStatus @default(pending)
+  reviewedAt                DateTime?
+  reviewedBy                String?
+  adminNotes                String?
+  createdAt                 DateTime         @default(now())
+}
+
+model CourseMaterial {
+  id          String       @id @map("_id")
+  programSlug String
+  title       String
+  description String
+  type        MaterialType
+  url         String
+  order       Int
+}
+
+model Assignment {
+  id          String   @id @map("_id")
+  programSlug String
+  title       String
+  description String
+  dueDate     String
+  trainerId   String
+  createdAt   DateTime @default(now())
+}
+
+model AssignmentSubmission {
+  id           String           @id @map("_id")
+  assignmentId String
+  studentId    String
+  studentName  String
+  content      String
+  status       SubmissionStatus @default(submitted)
+  submittedAt  DateTime         @default(now())
+  feedback     String?
+  reviewedAt   DateTime?
+}
+
+model LiveSession {
+  id          String  @id @map("_id")
+  programSlug String
+  title       String
+  date        String
+  time        String
+  meetLink    String
+  trainerId   String
+  trainerName String
+  notes       String?
+}

@@ -93,8 +93,8 @@ export default function AdminEnrollmentsPage() {
         ) : (
           filtered.map((enrollment) => {
             const program = getProgramBySlug(enrollment.program);
-            const screenshotUrl = enrollment.paymentScreenshot
-              ? `/api/uploads/${enrollment.paymentScreenshot.replace("uploads/", "")}`
+            const screenshotUrl = enrollment.paymentScreenshot?.startsWith("http")
+              ? enrollment.paymentScreenshot
               : null;
 
             return (

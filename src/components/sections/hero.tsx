@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FreeCoursePromo } from "@/components/shared/free-course-promo";
@@ -42,12 +41,7 @@ export function HeroSection() {
       />
 
       <div className="container-custom relative z-10 flex flex-col items-center px-4 sm:px-6 lg:px-8 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="w-full max-w-4xl"
-        >
+        <div className="w-full max-w-4xl">
           <FreeCoursePromo variant="compact" className="mb-6" />
 
           <h1
@@ -70,13 +64,13 @@ export function HeroSection() {
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 max-w-md sm:max-w-none mx-auto">
             <Button size="lg" className="text-base h-14 px-8" asChild>
-              <Link href="/register">
+              <Link href="/register" prefetch>
                 Register Now — Rs {PAYMENT_CONFIG.registrationFee.toLocaleString()}
                 <ArrowRight className="w-5 h-5" aria-hidden="true" />
               </Link>
             </Button>
             <Button size="lg" variant="secondary" className="text-base h-14" asChild>
-              <Link href="/programs">See All Courses</Link>
+              <Link href="/programs" prefetch>See All Courses</Link>
             </Button>
           </div>
 
@@ -84,7 +78,7 @@ export function HeroSection() {
             Confused? Tap the green <strong className="text-[#25D366]">Need Help?</strong> button
             at the bottom right corner.
           </p>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
