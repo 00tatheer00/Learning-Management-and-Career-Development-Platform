@@ -1,8 +1,13 @@
-export interface ProgramLevel {
+export interface ProgramModule {
   name: string;
+  subtitle?: string;
   duration: string;
-  description: string;
+  daysPerWeek: number;
+  hoursPerDay: number;
 }
+
+/** @deprecated Use ProgramModule */
+export type ProgramLevel = ProgramModule;
 
 export interface Program {
   id: string;
@@ -13,7 +18,7 @@ export interface Program {
   duration: string;
   level: string;
   outcomes: string[];
-  levels: ProgramLevel[];
+  modules: ProgramModule[];
   image?: string;
 }
 

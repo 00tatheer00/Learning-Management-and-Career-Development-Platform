@@ -1,13 +1,16 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowRight, Clock, CheckCircle2 } from "lucide-react";
+import { ArrowRight, CheckCircle2, Clock, Layers } from "lucide-react";
 import { PageHero } from "@/components/shared/page-hero";
+import { ProgramModuleTimeline } from "@/components/shared/program-module-timeline";
+import { TrainerCard } from "@/components/shared/trainer-card";
 import { BreadcrumbSchema, CourseSchema } from "@/components/seo/json-ld";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { createMetadata } from "@/lib/seo/metadata";
 import { SITE_CONFIG } from "@/lib/constants";
 import { programs, getProgramBySlug } from "@/lib/data/programs";
+import { getTrainersByProgramSlug } from "@/lib/data/trainers";
 
 interface ProgramPageProps {
   params: Promise<{ slug: string }>;
@@ -35,6 +38,9 @@ export default async function ProgramDetailPage({ params }: ProgramPageProps) {
 
   if (!program) notFound();
 
+  const trainers = getTrainersByProgramSlug(program.slug);
+  const isActive = program.category === "active";
+
   return (
     <>
       <CourseSchema
@@ -50,72 +56,106 @@ export default async function ProgramDetailPage({ params }: ProgramPageProps) {
         ]}
       />
       <PageHero
-        label={program.category === "active" ? "Active Program" : "Coming Soon"}
+        label={isActive ? "Active Program" : "Coming Soon"}
         title={program.title}
         description={program.description}
       />
 
       <section className="section-padding pt-0">
-        <div className="container-custom max-w-4xl">
-          <div className="flex flex-wrap gap-3 mb-8">
-            <Badge variant={program.category === "future" ? "future" : "default"}>
-              {program.category === "future" ? "Coming Soon" : "Enrolling Now"}
+        <div className="container-custom max-w-5xl">
+          <div className="mb-10 flex flex-wrap gap-3">
+            <Badge variant={isActive ? "default" : "future"}>
+              {isActive ? "Enrolling Now" : "Coming Soon"}
             </Badge>
-            <span className="flex items-center gap-1.5 text-sm text-muted bg-secondary px-3 py-1 rounded-full border border-border">
-              <Clock className="w-4 h-4 text-primary" />
+            <span className="flex items-center gap-1.5 rounded-full border border-border bg-secondary px-3 py-1 text-sm text-muted">
+              <Clock className="h-4 w-4 text-primary" />
               {program.duration}
             </span>
-            <span className="text-sm text-muted bg-secondary px-3 py-1 rounded-full border border-border">
+            <span className="rounded-full border border-border bg-secondary px-3 py-1 text-sm text-muted">
               {program.level}
             </span>
+            {program.modules.length > 0 && (
+              <span className="flex items-center gap-1.5 rounded-full border border-border bg-secondary px-3 py-1 text-sm text-muted">
+                <Layers className="h-4 w-4 text-primary" />
+                {program.modules.length} modules
+              </span>
+            )}
           </div>
 
-          {program.levels.length > 0 && (
-            <div className="mb-12">
-              <h2 className="text-2xl font-bold mb-6">Program Levels</h2>
-              <div className="space-y-4">
-                {program.levels.map((level, index) => (
-                  <div
-                    key={level.name}
-                    className="rounded-xl border border-border bg-background p-6 flex gap-4 items-start shadow-sm"
-                  >
-                    <span className="w-10 h-10 rounded-full bg-primary/20 text-primary font-bold flex items-center justify-center shrink-0">
-                      {index + 1}
-                    </span>
-                    <div>
-                      <h3 className="font-semibold text-lg mb-1">{level.name}</h3>
-                      <p className="text-sm text-primary mb-2">{level.duration}</p>
-                      <p className="text-muted">{level.description}</p>
-                    </div>
-                  </div>
-                ))}
+          {program.modules.length > 0 && (
+            <div className="mb-14">
+              <div className="mb-6">
+                <p className="text-sm font-bold uppercase tracking-[0.18em] text-primary">
+                  Curriculum
+                </p>
+                <h2 className="mt-2 text-2xl font-bold sm:text-3xl">Program Modules</h2>
+                <p className="mt-2 max-w-2xl text-muted">
+                  Each module includes live classes — typically 3 days per week, 1.5 hours per class.
+                </p>
               </div>
+              <ProgramModuleTimeline modules={program.modules} />
             </div>
           )}
 
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold mb-6">Learning Outcomes</h2>
-            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="mb-14">
+            <div className="mb-6">
+              <p className="text-sm font-bold uppercase tracking-[0.18em] text-primary">
+                Outcomes
+              </p>
+              <h2 className="mt-2 text-2xl font-bold sm:text-3xl">What You Will Learn</h2>
+            </div>
+            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {program.outcomes.map((outcome) => (
                 <li
                   key={outcome}
-                  className="flex items-start gap-3 rounded-lg border border-border bg-background p-4 shadow-sm"
+                  className="flex items-start gap-3 rounded-2xl border border-border/70 bg-background p-4 shadow-sm"
                 >
-                  <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
                   <span className="text-muted">{outcome}</span>
                 </li>
               ))}
             </ul>
           </div>
 
-          {program.category === "active" && (
-            <Button size="lg" asChild>
-              <Link href={`/register?program=${program.slug}`}>
-                Apply for This Program
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-            </Button>
+          {trainers.length > 0 && (
+            <div className="mb-14">
+              <div className="mb-6">
+                <p className="text-sm font-bold uppercase tracking-[0.18em] text-primary">
+                  Your Mentors
+                </p>
+                <h2 className="mt-2 text-2xl font-bold sm:text-3xl">Program Trainers</h2>
+                <p className="mt-2 max-w-2xl text-muted">
+                  Learn directly from specialists guiding this program at EEST.
+                </p>
+              </div>
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {trainers.map((trainer) => (
+                  <TrainerCard key={trainer.id} trainer={trainer} skillLimit={4} />
+                ))}
+              </div>
+            </div>
           )}
+
+          <div className="flex flex-col gap-3 sm:flex-row">
+            {isActive ? (
+              <Button size="lg" asChild>
+                <Link href={`/register?program=${program.slug}`}>
+                  Apply for This Program
+                  <ArrowRight className="h-5 w-5" />
+                </Link>
+              </Button>
+            ) : (
+              <Button size="lg" variant="secondary" asChild>
+                <Link href="/register">
+                  Register for Open Programs
+                  <ArrowRight className="h-5 w-5" />
+                </Link>
+              </Button>
+            )}
+            <Button size="lg" variant="outline" asChild>
+              <Link href="/programs">View All Programs</Link>
+            </Button>
+          </div>
         </div>
       </section>
     </>

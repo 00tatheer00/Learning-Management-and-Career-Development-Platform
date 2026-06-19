@@ -1,38 +1,7 @@
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { getProgramAccent } from "@/lib/constants/program-accents";
 import type { Trainer } from "@/types";
-
-const PROGRAM_ACCENTS: Record<string, { gradient: string; glow: string }> = {
-  "web-development": {
-    gradient: "from-slate-700 via-slate-800 to-slate-950",
-    glow: "group-hover:shadow-slate-900/20",
-  },
-  "app-development": {
-    gradient: "from-indigo-600 via-violet-700 to-indigo-950",
-    glow: "group-hover:shadow-indigo-600/20",
-  },
-  "graphics-designing": {
-    gradient: "from-rose-500 via-pink-600 to-rose-900",
-    glow: "group-hover:shadow-rose-500/20",
-  },
-  "digital-marketing": {
-    gradient: "from-emerald-500 via-teal-600 to-emerald-900",
-    glow: "group-hover:shadow-emerald-500/20",
-  },
-  "video-editing": {
-    gradient: "from-amber-500 via-orange-600 to-amber-900",
-    glow: "group-hover:shadow-amber-500/20",
-  },
-  "artificial-intelligence": {
-    gradient: "from-violet-600 via-purple-700 to-violet-950",
-    glow: "group-hover:shadow-violet-600/20",
-  },
-};
-
-const DEFAULT_ACCENT = {
-  gradient: "from-orange-500 via-orange-600 to-orange-900",
-  glow: "group-hover:shadow-primary/20",
-};
 
 interface TrainerCardProps {
   trainer: Trainer;
@@ -52,8 +21,15 @@ function getInitials(name: string) {
 }
 
 function getAccent(programSlug?: string) {
-  if (!programSlug) return DEFAULT_ACCENT;
-  return PROGRAM_ACCENTS[programSlug] ?? DEFAULT_ACCENT;
+  if (!programSlug) {
+    return {
+      gradient: "from-orange-500 via-orange-600 to-orange-900",
+      glow: "group-hover:shadow-primary/20",
+    };
+  }
+
+  const accent = getProgramAccent(programSlug);
+  return { gradient: accent.gradient, glow: accent.glow };
 }
 
 function TrainerPortrait({ trainer, tall = false }: { trainer: Trainer; tall?: boolean }) {

@@ -92,3 +92,7 @@ export const trainers: Trainer[] = [
 ];
 
 export const featuredTrainers = trainers.filter((trainer) => trainer.featured);
+
+export function getTrainersByProgramSlug(programSlug: string) {
+  return trainers.filter((trainer) => trainer.programSlug === programSlug);
+}

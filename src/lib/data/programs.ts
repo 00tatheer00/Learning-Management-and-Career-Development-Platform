@@ -1,4 +1,24 @@
-import type { Program } from "@/types";
+import type { Program, ProgramModule } from "@/types";
+
+export const MODULE_SCHEDULE = {
+  daysPerWeek: 3,
+  hoursPerDay: 1.5,
+} as const;
+
+function module(
+  name: string,
+  subtitle: string,
+  duration: string,
+  schedule: { daysPerWeek: number; hoursPerDay: number } = MODULE_SCHEDULE
+): ProgramModule {
+  return {
+    name,
+    subtitle,
+    duration,
+    daysPerWeek: schedule.daysPerWeek,
+    hoursPerDay: schedule.hoursPerDay,
+  };
+}
 
 export const programs: Program[] = [
   {
@@ -7,74 +27,57 @@ export const programs: Program[] = [
     title: "Web Development",
     category: "active",
     description:
-      "Master modern web technologies from fundamentals to full-stack production applications with industry-standard tools and practices.",
-    duration: "4–16 weeks per level",
+      "Go from zero to full-stack developer — HTML, CSS, JavaScript, React, and backend with Node.js, Express, and MongoDB.",
+    duration: "~3.5 months · 4 modules",
     level: "Beginner to Advanced",
     outcomes: [
-      "Build responsive, accessible websites",
-      "Develop RESTful APIs and databases",
-      "Deploy production-ready full-stack apps",
-      "Collaborate using Git and agile workflows",
+      "Build responsive, modern websites from scratch",
+      "Write JavaScript and React for fast, interactive UIs",
+      "Create APIs and databases with Node.js and MongoDB",
+      "Ship full-stack projects for your portfolio",
     ],
-    levels: [
-      {
-        name: "Foundations",
-        duration: "4 weeks",
-        description: "HTML, CSS, JavaScript fundamentals and problem-solving",
-      },
-      {
-        name: "Frontend Development",
-        duration: "6 weeks",
-        description: "React, TypeScript, state management, and modern UI patterns",
-      },
-      {
-        name: "Backend Development",
-        duration: "6 weeks",
-        description: "Node.js, databases, authentication, and API design",
-      },
-      {
-        name: "Full Stack Development",
-        duration: "8 weeks",
-        description: "End-to-end applications with deployment and DevOps basics",
-      },
+    modules: [
+      module(
+        "HTML & CSS",
+        "For very beginners learning web for the first time",
+        "1 month"
+      ),
+      module(
+        "JavaScript",
+        "For those who want to learn a programming language easily",
+        "3 weeks"
+      ),
+      module(
+        "React",
+        "To build websites with fast, modern UI",
+        "3 weeks"
+      ),
+      module(
+        "Backend + Database",
+        "Node.js, Express, and MongoDB for full-stack apps",
+        "1 month"
+      ),
     ],
   },
   {
     id: "app-dev",
     slug: "app-development",
-    title: "App Development",
+    title: "Flutter App Development",
     category: "active",
     description:
-      "Create beautiful cross-platform mobile applications with Flutter and Dart, from UI design to production deployment.",
-    duration: "4–14 weeks per level",
-    level: "Beginner to Advanced",
+      "Learn Dart, Flutter UI, and Firebase to build and publish cross-platform mobile apps for Android and iOS.",
+    duration: "9 weeks · 3 modules",
+    level: "Beginner to Intermediate",
     outcomes: [
-      "Build cross-platform iOS and Android apps",
-      "Design pixel-perfect mobile UIs",
-      "Integrate APIs and backend services",
-      "Publish apps to app stores",
+      "Master Dart and object-oriented programming",
+      "Design beautiful Flutter mobile interfaces",
+      "Connect apps to Firebase and REST APIs",
+      "Publish apps to the Play Store and App Store",
     ],
-    levels: [
-      {
-        name: "App Foundations",
-        duration: "4 weeks",
-        description: "Dart programming, widgets, and mobile app architecture",
-      },
-      {
-        name: "UI Development",
-        duration: "5 weeks",
-        description: "Custom widgets, animations, and responsive layouts",
-      },
-      {
-        name: "Backend Integration",
-        duration: "5 weeks",
-        description: "Firebase, REST APIs, state management, and authentication",
-      },
-      {
-        name: "Production Apps",
-        duration: "6 weeks",
-        description: "Performance optimization, testing, and app store deployment",
-      },
+    modules: [
+      module("Dart & OOP", "Programming foundations for mobile development", "3 weeks"),
+      module("Flutter Frontend", "Widgets, layouts, and polished mobile UI", "3 weeks"),
+      module("Firebase & APIs", "Authentication, cloud data, and backend integration", "3 weeks"),
     ],
   },
   {
@@ -92,7 +95,7 @@ export const programs: Program[] = [
       "Deploy AI models to production",
       "Apply AI to solve business problems",
     ],
-    levels: [],
+    modules: [],
   },
   {
     id: "video-editing",
@@ -109,7 +112,7 @@ export const programs: Program[] = [
       "Create engaging social media content",
       "Produce polished videos for clients and brands",
     ],
-    levels: [],
+    modules: [],
   },
   {
     id: "digital-marketing",
@@ -126,7 +129,7 @@ export const programs: Program[] = [
       "Manage paid advertising channels",
       "Analyze and optimize conversion funnels",
     ],
-    levels: [],
+    modules: [],
   },
   {
     id: "graphics-designing",
@@ -143,7 +146,7 @@ export const programs: Program[] = [
       "Use industry-standard design tools",
       "Develop a professional design portfolio",
     ],
-    levels: [],
+    modules: [],
   },
   {
     id: "ui-ux",
@@ -160,10 +163,14 @@ export const programs: Program[] = [
       "Build cohesive design systems",
       "Collaborate effectively with developers",
     ],
-    levels: [],
+    modules: [],
   },
 ];
 
 export function getProgramBySlug(slug: string): Program | undefined {
   return programs.find((p) => p.slug === slug);
+}
+
+export function formatModuleSchedule(mod: ProgramModule) {
+  return `${mod.daysPerWeek} days/week · ${mod.hoursPerDay} hr/class`;
 }

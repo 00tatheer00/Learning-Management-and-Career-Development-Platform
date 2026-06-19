@@ -420,7 +420,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
               </div>
 
               <div className="sm:col-span-2">
-                <Label htmlFor="level">Starting Level</Label>
+                <Label htmlFor="level">Starting Module</Label>
                 <Controller
                   name="level"
                   control={control}
@@ -431,12 +431,12 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                       disabled={!activeProgram || !isEnrollable(activeProgram.slug)}
                     >
                       <SelectTrigger id="level" className="mt-2">
-                        <SelectValue placeholder="Select starting level" />
+                        <SelectValue placeholder="Select starting module" />
                       </SelectTrigger>
                       <SelectContent>
-                        {activeProgram?.levels.map((level) => (
-                          <SelectItem key={level.name} value={level.name}>
-                            {level.name}
+                        {activeProgram?.modules.map((mod) => (
+                          <SelectItem key={mod.name} value={mod.name}>
+                            {mod.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
