@@ -65,7 +65,7 @@ export function HeroSection() {
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 max-w-md sm:max-w-none mx-auto">
             <Button size="lg" className="text-base h-14 px-8" asChild>
               <Link href="/register" prefetch>
-                Register Now — Rs {PAYMENT_CONFIG.registrationFee.toLocaleString()}
+                Register Now
                 <ArrowRight className="w-5 h-5" aria-hidden="true" />
               </Link>
             </Button>
