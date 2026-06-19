@@ -26,6 +26,24 @@ import { PAYMENT_CONFIG, ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/paymen
 import { programs, formatModuleSchedule } from "@/lib/data/programs";
 import { cn } from "@/lib/utils";
 
+function RequiredLabel({
+  htmlFor,
+  children,
+}: {
+  htmlFor?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Label htmlFor={htmlFor}>
+      {children}
+      <span className="ml-0.5 text-red-600" aria-hidden="true">
+        *
+      </span>
+      <span className="sr-only"> (required)</span>
+    </Label>
+  );
+}
+
 function FormSection({
   title,
   children,
@@ -67,7 +85,12 @@ function YesNoField({
 }) {
   return (
     <div>
-      <Label>{label}</Label>
+      <Label>
+        {label}
+        <span className="ml-0.5 text-red-600" aria-hidden="true">
+          *
+        </span>
+      </Label>
       <div className="mt-2 flex gap-3">
         {(["yes", "no"] as const).map((option) => (
           <label
@@ -192,6 +215,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
     const fileValidation = validatePaymentScreenshot(screenshotFile ?? undefined);
     if (fileValidation) {
       setScreenshotError(fileValidation);
+      document.getElementById("paymentScreenshot")?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
 
@@ -263,7 +287,8 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
         </h2>
         <p className="text-muted leading-relaxed">
           Fill in your details below and upload your PKR 1,000 registration payment
-          screenshot to secure your seat.
+          screenshot to secure your seat. Fields marked with{" "}
+          <span className="text-red-600 font-medium">*</span> are required.
         </p>
       </div>
 
@@ -278,59 +303,69 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
           <FormSection title="Personal Information">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="sm:col-span-2">
-                <Label htmlFor="fullName">Full Name</Label>
+                <RequiredLabel htmlFor="fullName">Full Name</RequiredLabel>
                 <Input
                   id="fullName"
                   placeholder="Your full name"
                   className="mt-2"
+                  required
+                  aria-required="true"
                   {...register("fullName")}
                 />
                 <FieldError message={errors.fullName?.message} />
               </div>
 
               <div className="sm:col-span-2">
-                <Label htmlFor="fatherName">Father&apos;s Name</Label>
+                <RequiredLabel htmlFor="fatherName">Father&apos;s Name</RequiredLabel>
                 <Input
                   id="fatherName"
                   placeholder="Father's full name"
                   className="mt-2"
+                  required
+                  aria-required="true"
                   {...register("fatherName")}
                 />
                 <FieldError message={errors.fatherName?.message} />
               </div>
 
               <div>
-                <Label htmlFor="cnic">CNIC (13 digits)</Label>
+                <RequiredLabel htmlFor="cnic">CNIC (13 digits)</RequiredLabel>
                 <Input
                   id="cnic"
                   inputMode="numeric"
                   placeholder="1234512345678"
                   maxLength={13}
                   className="mt-2"
+                  required
+                  aria-required="true"
                   {...register("cnic")}
                 />
                 <FieldError message={errors.cnic?.message} />
               </div>
 
               <div>
-                <Label htmlFor="whatsapp">WhatsApp Number</Label>
+                <RequiredLabel htmlFor="whatsapp">WhatsApp Number</RequiredLabel>
                 <Input
                   id="whatsapp"
                   type="tel"
                   placeholder="03001234567"
                   className="mt-2"
+                  required
+                  aria-required="true"
                   {...register("whatsapp")}
                 />
                 <FieldError message={errors.whatsapp?.message} />
               </div>
 
               <div className="sm:col-span-2">
-                <Label htmlFor="email">Email Address</Label>
+                <RequiredLabel htmlFor="email">Email Address</RequiredLabel>
                 <Input
                   id="email"
                   type="email"
                   placeholder="you@email.com"
                   className="mt-2"
+                  required
+                  aria-required="true"
                   {...register("email")}
                 />
                 <FieldError message={errors.email?.message} />
@@ -341,33 +376,39 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
           <FormSection title="Education Details">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="sm:col-span-2">
-                <Label htmlFor="institution">School / College / University</Label>
+                <RequiredLabel htmlFor="institution">School / College / University</RequiredLabel>
                 <Input
                   id="institution"
                   placeholder="Name of your institution"
                   className="mt-2"
+                  required
+                  aria-required="true"
                   {...register("institution")}
                 />
                 <FieldError message={errors.institution?.message} />
               </div>
 
               <div>
-                <Label htmlFor="classSemester">Class / Semester</Label>
+                <RequiredLabel htmlFor="classSemester">Class / Semester</RequiredLabel>
                 <Input
                   id="classSemester"
                   placeholder="e.g. 2nd Semester, Matric, 1st Year"
                   className="mt-2"
+                  required
+                  aria-required="true"
                   {...register("classSemester")}
                 />
                 <FieldError message={errors.classSemester?.message} />
               </div>
 
               <div>
-                <Label htmlFor="fieldOfStudy">Field of Study</Label>
+                <RequiredLabel htmlFor="fieldOfStudy">Field of Study</RequiredLabel>
                 <Input
                   id="fieldOfStudy"
                   placeholder="e.g. Computer Science, ICS, IT"
                   className="mt-2"
+                  required
+                  aria-required="true"
                   {...register("fieldOfStudy")}
                 />
                 <FieldError message={errors.fieldOfStudy?.message} />
@@ -378,7 +419,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
           <FormSection title="Program Selection">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="sm:col-span-2">
-                <Label htmlFor="program">Program Applying For</Label>
+                <RequiredLabel htmlFor="program">Program Applying For</RequiredLabel>
                 <Controller
                   name="program"
                   control={control}
@@ -392,7 +433,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                         }
                       }}
                     >
-                      <SelectTrigger id="program" className="mt-2">
+                      <SelectTrigger id="program" className="mt-2" aria-required="true">
                         <SelectValue placeholder="Select a program" />
                       </SelectTrigger>
                       <SelectContent>
@@ -421,7 +462,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
               </div>
 
               <div className="sm:col-span-2">
-                <Label htmlFor="level">Starting Module</Label>
+                <RequiredLabel htmlFor="level">Starting Module</RequiredLabel>
                 <Controller
                   name="level"
                   control={control}
@@ -431,7 +472,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                       onValueChange={field.onChange}
                       disabled={!activeProgram || !isEnrollable(activeProgram.slug)}
                     >
-                      <SelectTrigger id="level" className="mt-2">
+                      <SelectTrigger id="level" className="mt-2" aria-required="true">
                         <SelectValue placeholder="Select starting module" />
                       </SelectTrigger>
                       <SelectContent>
@@ -550,12 +591,12 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
               </p>
             </div>
             <div>
-              <Label htmlFor="paymentScreenshot">
+              <RequiredLabel htmlFor="paymentScreenshot">
                 Registration Payment Screenshot — PKR{" "}
                 {PAYMENT_CONFIG.registrationFee.toLocaleString()} only
-              </Label>
+              </RequiredLabel>
               <p className="text-xs text-muted mt-1 mb-2">
-                Upload a clear screenshot of your Easypaisa payment to{" "}
+                <strong>Required.</strong> Upload a clear screenshot of your Easypaisa payment to{" "}
                 <strong>{PAYMENT_CONFIG.easypaisa.number}</strong> (
                 {PAYMENT_CONFIG.easypaisa.accountName})
               </p>
@@ -564,6 +605,8 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                 ref={fileInputRef}
                 type="file"
                 accept="image/*"
+                required
+                aria-required="true"
                 className="mt-1 cursor-pointer file:mr-4 file:rounded-md file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-medium file:text-primary-foreground hover:file:bg-accent"
                 onChange={handleScreenshotChange}
               />
@@ -604,7 +647,8 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                       className="mt-0.5 h-4 w-4 shrink-0 rounded border-border text-primary focus:ring-primary"
                     />
                     <span className="text-sm leading-relaxed text-foreground">
-                      I confirm that all information provided is correct.
+                      I confirm that all information provided is correct.{" "}
+                      <span className="text-red-600">*</span>
                     </span>
                   </label>
                 )}
@@ -631,7 +675,8 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                     />
                     <span className="text-sm leading-relaxed text-foreground">
                       I agree to follow the rules, attendance policy, and code of conduct
-                      of Emerging Edge School of Technology.
+                      of Emerging Edge School of Technology.{" "}
+                      <span className="text-red-600">*</span>
                     </span>
                   </label>
                 )}

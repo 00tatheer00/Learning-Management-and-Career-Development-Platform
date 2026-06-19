@@ -41,7 +41,7 @@ export const enrollmentSchema = z.object({
   program: z.enum(ENROLLABLE_PROGRAM_SLUGS, {
     message: "Please choose Web or App course",
   }),
-  level: z.string().min(1, "Please choose a level"),
+  level: z.string().min(1, "Please choose a starting module"),
   learningMode: z.literal("online"),
   hasLaptop: z.enum(["yes", "no"], {
     message: "Please answer: do you have a laptop?",
