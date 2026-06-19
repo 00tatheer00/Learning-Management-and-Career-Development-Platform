@@ -2,9 +2,8 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
 import { createApiResponse } from "@/lib/api/enrollment";
-import { saveEnrollment } from "@/lib/api/portal-data";
+import { saveEnrollment, getEnrollmentByEmail } from "@/lib/api/portal-data";
 import { uploadPaymentScreenshot, uploadProfilePhoto } from "@/lib/cloudinary";
-import { checkRateLimit, enrollmentRateLimit } from "@/lib/security/rate-limit";
 import { hashPassword } from "@/lib/auth/password";
 import { encryptSecret } from "@/lib/crypto/secret";
 
@@ -32,22 +31,6 @@ const enrollmentBodySchema = z.object({
 
 export async function POST(request: Request) {
   try {
-    const ip =
-      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-      request.headers.get("x-real-ip") ??
-      "unknown";
-
-    const rate = await checkRateLimit(enrollmentRateLimit, `enrollment:${ip}`);
-    if (!rate.success) {
-      return NextResponse.json(
-        createApiResponse(false, {
-          error: "Too many requests",
-          message: "Please wait before submitting another registration.",
-        }),
-        { status: 429 }
-      );
-    }
-
     const formData = await request.formData();
     const screenshot = formData.get("paymentScreenshot");
     const profilePhoto = formData.get("profilePhoto");
@@ -135,6 +118,23 @@ export async function POST(request: Request) {
           message: validated.error.issues[0]?.message,
         }),
         { status: 400 }
+      );
+    }
+
+    const existingEnrollment = await getEnrollmentByEmail(validated.data.email);
+    if (
+      existingEnrollment &&
+      (existingEnrollment.status === "pending" || existingEnrollment.status === "approved")
+    ) {
+      return NextResponse.json(
+        createApiResponse(false, {
+          error: "Already registered",
+          message:
+            existingEnrollment.status === "pending"
+              ? "This email already has a pending registration. Please wait for admin approval."
+              : "This email is already registered and approved. Use the portal login page.",
+        }),
+        { status: 409 }
       );
     }
 

@@ -66,6 +66,13 @@ function mapEnrollment(record: {
 
 export type LiveSessionPreview = Omit<LiveSession, "meetLink">;
 
+export async function getEnrollmentByEmail(email: string) {
+  return prisma.enrollment.findFirst({
+    where: { email: email.toLowerCase() },
+    orderBy: { createdAt: "desc" },
+  });
+}
+
 export async function getEnrollmentById(id: string) {
   return prisma.enrollment.findUnique({ where: { id } });
 }

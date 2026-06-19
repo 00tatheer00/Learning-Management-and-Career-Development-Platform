@@ -16,7 +16,6 @@ function createRatelimit(requests: number, window: `${number} ${"s" | "m" | "h" 
 }
 
 export const loginRateLimit = createRatelimit(5, "15 m");
-export const enrollmentRateLimit = createRatelimit(3, "1 h");
 
 export async function checkRateLimit(
   limiter: Ratelimit | null,
