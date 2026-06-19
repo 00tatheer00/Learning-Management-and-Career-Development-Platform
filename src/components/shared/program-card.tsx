@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -48,13 +49,24 @@ export function ProgramCard({ program, className }: ProgramCardProps) {
       )}
     >
       <div className="flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-border/70 bg-background shadow-[0_12px_40px_-18px_rgba(15,23,42,0.35)] transition-all duration-500 group-hover:border-primary/25 group-hover:shadow-[0_28px_60px_-24px_rgba(234,88,12,0.28)]">
-        <div
-          className={cn(
-            "relative overflow-hidden bg-gradient-to-br px-6 pb-8 pt-6",
-            accent.gradient
+        <div className="relative min-h-[220px] overflow-hidden px-6 pb-8 pt-6 sm:min-h-[240px]">
+          {program.image && (
+            <Image
+              src={program.image}
+              alt=""
+              fill
+              className="object-cover transition-transform duration-700 group-hover:scale-105"
+              sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+              aria-hidden="true"
+            />
           )}
-        >
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,0.2),transparent_45%)]" />
+          <div
+            className={cn(
+              "absolute inset-0 bg-gradient-to-br",
+              program.image ? "from-black/75 via-black/55 to-black/80" : accent.gradient
+            )}
+          />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,0.12),transparent_50%)]" />
           <div className="relative z-10 flex items-start justify-between gap-3">
             <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15 text-white backdrop-blur-sm">
               <Icon size={24} weight="duotone" aria-hidden="true" />

@@ -32,25 +32,23 @@ function getAccent(programSlug?: string) {
   return { gradient: accent.gradient, glow: accent.glow };
 }
 
-function TrainerPortrait({ trainer, tall = false }: { trainer: Trainer; tall?: boolean }) {
+function TrainerPortrait({ trainer }: { trainer: Trainer }) {
   const accent = getAccent(trainer.programSlug);
   const initials = getInitials(trainer.name);
+  const isLocalImage = trainer.image?.startsWith("/");
 
   return (
-    <div
-      className={cn(
-        "relative overflow-hidden bg-surface",
-        tall ? "aspect-[4/5]" : "aspect-[5/6]"
-      )}
-    >
+    <div className="relative aspect-[4/5] w-full overflow-hidden bg-surface">
       {trainer.image ? (
         <Image
           src={trainer.image}
           alt={trainer.name}
           fill
-          className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
-          style={{ objectPosition: trainer.imagePosition ?? "center" }}
+          unoptimized={isLocalImage}
+          className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+          style={{ objectPosition: trainer.imagePosition ?? "center top" }}
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          priority={trainer.featured}
         />
       ) : (
         <div
@@ -66,24 +64,15 @@ function TrainerPortrait({ trainer, tall = false }: { trainer: Trainer; tall?: b
         </div>
       )}
 
-      <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/45 to-black/10" />
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
 
       {trainer.experience && (
         <div className="absolute left-4 top-4 z-10">
-          <span className="inline-flex items-center rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white backdrop-blur-md">
+          <span className="inline-flex items-center rounded-full border border-white/25 bg-black/35 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white backdrop-blur-md">
             {trainer.experience}
           </span>
         </div>
       )}
-
-      <div className="absolute inset-x-0 bottom-0 z-10 p-5 pt-20">
-        <div className="mb-3 h-1 w-10 rounded-full bg-primary shadow-[0_0_12px_rgba(234,88,12,0.65)]" />
-        <h3 className="text-xl font-bold leading-tight text-white sm:text-[1.35rem]">
-          {trainer.name}
-        </h3>
-        <p className="mt-1.5 text-sm font-medium text-white/75">{trainer.designation}</p>
-      </div>
     </div>
   );
 }
@@ -122,9 +111,15 @@ export function TrainerCard({
       )}
     >
       <div className="overflow-hidden rounded-[1.75rem] border border-border/70 bg-background shadow-[0_12px_40px_-18px_rgba(15,23,42,0.35)] transition-all duration-500 group-hover:border-primary/25 group-hover:shadow-[0_28px_60px_-24px_rgba(234,88,12,0.28)]">
-        <TrainerPortrait trainer={trainer} tall={variant === "detailed"} />
+        <TrainerPortrait trainer={trainer} />
 
         <div className="space-y-4 border-t border-border/60 bg-background p-4 sm:p-5">
+          <div>
+            <div className="mb-2 h-1 w-10 rounded-full bg-primary" />
+            <h3 className="text-lg font-bold tracking-tight sm:text-xl">{trainer.name}</h3>
+            <p className="mt-1 text-sm font-semibold text-primary">{trainer.designation}</p>
+          </div>
+
           {variant === "detailed" && (
             <p className="text-sm leading-relaxed text-muted">{trainer.bio}</p>
           )}

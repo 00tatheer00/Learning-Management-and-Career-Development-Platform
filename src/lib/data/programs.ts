@@ -30,6 +30,8 @@ export const programs: Program[] = [
       "Go from zero to full-stack developer — HTML, CSS, JavaScript, React, and backend with Node.js, Express, and MongoDB.",
     duration: "~3.5 months · 4 modules",
     level: "Beginner to Advanced",
+    image:
+      "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=900&h=560&fit=crop&q=80",
     outcomes: [
       "Build responsive, modern websites from scratch",
       "Write JavaScript and React for fast, interactive UIs",
@@ -68,6 +70,8 @@ export const programs: Program[] = [
       "Learn Dart, Flutter UI, and Firebase to build and publish cross-platform mobile apps for Android and iOS.",
     duration: "9 weeks · 3 modules",
     level: "Beginner to Intermediate",
+    image:
+      "https://images.unsplash.com/photo-1512941937719-81f0f74b0f78?w=900&h=560&fit=crop&q=80",
     outcomes: [
       "Master Dart and object-oriented programming",
       "Design beautiful Flutter mobile interfaces",
@@ -89,6 +93,8 @@ export const programs: Program[] = [
       "Explore machine learning, deep learning, and AI application development for real-world business solutions.",
     duration: "Coming Soon",
     level: "Intermediate",
+    image:
+      "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=900&h=560&fit=crop&q=80",
     outcomes: [
       "Understand ML fundamentals and algorithms",
       "Build and train neural networks",
@@ -106,6 +112,8 @@ export const programs: Program[] = [
       "Learn professional video editing, motion graphics, and content creation for social media, YouTube, and digital campaigns.",
     duration: "Coming Soon",
     level: "Beginner to Intermediate",
+    image:
+      "https://images.unsplash.com/photo-1574710160579-8ec4fc04bd1e?w=900&h=560&fit=crop&q=80",
     outcomes: [
       "Edit videos with professional tools",
       "Apply transitions, effects, and color grading",
@@ -123,6 +131,8 @@ export const programs: Program[] = [
       "Master SEO, content strategy, social media, and analytics to drive measurable business growth.",
     duration: "Coming Soon",
     level: "Beginner",
+    image:
+      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=900&h=560&fit=crop&q=80",
     outcomes: [
       "Develop data-driven marketing strategies",
       "Execute SEO and content campaigns",
@@ -140,6 +150,8 @@ export const programs: Program[] = [
       "Build strong visual design skills for branding, social media, print, and digital marketing creatives.",
     duration: "Coming Soon",
     level: "Beginner to Intermediate",
+    image:
+      "https://images.unsplash.com/photo-1626785774573-ac980107945f?w=900&h=560&fit=crop&q=80",
     outcomes: [
       "Create logos, posters, and brand assets",
       "Design social media and marketing graphics",
@@ -157,6 +169,8 @@ export const programs: Program[] = [
       "Learn user-centered design principles, prototyping, and design systems for digital products.",
     duration: "Coming Soon",
     level: "Beginner to Intermediate",
+    image:
+      "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=900&h=560&fit=crop&q=80",
     outcomes: [
       "Conduct user research and usability testing",
       "Create wireframes and high-fidelity prototypes",
