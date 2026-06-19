@@ -8,7 +8,7 @@ export const LOGO_PATH = SITE_CONFIG.logo;
 type SiteLogoVariant = "navbar" | "footer" | "login" | "portal";
 
 const variantClasses: Record<SiteLogoVariant, string> = {
-  navbar: "h-10 sm:h-11",
+  navbar: "h-12 sm:h-14 lg:h-16",
   footer: "h-14 sm:h-16",
   login: "h-16 sm:h-20",
   portal: "h-8",
