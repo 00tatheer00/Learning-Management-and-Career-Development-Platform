@@ -3,7 +3,7 @@ import { z } from "zod";
 import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
 import { getBatchForProgram } from "@/lib/constants/batch";
 import { createApiResponse } from "@/lib/api/enrollment";
-import { saveEnrollment, getEnrollmentByEmail, getEnrollmentByCnic } from "@/lib/api/portal-data";
+import { saveEnrollment } from "@/lib/api/portal-data";
 import { sendAdminNewRegistrationAlert } from "@/lib/notifications/admin-registration-alert";
 import { uploadPaymentScreenshot } from "@/lib/cloudinary";
 
@@ -90,40 +90,6 @@ export async function POST(request: Request) {
           message: validated.error.issues[0]?.message,
         }),
         { status: 400 }
-      );
-    }
-
-    const existingEnrollment = await getEnrollmentByEmail(validated.data.email);
-    if (
-      existingEnrollment &&
-      (existingEnrollment.status === "pending" || existingEnrollment.status === "approved")
-    ) {
-      return NextResponse.json(
-        createApiResponse(false, {
-          error: "Already registered",
-          message:
-            existingEnrollment.status === "pending"
-              ? "This email already has a pending registration. Please wait for admin approval."
-              : "This email is already registered and approved. Use the portal login page.",
-        }),
-        { status: 409 }
-      );
-    }
-
-    const existingCnic = await getEnrollmentByCnic(validated.data.cnic);
-    if (
-      existingCnic &&
-      (existingCnic.status === "pending" || existingCnic.status === "approved")
-    ) {
-      return NextResponse.json(
-        createApiResponse(false, {
-          error: "CNIC already registered",
-          message:
-            existingCnic.status === "pending"
-              ? "This CNIC already has a pending registration. Please wait for admin approval."
-              : "This CNIC is already registered. Contact admin if you need help.",
-        }),
-        { status: 409 }
       );
     }
 
