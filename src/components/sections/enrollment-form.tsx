@@ -6,7 +6,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { Loader2, CheckCircle2 } from "lucide-react";
-import { GlobeHemisphereWest, DeviceMobile, WifiHigh } from "@phosphor-icons/react";
+import { GlobeHemisphereWest, DeviceMobile, WifiHigh, Clock, CalendarDots } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,6 +24,7 @@ import {
 } from "@/lib/validations/enrollment";
 import { PAYMENT_CONFIG, ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
 import { programs, formatModuleSchedule } from "@/lib/data/programs";
+import type { ProgramModule } from "@/types";
 import { cn } from "@/lib/utils";
 
 function RequiredLabel({
@@ -41,6 +42,84 @@ function RequiredLabel({
       </span>
       <span className="sr-only"> (required)</span>
     </Label>
+  );
+}
+
+function EnrollmentModulePicker({
+  modules,
+  value,
+  onChange,
+  disabled,
+}: {
+  modules: ProgramModule[];
+  value: string;
+  onChange: (moduleName: string) => void;
+  disabled?: boolean;
+}) {
+  if (modules.length === 0) {
+    return (
+      <p className="mt-2 text-sm text-muted">Select a program first to see available modules.</p>
+    );
+  }
+
+  return (
+    <div className="mt-3 space-y-3" role="radiogroup" aria-label="Starting module">
+      {modules.map((mod, index) => {
+        const isSelected = value === mod.name;
+
+        return (
+          <button
+            key={mod.name}
+            type="button"
+            disabled={disabled}
+            onClick={() => onChange(mod.name)}
+            className={cn(
+              "w-full rounded-xl border p-4 text-left transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50",
+              isSelected
+                ? "border-primary bg-primary/5 shadow-sm ring-2 ring-primary/20"
+                : "border-border bg-background hover:border-primary/30 hover:bg-surface/50"
+            )}
+            role="radio"
+            aria-checked={isSelected}
+          >
+            <div className="flex items-start gap-4">
+              <span
+                className={cn(
+                  "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-sm font-bold",
+                  isSelected ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary"
+                )}
+              >
+                {index + 1}
+              </span>
+
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">
+                  Module {index + 1}
+                </p>
+                <p className="mt-1 text-base font-semibold text-foreground">{mod.name}</p>
+                {mod.subtitle && (
+                  <p className="mt-1.5 text-sm leading-relaxed text-muted">{mod.subtitle}</p>
+                )}
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-surface/80 px-2.5 py-1 text-xs font-medium text-muted">
+                    <Clock size={14} weight="duotone" className="text-primary" aria-hidden="true" />
+                    Duration: {mod.duration}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-surface/80 px-2.5 py-1 text-xs font-medium text-muted">
+                    <CalendarDots size={14} weight="duotone" className="text-primary" aria-hidden="true" />
+                    {formatModuleSchedule(mod)}
+                  </span>
+                </div>
+              </div>
+
+              {isSelected && (
+                <CheckCircle2 className="mt-1 h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
+              )}
+            </div>
+          </button>
+        );
+      })}
+    </div>
   );
 }
 
@@ -177,7 +256,6 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
   });
 
   const selectedProgram = watch("program");
-  const selectedModuleName = watch("level");
   const activeProgram = programs.find((p) => p.slug === selectedProgram);
   const isEnrollable = (slug: string) =>
     ENROLLABLE_PROGRAM_SLUGS.includes(slug as (typeof ENROLLABLE_PROGRAM_SLUGS)[number]);
@@ -463,71 +541,23 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
 
               <div className="sm:col-span-2">
                 <RequiredLabel htmlFor="level">Starting Module</RequiredLabel>
+                <p className="mt-1 text-xs text-muted">
+                  Har module kya cover karta hai aur kitni duration hai — neeche se apna starting
+                  module choose karein.
+                </p>
                 <Controller
                   name="level"
                   control={control}
                   render={({ field }) => (
-                    <Select
+                    <EnrollmentModulePicker
+                      modules={activeProgram?.modules ?? []}
                       value={field.value}
-                      onValueChange={field.onChange}
+                      onChange={field.onChange}
                       disabled={!activeProgram || !isEnrollable(activeProgram.slug)}
-                    >
-                      <SelectTrigger id="level" className="mt-2" aria-required="true">
-                        <SelectValue placeholder="Select starting module" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {activeProgram?.modules.map((mod, index) => (
-                          <SelectItem key={mod.name} value={mod.name} className="py-3">
-                            <div className="flex flex-col gap-0.5 text-left">
-                              <span className="font-medium">
-                                Module {index + 1}: {mod.name}
-                              </span>
-                              {mod.subtitle && (
-                                <span className="text-xs text-muted">{mod.subtitle}</span>
-                              )}
-                              <span className="text-xs text-primary">
-                                {mod.duration} · {formatModuleSchedule(mod)}
-                              </span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    />
                   )}
                 />
                 <FieldError message={errors.level?.message} />
-
-                {activeProgram && activeProgram.modules.length > 0 && (
-                  <div className="mt-4 space-y-3 rounded-xl border border-border bg-surface/50 p-4">
-                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
-                      {activeProgram.title} — All Modules
-                    </p>
-                    {activeProgram.modules.map((mod, index) => {
-                      const isSelected = selectedModuleName === mod.name;
-                      return (
-                        <div
-                          key={mod.name}
-                          className={cn(
-                            "rounded-lg border bg-background p-3 transition-colors",
-                            isSelected
-                              ? "border-primary/40 bg-primary/5"
-                              : "border-border/70"
-                          )}
-                        >
-                          <p className="text-sm font-semibold">
-                            Module {index + 1}: {mod.name}
-                          </p>
-                          {mod.subtitle && (
-                            <p className="mt-1 text-xs leading-relaxed text-muted">{mod.subtitle}</p>
-                          )}
-                          <p className="mt-2 text-xs font-medium text-primary">
-                            {mod.duration} · {formatModuleSchedule(mod)}
-                          </p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
               </div>
 
               <div className="sm:col-span-2">
