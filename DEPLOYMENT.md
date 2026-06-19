@@ -29,9 +29,14 @@ Stack: **Vercel** (frontend + API) · **MongoDB Atlas** (database) · **NextAuth
 ## 2b. Resend (approval emails)
 
 1. Create account at [resend.com](https://resend.com)
-2. Add and verify your domain (or use `onboarding@resend.dev` for testing)
-3. Copy API key → `RESEND_API_KEY`
-4. Set `EMAIL_FROM` to your verified sender
+2. **Domains** → Add `emergingedge.tech`
+3. Add the DNS records Resend shows (SPF, DKIM) in Hostinger DNS for `emergingedge.tech`
+4. Wait until status is **Verified**
+5. Copy API key → `RESEND_API_KEY`
+6. Set on Vercel:
+   - `EMAIL_FROM` = `EEST <noreply@emergingedge.tech>`
+   - `EMAIL_REPLY_TO` = `eeschooltech@gmail.com` (optional)
+7. **Gmail cannot be used as sender.** Until the domain is verified, emails will fail.
 
 ---
 
@@ -74,7 +79,8 @@ openssl rand -base64 32
 | `UPSTASH_REDIS_REST_URL` | No | Rate limiting |
 | `UPSTASH_REDIS_REST_TOKEN` | No | Rate limiting |
 | `RESEND_API_KEY` | Yes (approval emails) | [resend.com](https://resend.com) API key |
-| `EMAIL_FROM` | Yes (approval emails) | Verified sender, e.g. `EEST <hello@yourdomain.com>` |
+| `EMAIL_FROM` | Yes (approval emails) | Verified sender: `EEST <noreply@emergingedge.tech>` |
+| `EMAIL_REPLY_TO` | No | Reply address, e.g. `eeschooltech@gmail.com` |
 | `ULTRAMSG_INSTANCE_ID` | Yes (approval WhatsApp) | UltraMsg instance ID, e.g. `instance181496` |
 | `ULTRAMSG_TOKEN` | Yes (approval WhatsApp) | UltraMsg API token |
 

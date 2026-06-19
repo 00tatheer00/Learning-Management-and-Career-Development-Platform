@@ -109,6 +109,21 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
 
+  useEffect(() => {
+    if (!isSuccess) return;
+
+    const scrollToForm = () => {
+      const target = document.getElementById("register-form");
+      if (!target) return;
+      const top = target.getBoundingClientRect().top + window.scrollY - 96;
+      window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+    };
+
+    scrollToForm();
+    const timer = window.setTimeout(scrollToForm, 150);
+    return () => window.clearTimeout(timer);
+  }, [isSuccess]);
+
   const {
     register,
     handleSubmit,
@@ -217,10 +232,12 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
   if (isSuccess) {
     return (
       <motion.div
+        id="register-form-panel"
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="rounded-2xl border border-border bg-background p-8 lg:p-10 shadow-sm text-center"
+        className="rounded-2xl border border-border bg-background p-8 lg:p-10 shadow-sm text-center min-h-[320px] flex flex-col items-center justify-center"
         aria-live="polite"
+        tabIndex={-1}
       >
         <CheckCircle2 className="w-16 h-16 text-primary mx-auto mb-4" aria-hidden="true" />
         <h2 className="text-2xl font-bold mb-2">Registration Submitted!</h2>

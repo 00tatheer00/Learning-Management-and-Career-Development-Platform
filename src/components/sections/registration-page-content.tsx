@@ -18,7 +18,7 @@ export function RegistrationPageContent({
             <RegistrationDetailsSidebar />
           </div>
 
-          <div className="lg:col-span-3" id="register-form">
+          <div className="lg:col-span-3 scroll-mt-24" id="register-form">
             <EnrollmentForm defaultProgram={defaultProgram} />
           </div>
         </div>

@@ -1,51 +1,65 @@
 import { PortalPageHeader } from "@/components/portal/portal-ui";
-import { Gear, Key, Database, ShieldCheck } from "@phosphor-icons/react/ssr";
+import { Key, Envelope, ChatsCircle, Globe } from "@phosphor-icons/react/ssr";
+import { SITE_CONFIG } from "@/lib/constants";
+import { getPortalLoginUrl } from "@/lib/site-url";
 
 export default function AdminSettingsPage() {
   return (
     <div>
-      <PortalPageHeader title="Settings" description="Portal configuration and demo account information." />
+      <PortalPageHeader
+        title="Settings"
+        description="Portal configuration and production checklist."
+      />
 
       <div className="space-y-4 max-w-2xl">
         <div className="rounded-2xl border border-border bg-background p-5">
           <div className="flex items-center gap-3 mb-3">
             <Key size={24} weight="duotone" className="text-primary" />
-            <h2 className="font-bold">Demo Login Accounts</h2>
+            <h2 className="font-bold">Student Accounts</h2>
           </div>
-          <div className="space-y-2 text-sm">
-            <p><strong>Admin:</strong> admin@eest.com / admin123</p>
-            <p><strong>Trainer:</strong> trainer@eest.com / trainer123</p>
-            <p><strong>Student:</strong> student@eest.com / student123</p>
+          <p className="text-sm text-muted">
+            When you approve a registration, a random 8-character portal password is created.
+            Login details are sent by email and WhatsApp. Username is the student&apos;s email.
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+          <div className="flex items-center gap-3 mb-3">
+            <Envelope size={24} weight="duotone" className="text-amber-700" />
+            <h2 className="font-bold text-amber-900">Email (Resend)</h2>
           </div>
-          <p className="text-xs text-muted mt-3">When you approve a registration, a random portal password is generated and sent to the student by email and WhatsApp. Username is their email.</p>
+          <p className="text-sm text-amber-900/90 leading-relaxed">
+            Emails only work after you verify <strong>emergingedge.tech</strong> at{" "}
+            <a href="https://resend.com/domains" className="underline" target="_blank" rel="noopener noreferrer">
+              resend.com/domains
+            </a>
+            . Then set Vercel env <code className="bg-white/80 px-1 rounded">EMAIL_FROM</code> to{" "}
+            <code className="bg-white/80 px-1 rounded">EEST &lt;noreply@emergingedge.tech&gt;</code>.
+            Gmail addresses cannot be used as the sender.
+          </p>
         </div>
 
         <div className="rounded-2xl border border-border bg-background p-5">
           <div className="flex items-center gap-3 mb-3">
-            <Database size={24} weight="duotone" className="text-blue-600" />
-            <h2 className="font-bold">Data Storage</h2>
+            <ChatsCircle size={24} weight="duotone" className="text-emerald-600" />
+            <h2 className="font-bold">WhatsApp (UltraMsg)</h2>
           </div>
-          <p className="text-sm text-muted">Enrollments, users, assignments, and sessions are stored in the <code className="bg-surface px-1 rounded">data/</code> folder. Payment screenshots are in <code className="bg-surface px-1 rounded">data/uploads/</code>.</p>
+          <p className="text-sm text-muted">
+            Keep your UltraMsg instance connected (QR scanned). Approval messages use{" "}
+            <code className="bg-surface px-1 rounded">ULTRAMSG_INSTANCE_ID</code> and{" "}
+            <code className="bg-surface px-1 rounded">ULTRAMSG_TOKEN</code> on Vercel.
+          </p>
         </div>
 
         <div className="rounded-2xl border border-border bg-background p-5">
           <div className="flex items-center gap-3 mb-3">
-            <ShieldCheck size={24} weight="duotone" className="text-emerald-600" />
-            <h2 className="font-bold">Security Note</h2>
+            <Globe size={24} weight="duotone" className="text-blue-600" />
+            <h2 className="font-bold">Live URLs</h2>
           </div>
-          <p className="text-sm text-muted">This is a development portal. For production, use a real database and stronger authentication.</p>
-        </div>
-
-        <div className="rounded-2xl border border-border bg-background p-5">
-          <div className="flex items-center gap-3 mb-3">
-            <Gear size={24} weight="duotone" className="text-muted" />
-            <h2 className="font-bold">Portal URLs</h2>
-          </div>
-          <ul className="text-sm space-y-1 text-muted">
-            <li>/login — Sign in page</li>
-            <li>/student/dashboard — Student portal</li>
-            <li>/trainer/dashboard — Trainer portal</li>
-            <li>/admin/dashboard — Admin panel</li>
+          <ul className="text-sm space-y-2 text-muted">
+            <li><strong>Website:</strong> {SITE_CONFIG.url}</li>
+            <li><strong>Login:</strong> {getPortalLoginUrl()}</li>
+            <li><strong>Register:</strong> {SITE_CONFIG.url}/register</li>
           </ul>
         </div>
       </div>

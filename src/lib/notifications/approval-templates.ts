@@ -109,3 +109,28 @@ Login: ${loginUrl}
 
 Welcome to your batch. See you in class!`;
 }
+
+export function buildApprovalEmailText({
+  studentName,
+  email,
+  password,
+  courseName,
+  level,
+  loginUrl,
+}: ApprovalEmailParams): string {
+  const firstName = studentName.split(" ")[0];
+
+  return `Congratulations ${firstName}!
+
+Your registration at Emerging Edge School of Technology has been approved.
+
+Course: ${courseName}
+Level: ${level}
+
+Portal Login
+Username: ${email}
+Password: ${password}
+Login: ${loginUrl}
+
+Keep your login details private.`;
+}
