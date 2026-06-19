@@ -11,7 +11,7 @@ export const faqs: FAQ[] = [
     id: "2",
     question: "What are the eligibility requirements?",
     answer:
-      "Most programs require basic computer literacy and English proficiency. Web Development Foundations has no prior coding experience required. Advanced levels may require completion of prerequisite levels or equivalent experience demonstrated through our assessment.",
+      "Anyone can join EEST. There are no strict eligibility requirements — whether you are a student, job seeker, or working professional. Beginners are welcome, and no prior coding experience is needed. You only need a phone or laptop, internet access, and 1–2 hours daily to learn.",
   },
   {
     id: "3",

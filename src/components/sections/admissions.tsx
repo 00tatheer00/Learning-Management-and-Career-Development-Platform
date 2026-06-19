@@ -39,6 +39,9 @@ export function AdmissionsSection() {
           >
             <PremiumIcon icon={UsersThree} size="lg" className="mb-6" />
             <h3 className="text-xl font-bold mb-4">Eligibility</h3>
+            <p className="text-sm text-muted mb-4 leading-relaxed">
+              Anyone can join EEST — beginners, students, and professionals are all welcome.
+            </p>
             <ul className="space-y-3">
               {eligibility.map((item) => (
                 <li key={item} className="group/item flex items-start gap-3 text-sm text-muted">

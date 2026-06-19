@@ -1,9 +1,10 @@
 export const eligibility = [
+  "Anyone can join — no strict barriers",
+  "Beginners, students, and professionals welcome",
+  "No coding or technical background needed",
   "You can use a phone or laptop",
-  "You have internet at home",
-  "You can give 1–2 hours daily for learning",
-  "No coding experience needed to start",
-  "Age 16 or above",
+  "You need internet at home",
+  "Give 1–2 hours daily for learning",
 ];
 
 export const applicationProcess = [
