@@ -30,7 +30,6 @@ function mapEnrollment(record: {
   paymentScreenshot: string | null;
   paymentScreenshotPublicId: string | null;
   profilePhotoUrl: string | null;
-  profilePhotoPublicId: string | null;
   status: EnrollmentStatus;
   reviewedAt: Date | null;
   reviewedBy: string | null;
@@ -55,7 +54,6 @@ function mapEnrollment(record: {
     confirmInfoCorrect: record.confirmInfoCorrect,
     agreeToPolicies: record.agreeToPolicies,
     paymentScreenshot: record.paymentScreenshot ?? undefined,
-    profilePhotoUrl: record.profilePhotoUrl ?? undefined,
     status: record.status,
     reviewedAt: record.reviewedAt?.toISOString(),
     reviewedBy: record.reviewedBy ?? undefined,
@@ -84,23 +82,12 @@ export async function getEnrollments(): Promise<EnrollmentRecord[]> {
   return records.map(mapEnrollment);
 }
 
-export async function clearEnrollmentPortalPasswordEnc(id: string): Promise<void> {
-  await prisma.enrollment.update({
-    where: { id },
-    data: { portalPasswordEnc: null },
-  });
-}
-
 export async function saveEnrollment(
   enrollment: EnrollmentPayload & {
     id: string;
     createdAt: string;
     paymentScreenshot?: string;
     paymentScreenshotPublicId?: string;
-    profilePhotoUrl?: string;
-    profilePhotoPublicId?: string;
-    passwordHash: string;
-    portalPasswordEnc: string;
   }
 ): Promise<void> {
   await prisma.enrollment.create({
@@ -123,10 +110,6 @@ export async function saveEnrollment(
       agreeToPolicies: enrollment.agreeToPolicies,
       paymentScreenshot: enrollment.paymentScreenshot,
       paymentScreenshotPublicId: enrollment.paymentScreenshotPublicId,
-      profilePhotoUrl: enrollment.profilePhotoUrl,
-      profilePhotoPublicId: enrollment.profilePhotoPublicId,
-      passwordHash: enrollment.passwordHash,
-      portalPasswordEnc: enrollment.portalPasswordEnc,
       status: "pending",
       createdAt: new Date(enrollment.createdAt),
     },

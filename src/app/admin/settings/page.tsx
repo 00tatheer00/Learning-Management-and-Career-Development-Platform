@@ -17,7 +17,7 @@ export default function AdminSettingsPage() {
             <p><strong>Trainer:</strong> trainer@eest.com / trainer123</p>
             <p><strong>Student:</strong> student@eest.com / student123</p>
           </div>
-          <p className="text-xs text-muted mt-3">When you approve a registration, the student logs in with their registration email and portal password.</p>
+          <p className="text-xs text-muted mt-3">When you approve a registration, a random portal password is generated and sent to the student by email and WhatsApp. Username is their email.</p>
         </div>
 
         <div className="rounded-2xl border border-border bg-background p-5">

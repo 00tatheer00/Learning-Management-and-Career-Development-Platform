@@ -50,7 +50,7 @@ export function buildApprovalEmailHtml({
                 <tr>
                   <td style="padding:20px;">
                     <p style="margin:0 0 12px;font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#c2410c;">Your Portal Login</p>
-                    <p style="margin:0 0 8px;font-size:15px;"><strong>Email:</strong> ${email}</p>
+                    <p style="margin:0 0 8px;font-size:15px;"><strong>Username:</strong> ${email}</p>
                     <p style="margin:0 0 8px;font-size:15px;"><strong>Password:</strong> ${password}</p>
                     <p style="margin:0;font-size:15px;"><strong>Portal:</strong> <a href="${loginUrl}" style="color:#ea580c;">${loginUrl}</a></p>
                   </td>
@@ -103,7 +103,7 @@ Your registration at Emerging Edge School of Technology has been *approved*.
 📌 Level: ${level}
 
 🔐 *Portal Login*
-Email: ${email}
+Username: ${email}
 Password: ${password}
 Login: ${loginUrl}
 

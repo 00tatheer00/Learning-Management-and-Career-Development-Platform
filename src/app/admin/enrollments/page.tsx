@@ -17,7 +17,6 @@ interface Enrollment {
   cnic: string;
   status: "pending" | "approved" | "rejected";
   paymentScreenshot?: string;
-  profilePhotoUrl?: string;
   createdAt: string;
   institution: string;
 }
@@ -97,31 +96,19 @@ export default function AdminEnrollmentsPage() {
             const screenshotUrl = enrollment.paymentScreenshot?.startsWith("http")
               ? enrollment.paymentScreenshot
               : null;
-            const profilePhotoUrl = enrollment.profilePhotoUrl?.startsWith("http")
-              ? enrollment.profilePhotoUrl
-              : null;
 
             return (
               <div key={enrollment.id} className="rounded-2xl border border-border bg-background overflow-hidden">
                 <div className="p-5 sm:p-6">
                   <div className="flex flex-col lg:flex-row gap-6">
                     <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-3">
-                        {profilePhotoUrl ? (
-                          <div className="relative h-14 w-14 rounded-full overflow-hidden border border-border shrink-0">
-                            <Image src={profilePhotoUrl} alt={enrollment.fullName} fill className="object-cover" unoptimized />
-                          </div>
-                        ) : null}
-                        <div>
-                          <div className="flex items-center gap-2 mb-1">
-                            <StatusBadge status={enrollment.status} />
-                            <span className="text-xs text-muted">
-                              {new Date(enrollment.createdAt).toLocaleDateString()}
-                            </span>
-                          </div>
-                          <h2 className="text-xl font-bold">{enrollment.fullName}</h2>
-                        </div>
+                      <div className="flex items-center gap-2 mb-3">
+                        <StatusBadge status={enrollment.status} />
+                        <span className="text-xs text-muted">
+                          {new Date(enrollment.createdAt).toLocaleDateString()}
+                        </span>
                       </div>
+                      <h2 className="text-xl font-bold">{enrollment.fullName}</h2>
                       <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
                         <p><strong>Email:</strong> {enrollment.email}</p>
                         <p><strong>WhatsApp:</strong> {enrollment.whatsapp}</p>

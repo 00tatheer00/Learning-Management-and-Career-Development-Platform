@@ -68,6 +68,13 @@ export async function updateUser(id: string, updates: Partial<User>): Promise<Us
   }
 }
 
+export async function updateUserPasswordHash(id: string, passwordHash: string): Promise<void> {
+  await prisma.user.update({
+    where: { id },
+    data: { passwordHash, isActive: true },
+  });
+}
+
 function mapUser(user: {
   id: string;
   email: string;

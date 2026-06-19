@@ -74,5 +74,4 @@ export interface EnrollmentPayload {
   confirmInfoCorrect: boolean;
   agreeToPolicies: boolean;
   paymentScreenshot?: string;
-  profilePhotoUrl?: string;
 }

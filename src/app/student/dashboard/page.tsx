@@ -8,7 +8,6 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { getAssignments, getLiveSessionsPreview, getMaterials } from "@/lib/api/portal-data";
 import { getProgramBySlug } from "@/lib/data/programs";
 import { PortalPageHeader, StatCard, QuickActionCard } from "@/components/portal/portal-ui";
-import { PortalAvatar } from "@/components/portal/portal-avatar";
 import { Button } from "@/components/ui/button";
 import { JoinClassButton } from "@/components/portal/join-class-button";
 import { HELP_CONFIG } from "@/lib/constants/help";
@@ -34,18 +33,9 @@ export default async function StudentDashboardPage() {
         title={`Welcome, ${user.name.split(" ")[0]}!`}
         description={`You are enrolled in ${program?.title ?? "your course"}. Everything you need is right here.`}
       >
-        <div className="flex items-center gap-4">
-          <PortalAvatar
-            name={user.name}
-            avatarUrl={user.avatarUrl}
-            avatarInitials={user.avatarInitials}
-            size="lg"
-            className="border-2 border-primary/20"
-          />
-          <Button size="lg" asChild>
-            <Link href="/student/classes">Join Live Class</Link>
-          </Button>
-        </div>
+        <Button size="lg" asChild>
+          <Link href="/student/classes">Join Live Class</Link>
+        </Button>
       </PortalPageHeader>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getEnrollments, updateEnrollmentStatus, getEnrollmentById } from "@/lib/api/portal-data";
-import { createUserWithPasswordHash, getUserByEmail } from "@/lib/auth/users";
+import { createUserWithPasswordHash, getUserByEmail, updateUserPasswordHash } from "@/lib/auth/users";
 import { hashPassword } from "@/lib/auth/password";
+import { generateStudentPassword } from "@/lib/auth/generate-password";
 import { createApiResponse } from "@/lib/api/enrollment";
 import { sendApprovalWelcomeNotifications } from "@/lib/notifications/approval-welcome";
 import { z } from "zod";
@@ -59,13 +60,9 @@ export async function PATCH(request: Request) {
 
   if (parsed.data.status === "approved" && parsed.data.createStudentAccount) {
     const enrollmentRecord = await getEnrollmentById(parsed.data.id);
-    const existing = await getUserByEmail(enrollment.email);
-
-    if (!existing && enrollmentRecord) {
-      const passwordHash =
-        enrollmentRecord.passwordHash ??
-        (await hashPassword(enrollment.cnic.slice(-6)));
-
+    if (enrollmentRecord) {
+      const plainPassword = generateStudentPassword();
+      const passwordHash = await hashPassword(plainPassword);
       const avatarInitials = enrollment.fullName
         .split(" ")
         .map((n) => n[0])
@@ -73,37 +70,37 @@ export async function PATCH(request: Request) {
         .slice(0, 2)
         .toUpperCase();
 
-      await createUserWithPasswordHash({
-        email: enrollment.email,
-        passwordHash,
-        role: "student",
-        name: enrollment.fullName,
-        phone: enrollment.whatsapp,
-        programSlug: enrollment.program,
-        level: enrollment.level,
-        isActive: true,
-        avatarInitials,
-        avatarUrl: enrollmentRecord.profilePhotoUrl ?? undefined,
-      });
-    }
+      const existing = await getUserByEmail(enrollment.email);
+      if (!existing) {
+        await createUserWithPasswordHash({
+          email: enrollment.email,
+          passwordHash,
+          role: "student",
+          name: enrollment.fullName,
+          phone: enrollment.whatsapp,
+          programSlug: enrollment.program,
+          level: enrollment.level,
+          isActive: true,
+          avatarInitials,
+        });
+      } else {
+        await updateUserPasswordHash(existing.id, passwordHash);
+      }
 
-    if (enrollmentRecord) {
       const notifications = await sendApprovalWelcomeNotifications({
-        id: enrollmentRecord.id,
         fullName: enrollmentRecord.fullName,
         email: enrollmentRecord.email,
         whatsapp: enrollmentRecord.whatsapp,
         program: enrollmentRecord.program,
         level: enrollmentRecord.level,
-        cnic: enrollmentRecord.cnic,
-        portalPasswordEnc: enrollmentRecord.portalPasswordEnc,
+        password: plainPassword,
       });
 
       const parts: string[] = [];
       if (notifications.emailSent) parts.push("email sent");
       if (notifications.whatsappSent) parts.push("WhatsApp sent");
       if (parts.length > 0) {
-        notificationSummary = ` Welcome ${parts.join(" and ")}.`;
+        notificationSummary = ` Login details ${parts.join(" and ")}.`;
       } else if (notifications.warnings.length > 0) {
         notificationSummary = ` Account ready, but notifications failed: ${notifications.warnings.join("; ")}`;
       }
