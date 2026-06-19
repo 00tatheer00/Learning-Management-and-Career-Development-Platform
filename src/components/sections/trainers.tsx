@@ -6,7 +6,7 @@ import { ArrowRight } from "lucide-react";
 import { SectionHeader } from "@/components/shared/section-header";
 import { TrainerCard } from "@/components/shared/trainer-card";
 import { Button } from "@/components/ui/button";
-import { featuredTrainers } from "@/lib/data/trainers";
+import { trainers } from "@/lib/data/trainers";
 
 export function TrainersSection() {
   return (
@@ -18,8 +18,8 @@ export function TrainersSection() {
           description="Meet the trainers and specialists guiding every EEST program — from web and mobile to AI, design, and media."
         />
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
-          {featuredTrainers.map((trainer, index) => (
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {trainers.map((trainer, index) => (
             <motion.div
               key={trainer.id}
               initial={{ opacity: 0, y: 30 }}
