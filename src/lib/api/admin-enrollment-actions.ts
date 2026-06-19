@@ -166,8 +166,16 @@ export async function deleteEnrollmentRegistration(
   let studentAccountRemoved = false;
 
   if (enrollment.status === "approved") {
+    const otherApprovedCount = await prisma.enrollment.count({
+      where: {
+        email: enrollment.email.toLowerCase(),
+        status: "approved",
+        id: { not: enrollmentId },
+      },
+    });
+
     const student = await getUserByEmail(enrollment.email);
-    if (student?.role === "student") {
+    if (student?.role === "student" && otherApprovedCount === 0) {
       await prisma.assignmentSubmission.deleteMany({ where: { studentId: student.id } });
       await prisma.user.delete({ where: { id: student.id } });
       studentAccountRemoved = true;

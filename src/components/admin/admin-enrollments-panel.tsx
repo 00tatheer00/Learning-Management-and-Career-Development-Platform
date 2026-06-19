@@ -434,6 +434,33 @@ export function AdminEnrollmentsPanel() {
                       </Button>
                     </div>
                   )}
+
+                  {!isPending && (
+                    <div className="mt-5 flex flex-wrap gap-3 border-t border-border pt-5">
+                      <Button
+                        size="lg"
+                        variant="secondary"
+                        className="gap-2 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                        disabled={loadingId === enrollment.id || bulkLoading}
+                        onClick={() =>
+                          setDeleteTarget({
+                            id: enrollment.id,
+                            name: enrollment.fullName,
+                            status: enrollment.status,
+                          })
+                        }
+                      >
+                        <Trash size={20} weight="duotone" />
+                        Delete Registration
+                      </Button>
+                      {enrollment.status === "approved" && (
+                        <p className="w-full text-xs text-muted">
+                          Removes this registration
+                          {enrollment.email ? " and portal account if no other approved registration exists for this email" : ""}.
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             );
