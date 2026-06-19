@@ -36,6 +36,7 @@ export function AdmissionsSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="group rounded-2xl border border-border bg-background p-6 lg:p-8 shadow-sm transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1"
+            id="eligibility"
           >
             <PremiumIcon icon={UsersThree} size="lg" className="mb-6" />
             <h3 className="text-xl font-bold mb-4">Eligibility</h3>
