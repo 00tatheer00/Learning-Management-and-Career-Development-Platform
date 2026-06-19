@@ -78,7 +78,11 @@ export default function LoginForm() {
       });
 
       if (result?.error) {
-        setError("Wrong email or password. Try again.");
+        setError(
+          result.status === 500
+            ? "Server error. Check Vercel env vars (NEXTAUTH_URL, DATABASE_URL)."
+            : "Wrong email or password. Try again."
+        );
         return;
       }
 

@@ -20,32 +20,37 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials, req) {
-        const parsed = credentialsSchema.safeParse(credentials);
-        if (!parsed.success) return null;
+        try {
+          const parsed = credentialsSchema.safeParse(credentials);
+          if (!parsed.success) return null;
 
-        const ip =
-          req?.headers?.["x-forwarded-for"]?.toString().split(",")[0]?.trim() ??
-          req?.headers?.["x-real-ip"]?.toString() ??
-          "unknown";
+          const ip =
+            req?.headers?.["x-forwarded-for"]?.toString().split(",")[0]?.trim() ??
+            req?.headers?.["x-real-ip"]?.toString() ??
+            "unknown";
 
-        const rate = await checkRateLimit(loginRateLimit, `login:${ip}`);
-        if (!rate.success) return null;
+          const rate = await checkRateLimit(loginRateLimit, `login:${ip}`);
+          if (!rate.success) return null;
 
-        const user = await prisma.user.findUnique({
-          where: { email: parsed.data.email.toLowerCase() },
-        });
+          const user = await prisma.user.findUnique({
+            where: { email: parsed.data.email.toLowerCase() },
+          });
 
-        if (!user || !user.isActive) return null;
+          if (!user || !user.isActive) return null;
 
-        const valid = await verifyPassword(parsed.data.password, user.passwordHash);
-        if (!valid) return null;
+          const valid = await verifyPassword(parsed.data.password, user.passwordHash);
+          if (!valid) return null;
 
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-        };
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+          };
+        } catch (error) {
+          console.error("Login authorize error:", error);
+          return null;
+        }
       },
     }),
   ],
@@ -86,5 +91,5 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
-  secret: process.env.AUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET ?? process.env.AUTH_SECRET,
 };

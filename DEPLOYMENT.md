@@ -46,12 +46,15 @@ openssl rand -base64 32
 |----------|----------|-------------|
 | `DATABASE_URL` | Yes | MongoDB Atlas connection string |
 | `AUTH_SECRET` | Yes | 32+ char random string |
-| `AUTH_URL` | Yes | `http://localhost:3000` or production URL |
+| `NEXTAUTH_SECRET` | Yes (Vercel) | Same value as `AUTH_SECRET` |
+| `NEXTAUTH_URL` | Yes (Vercel) | `https://school.emergingedge.tech` (exact production URL) |
 | `CLOUDINARY_CLOUD_NAME` | Yes | Cloudinary cloud name |
 | `CLOUDINARY_API_KEY` | Yes | Cloudinary API key |
 | `CLOUDINARY_API_SECRET` | Yes | Cloudinary API secret |
 | `UPSTASH_REDIS_REST_URL` | No | Rate limiting |
 | `UPSTASH_REDIS_REST_TOKEN` | No | Rate limiting |
+
+**Login 500 on production?** Almost always missing `NEXTAUTH_URL` or `DATABASE_URL` in Vercel → Settings → Environment Variables. After adding, click **Redeploy**.
 
 ---
 
@@ -88,10 +91,10 @@ npm run db:seed
 ## 7. Custom domain on Vercel
 
 1. Vercel project → Settings → Domains
-2. Add `school.emergingedge.com` (or your domain)
+2. Add `school.emergingedge.tech` (or your domain)
 3. Update DNS at your registrar:
-   - Type `CNAME` → `cname.vercel-dns.com`
-4. Update `AUTH_URL` env var to `https://school.emergingedge.com`
+   - Type `CNAME` → Vercel DNS value (e.g. `xxx.vercel-dns.com`)
+4. Set `NEXTAUTH_URL` to `https://school.emergingedge.tech`
 5. Redeploy
 
 ---
@@ -103,7 +106,7 @@ npm run db:seed
 - [ ] Enable Upstash rate limiting
 - [ ] MongoDB user has minimum required permissions
 - [ ] Cloudinary uploads folder is not public (use authenticated URLs for admin)
-- [ ] `AUTH_URL` matches your exact production domain (with https)
+- [ ] `NEXTAUTH_URL` matches your exact production domain (with https)
 
 ---
 
