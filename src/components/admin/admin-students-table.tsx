@@ -8,6 +8,7 @@ import {
   Prohibit,
   CheckCircle,
   PencilSimple,
+  Trash,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,6 +35,7 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
   const [editStudent, setEditStudent] = useState<AdminStudentRow | null>(null);
   const [editModule, setEditModule] = useState("");
   const [editBatch, setEditBatch] = useState(DEFAULT_BATCH_NAME);
+  const [deleteTarget, setDeleteTarget] = useState<AdminStudentRow | null>(null);
 
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -105,6 +107,25 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
       refreshStudent(editStudent.id, { module: editModule, batch: editBatch });
       setEditStudent(null);
     }
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    setLoadingId(deleteTarget.id);
+    const res = await fetch("/api/admin/students", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: deleteTarget.id }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      toast.success(data.message ?? "Student deleted.");
+      setStudents((current) => current.filter((student) => student.id !== deleteTarget.id));
+      setDeleteTarget(null);
+    } else {
+      toast.error(data.message ?? data.error ?? "Delete failed.");
+    }
+    setLoadingId(null);
   };
 
   const moduleOptions = editStudent
@@ -263,6 +284,15 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
                       >
                         {student.isActive ? <Prohibit size={16} /> : <CheckCircle size={16} />}
                       </button>
+                      <button
+                        type="button"
+                        title="Delete student"
+                        disabled={loadingId === student.id}
+                        onClick={() => setDeleteTarget(student)}
+                        className="rounded-lg border border-red-200 p-2 text-red-600 hover:bg-red-50"
+                      >
+                        <Trash size={16} weight="duotone" />
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -322,6 +352,38 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
               </Button>
               <Button disabled={loadingId === editStudent.id} onClick={saveEdit}>
                 Save Changes
+              </Button>
+            </div>
+          </>
+        )}
+      </Modal>
+
+      <Modal
+        open={Boolean(deleteTarget)}
+        onClose={() => setDeleteTarget(null)}
+        title="Delete Student"
+      >
+        {deleteTarget && (
+          <>
+            <p className="text-sm text-muted">
+              Permanently delete <strong>{deleteTarget.name}</strong> ({deleteTarget.email})?
+            </p>
+            <p className="mt-3 rounded-xl bg-red-50 p-3 text-sm text-red-700">
+              This removes their portal account, all registration records, assignment
+              submissions, and payment screenshots. This cannot be undone.
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <Button variant="secondary" onClick={() => setDeleteTarget(null)}>
+                Cancel
+              </Button>
+              <Button
+                variant="secondary"
+                className="gap-2 text-red-600 hover:text-red-700"
+                disabled={loadingId === deleteTarget.id}
+                onClick={confirmDelete}
+              >
+                <Trash size={16} weight="duotone" />
+                Delete Permanently
               </Button>
             </div>
           </>

@@ -5,6 +5,7 @@ import { getUserById, updateUser, updateUserPasswordHash } from "@/lib/auth/user
 import { hashPassword } from "@/lib/auth/password";
 import { generateStudentPassword } from "@/lib/auth/generate-password";
 import { sendPasswordResetNotifications } from "@/lib/notifications/password-reset-notice";
+import { deleteAdminStudent } from "@/lib/api/admin-students";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
@@ -121,4 +122,35 @@ export async function PATCH(request: Request) {
       message: "Student module/batch updated.",
     })
   );
+}
+
+const deleteSchema = z.object({
+  id: z.string(),
+});
+
+export async function DELETE(request: Request) {
+  const admin = await getCurrentUser();
+  if (!admin || admin.role !== "admin") {
+    return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), {
+      status: 403,
+    });
+  }
+
+  const body = await request.json();
+  const parsed = deleteSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      createApiResponse(false, { message: parsed.error.issues[0]?.message }),
+      { status: 400 }
+    );
+  }
+
+  const result = await deleteAdminStudent(parsed.data.id);
+  if (!result.success) {
+    return NextResponse.json(createApiResponse(false, { error: result.error ?? "Delete failed" }), {
+      status: result.error === "Student not found" ? 404 : 400,
+    });
+  }
+
+  return NextResponse.json(createApiResponse(true, { message: result.message }));
 }

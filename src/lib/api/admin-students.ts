@@ -1,4 +1,6 @@
 import { prisma } from "@/lib/prisma";
+import { getUserById } from "@/lib/auth/users";
+import { deleteCloudinaryImage } from "@/lib/cloudinary";
 import { getProgramBySlug } from "@/lib/data/programs";
 import { DEFAULT_BATCH_NAME } from "@/lib/constants/batch";
 import { formatAppliedDate, formatAppliedDateTime } from "@/lib/utils";
@@ -130,4 +132,37 @@ export function buildStudentsCsv(rows: AdminStudentRow[]) {
 export function buildStudentsExportFilename() {
   const stamp = new Date().toISOString().slice(0, 10);
   return `eest-students-${stamp}.csv`;
+}
+
+export async function deleteAdminStudent(
+  studentId: string
+): Promise<{ success: boolean; message: string; error?: string }> {
+  const student = await getUserById(studentId);
+  if (!student || student.role !== "student") {
+    return { success: false, message: "", error: "Student not found" };
+  }
+
+  await prisma.assignmentSubmission.deleteMany({ where: { studentId: student.id } });
+
+  const enrollments = await prisma.enrollment.findMany({
+    where: { email: student.email.toLowerCase() },
+  });
+
+  for (const enrollment of enrollments) {
+    if (enrollment.paymentScreenshotPublicId) {
+      void deleteCloudinaryImage(enrollment.paymentScreenshotPublicId);
+    }
+    if (enrollment.profilePhotoPublicId) {
+      void deleteCloudinaryImage(enrollment.profilePhotoPublicId);
+    }
+  }
+
+  await prisma.enrollment.deleteMany({ where: { email: student.email.toLowerCase() } });
+  await prisma.passwordResetToken.deleteMany({ where: { email: student.email.toLowerCase() } });
+  await prisma.user.delete({ where: { id: student.id } });
+
+  return {
+    success: true,
+    message: "Student account and all registration records deleted.",
+  };
 }
