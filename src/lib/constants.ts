@@ -1,3 +1,8 @@
+import {
+  OFFICIAL_PHONE_DISPLAY,
+  OFFICIAL_WHATSAPP_NUMBER,
+} from "@/lib/constants/contact";
+
 export const SITE_CONFIG = {
   name: "Emerging Edge School of Technology",
   shortName: "EEST",
@@ -7,7 +12,8 @@ export const SITE_CONFIG = {
   url: "https://school.emergingedge.tech",
   logo: "/eest-logo.png",
   email: "eeschooltech@gmail.com",
-  phone: "+92 327 5792600",
+  phone: OFFICIAL_PHONE_DISPLAY,
+  whatsapp: OFFICIAL_WHATSAPP_NUMBER,
   address: "Global Campus — Online & Hybrid",
   social: {
     twitter: "https://twitter.com/emergingedge",

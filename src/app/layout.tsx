@@ -3,6 +3,7 @@ import { Inter, Geist_Mono } from "next/font/google";
 import { LayoutSwitcher } from "@/components/layout/layout-switcher";
 import { AuthSessionProvider } from "@/components/providers/session-provider";
 import { ToastProvider } from "@/components/providers/toast-provider";
+import { HelpWhatsApp } from "@/components/shared/student-help";
 import { OrganizationSchema } from "@/components/seo/json-ld";
 import { createMetadata } from "@/lib/seo/metadata";
 import { SITE_CONFIG } from "@/lib/constants";
@@ -41,6 +42,7 @@ export default function RootLayout({
       >
         <AuthSessionProvider>
           <LayoutSwitcher>{children}</LayoutSwitcher>
+          <HelpWhatsApp />
           <ToastProvider />
         </AuthSessionProvider>
       </body>

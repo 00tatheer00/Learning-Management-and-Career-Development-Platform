@@ -19,7 +19,8 @@ export function HelpWhatsApp({ className }: HelpWhatsAppProps) {
         "fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full bg-[#25D366] px-4 py-3.5 text-white font-semibold shadow-lg shadow-[#25D366]/30 hover:scale-105 transition-transform",
         className
       )}
-      aria-label="Get help on WhatsApp"
+      aria-label={`Get help on WhatsApp — ${HELP_CONFIG.whatsappDisplay}`}
+      title={`WhatsApp: ${HELP_CONFIG.whatsappNumber}`}
     >
       <WhatsappLogo size={24} weight="fill" />
       <span className="hidden sm:inline">Need Help?</span>

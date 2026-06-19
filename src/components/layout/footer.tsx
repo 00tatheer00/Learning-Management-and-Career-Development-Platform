@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Mail, Phone, MapPin } from "lucide-react";
 import { SITE_CONFIG } from "@/lib/constants";
+import { getOfficialTelHref } from "@/lib/constants/contact";
 import { SiteLogo } from "@/components/shared/site-logo";
 
 const footerLinks = {
@@ -56,7 +57,7 @@ export function Footer() {
                 {SITE_CONFIG.email}
               </a>
               <a
-                href={`tel:${SITE_CONFIG.phone}`}
+                href={getOfficialTelHref()}
                 className="flex items-center gap-2 hover:text-primary transition-colors"
               >
                 <Phone className="w-4 h-4 text-primary" strokeWidth={1.75} aria-hidden="true" />

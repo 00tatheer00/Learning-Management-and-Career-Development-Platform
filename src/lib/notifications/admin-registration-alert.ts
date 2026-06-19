@@ -1,6 +1,6 @@
-import { SITE_CONFIG } from "@/lib/constants";
 import { getProgramBySlug } from "@/lib/data/programs";
 import { sendWhatsAppMessage } from "@/lib/notifications/whatsapp";
+import { getPortalLoginUrl } from "@/lib/site-url";
 import { formatAppliedDateTime } from "@/lib/utils";
 
 const DEFAULT_ADMIN_ALERT_WHATSAPP = "03115969527";
@@ -23,7 +23,7 @@ function getAdminAlertWhatsApp(): string {
 
 function buildAdminAlertText(input: NewRegistrationAlertInput): string {
   const courseName = getProgramBySlug(input.program)?.title ?? input.program;
-  const adminUrl = `${SITE_CONFIG.url}/admin/enrollments`;
+  const loginUrl = getPortalLoginUrl();
 
   return [
     "New EEST Registration",
@@ -37,7 +37,7 @@ function buildAdminAlertText(input: NewRegistrationAlertInput): string {
     `Institution: ${input.institution}`,
     `Applied: ${formatAppliedDateTime(input.createdAt)}`,
     "",
-    `Review now: ${adminUrl}`,
+    `Student portal login: ${loginUrl}`,
   ].join("\n");
 }
 

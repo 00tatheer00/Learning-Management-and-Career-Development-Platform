@@ -10,7 +10,7 @@ const DEFAULT_USERS = [
     password: "admin@321",
     role: "admin" as const,
     name: "Admin User",
-    phone: "03275792600",
+    phone: "03374005515",
     avatarInitials: "AU",
   },
   {
@@ -19,7 +19,7 @@ const DEFAULT_USERS = [
     password: "tatheer@321",
     role: "trainer" as const,
     name: "S Tatheer Hussain",
-    phone: "03275792600",
+    phone: "03374005515",
     programSlug: "web-development",
     trainerId: "trainer-tatheer",
     avatarInitials: "ST",

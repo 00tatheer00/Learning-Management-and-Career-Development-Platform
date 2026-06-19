@@ -1,12 +1,15 @@
-import { PAYMENT_CONFIG } from "@/lib/constants/payment";
+import {
+  OFFICIAL_WHATSAPP_NUMBER,
+  OFFICIAL_HELP_MESSAGE,
+  getOfficialWhatsAppUrl,
+} from "@/lib/constants/contact";
 
 export const HELP_CONFIG = {
-  whatsappNumber: PAYMENT_CONFIG.easypaisa.number,
-  whatsappDisplay: "0327-5792600",
-  whatsappMessage:
-    "Assalam o Alaikum! I need help with registration at Emerging Edge School.",
+  whatsappNumber: OFFICIAL_WHATSAPP_NUMBER,
+  whatsappDisplay: "0337-4005515",
+  whatsappMessage: OFFICIAL_HELP_MESSAGE,
   get whatsappUrl() {
-    return `https://wa.me/92${this.whatsappNumber.replace(/^0/, "")}?text=${encodeURIComponent(this.whatsappMessage)}`;
+    return getOfficialWhatsAppUrl(this.whatsappMessage);
   },
 } as const;
 

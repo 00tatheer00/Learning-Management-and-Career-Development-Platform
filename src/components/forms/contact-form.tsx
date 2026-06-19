@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SITE_CONFIG } from "@/lib/constants";
+import { getOfficialTelHref } from "@/lib/constants/contact";
 import { toast } from "@/lib/ui/toast";
 
 const contactSchema = z.object({
@@ -85,7 +86,7 @@ export function ContactContent() {
                 <PremiumIcon icon={Phone} size="md" className="mb-4" />
                 <h3 className="font-semibold mb-1">Phone</h3>
                 <a
-                  href={`tel:${SITE_CONFIG.phone}`}
+                  href={getOfficialTelHref()}
                   className="text-sm text-muted hover:text-primary transition-colors"
                 >
                   {SITE_CONFIG.phone}

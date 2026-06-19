@@ -3,7 +3,7 @@ export const PAYMENT_CONFIG = {
   currency: "PKR",
   learningMode: "Online",
   easypaisa: {
-    number: "03275792600",
+    number: "03374005515",
     accountName: "Syed Tatheer Hussain",
   },
   headline: "Course is 100% FREE",

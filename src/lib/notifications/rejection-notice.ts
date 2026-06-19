@@ -30,7 +30,7 @@ function buildRejectionText(input: RejectionNoticeInput): string {
     "",
     `Reason: ${reason}`,
     "",
-    `If you have questions, contact us at ${SITE_CONFIG.email} or WhatsApp ${SITE_CONFIG.phone}.`,
+    `If you have questions, contact us at ${SITE_CONFIG.email} or WhatsApp ${SITE_CONFIG.whatsapp}.`,
     "",
     "— Emerging Edge Summer Training",
   ].join("\n");
@@ -49,7 +49,7 @@ function buildRejectionHtml(input: RejectionNoticeInput): string {
       <p style="background:#fef2f2;border-left:4px solid #b91c1c;padding:12px 16px;margin:16px 0">
         <strong>Reason:</strong> ${reason}
       </p>
-      <p>Questions? Contact us at ${SITE_CONFIG.email}.</p>
+      <p>Questions? Contact us at ${SITE_CONFIG.email} or WhatsApp ${SITE_CONFIG.whatsapp}.</p>
       <p style="margin-top:24px;color:#666">— Emerging Edge Summer Training</p>
     </div>
   `;
