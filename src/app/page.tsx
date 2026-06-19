@@ -17,10 +17,10 @@ export default function HomePage() {
       <HeroSection />
       <StatsSection />
       <AdmissionsSection />
+      <TrainersSection />
       <ProgramsSection />
       <WhyChooseUsSection />
       <LearningJourneySection />
-      <TrainersSection />
       <FAQSection />
       <CTASection />
     </>
