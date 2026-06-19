@@ -39,6 +39,7 @@
     "react-countup": "^6.5.3",
     "react-dom": "19.1.0",
     "react-hook-form": "^7.79.0",
+    "resend": "^6.14.0",
     "swiper": "^12.2.0",
     "tailwind-merge": "^3.6.0",
     "zod": "^4.4.3"

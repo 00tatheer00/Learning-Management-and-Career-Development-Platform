@@ -1,14 +1,14 @@
-import { VideoCamera, CalendarBlank } from "@phosphor-icons/react/ssr";
+import { CalendarBlank } from "@phosphor-icons/react/ssr";
 import { getCurrentUser } from "@/lib/auth/session";
-import { getLiveSessions } from "@/lib/api/portal-data";
+import { getLiveSessionsPreview } from "@/lib/api/portal-data";
 import { PortalPageHeader, EmptyState } from "@/components/portal/portal-ui";
-import { Button } from "@/components/ui/button";
+import { JoinClassButton } from "@/components/portal/join-class-button";
 
 export default async function StudentClassesPage() {
   const user = await getCurrentUser();
   if (!user) return null;
 
-  const sessions = await getLiveSessions(user.programSlug ?? "web-development");
+  const sessions = await getLiveSessionsPreview(user.programSlug ?? "web-development");
   const today = new Date().toISOString().split("T")[0];
 
   return (
@@ -17,6 +17,12 @@ export default async function StudentClassesPage() {
         title="Live Classes"
         description="Join your online class using the button below. Be ready 5 minutes early."
       />
+
+      <p className="mb-6 text-sm text-muted rounded-xl border border-border bg-surface p-4">
+        Class links are only shown to enrolled students at class time. Do not share your portal
+        login or class link with anyone outside your batch. Trainers use waiting room to admit
+        only registered students.
+      </p>
 
       {sessions.length === 0 ? (
         <EmptyState
@@ -48,14 +54,7 @@ export default async function StudentClassesPage() {
                       </p>
                     )}
                   </div>
-                  {isUpcoming && (
-                    <Button size="lg" className="shrink-0 h-14 text-base" asChild>
-                      <a href={session.meetLink} target="_blank" rel="noopener noreferrer">
-                        <VideoCamera size={22} weight="duotone" />
-                        Join Class
-                      </a>
-                    </Button>
-                  )}
+                  {isUpcoming && <JoinClassButton sessionId={session.id} />}
                 </div>
               </div>
             );

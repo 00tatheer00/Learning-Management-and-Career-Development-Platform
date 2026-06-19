@@ -26,6 +26,11 @@ export const enrollmentSchema = z.object({
     .transform((val) => val.replace(/[-\s]/g, ""))
     .pipe(z.string().regex(cnicRegex, "CNIC must be 13 numbers only (no dashes)")),
   email: z.string().email("Please enter a valid email"),
+  portalPassword: z
+    .string()
+    .min(8, "Portal password must be at least 8 characters")
+    .max(72, "Password is too long"),
+  confirmPortalPassword: z.string().min(1, "Please confirm your portal password"),
   whatsapp: z
     .string()
     .transform((val) => val.replace(/[\s-]/g, ""))
@@ -55,6 +60,9 @@ export const enrollmentSchema = z.object({
   agreeToPolicies: z.boolean().refine((v) => v === true, {
     message: "Please tick the box to agree to class rules",
   }),
+}).refine((data) => data.portalPassword === data.confirmPortalPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPortalPassword"],
 });
 
 export type EnrollmentFormData = z.infer<typeof enrollmentSchema>;
@@ -68,6 +76,19 @@ export function validatePaymentScreenshot(file: File | undefined): string | null
   }
   if (file.size > 5 * 1024 * 1024) {
     return "Screenshot must be smaller than 5MB";
+  }
+  return null;
+}
+
+export function validateProfilePhoto(file: File | undefined): string | null {
+  if (!file || file.size === 0) {
+    return "Please upload your profile photo";
+  }
+  if (!file.type.startsWith("image/")) {
+    return "Profile photo must be an image (JPG, PNG, etc.)";
+  }
+  if (file.size > 3 * 1024 * 1024) {
+    return "Profile photo must be smaller than 3MB";
   }
   return null;
 }

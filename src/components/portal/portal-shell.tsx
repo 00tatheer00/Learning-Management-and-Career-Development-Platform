@@ -13,6 +13,7 @@ import {
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { PORTAL_COLORS, PORTAL_LABELS, PORTAL_NAV } from "@/lib/constants/portal-nav";
+import { PortalAvatar } from "@/components/portal/portal-avatar";
 import type { PortalUser } from "@/types/portal";
 import { cn } from "@/lib/utils";
 
@@ -133,14 +134,11 @@ function SidebarContent({
           )}
         </div>
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center font-bold text-sm">
-            {user.name
-              .split(" ")
-              .map((n) => n[0])
-              .join("")
-              .slice(0, 2)
-              .toUpperCase()}
-          </div>
+          <PortalAvatar
+            name={user.name}
+            avatarUrl={user.avatarUrl}
+            avatarInitials={user.avatarInitials}
+          />
           <div className="min-w-0">
             <p className="font-semibold truncate">{user.name}</p>
             <p className="text-xs opacity-80 truncate">{user.email}</p>

@@ -29,6 +29,8 @@ function mapEnrollment(record: {
   agreeToPolicies: boolean;
   paymentScreenshot: string | null;
   paymentScreenshotPublicId: string | null;
+  profilePhotoUrl: string | null;
+  profilePhotoPublicId: string | null;
   status: EnrollmentStatus;
   reviewedAt: Date | null;
   reviewedBy: string | null;
@@ -53,12 +55,19 @@ function mapEnrollment(record: {
     confirmInfoCorrect: record.confirmInfoCorrect,
     agreeToPolicies: record.agreeToPolicies,
     paymentScreenshot: record.paymentScreenshot ?? undefined,
+    profilePhotoUrl: record.profilePhotoUrl ?? undefined,
     status: record.status,
     reviewedAt: record.reviewedAt?.toISOString(),
     reviewedBy: record.reviewedBy ?? undefined,
     adminNotes: record.adminNotes ?? undefined,
     createdAt: record.createdAt.toISOString(),
   };
+}
+
+export type LiveSessionPreview = Omit<LiveSession, "meetLink">;
+
+export async function getEnrollmentById(id: string) {
+  return prisma.enrollment.findUnique({ where: { id } });
 }
 
 export async function getEnrollments(): Promise<EnrollmentRecord[]> {
@@ -68,12 +77,23 @@ export async function getEnrollments(): Promise<EnrollmentRecord[]> {
   return records.map(mapEnrollment);
 }
 
+export async function clearEnrollmentPortalPasswordEnc(id: string): Promise<void> {
+  await prisma.enrollment.update({
+    where: { id },
+    data: { portalPasswordEnc: null },
+  });
+}
+
 export async function saveEnrollment(
   enrollment: EnrollmentPayload & {
     id: string;
     createdAt: string;
     paymentScreenshot?: string;
     paymentScreenshotPublicId?: string;
+    profilePhotoUrl?: string;
+    profilePhotoPublicId?: string;
+    passwordHash: string;
+    portalPasswordEnc: string;
   }
 ): Promise<void> {
   await prisma.enrollment.create({
@@ -96,6 +116,10 @@ export async function saveEnrollment(
       agreeToPolicies: enrollment.agreeToPolicies,
       paymentScreenshot: enrollment.paymentScreenshot,
       paymentScreenshotPublicId: enrollment.paymentScreenshotPublicId,
+      profilePhotoUrl: enrollment.profilePhotoUrl,
+      profilePhotoPublicId: enrollment.profilePhotoPublicId,
+      passwordHash: enrollment.passwordHash,
+      portalPasswordEnc: enrollment.portalPasswordEnc,
       status: "pending",
       createdAt: new Date(enrollment.createdAt),
     },
@@ -228,7 +252,31 @@ export async function getLiveSessions(programSlug?: string): Promise<LiveSession
     where: programSlug ? { programSlug } : undefined,
     orderBy: { date: "asc" },
   });
-  return sessions.map((s) => ({
+  return sessions.map(mapLiveSession);
+}
+
+export async function getLiveSessionsPreview(programSlug?: string): Promise<LiveSessionPreview[]> {
+  const sessions = await getLiveSessions(programSlug);
+  return sessions.map(({ meetLink: _meetLink, ...session }) => session);
+}
+
+export async function getLiveSessionById(id: string): Promise<LiveSession | null> {
+  const session = await prisma.liveSession.findUnique({ where: { id } });
+  return session ? mapLiveSession(session) : null;
+}
+
+function mapLiveSession(s: {
+  id: string;
+  programSlug: string;
+  title: string;
+  date: string;
+  time: string;
+  meetLink: string;
+  trainerId: string;
+  trainerName: string;
+  notes: string | null;
+}): LiveSession {
+  return {
     id: s.id,
     programSlug: s.programSlug,
     title: s.title,
@@ -238,7 +286,7 @@ export async function getLiveSessions(programSlug?: string): Promise<LiveSession
     trainerId: s.trainerId,
     trainerName: s.trainerName,
     notes: s.notes ?? undefined,
-  }));
+  };
 }
 
 export async function createLiveSession(

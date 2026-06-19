@@ -4,8 +4,8 @@ export const SITE_CONFIG = {
   tagline: "Learn. Build. Lead.",
   description:
     "Emerging Edge School of Technology provides industry-focused training in Web Development, App Development, Artificial Intelligence, Video Editing, Digital Marketing, Graphics Designing, and UI/UX Designing.",
-  url: "https://school.emergingedge.com",
-  email: "admissions@emergingedge.com",
+  url: "https://school.emergingedge.tech",
+  email: "admissions@emergingedge.tech",
   phone: "+1 (555) 123-4567",
   address: "Global Campus — Online & Hybrid",
   social: {

@@ -22,6 +22,26 @@ Stack: **Vercel** (frontend + API) · **MongoDB Atlas** (database) · **NextAuth
 1. Create account at [cloudinary.com](https://cloudinary.com)
 2. Dashboard → copy **Cloud Name**, **API Key**, **API Secret**
 3. Payment screenshots upload to folder `eest/payment-screenshots`
+4. Profile photos upload to folder `eest/profile-photos`
+
+---
+
+## 2b. Resend (approval emails)
+
+1. Create account at [resend.com](https://resend.com)
+2. Add and verify your domain (or use `onboarding@resend.dev` for testing)
+3. Copy API key → `RESEND_API_KEY`
+4. Set `EMAIL_FROM` to your verified sender
+
+---
+
+## 2c. UltraMsg (approval WhatsApp)
+
+1. Create account at [ultramsg.com](https://ultramsg.com)
+2. Create an instance → copy **Instance ID** and **Token**
+3. Scan QR in UltraMsg dashboard to link your WhatsApp number
+4. Set `ULTRAMSG_INSTANCE_ID` and `ULTRAMSG_TOKEN` in env vars
+5. API docs: [Send chat message](https://docs.ultramsg.com/api/post/messages/chat)
 
 ---
 
@@ -53,8 +73,12 @@ openssl rand -base64 32
 | `CLOUDINARY_API_SECRET` | Yes | Cloudinary API secret |
 | `UPSTASH_REDIS_REST_URL` | No | Rate limiting |
 | `UPSTASH_REDIS_REST_TOKEN` | No | Rate limiting |
+| `RESEND_API_KEY` | Yes (approval emails) | [resend.com](https://resend.com) API key |
+| `EMAIL_FROM` | Yes (approval emails) | Verified sender, e.g. `EEST <hello@yourdomain.com>` |
+| `ULTRAMSG_INSTANCE_ID` | Yes (approval WhatsApp) | UltraMsg instance ID, e.g. `instance181496` |
+| `ULTRAMSG_TOKEN` | Yes (approval WhatsApp) | UltraMsg API token |
 
-**Login 500 on production?** Almost always missing `NEXTAUTH_URL` or `DATABASE_URL` in Vercel → Settings → Environment Variables. After adding, click **Redeploy**.
+When admin approves a student, the platform sends a designed congratulations email and WhatsApp message with portal login URL and credentials.
 
 ---
 

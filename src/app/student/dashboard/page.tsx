@@ -1,15 +1,16 @@
 import Link from "next/link";
 import {
   BookOpen,
-  VideoCamera,
   ClipboardText,
   ChatsCircle,
 } from "@phosphor-icons/react/ssr";
 import { getCurrentUser } from "@/lib/auth/session";
-import { getAssignments, getLiveSessions, getMaterials } from "@/lib/api/portal-data";
+import { getAssignments, getLiveSessionsPreview, getMaterials } from "@/lib/api/portal-data";
 import { getProgramBySlug } from "@/lib/data/programs";
 import { PortalPageHeader, StatCard, QuickActionCard } from "@/components/portal/portal-ui";
+import { PortalAvatar } from "@/components/portal/portal-avatar";
 import { Button } from "@/components/ui/button";
+import { JoinClassButton } from "@/components/portal/join-class-button";
 import { HELP_CONFIG } from "@/lib/constants/help";
 
 export default async function StudentDashboardPage() {
@@ -20,7 +21,7 @@ export default async function StudentDashboardPage() {
   const [materials, assignments, sessions] = await Promise.all([
     getMaterials(programSlug),
     getAssignments(programSlug),
-    getLiveSessions(programSlug),
+    getLiveSessionsPreview(programSlug),
   ]);
   const program = getProgramBySlug(programSlug);
   const nextSession = sessions.find(
@@ -33,9 +34,18 @@ export default async function StudentDashboardPage() {
         title={`Welcome, ${user.name.split(" ")[0]}!`}
         description={`You are enrolled in ${program?.title ?? "your course"}. Everything you need is right here.`}
       >
-        <Button size="lg" asChild>
-          <Link href="/student/classes">Join Live Class</Link>
-        </Button>
+        <div className="flex items-center gap-4">
+          <PortalAvatar
+            name={user.name}
+            avatarUrl={user.avatarUrl}
+            avatarInitials={user.avatarInitials}
+            size="lg"
+            className="border-2 border-primary/20"
+          />
+          <Button size="lg" asChild>
+            <Link href="/student/classes">Join Live Class</Link>
+          </Button>
+        </div>
       </PortalPageHeader>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -54,12 +64,7 @@ export default async function StudentDashboardPage() {
           <p className="text-muted mb-4">
             {nextSession.date} at {nextSession.time} · {nextSession.trainerName}
           </p>
-          <Button size="lg" asChild>
-            <a href={nextSession.meetLink} target="_blank" rel="noopener noreferrer">
-              <VideoCamera size={20} weight="duotone" />
-              Join Class Now
-            </a>
-          </Button>
+          <JoinClassButton sessionId={nextSession.id} label="Join Class Now" />
         </div>
       )}
 

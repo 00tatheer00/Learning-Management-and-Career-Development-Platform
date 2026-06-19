@@ -20,6 +20,7 @@ import {
 import {
   enrollmentSchema,
   validatePaymentScreenshot,
+  validateProfilePhoto,
   type EnrollmentFormData,
 } from "@/lib/validations/enrollment";
 import { PAYMENT_CONFIG, ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
@@ -105,9 +106,13 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [screenshotError, setScreenshotError] = useState<string | null>(null);
+  const [profilePhotoError, setProfilePhotoError] = useState<string | null>(null);
   const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
+  const [profilePhotoPreview, setProfilePhotoPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const profilePhotoInputRef = useRef<HTMLInputElement>(null);
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
+  const [profilePhotoFile, setProfilePhotoFile] = useState<File | null>(null);
 
   const {
     register,
@@ -126,6 +131,8 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
       classSemester: "",
       cnic: "",
       email: "",
+      portalPassword: "",
+      confirmPortalPassword: "",
       whatsapp: "",
       fieldOfStudy: "",
       program: undefined,
@@ -172,10 +179,39 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
     setScreenshotPreview(URL.createObjectURL(file));
   };
 
+  const handleProfilePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    setProfilePhotoError(null);
+    if (profilePhotoPreview) URL.revokeObjectURL(profilePhotoPreview);
+
+    if (!file) {
+      setProfilePhotoFile(null);
+      setProfilePhotoPreview(null);
+      return;
+    }
+
+    const validationError = validateProfilePhoto(file);
+    if (validationError) {
+      setProfilePhotoError(validationError);
+      setProfilePhotoFile(null);
+      setProfilePhotoPreview(null);
+      return;
+    }
+
+    setProfilePhotoFile(file);
+    setProfilePhotoPreview(URL.createObjectURL(file));
+  };
+
   const onSubmit = async (data: EnrollmentFormData) => {
     const fileValidation = validatePaymentScreenshot(screenshotFile ?? undefined);
     if (fileValidation) {
       setScreenshotError(fileValidation);
+      return;
+    }
+
+    const photoValidation = validateProfilePhoto(profilePhotoFile ?? undefined);
+    if (photoValidation) {
+      setProfilePhotoError(photoValidation);
       return;
     }
 
@@ -185,10 +221,14 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
     try {
       const formData = new FormData();
       Object.entries(data).forEach(([key, value]) => {
+        if (key === "confirmPortalPassword") return;
         formData.append(key, String(value));
       });
       if (screenshotFile) {
         formData.append("paymentScreenshot", screenshotFile);
+      }
+      if (profilePhotoFile) {
+        formData.append("profilePhoto", profilePhotoFile);
       }
 
       const response = await fetch("/api/enrollment", {
@@ -205,8 +245,11 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
       setIsSuccess(true);
       reset();
       setScreenshotFile(null);
+      setProfilePhotoFile(null);
       setScreenshotPreview(null);
+      setProfilePhotoPreview(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
+      if (profilePhotoInputRef.current) profilePhotoInputRef.current.value = "";
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
@@ -226,9 +269,9 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
         <h2 className="text-2xl font-bold mb-2">Registration Submitted!</h2>
         <p className="text-muted mb-6 leading-relaxed max-w-md mx-auto">
           Thank you for registering. Our team will verify your payment screenshot
-          and contact you on WhatsApp within 2–3 business days. Once verified,
-          you will be added to the WhatsApp group and receive your online class
-          link, recorded lectures, quizzes, assignments, and projects.
+          and contact you on WhatsApp within 2–3 business days. Once approved,
+          sign in at the portal using the <strong>same email and portal password</strong> you
+          chose in this form.
         </p>
         <Button onClick={() => setIsSuccess(false)}>Submit Another Registration</Button>
       </motion.div>
@@ -318,6 +361,63 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                 />
                 <FieldError message={errors.email?.message} />
               </div>
+              <div>
+                <Label htmlFor="portalPassword">Portal Password</Label>
+                <Input
+                  id="portalPassword"
+                  type="password"
+                  placeholder="At least 8 characters"
+                  className="mt-2"
+                  autoComplete="new-password"
+                  {...register("portalPassword")}
+                />
+                <p className="text-xs text-muted mt-1">
+                  After admin approval, use this password to sign in to your student portal.
+                </p>
+                <FieldError message={errors.portalPassword?.message} />
+              </div>
+              <div>
+                <Label htmlFor="confirmPortalPassword">Confirm Portal Password</Label>
+                <Input
+                  id="confirmPortalPassword"
+                  type="password"
+                  placeholder="Re-enter portal password"
+                  className="mt-2"
+                  autoComplete="new-password"
+                  {...register("confirmPortalPassword")}
+                />
+                <FieldError message={errors.confirmPortalPassword?.message} />
+              </div>
+            </div>
+          </FormSection>
+
+          <FormSection title="Profile Photo">
+            <div>
+              <Label htmlFor="profilePhoto">Your Photo</Label>
+              <p className="text-xs text-muted mt-1 mb-2">
+                Upload a clear face photo. This will appear on your student portal profile after approval.
+              </p>
+              <Input
+                id="profilePhoto"
+                ref={profilePhotoInputRef}
+                type="file"
+                accept="image/*"
+                className="mt-1 cursor-pointer file:mr-4 file:rounded-md file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-medium file:text-primary-foreground hover:file:bg-accent"
+                onChange={handleProfilePhotoChange}
+              />
+              <FieldError message={profilePhotoError ?? undefined} />
+
+              {profilePhotoPreview && (
+                <div className="mt-4 relative h-32 w-32 rounded-full overflow-hidden border-2 border-border">
+                  <Image
+                    src={profilePhotoPreview}
+                    alt="Profile photo preview"
+                    fill
+                    className="object-cover"
+                    unoptimized
+                  />
+                </div>
+              )}
             </div>
           </FormSection>
 

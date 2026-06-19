@@ -14,6 +14,7 @@ export interface User {
   level?: string;
   trainerId?: string;
   avatarInitials?: string;
+  avatarUrl?: string;
   isActive: boolean;
   createdAt: string;
 }
@@ -86,4 +87,6 @@ export interface PortalUser {
   programSlug?: string;
   level?: string;
   trainerId?: string;
+  avatarInitials?: string;
+  avatarUrl?: string;
 }

@@ -42,6 +42,7 @@ model User {
   level          String?
   trainerId      String?
   avatarInitials String?
+  avatarUrl      String?
   isActive       Boolean  @default(true)
   createdAt      DateTime @default(now())
 }
@@ -65,6 +66,10 @@ model Enrollment {
   agreeToPolicies           Boolean
   paymentScreenshot         String?
   paymentScreenshotPublicId String?
+  profilePhotoUrl           String?
+  profilePhotoPublicId      String?
+  passwordHash              String?
+  portalPasswordEnc         String?
   status                    EnrollmentStatus @default(pending)
   reviewedAt                DateTime?
   reviewedBy                String?

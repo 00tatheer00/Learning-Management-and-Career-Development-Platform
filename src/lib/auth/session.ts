@@ -25,6 +25,8 @@ export async function getCurrentUser(): Promise<PortalUser | null> {
     programSlug: user.programSlug ?? undefined,
     level: user.level ?? undefined,
     trainerId: user.trainerId ?? undefined,
+    avatarInitials: user.avatarInitials ?? undefined,
+    avatarUrl: user.avatarUrl ?? undefined,
   };
 }
 

@@ -30,12 +30,26 @@ export async function createUser(
   data: Omit<User, "id" | "passwordHash" | "createdAt"> & { password: string; id?: string }
 ): Promise<User> {
   const { password, id, ...rest } = data;
+  return createUserWithPasswordHash({
+    ...rest,
+    id,
+    passwordHash: await hashPassword(password),
+  });
+}
+
+export async function createUserWithPasswordHash(
+  data: Omit<User, "id" | "passwordHash" | "createdAt"> & {
+    passwordHash: string;
+    id?: string;
+  }
+): Promise<User> {
+  const { passwordHash, id, ...rest } = data;
   const user = await prisma.user.create({
     data: {
       ...rest,
       id: id ?? crypto.randomUUID(),
       email: rest.email.toLowerCase(),
-      passwordHash: await hashPassword(password),
+      passwordHash,
     },
   });
   return mapUser(user);
@@ -65,6 +79,7 @@ function mapUser(user: {
   level: string | null;
   trainerId: string | null;
   avatarInitials: string | null;
+  avatarUrl: string | null;
   isActive: boolean;
   createdAt: Date;
 }): User {
@@ -79,6 +94,7 @@ function mapUser(user: {
     level: user.level ?? undefined,
     trainerId: user.trainerId ?? undefined,
     avatarInitials: user.avatarInitials ?? undefined,
+    avatarUrl: user.avatarUrl ?? undefined,
     isActive: user.isActive,
     createdAt: user.createdAt.toISOString(),
   };

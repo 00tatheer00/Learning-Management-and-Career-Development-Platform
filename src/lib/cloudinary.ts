@@ -28,6 +28,21 @@ export async function uploadPaymentScreenshot(
   file: File,
   enrollmentId: string
 ): Promise<{ url: string; publicId: string }> {
+  return uploadEnrollmentImage(file, enrollmentId, "eest/payment-screenshots");
+}
+
+export async function uploadProfilePhoto(
+  file: File,
+  enrollmentId: string
+): Promise<{ url: string; publicId: string }> {
+  return uploadEnrollmentImage(file, `${enrollmentId}-profile`, "eest/profile-photos");
+}
+
+async function uploadEnrollmentImage(
+  file: File,
+  publicId: string,
+  folder: string
+): Promise<{ url: string; publicId: string }> {
   ensureCloudinary();
 
   const bytes = await file.arrayBuffer();
@@ -36,11 +51,12 @@ export async function uploadPaymentScreenshot(
   const dataUri = `data:${file.type || "image/jpeg"};base64,${base64}`;
 
   const result = await cloudinary.uploader.upload(dataUri, {
-    folder: "eest/payment-screenshots",
-    public_id: enrollmentId,
+    folder,
+    public_id: publicId,
     resource_type: "image",
     overwrite: true,
     invalidate: true,
+    transformation: [{ width: 800, height: 800, crop: "limit" }],
   });
 
   return {
