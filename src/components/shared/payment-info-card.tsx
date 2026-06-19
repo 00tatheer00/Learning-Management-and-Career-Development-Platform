@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, Check } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Wallet, Copy, Check, ArrowRight } from "@phosphor-icons/react";
 import { PAYMENT_CONFIG } from "@/lib/constants/payment";
 import { cn } from "@/lib/utils";
 
@@ -23,57 +22,69 @@ export function PaymentInfoCard({ className, compact = false }: PaymentInfoCardP
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-2xl border-2 border-emerald-500 bg-gradient-to-br from-emerald-50 via-white to-emerald-100/80 shadow-lg shadow-emerald-500/15",
+        "relative overflow-hidden rounded-xl border border-emerald-200/80 bg-gradient-to-br from-white via-emerald-50/25 to-white shadow-sm",
+        compact ? "p-3.5" : "p-4",
         className
       )}
     >
-      <div className="bg-emerald-600 px-4 py-3 sm:px-5">
-        <p className="text-sm font-bold uppercase tracking-[0.14em] text-emerald-50">
-          Easypaisa Payment
-        </p>
-        <p className="text-xs text-emerald-100 mt-0.5">
-          Send Rs {PAYMENT_CONFIG.registrationFee.toLocaleString()} to this account
-        </p>
+      <div
+        className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-emerald-400/10 blur-2xl"
+        aria-hidden="true"
+      />
+
+      <div className="relative mb-3 flex items-start justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-2.5">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-600 text-white shadow-sm shadow-emerald-600/20">
+            <Wallet size={18} weight="duotone" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold leading-tight text-foreground">
+              Easypaisa Payment
+            </p>
+            <p className="mt-0.5 text-xs text-muted">
+              Rs {PAYMENT_CONFIG.registrationFee.toLocaleString()} · one-time registration
+            </p>
+          </div>
+        </div>
+        <span className="shrink-0 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-700">
+          Send here
+        </span>
       </div>
 
-      <div className={cn("p-4 sm:p-5", compact && "p-4")}>
-        {!compact && (
-          <p className="text-sm text-emerald-900/80 mb-4 leading-relaxed">
-            Open Easypaisa app → Send Money → enter the number below → take screenshot →
-            upload in the form.
+      <div className="relative flex items-center gap-2 rounded-lg border border-emerald-200/90 bg-white/90 px-3 py-2.5">
+        <div className="min-w-0 flex-1">
+          <p className="mb-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-700/80">
+            Account number
           </p>
-        )}
-
-        <div className="rounded-xl border-2 border-emerald-400 bg-white p-4 sm:p-5">
-          <p className="text-xs font-bold uppercase tracking-wider text-emerald-700 mb-2">
-            Easypaisa Account Number
-          </p>
-          <p className="font-black text-3xl sm:text-4xl text-emerald-600 tracking-wide tabular-nums">
+          <p className="truncate font-bold tabular-nums tracking-wide text-emerald-700 text-lg sm:text-xl">
             {PAYMENT_CONFIG.easypaisa.number}
           </p>
-          <p className="mt-2 text-sm font-semibold text-emerald-800">
+          <p className="mt-0.5 truncate text-xs text-muted">
             {PAYMENT_CONFIG.easypaisa.accountName}
           </p>
-          <Button
-            type="button"
-            size="sm"
-            onClick={copyNumber}
-            className="mt-4 gap-2 bg-emerald-600 text-white hover:bg-emerald-700"
-          >
-            {copied ? (
-              <>
-                <Check className="h-4 w-4" />
-                Copied!
-              </>
-            ) : (
-              <>
-                <Copy className="h-4 w-4" />
-                Copy Easypaisa Number
-              </>
-            )}
-          </Button>
         </div>
+        <button
+          type="button"
+          onClick={copyNumber}
+          title={copied ? "Copied" : "Copy Easypaisa number"}
+          aria-label={copied ? "Copied" : "Copy Easypaisa number"}
+          className={cn(
+            "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border transition-colors",
+            copied
+              ? "border-emerald-300 bg-emerald-50 text-emerald-700"
+              : "border-border bg-surface text-muted hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700"
+          )}
+        >
+          {copied ? <Check size={16} weight="bold" /> : <Copy size={16} />}
+        </button>
       </div>
+
+      {!compact && (
+        <p className="relative mt-3 flex items-start gap-1.5 text-xs leading-relaxed text-muted">
+          <ArrowRight size={14} weight="bold" className="mt-0.5 shrink-0 text-emerald-600" />
+          Easypaisa app → Send Money → screenshot → upload in the form.
+        </p>
+      )}
     </div>
   );
 }

@@ -772,7 +772,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
               </RequiredLabel>
               <p className="text-xs text-muted mt-1 mb-2">
                 <strong>Required.</strong> Upload a clear screenshot after sending money to
-                the green Easypaisa number above.
+                the Easypaisa number above.
               </p>
               <Input
                 id="paymentScreenshot"
