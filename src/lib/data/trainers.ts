@@ -9,6 +9,7 @@ export const trainers: Trainer[] = [
     experience: "4+ years",
     bio: "Web Development trainer at EEST. Teaches students from basics to building real websites and full-stack projects.",
     image: "/trainers/tatheer-hussain.png",
+    imagePosition: "center 15%",
     social: {
       linkedin: "https://linkedin.com",
       github: "https://github.com",
@@ -22,6 +23,7 @@ export const trainers: Trainer[] = [
     experience: "4+ years",
     bio: "Mobile app development trainer at EEST. Helps students build and publish Android & iOS apps with Flutter.",
     image: "/trainers/talha-iqbal.png",
+    imagePosition: "center 20%",
     social: {
       linkedin: "https://linkedin.com",
       github: "https://github.com",

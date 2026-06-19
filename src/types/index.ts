@@ -25,6 +25,8 @@ export interface Trainer {
   experience: string;
   bio: string;
   image: string;
+  /** CSS object-position for cropping (e.g. "center 20%") */
+  imagePosition?: string;
   social: {
     linkedin?: string;
     twitter?: string;
