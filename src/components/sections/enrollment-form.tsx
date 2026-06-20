@@ -292,8 +292,6 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
     setScreenshotPreview(URL.createObjectURL(file));
   };
 
-  const showStep = (_stepIndex: number) => true;
-
   const onSubmit = async (data: EnrollmentFormData) => {
     const fileValidation = validatePaymentScreenshot(screenshotFile ?? undefined);
     if (fileValidation) {
@@ -390,7 +388,6 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
         className="rounded-2xl border border-border bg-background p-6 lg:p-8 space-y-8 shadow-sm"
         noValidate
       >
-          {showStep(0) && (
           <FormSection title="Personal Information">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="sm:col-span-2">
@@ -463,9 +460,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
               </div>
             </div>
           </FormSection>
-          )}
 
-          {showStep(1) && (
           <FormSection title="Education Details">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="sm:col-span-2">
@@ -508,9 +503,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
               </div>
             </div>
           </FormSection>
-          )}
 
-          {showStep(2) && (
           <FormSection title="Program Selection">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="sm:col-span-2">
@@ -588,9 +581,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
               </div>
             </div>
           </FormSection>
-          )}
 
-          {showStep(3) && (
           <FormSection title="Resources &amp; Requirements">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <Controller
@@ -631,9 +622,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
               </span>
             </div>
           </FormSection>
-          )}
 
-          {showStep(4) && (
           <FormSection title="Payment Verification">
             <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 mb-4">
               <p className="text-sm font-semibold text-emerald-800">
@@ -678,9 +667,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
               )}
             </div>
           </FormSection>
-          )}
 
-          {showStep(5) && (
           <FormSection title="Agreement">
             <div className="space-y-4">
               <Controller
@@ -739,7 +726,6 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
               <FieldError message={errors.agreeToPolicies?.message} />
             </div>
           </FormSection>
-          )}
 
           {error && (
             <Alert variant="error">{error}</Alert>
