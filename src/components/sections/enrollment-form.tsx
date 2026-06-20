@@ -28,7 +28,6 @@ import { programs, formatModuleSchedule } from "@/lib/data/programs";
 import type { ProgramModule } from "@/types";
 import { cn } from "@/lib/utils";
 import { Alert } from "@/components/ui/alert";
-import { useMediaQuery } from "@/hooks/use-media-query";
 import { toast } from "@/lib/ui/toast";
 import type { FieldPath } from "react-hook-form";
 
@@ -297,7 +296,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
-  const isMobileStepper = useMediaQuery("(max-width: 767px)");
+  const isMobileStepper = false;
 
   useEffect(() => {
     if (!isSuccess) return;
