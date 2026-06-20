@@ -10,6 +10,7 @@ import {
   Gear,
   ChartBar,
   GraduationCap,
+  ChalkboardTeacher,
 } from "@phosphor-icons/react";
 
 import type { UserRole } from "@/types/portal";
@@ -26,6 +27,7 @@ export const PORTAL_NAV: Record<UserRole, PortalNavItem[]> = {
     { href: "/student/dashboard", label: "Home", icon: House, description: "Your main page" },
     { href: "/student/course", label: "My Course", icon: BookOpen, description: "Videos & lessons" },
     { href: "/student/classes", label: "Live Classes", icon: VideoCamera, description: "Join online class" },
+    { href: "/student/trainer", label: "My Trainer", icon: ChalkboardTeacher, description: "Your course trainer" },
     { href: "/student/assignments", label: "Assignments", icon: ClipboardText, description: "Submit homework" },
     { href: "/student/whatsapp", label: "WhatsApp Group", icon: ChatsCircle, description: "Chat with class" },
     { href: "/student/profile", label: "My Profile", icon: UserCircle, description: "Your details" },

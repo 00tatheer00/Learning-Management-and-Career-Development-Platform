@@ -1,20 +1,29 @@
 import { getCurrentUser } from "@/lib/auth/session";
 import { getProgramBySlug } from "@/lib/data/programs";
+import { getProgramCategory } from "@/lib/constants/program-categories";
 import { PortalPageHeader } from "@/components/portal/portal-ui";
-import { UserCircle, Envelope, Phone, BookOpen, GraduationCap } from "@phosphor-icons/react/ssr";
+import { ProgramCategoryBadge } from "@/components/portal/program-category-badge";
+import { UserCircle, Envelope, Phone, BookOpen, GraduationCap, ChalkboardTeacher } from "@phosphor-icons/react/ssr";
+import { getTrainersByProgramSlug } from "@/lib/data/trainers";
 
 export default async function StudentProfilePage() {
   const user = await getCurrentUser();
   if (!user) return null;
 
   const program = user.programSlug ? getProgramBySlug(user.programSlug) : null;
+  const category = user.programSlug ? getProgramCategory(user.programSlug) : null;
+  const trainer = user.programSlug
+    ? getTrainersByProgramSlug(user.programSlug).find((t) => t.id === user.trainerId) ??
+      getTrainersByProgramSlug(user.programSlug).find((t) => t.featured)
+    : null;
 
   const fields = [
     { icon: UserCircle, label: "Full Name", value: user.name },
     { icon: Envelope, label: "Email", value: user.email },
     { icon: Phone, label: "Phone / WhatsApp", value: user.phone ?? "—" },
-    { icon: BookOpen, label: "Course", value: program?.title ?? "—" },
+    { icon: BookOpen, label: "Program Category", value: category?.sidebarLabel ?? program?.title ?? "—" },
     { icon: GraduationCap, label: "Current Module", value: user.level ?? "—" },
+    { icon: ChalkboardTeacher, label: "Assigned Trainer", value: trainer?.name ?? "—" },
   ];
 
   return (
@@ -22,7 +31,9 @@ export default async function StudentProfilePage() {
       <PortalPageHeader
         title="My Profile"
         description="Your account details. Contact admin if anything is wrong."
-      />
+      >
+        {user.programSlug && <ProgramCategoryBadge programSlug={user.programSlug} />}
+      </PortalPageHeader>
 
       <div className="rounded-2xl border border-border bg-background overflow-hidden max-w-xl">
         <div className="bg-gradient-to-r from-primary to-orange-400 p-6 text-white">

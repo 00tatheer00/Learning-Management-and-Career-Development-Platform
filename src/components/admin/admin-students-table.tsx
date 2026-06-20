@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
 import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
+import { getProgramCategory } from "@/lib/constants/program-categories";
 import { DEFAULT_BATCH_NAME } from "@/lib/constants/batch";
 import { getProgramBySlug } from "@/lib/data/programs";
 import { formatAppliedDate } from "@/lib/utils";
@@ -134,6 +135,38 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
 
   return (
     <div className="space-y-4">
+      <div className="flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={() => setCourseFilter("all")}
+          className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+            courseFilter === "all"
+              ? "bg-primary text-primary-foreground"
+              : "border border-border bg-background text-muted hover:text-foreground"
+          }`}
+        >
+          All Students ({students.length})
+        </button>
+        {ENROLLABLE_PROGRAM_SLUGS.map((slug) => {
+          const category = getProgramCategory(slug);
+          const count = students.filter((student) => student.programSlug === slug).length;
+          return (
+            <button
+              key={slug}
+              type="button"
+              onClick={() => setCourseFilter(slug)}
+              className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+                courseFilter === slug
+                  ? "bg-primary text-primary-foreground"
+                  : "border border-border bg-background text-muted hover:text-foreground"
+              }`}
+            >
+              {category?.shortLabel ?? slug} Students ({count})
+            </button>
+          );
+        })}
+      </div>
+
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-1 flex-col gap-3 sm:flex-row">
           <div className="relative flex-1">
@@ -148,18 +181,6 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
               className="pl-10"
             />
           </div>
-          <select
-            value={courseFilter}
-            onChange={(event) => setCourseFilter(event.target.value)}
-            className="h-11 rounded-lg border border-border bg-background px-3 text-sm"
-          >
-            <option value="all">All courses</option>
-            {ENROLLABLE_PROGRAM_SLUGS.map((slug) => (
-              <option key={slug} value={slug}>
-                {getProgramBySlug(slug)?.title ?? slug}
-              </option>
-            ))}
-          </select>
           <select
             value={statusFilter}
             onChange={(event) =>

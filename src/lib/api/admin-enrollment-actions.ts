@@ -5,8 +5,10 @@ import {
 import {
   createUserWithPasswordHash,
   getUserByEmail,
+  updateUser,
   updateUserPasswordHash,
 } from "@/lib/auth/users";
+import { buildStudentProgramAssignment } from "@/lib/auth/program-assignment";
 import { hashPassword } from "@/lib/auth/password";
 import { generateStudentPassword } from "@/lib/auth/generate-password";
 import { sendApprovalWelcomeNotifications } from "@/lib/notifications/approval-welcome";
@@ -63,6 +65,12 @@ export async function approveEnrollmentAndCreateAccount(
     .slice(0, 2)
     .toUpperCase();
 
+  const assignment = await buildStudentProgramAssignment(
+    enrollment.program,
+    enrollment.level,
+    enrollment.batch
+  );
+
   const user = await getUserByEmail(enrollment.email);
   if (!user) {
     await createUserWithPasswordHash({
@@ -71,13 +79,24 @@ export async function approveEnrollmentAndCreateAccount(
       role: "student",
       name: enrollment.fullName,
       phone: enrollment.whatsapp,
-      programSlug: enrollment.program,
-      level: enrollment.level,
-      batch: enrollment.batch,
+      programSlug: assignment.programSlug,
+      level: assignment.level,
+      batch: assignment.batch,
+      trainerId: assignment.trainerId,
       isActive: true,
       avatarInitials,
     });
   } else {
+    await updateUser(user.id, {
+      name: enrollment.fullName,
+      phone: enrollment.whatsapp,
+      programSlug: assignment.programSlug,
+      level: assignment.level,
+      batch: assignment.batch,
+      trainerId: assignment.trainerId,
+      isActive: true,
+      avatarInitials,
+    });
     await updateUserPasswordHash(user.id, passwordHash);
   }
 

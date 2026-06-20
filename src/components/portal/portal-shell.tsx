@@ -13,6 +13,8 @@ import {
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { PORTAL_COLORS, PORTAL_LABELS, PORTAL_NAV } from "@/lib/constants/portal-nav";
+import { getProgramCategory } from "@/lib/constants/program-categories";
+import { ProgramCategoryBadge } from "@/components/portal/program-category-badge";
 import { SiteLogo } from "@/components/shared/site-logo";
 import { PortalAvatar } from "@/components/portal/portal-avatar";
 import type { PortalUser } from "@/types/portal";
@@ -116,7 +118,10 @@ function SidebarContent({
   onLogout: () => void;
   onNavigate?: () => void;
 }) {
-  const gradient = PORTAL_COLORS[user.role];
+  const gradient =
+    user.programSlug && (user.role === "student" || user.role === "trainer")
+      ? (getProgramCategory(user.programSlug)?.headerGradient ?? PORTAL_COLORS[user.role])
+      : PORTAL_COLORS[user.role];
 
   return (
     <div className="flex flex-col h-full">
@@ -141,6 +146,9 @@ function SidebarContent({
           <div className="min-w-0">
             <p className="font-semibold truncate">{user.name}</p>
             <p className="text-xs opacity-80 truncate">{user.email}</p>
+            {user.programSlug && (user.role === "student" || user.role === "trainer") && (
+              <ProgramCategoryBadge programSlug={user.programSlug} variant="onDark" className="mt-1.5" />
+            )}
           </div>
         </div>
       </div>

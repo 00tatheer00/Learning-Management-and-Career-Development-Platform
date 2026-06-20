@@ -40,16 +40,23 @@ export async function getAdminStudentRows(): Promise<AdminStudentRow[]> {
     orderBy: { createdAt: "desc" },
   });
 
-  const enrollmentByEmail = new Map<string, (typeof enrollments)[number]>();
+  const enrollmentByEmail = new Map<string, (typeof enrollments)[number][]>();
   for (const enrollment of enrollments) {
     const key = enrollment.email.toLowerCase();
-    if (!enrollmentByEmail.has(key)) {
-      enrollmentByEmail.set(key, enrollment);
-    }
+    const list = enrollmentByEmail.get(key) ?? [];
+    list.push(enrollment);
+    enrollmentByEmail.set(key, list);
   }
 
   return students.map((student) => {
-    const enrollment = enrollmentByEmail.get(student.email.toLowerCase());
+    const studentEnrollments = enrollmentByEmail.get(student.email.toLowerCase()) ?? [];
+    const approvedEnrollments = studentEnrollments.filter(
+      (entry) => entry.status === "approved"
+    );
+    const enrollment =
+      approvedEnrollments.find((entry) => entry.program === student.programSlug) ??
+      approvedEnrollments[0] ??
+      studentEnrollments[0];
     const programSlug = student.programSlug ?? enrollment?.program ?? "";
     const course = getProgramBySlug(programSlug)?.title ?? (programSlug || "—");
 

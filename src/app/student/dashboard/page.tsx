@@ -10,7 +10,10 @@ import { getProgramBySlug } from "@/lib/data/programs";
 import { PortalPageHeader, StatCard, QuickActionCard } from "@/components/portal/portal-ui";
 import { Button } from "@/components/ui/button";
 import { JoinClassButton } from "@/components/portal/join-class-button";
+import { StudentTrainerCard } from "@/components/portal/student-trainer-card";
+import { ProgramCategoryBadge } from "@/components/portal/program-category-badge";
 import { HELP_CONFIG } from "@/lib/constants/help";
+import { getProgramCategory } from "@/lib/constants/program-categories";
 
 export default async function StudentDashboardPage() {
   const user = await getCurrentUser();
@@ -23,6 +26,7 @@ export default async function StudentDashboardPage() {
     getLiveSessionsPreview(programSlug),
   ]);
   const program = getProgramBySlug(programSlug);
+  const category = getProgramCategory(programSlug);
   const nextSession = sessions.find(
     (s) => s.date >= new Date().toISOString().split("T")[0]
   );
@@ -31,12 +35,19 @@ export default async function StudentDashboardPage() {
     <div>
       <PortalPageHeader
         title={`Welcome, ${user.name.split(" ")[0]}!`}
-        description={`You are enrolled in ${program?.title ?? "your course"}. Everything you need is right here.`}
+        description={`You are in ${category?.sidebarLabel ?? program?.title ?? "your course"}. Classes, lessons, and trainer are only for your program.`}
       >
-        <Button size="lg" asChild>
-          <Link href="/student/classes">Join Live Class</Link>
-        </Button>
+        <div className="flex flex-wrap items-center gap-3">
+          <ProgramCategoryBadge programSlug={programSlug} />
+          <Button size="lg" asChild>
+            <Link href="/student/classes">Join Live Class</Link>
+          </Button>
+        </div>
       </PortalPageHeader>
+
+      <div className="mb-8">
+        <StudentTrainerCard programSlug={programSlug} trainerId={user.trainerId} />
+      </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <StatCard label="Video Lessons" value={materials.length} accent="orange" />
@@ -72,6 +83,13 @@ export default async function StudentDashboardPage() {
           description="See and submit your assignments"
           icon={<ClipboardText size={24} weight="duotone" />}
           color="bg-blue-500/10 text-blue-600"
+        />
+        <QuickActionCard
+          href="/student/trainer"
+          title="My Trainer"
+          description="See your program trainer"
+          icon={<BookOpen size={24} weight="duotone" />}
+          color="bg-violet-500/10 text-violet-600"
         />
         <QuickActionCard
           href="/student/whatsapp"
