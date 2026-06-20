@@ -29,7 +29,6 @@ import type { ProgramModule } from "@/types";
 import { cn } from "@/lib/utils";
 import { Alert } from "@/components/ui/alert";
 import { toast } from "@/lib/ui/toast";
-import type { FieldPath } from "react-hook-form";
 
 function RequiredLabel({
   htmlFor,
@@ -206,87 +205,6 @@ interface EnrollmentFormProps {
   defaultProgram?: string;
 }
 
-const REGISTRATION_STEPS = [
-  {
-    id: "personal",
-    title: "Personal",
-    fields: ["fullName", "fatherName", "cnic", "whatsapp", "email"] as FieldPath<EnrollmentFormData>[],
-  },
-  {
-    id: "education",
-    title: "Education",
-    fields: ["institution", "classSemester", "fieldOfStudy"] as FieldPath<EnrollmentFormData>[],
-  },
-  {
-    id: "program",
-    title: "Program",
-    fields: ["program", "level"] as FieldPath<EnrollmentFormData>[],
-  },
-  {
-    id: "resources",
-    title: "Resources",
-    fields: ["hasLaptop", "internetAvailable"] as FieldPath<EnrollmentFormData>[],
-  },
-  { id: "payment", title: "Payment", fields: [] as FieldPath<EnrollmentFormData>[] },
-  {
-    id: "agreement",
-    title: "Agreement",
-    fields: ["confirmInfoCorrect", "agreeToPolicies"] as FieldPath<EnrollmentFormData>[],
-  },
-] as const;
-
-function RegistrationStepper({
-  currentStep,
-  onStepClick,
-}: {
-  currentStep: number;
-  onStepClick?: (step: number) => void;
-}) {
-  return (
-    <div className="mb-6 md:hidden">
-      <div className="flex items-center justify-between gap-1">
-        {REGISTRATION_STEPS.map((step, index) => {
-          const isActive = index === currentStep;
-          const isComplete = index < currentStep;
-          return (
-            <button
-              key={step.id}
-              type="button"
-              onClick={() => onStepClick?.(index)}
-              className="flex flex-1 flex-col items-center gap-1"
-            >
-              <span
-                className={cn(
-                  "flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-colors",
-                  isActive
-                    ? "bg-primary text-primary-foreground"
-                    : isComplete
-                      ? "bg-primary/15 text-primary"
-                      : "bg-surface text-muted border border-border"
-                )}
-              >
-                {index + 1}
-              </span>
-              <span
-                className={cn(
-                  "text-[10px] font-medium leading-tight text-center",
-                  isActive ? "text-primary" : "text-muted"
-                )}
-              >
-                {step.title}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-      <p className="mt-3 text-center text-sm font-semibold text-foreground">
-        Step {currentStep + 1} of {REGISTRATION_STEPS.length}:{" "}
-        {REGISTRATION_STEPS[currentStep]?.title}
-      </p>
-    </div>
-  );
-}
-
 export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -295,8 +213,6 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
   const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
-  const [currentStep, setCurrentStep] = useState(0);
-  const isMobileStepper = false;
 
   useEffect(() => {
     if (!isSuccess) return;
@@ -320,7 +236,6 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
     setValue,
     watch,
     reset,
-    trigger,
     formState: { errors },
   } = useForm<EnrollmentFormData>({
     resolver: zodResolver(enrollmentSchema),
@@ -377,33 +292,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
     setScreenshotPreview(URL.createObjectURL(file));
   };
 
-  const showStep = (stepIndex: number) => !isMobileStepper || currentStep === stepIndex;
-
-  const goToNextStep = async () => {
-    const step = REGISTRATION_STEPS[currentStep];
-    if (step.fields.length > 0) {
-      const valid = await trigger(step.fields);
-      if (!valid) {
-        toast.error("Please complete all required fields on this step");
-        return;
-      }
-    }
-
-    if (step.id === "payment") {
-      const fileValidation = validatePaymentScreenshot(screenshotFile ?? undefined);
-      if (fileValidation) {
-        setScreenshotError(fileValidation);
-        toast.error("Payment screenshot required", fileValidation);
-        return;
-      }
-    }
-
-    setCurrentStep((value) => Math.min(value + 1, REGISTRATION_STEPS.length - 1));
-  };
-
-  const goToPreviousStep = () => {
-    setCurrentStep((value) => Math.max(value - 1, 0));
-  };
+  const showStep = (_stepIndex: number) => true;
 
   const onSubmit = async (data: EnrollmentFormData) => {
     const fileValidation = validatePaymentScreenshot(screenshotFile ?? undefined);
@@ -501,17 +390,6 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
         className="rounded-2xl border border-border bg-background p-6 lg:p-8 space-y-8 shadow-sm"
         noValidate
       >
-          {isMobileStepper && (
-            <RegistrationStepper
-              currentStep={currentStep}
-              onStepClick={(step) => {
-                if (step <= currentStep) {
-                  setCurrentStep(step);
-                }
-              }}
-            />
-          )}
-
           {showStep(0) && (
           <FormSection title="Personal Information">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -867,18 +745,6 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
             <Alert variant="error">{error}</Alert>
           )}
 
-          {isMobileStepper && currentStep < REGISTRATION_STEPS.length - 1 ? (
-            <div className="flex gap-3">
-              {currentStep > 0 && (
-                <Button type="button" variant="secondary" className="flex-1" onClick={goToPreviousStep}>
-                  Back
-                </Button>
-              )}
-              <Button type="button" className="flex-1" onClick={goToNextStep}>
-                Next
-              </Button>
-            </div>
-          ) : (
           <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
             {isSubmitting ? (
               <>
@@ -889,13 +755,6 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
               "Submit Registration"
             )}
           </Button>
-          )}
-
-          {isMobileStepper && currentStep === REGISTRATION_STEPS.length - 1 && currentStep > 0 && (
-            <Button type="button" variant="secondary" className="w-full" onClick={goToPreviousStep}>
-              Back
-            </Button>
-          )}
         </motion.form>
     </div>
   );
