@@ -1,7 +1,10 @@
 import { PrismaClient } from "@prisma/client";
 import { hashPassword } from "../src/lib/auth/password";
+import { getDatabaseUrl } from "../src/lib/database-url";
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  datasources: { db: { url: getDatabaseUrl() } },
+});
 
 const DEFAULT_USERS = [
   {
@@ -49,87 +52,36 @@ const DEFAULT_USERS = [
   },
 ];
 
-const DEFAULT_MATERIALS = [
-  {
-    id: "mat-1",
-    programSlug: "web-development",
-    title: "HTML & CSS Basics",
-    description: "Introduction to building web pages",
-    type: "video" as const,
-    url: "https://www.youtube.com/watch?v=qz0aGYrrlhU",
-    order: 1,
-  },
-  {
-    id: "mat-2",
-    programSlug: "web-development",
-    title: "JavaScript Fundamentals",
-    description: "Learn JS from scratch",
-    type: "video" as const,
-    url: "https://www.youtube.com/watch?v=W6NZfCO5SIk",
-    order: 2,
-  },
-  {
-    id: "mat-3",
-    programSlug: "web-development",
-    title: "Practice Exercises",
-    description: "Download and practice",
-    type: "link" as const,
-    url: "https://www.w3schools.com/html/html_exercises.asp",
-    order: 3,
-  },
-  {
-    id: "mat-4",
-    programSlug: "app-development",
-    title: "Flutter Introduction",
-    description: "Start mobile app development",
-    type: "video" as const,
-    url: "https://www.youtube.com/watch?v=1ukSR1GRtMU",
-    order: 1,
-  },
-];
+const DEFAULT_MATERIALS: Array<{
+  id: string;
+  programSlug: string;
+  title: string;
+  description: string;
+  type: "video" | "link" | "document";
+  url: string;
+  order: number;
+}> = [];
 
-const DEFAULT_ASSIGNMENTS = [
-  {
-    id: "asg-1",
-    programSlug: "web-development",
-    title: "Build Your First Web Page",
-    description: "Create a simple personal portfolio page using HTML and CSS.",
-    dueDate: new Date(Date.now() + 7 * 86400000).toISOString().split("T")[0],
-    trainerId: "trainer-tatheer",
-  },
-  {
-    id: "asg-2",
-    programSlug: "web-development",
-    title: "JavaScript Calculator",
-    description: "Make a basic calculator using JavaScript.",
-    dueDate: new Date(Date.now() + 14 * 86400000).toISOString().split("T")[0],
-    trainerId: "trainer-tatheer",
-  },
-];
+const DEFAULT_ASSIGNMENTS: Array<{
+  id: string;
+  programSlug: string;
+  title: string;
+  description: string;
+  dueDate: string;
+  trainerId: string;
+}> = [];
 
-const DEFAULT_SESSIONS = [
-  {
-    id: "ses-1",
-    programSlug: "web-development",
-    title: "Live Class — HTML & CSS",
-    date: new Date(Date.now() + 2 * 86400000).toISOString().split("T")[0],
-    time: "07:00 PM",
-    meetLink: "https://meet.google.com/eest-web-dev",
-    trainerId: "trainer-tatheer",
-    trainerName: "S Tatheer Hussain",
-    notes: "Join 5 minutes early. Keep your mic muted.",
-  },
-  {
-    id: "ses-2",
-    programSlug: "app-development",
-    title: "Live Class — Flutter Setup",
-    date: new Date(Date.now() + 4 * 86400000).toISOString().split("T")[0],
-    time: "07:00 PM",
-    meetLink: "https://meet.google.com/eest-flutter",
-    trainerId: "trainer-talha",
-    trainerName: "Talha Iqbal",
-  },
-];
+const DEFAULT_SESSIONS: Array<{
+  id: string;
+  programSlug: string;
+  title: string;
+  date: string;
+  time: string;
+  meetLink: string;
+  trainerId: string;
+  trainerName: string;
+  notes?: string;
+}> = [];
 
 async function upsertUser(user: (typeof DEFAULT_USERS)[number]) {
   const { password, ...rest } = user;
@@ -161,6 +113,11 @@ async function main() {
   for (const user of DEFAULT_USERS) {
     await upsertUser(user);
   }
+
+  await prisma.assignmentSubmission.deleteMany({});
+  await prisma.assignment.deleteMany({});
+  await prisma.courseMaterial.deleteMany({});
+  await prisma.liveSession.deleteMany({});
 
   for (const material of DEFAULT_MATERIALS) {
     await prisma.courseMaterial.upsert({
@@ -208,7 +165,7 @@ async function main() {
     });
   }
 
-  console.log("Seed complete: users, materials, assignments, and sessions upserted.");
+  console.log("Seed complete: users upserted; course content cleared.");
 }
 
 main()

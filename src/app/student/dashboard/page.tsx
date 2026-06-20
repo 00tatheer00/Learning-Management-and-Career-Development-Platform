@@ -11,6 +11,7 @@ import { PortalPageHeader, StatCard, QuickActionCard } from "@/components/portal
 import { Button } from "@/components/ui/button";
 import { JoinClassButton } from "@/components/portal/join-class-button";
 import { StudentTrainerCard } from "@/components/portal/student-trainer-card";
+import { StudentWhatsAppGroupCard } from "@/components/portal/student-whatsapp-group-card";
 import { ProgramCategoryBadge } from "@/components/portal/program-category-badge";
 import { HELP_CONFIG } from "@/lib/constants/help";
 import { getProgramCategory } from "@/lib/constants/program-categories";
@@ -44,6 +45,10 @@ export default async function StudentDashboardPage() {
           </Button>
         </div>
       </PortalPageHeader>
+
+      <div className="mb-8">
+        <StudentWhatsAppGroupCard variant="banner" />
+      </div>
 
       <div className="mb-8">
         <StudentTrainerCard programSlug={programSlug} trainerId={user.trainerId} />
@@ -94,7 +99,7 @@ export default async function StudentDashboardPage() {
         <QuickActionCard
           href="/student/whatsapp"
           title="WhatsApp Group"
-          description="Chat with your class and trainer"
+          description="Join the class group now"
           icon={<ChatsCircle size={24} weight="duotone" />}
           color="bg-emerald-500/10 text-emerald-600"
         />

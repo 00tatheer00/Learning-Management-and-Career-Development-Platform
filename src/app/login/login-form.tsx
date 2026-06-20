@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { toast } from "@/lib/ui/toast";
+import { resetWhatsAppGroupPromptForLogin } from "@/components/portal/student-whatsapp-group-prompt";
 import type { UserRole } from "@/types/portal";
 
 const ROLES: {
@@ -93,6 +94,9 @@ export default function LoginForm() {
 
       const session = await getSession();
       const role = session?.user?.role ?? selectedRole;
+      if (role === "student") {
+        resetWhatsAppGroupPromptForLogin();
+      }
       router.push(getPortalHome(role));
       router.refresh();
     } catch {

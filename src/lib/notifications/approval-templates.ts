@@ -1,4 +1,8 @@
 import { SITE_CONFIG } from "@/lib/constants";
+import {
+  STUDENT_WHATSAPP_GROUP_NAME,
+  STUDENT_WHATSAPP_GROUP_URL,
+} from "@/lib/constants/contact";
 
 interface ApprovalEmailParams {
   studentName: string;
@@ -7,6 +11,8 @@ interface ApprovalEmailParams {
   courseName: string;
   level: string;
   loginUrl: string;
+  whatsappGroupUrl?: string;
+  whatsappGroupName?: string;
 }
 
 export function buildApprovalEmailHtml({
@@ -16,6 +22,8 @@ export function buildApprovalEmailHtml({
   courseName,
   level,
   loginUrl,
+  whatsappGroupUrl = STUDENT_WHATSAPP_GROUP_URL,
+  whatsappGroupName = STUDENT_WHATSAPP_GROUP_NAME,
 }: ApprovalEmailParams): string {
   const firstName = studentName.split(" ")[0];
 
@@ -70,6 +78,18 @@ export function buildApprovalEmailHtml({
                 </tr>
               </table>
 
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:16px;margin-bottom:20px;">
+                <tr>
+                  <td style="padding:20px;">
+                    <p style="margin:0 0 12px;font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#047857;">Join WhatsApp Group Now</p>
+                    <p style="margin:0 0 12px;font-size:15px;line-height:1.6;color:#374151;">
+                      After logging in, join <strong>${whatsappGroupName}</strong> for live class links, videos, and announcements.
+                    </p>
+                    <a href="${whatsappGroupUrl}" style="display:inline-block;padding:12px 24px;background:#25D366;color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;border-radius:999px;">Join Group on WhatsApp</a>
+                  </td>
+                </tr>
+              </table>
+
               <p style="margin:0;font-size:13px;line-height:1.6;color:#6b7280;">
                 Keep your login details private. If you need help, reply to this email or message us on WhatsApp.
               </p>
@@ -97,6 +117,8 @@ export function buildApprovalWhatsAppMessage({
   courseName,
   level,
   loginUrl,
+  whatsappGroupUrl = STUDENT_WHATSAPP_GROUP_URL,
+  whatsappGroupName = STUDENT_WHATSAPP_GROUP_NAME,
 }: ApprovalEmailParams): string {
   const firstName = studentName.split(" ")[0];
 
@@ -112,6 +134,11 @@ Username: ${email}
 Password: ${password}
 Login: ${loginUrl}
 
+📱 *Join WhatsApp Group Now*
+${whatsappGroupName}: ${whatsappGroupUrl}
+
+Log in to the portal, then join the group for live classes and updates.
+
 Welcome to your batch. See you in class!`;
 }
 
@@ -122,6 +149,8 @@ export function buildApprovalEmailText({
   courseName,
   level,
   loginUrl,
+  whatsappGroupUrl = STUDENT_WHATSAPP_GROUP_URL,
+  whatsappGroupName = STUDENT_WHATSAPP_GROUP_NAME,
 }: ApprovalEmailParams): string {
   const firstName = studentName.split(" ")[0];
 
@@ -136,6 +165,9 @@ Portal Login
 Username: ${email}
 Password: ${password}
 Login: ${loginUrl}
+
+Join WhatsApp Group Now
+${whatsappGroupName}: ${whatsappGroupUrl}
 
 Keep your login details private.`;
 }

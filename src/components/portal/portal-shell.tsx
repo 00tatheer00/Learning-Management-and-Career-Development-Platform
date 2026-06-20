@@ -17,6 +17,7 @@ import { getProgramCategory } from "@/lib/constants/program-categories";
 import { ProgramCategoryBadge } from "@/components/portal/program-category-badge";
 import { SiteLogo } from "@/components/shared/site-logo";
 import { PortalAvatar } from "@/components/portal/portal-avatar";
+import { StudentWhatsAppGroupPrompt } from "@/components/portal/student-whatsapp-group-prompt";
 import type { PortalUser } from "@/types/portal";
 import { cn } from "@/lib/utils";
 
@@ -100,6 +101,7 @@ export function PortalShell({ user, children }: PortalShellProps) {
         </header>
 
         <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
+        {user.role === "student" && <StudentWhatsAppGroupPrompt />}
       </div>
     </div>
   );

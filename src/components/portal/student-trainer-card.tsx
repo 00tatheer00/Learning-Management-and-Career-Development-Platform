@@ -75,10 +75,10 @@ export function StudentTrainerCard({
           </p>
           {assignedTrainer.expertise.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-1.5">
-              {assignedTrainer.expertise.slice(0, 4).map((skill) => (
+              {assignedTrainer.expertise.map((skill) => (
                 <span
                   key={skill}
-                  className="rounded-full bg-surface px-2 py-0.5 text-[11px] font-medium text-muted"
+                  className="rounded-full border border-border bg-surface px-2.5 py-0.5 text-[11px] font-medium text-foreground/80"
                 >
                   {skill}
                 </span>
