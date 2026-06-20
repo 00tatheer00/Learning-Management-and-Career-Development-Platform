@@ -379,12 +379,6 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
   };
 
   const showStep = (stepIndex: number) => !isMobileStepper || currentStep === stepIndex;
-  const keepStepperInView = () => {
-    if (!isMobileStepper) return;
-    const panel = document.getElementById("register-form-panel");
-    if (!panel) return;
-    panel.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
 
   const goToNextStep = async () => {
     const step = REGISTRATION_STEPS[currentStep];
@@ -406,12 +400,10 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
     }
 
     setCurrentStep((value) => Math.min(value + 1, REGISTRATION_STEPS.length - 1));
-    keepStepperInView();
   };
 
   const goToPreviousStep = () => {
     setCurrentStep((value) => Math.max(value - 1, 0));
-    keepStepperInView();
   };
 
   const onSubmit = async (data: EnrollmentFormData) => {
@@ -516,7 +508,6 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
               onStepClick={(step) => {
                 if (step <= currentStep) {
                   setCurrentStep(step);
-                  keepStepperInView();
                 }
               }}
             />
