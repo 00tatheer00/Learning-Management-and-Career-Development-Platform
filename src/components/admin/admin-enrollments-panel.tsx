@@ -65,6 +65,20 @@ export function AdminEnrollmentsPanel() {
     load();
   }, []);
 
+  const programCounts = useMemo(() => {
+    const base = enrollments.filter((enrollment) =>
+      statusFilter === "all" ? true : enrollment.status === statusFilter
+    );
+
+    const all = base.length;
+    const perProgram: Record<string, number> = {};
+    for (const slug of ENROLLABLE_PROGRAM_SLUGS) {
+      perProgram[slug] = base.filter((enrollment) => enrollment.program === slug).length;
+    }
+
+    return { all, perProgram };
+  }, [enrollments, statusFilter]);
+
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
     return enrollments.filter((enrollment) => {
@@ -223,18 +237,30 @@ export function AdminEnrollmentsPanel() {
               className="pl-10"
             />
           </div>
-          <select
-            value={programFilter}
-            onChange={(event) => setProgramFilter(event.target.value)}
-            className="h-11 rounded-lg border border-border bg-background px-3 text-sm"
-          >
-            <option value="all">All courses</option>
-            {ENROLLABLE_PROGRAM_SLUGS.map((slug) => (
-              <option key={slug} value={slug}>
-                {getProgramBySlug(slug)?.title ?? slug}
-              </option>
+          <div className="inline-flex rounded-xl bg-secondary/60 p-1 text-xs sm:text-sm">
+            {[
+              { value: "all", label: "All courses", count: programCounts.all },
+              ...ENROLLABLE_PROGRAM_SLUGS.map((slug) => ({
+                value: slug,
+                label: getProgramBySlug(slug)?.shortLabel ?? slug,
+                count: programCounts.perProgram[slug] ?? 0,
+              })),
+            ].map((item) => (
+              <button
+                key={item.value}
+                type="button"
+                onClick={() => setProgramFilter(item.value)}
+                className={`rounded-lg px-3 py-1.5 font-semibold transition-colors ${
+                  programFilter === item.value
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted hover:text-foreground/90"
+                }`}
+              >
+                {item.label}
+                {item.count > 0 ? ` (${item.count})` : ""}
+              </button>
             ))}
-          </select>
+          </div>
           <Button asChild variant="secondary" className="gap-2 shrink-0">
             <a href={exportUrl} download>
               <DownloadSimple size={18} weight="duotone" />
