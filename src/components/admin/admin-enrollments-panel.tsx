@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
 import { PortalPageHeader } from "@/components/portal/portal-ui";
 import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
-import { getProgramBySlug } from "@/lib/data/programs";
+import { getProgramCategory } from "@/lib/constants/program-categories";
 import { formatAppliedDate, formatAppliedDateTime, formatAppliedTime } from "@/lib/utils";
 import { toast } from "@/lib/ui/toast";
 import { Alert } from "@/components/ui/alert";
@@ -242,7 +242,7 @@ export function AdminEnrollmentsPanel() {
               { value: "all", label: "All courses", count: programCounts.all },
               ...ENROLLABLE_PROGRAM_SLUGS.map((slug) => ({
                 value: slug,
-                label: getProgramBySlug(slug)?.shortLabel ?? slug,
+                label: getProgramCategory(slug)?.shortLabel ?? slug,
                 count: programCounts.perProgram[slug] ?? 0,
               })),
             ].map((item) => (
