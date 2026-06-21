@@ -152,7 +152,15 @@ export function AdminEnrollmentsPanel() {
     const data = await res.json();
     if (data.success) {
       playPortalSound(status === "approved" ? "adminApprove" : "adminReject");
-      toast.success(data.message ?? "Updated successfully.");
+      const msg = data.message ?? "Updated successfully.";
+      if (
+        status === "approved" &&
+        (msg.includes("notifications failed") || msg.includes("WhatsApp not sent"))
+      ) {
+        toast.warning("Approved — WhatsApp failed", msg);
+      } else {
+        toast.success(msg);
+      }
       if (status === "approved" && data.credentials) {
         const enrollment = enrollments.find((item) => item.id === id);
         setApprovedCredentials({

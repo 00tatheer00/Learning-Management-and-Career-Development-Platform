@@ -110,6 +110,27 @@ export function AdminCredentialsPanel() {
     });
   };
 
+  const handleResendWhatsApp = async (row: AdminCredentialRow) => {
+    setLoadingId(row.id);
+    try {
+      const res = await fetch("/api/admin/whatsapp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "resendLogin", studentId: row.id }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        toast.success(json.message ?? "WhatsApp sent.");
+      } else {
+        toast.error(json.error ?? json.message ?? "WhatsApp send failed");
+      }
+    } catch {
+      toast.error("WhatsApp send failed");
+    } finally {
+      setLoadingId(null);
+    }
+  };
+
   const handleResetPassword = async (row: AdminCredentialRow) => {
     setLoadingId(row.id);
     try {
@@ -356,6 +377,15 @@ export function AdminCredentialsPanel() {
                             className="rounded-lg border border-border p-2 hover:bg-surface disabled:opacity-40"
                           >
                             <Copy size={16} />
+                          </button>
+                          <button
+                            type="button"
+                            title="Send login on WhatsApp"
+                            disabled={!row.password || loadingId === row.id}
+                            onClick={() => void handleResendWhatsApp(row)}
+                            className="rounded-lg border border-[#25D366]/40 bg-[#25D366]/10 p-2 text-[#128C7E] hover:bg-[#25D366]/20 disabled:opacity-40"
+                          >
+                            <ChatsCircle size={16} weight="fill" />
                           </button>
                           <button
                             type="button"

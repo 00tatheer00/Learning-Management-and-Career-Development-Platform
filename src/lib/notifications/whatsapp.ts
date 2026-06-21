@@ -1,8 +1,20 @@
 function formatWhatsAppNumber(phone: string): string | null {
-  const digits = phone.replace(/\D/g, "");
-  if (digits.startsWith("92") && digits.length === 12) return `+${digits}`;
-  if (digits.startsWith("0") && digits.length === 11) return `+92${digits.slice(1)}`;
-  if (digits.length === 10) return `+92${digits}`;
+  let digits = phone.replace(/\D/g, "");
+  if (digits.startsWith("92") && digits.length === 12) {
+    return `+${digits}`;
+  }
+  if (digits.startsWith("0092") && digits.length === 14) {
+    digits = digits.slice(4);
+  }
+  if (digits.startsWith("92") && digits.length === 12) {
+    return `+${digits}`;
+  }
+  if (digits.startsWith("0") && digits.length === 11) {
+    return `+92${digits.slice(1)}`;
+  }
+  if (digits.length === 10 && !digits.startsWith("0")) {
+    return `+92${digits}`;
+  }
   return null;
 }
 
@@ -131,17 +143,15 @@ export async function sendWhatsAppMessage(
 
   const instanceStatus = await getUltraMsgInstanceStatus();
   if (instanceStatus.configured && !instanceStatus.connected) {
-    return {
-      sent: false,
-      error:
-        instanceStatus.error ??
-        "UltraMsg WhatsApp is not connected. Scan QR at ultramsg.com dashboard.",
-    };
+    console.warn("UltraMsg status not connected, attempting send anyway:", instanceStatus.error);
   }
 
   const to = formatWhatsAppNumber(phone);
   if (!to) {
-    return { sent: false, error: "Invalid WhatsApp number format" };
+    return {
+      sent: false,
+      error: `Invalid WhatsApp number "${phone}". Use 03XXXXXXXXX format.`,
+    };
   }
 
   try {

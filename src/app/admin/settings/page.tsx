@@ -1,13 +1,11 @@
 import { PortalPageHeader } from "@/components/portal/portal-ui";
-import { Key, Envelope, ChatsCircle, Globe } from "@phosphor-icons/react/ssr";
+import { Key, Envelope, Globe } from "@phosphor-icons/react/ssr";
 import { SITE_CONFIG } from "@/lib/constants";
 import { getPortalLoginUrl } from "@/lib/site-url";
-import { getUltraMsgInstanceStatus } from "@/lib/notifications/whatsapp";
 import { AdminNotificationSettings } from "@/components/admin/admin-notification-settings";
+import { AdminWhatsAppSettings } from "@/components/admin/admin-whatsapp-settings";
 
 export default async function AdminSettingsPage() {
-  const whatsappStatus = await getUltraMsgInstanceStatus();
-
   return (
     <div>
       <PortalPageHeader
@@ -46,37 +44,7 @@ export default async function AdminSettingsPage() {
           </p>
         </div>
 
-        <div
-          className={`rounded-2xl border p-5 ${
-            whatsappStatus.connected
-              ? "border-emerald-200 bg-emerald-50"
-              : "border-red-200 bg-red-50"
-          }`}
-        >
-          <div className="flex items-center gap-3 mb-3">
-            <ChatsCircle size={24} weight="duotone" className="text-emerald-600" />
-            <h2 className="font-bold">WhatsApp (UltraMsg)</h2>
-          </div>
-          <p className="text-sm leading-relaxed">
-            <strong>Status:</strong>{" "}
-            {whatsappStatus.connected
-              ? "Connected — messages will send"
-              : whatsappStatus.configured
-                ? `Not connected (${whatsappStatus.status ?? "unknown"})`
-                : "Not configured on server"}
-          </p>
-          {!whatsappStatus.connected && (
-            <p className="mt-2 text-sm leading-relaxed">
-              {whatsappStatus.error ??
-                "Open ultramsg.com → instance181496 → scan QR with your WhatsApp. Until connected, approval messages will not deliver."}
-            </p>
-          )}
-          <p className="mt-3 text-sm text-muted">
-            Vercel env vars:{" "}
-            <code className="bg-surface px-1 rounded">ULTRAMSG_INSTANCE_ID</code> and{" "}
-            <code className="bg-surface px-1 rounded">ULTRAMSG_TOKEN</code>
-          </p>
-        </div>
+        <AdminWhatsAppSettings />
 
         <div className="rounded-2xl border border-border bg-background p-5">
           <div className="flex items-center gap-3 mb-3">
