@@ -1,9 +1,4 @@
 import { sendWhatsAppMessage } from "@/lib/notifications/whatsapp";
-import { Resend } from "resend";
-import {
-  getEmailFromAddress,
-  getEmailReplyTo,
-} from "@/lib/notifications/email-config";
 
 interface SubmissionReviewNoticeInput {
   studentName: string;
@@ -36,30 +31,9 @@ function buildText(input: SubmissionReviewNoticeInput): string {
 
 export async function sendSubmissionReviewNotifications(
   input: SubmissionReviewNoticeInput
-): Promise<{ emailSent: boolean; whatsappSent: boolean }> {
+): Promise<{ whatsappSent: boolean }> {
   const text = buildText(input);
-  let emailSent = false;
   let whatsappSent = false;
-
-  const apiKey = process.env.RESEND_API_KEY;
-  const from = getEmailFromAddress();
-
-  if (apiKey && from) {
-    try {
-      const resend = new Resend(apiKey);
-      const { data, error } = await resend.emails.send({
-        from,
-        to: input.email,
-        subject: `Assignment update: ${input.assignmentTitle}`,
-        html: `<pre style="font-family:Arial,sans-serif;white-space:pre-wrap">${text}</pre>`,
-        text,
-        replyTo: getEmailReplyTo(),
-      });
-      emailSent = Boolean(data?.id && !error);
-    } catch {
-      emailSent = false;
-    }
-  }
 
   if (input.whatsapp) {
     const emoji = input.status === "approved" ? "✅" : "📝";
@@ -70,5 +44,5 @@ export async function sendSubmissionReviewNotifications(
     whatsappSent = result.sent;
   }
 
-  return { emailSent, whatsappSent };
+  return { whatsappSent };
 }

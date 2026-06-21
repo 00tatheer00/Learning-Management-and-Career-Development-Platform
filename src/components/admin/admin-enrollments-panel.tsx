@@ -71,7 +71,6 @@ export function AdminEnrollmentsPanel() {
 
   useEffect(() => {
     load();
-    primePortalSounds();
   }, []);
 
   const programCounts = useMemo(() => {
@@ -213,6 +212,7 @@ export function AdminEnrollmentsPanel() {
       toast.error("Rejection reason is required");
       return;
     }
+    primePortalSounds();
     try {
       await runAction(
         pendingAction.id,
@@ -570,7 +570,7 @@ export function AdminEnrollmentsPanel() {
           <>
             <p className="text-sm text-muted">
               Approve <strong>{pendingAction.name}</strong> and create their student account?
-              Login details will be sent by email and WhatsApp.
+              Login details will be saved in Portal Logins and sent on WhatsApp.
             </p>
             <div className="mt-6 flex justify-end gap-3">
               <Button variant="secondary" onClick={() => setPendingAction(null)}>
@@ -585,7 +585,7 @@ export function AdminEnrollmentsPanel() {
           <>
             <p className="text-sm text-muted">
               Reject <strong>{pendingAction?.name}</strong>? The student will be notified by
-              email and WhatsApp with your reason.
+              The student will be notified on WhatsApp with your reason.
             </p>
             <label className="mt-4 block text-sm font-medium">
               Rejection reason

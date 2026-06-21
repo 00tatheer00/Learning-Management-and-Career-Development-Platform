@@ -11,7 +11,7 @@ import {
 } from "react";
 import { usePathname } from "next/navigation";
 import { toast } from "@/lib/ui/toast";
-import { playPortalSound, primePortalSounds } from "@/lib/ui/portal-sounds";
+import { playPortalSound } from "@/lib/ui/portal-sounds";
 import {
   notifyAdminNewRegistration,
   requestBrowserNotificationPermission,
@@ -148,7 +148,6 @@ export function AdminAlertsProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    primePortalSounds();
     void requestBrowserNotificationPermission();
     connectStream();
 

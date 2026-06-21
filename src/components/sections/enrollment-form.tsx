@@ -417,8 +417,8 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
         <h2 className="text-2xl font-bold mb-2">Registration Submitted!</h2>
         <p className="text-muted mb-6 leading-relaxed max-w-md mx-auto">
           Thank you for registering. Our team will verify your payment screenshot
-          within 2–3 business days. Once approved, your portal login details will be
-          sent to your <strong>email</strong> and <strong>WhatsApp</strong>.
+          within 2–3 business days.           Once approved, your portal login details will be
+          sent to your <strong>WhatsApp</strong>.
         </p>
         <Button onClick={() => setIsSuccess(false)}>Submit Another Registration</Button>
       </motion.div>

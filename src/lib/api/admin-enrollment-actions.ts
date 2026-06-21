@@ -15,7 +15,7 @@ import { sendApprovalWelcomeNotifications } from "@/lib/notifications/approval-w
 import { sendRejectionNotifications } from "@/lib/notifications/rejection-notice";
 import { deleteCloudinaryImage } from "@/lib/cloudinary";
 import { prisma } from "@/lib/prisma";
-import { savePortalPasswordForEnrollment } from "@/lib/auth/portal-password-vault";
+import { savePortalPasswordForEnrollment, savePortalPasswordForStudentEmail } from "@/lib/auth/portal-password-vault";
 import { getPortalLoginUrl } from "@/lib/site-url";
 import type { EnrollmentRecord } from "@/types/portal";
 
@@ -97,7 +97,14 @@ export async function approveEnrollmentAndCreateAccount(
     await updateUserPasswordHash(user.id, passwordHash);
   }
 
-  await savePortalPasswordForEnrollment(enrollmentId, plainPassword);
+  const passwordSaved =
+    (await savePortalPasswordForEnrollment(enrollmentId, plainPassword)) ||
+    (await savePortalPasswordForStudentEmail(enrollment.email, plainPassword));
+  if (!passwordSaved) {
+    console.warn(
+      "Approval succeeded but portal password was not saved — use Portal Logins → Generate & Save."
+    );
+  }
 
   void sendApprovalWelcomeNotifications({
     fullName: enrollmentRecord.fullName,
@@ -113,7 +120,7 @@ export async function approveEnrollmentAndCreateAccount(
   return {
     enrollment,
     message:
-      "Registration approved. Login details are being sent by email and WhatsApp (use Portal Logins if needed).",
+      "Registration approved. Login saved in Portal Logins. WhatsApp message is being sent to the student.",
     credentials: {
       loginId: enrollment.email,
       password: plainPassword,
@@ -159,7 +166,7 @@ export async function rejectEnrollment(
 
   return {
     enrollment,
-    message: "Registration rejected. Student will be notified by email and WhatsApp.",
+    message: "Registration rejected. Student will be notified on WhatsApp.",
   };
 }
 

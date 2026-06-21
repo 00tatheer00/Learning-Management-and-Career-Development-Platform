@@ -6,7 +6,7 @@ export type PortalSound =
 
 let audioContext: AudioContext | null = null;
 
-function getAudioContext(): AudioContext | null {
+function unlockSoundsInGesture(): AudioContext | null {
   if (typeof window === "undefined") return null;
   try {
     if (!audioContext) {
@@ -19,6 +19,21 @@ function getAudioContext(): AudioContext | null {
   } catch {
     return null;
   }
+}
+
+function getAudioContext(): AudioContext | null {
+  if (!audioContext || audioContext.state !== "running") return null;
+  return audioContext;
+}
+
+if (typeof window !== "undefined") {
+  const onFirstGesture = () => {
+    unlockSoundsInGesture();
+    window.removeEventListener("pointerdown", onFirstGesture);
+    window.removeEventListener("keydown", onFirstGesture);
+  };
+  window.addEventListener("pointerdown", onFirstGesture, { passive: true });
+  window.addEventListener("keydown", onFirstGesture, { passive: true });
 }
 
 function playTone(
@@ -67,6 +82,8 @@ function playSequence(
 }
 
 export function playPortalSound(sound: PortalSound) {
+  unlockSoundsInGesture();
+
   switch (sound) {
     case "adminNewRegistration":
       playSequence([
@@ -102,7 +119,7 @@ export function playPortalSound(sound: PortalSound) {
   }
 }
 
-/** Resume audio after a user click so later sounds can play. */
+/** Call from a click handler so sounds can play later in the session. */
 export function primePortalSounds() {
-  getAudioContext();
+  unlockSoundsInGesture();
 }

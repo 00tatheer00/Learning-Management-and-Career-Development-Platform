@@ -184,7 +184,7 @@ export function AdminCredentialsPanel() {
     <div>
       <PortalPageHeader
         title="Portal Logins"
-        description="View and share student portal username and password when WhatsApp or email is missed."
+        description="View and share student portal username and password. Saved automatically on approval."
       />
 
       <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -423,7 +423,7 @@ export function AdminCredentialsPanel() {
         {credentialModal && (
           <div className="space-y-4">
             <p className="text-sm text-muted">
-              Share these details with <strong>{credentialModal.name}</strong> if WhatsApp or email
+              Share these details with <strong>{credentialModal.name}</strong> if WhatsApp
               was not received.
             </p>
             <div className="rounded-xl border border-border bg-surface p-4 space-y-2 text-sm">

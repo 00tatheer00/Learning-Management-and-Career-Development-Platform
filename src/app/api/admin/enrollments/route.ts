@@ -54,33 +54,44 @@ export async function PATCH(request: Request) {
     );
   }
 
-  const result =
-    parsed.data.status === "approved"
-      ? await approveEnrollmentAndCreateAccount(
-          parsed.data.id,
-          user.id,
-          parsed.data.adminNotes
-        )
-      : await rejectEnrollment(parsed.data.id, user.id, parsed.data.adminNotes);
+  try {
+    const result =
+      parsed.data.status === "approved"
+        ? await approveEnrollmentAndCreateAccount(
+            parsed.data.id,
+            user.id,
+            parsed.data.adminNotes
+          )
+        : await rejectEnrollment(parsed.data.id, user.id, parsed.data.adminNotes);
 
-  if (!result.enrollment) {
-    return NextResponse.json(createApiResponse(false, { error: result.error ?? "Not found" }), {
-      status: result.error === "Enrollment not found" ? 404 : 400,
+    if (!result.enrollment) {
+      return NextResponse.json(createApiResponse(false, { error: result.error ?? "Not found" }), {
+        status: result.error === "Enrollment not found" ? 404 : 400,
+      });
+    }
+
+    const credentials =
+      parsed.data.status === "approved" && "credentials" in result
+        ? result.credentials
+        : undefined;
+
+    return NextResponse.json({
+      ...createApiResponse(true, {
+        data: result.enrollment,
+        message: result.message,
+      }),
+      ...(credentials ? { credentials } : {}),
     });
+  } catch (error) {
+    console.error("Enrollment PATCH failed:", error);
+    return NextResponse.json(
+      createApiResponse(false, {
+        error: "Internal server error",
+        message: error instanceof Error ? error.message : "Approval failed",
+      }),
+      { status: 500 }
+    );
   }
-
-  const credentials =
-    parsed.data.status === "approved" && "credentials" in result
-      ? result.credentials
-      : undefined;
-
-  return NextResponse.json({
-    ...createApiResponse(true, {
-      data: result.enrollment,
-      message: result.message,
-    }),
-    ...(credentials ? { credentials } : {}),
-  });
 }
 
 const bulkSchema = z.object({

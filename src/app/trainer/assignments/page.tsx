@@ -80,7 +80,7 @@ export default function TrainerAssignmentsPage() {
     if (data.success) {
       toast.success(
         status === "approved" ? "Submission approved" : "Sent back for revision",
-        "Student notified by email and WhatsApp."
+        "Student notified on WhatsApp."
       );
       load();
     } else {

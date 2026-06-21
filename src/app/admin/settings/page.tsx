@@ -23,8 +23,8 @@ export default async function AdminSettingsPage() {
           </div>
           <p className="text-sm text-muted">
             When you approve a registration, a random 8-character portal password is created and
-            saved under <strong>Portal Logins</strong>. Login details are also sent by email and
-            WhatsApp. Username is the student&apos;s email.
+            saved under <strong>Portal Logins</strong>. Login details are sent on{" "}
+            <strong>WhatsApp</strong>. Username is the student&apos;s email.
           </p>
         </div>
 
@@ -34,7 +34,9 @@ export default async function AdminSettingsPage() {
             <h2 className="font-bold text-amber-900">Email (Resend)</h2>
           </div>
           <p className="text-sm text-amber-900/90 leading-relaxed">
-            Emails only work after you verify <strong>emergingedge.tech</strong> at{" "}
+            Student notifications currently use <strong>WhatsApp only</strong>. Email (Resend) is
+            disabled until domain verification is complete. When ready, verify{" "}
+            <strong>emergingedge.tech</strong> at{" "}
             <a href="https://resend.com/domains" className="underline" target="_blank" rel="noopener noreferrer">
               resend.com/domains
             </a>

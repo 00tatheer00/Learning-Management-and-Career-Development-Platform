@@ -90,15 +90,14 @@ export async function PATCH(request: Request) {
     });
 
     const parts: string[] = [];
-    if (notifications.emailSent) parts.push("email");
     if (notifications.whatsappSent) parts.push("WhatsApp");
 
     const notificationSummary =
       parts.length > 0
         ? ` New password sent via ${parts.join(" and ")}.`
         : notifications.warnings.length > 0
-          ? ` Password reset but notifications failed: ${notifications.warnings.join("; ")}`
-          : "";
+          ? ` Password saved but WhatsApp failed: ${notifications.warnings.join("; ")}`
+          : " Password saved in Portal Logins.";
 
     return NextResponse.json(
       createApiResponse(true, {

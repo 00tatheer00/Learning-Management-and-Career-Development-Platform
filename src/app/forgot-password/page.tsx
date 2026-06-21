@@ -33,7 +33,7 @@ export default function ForgotPasswordForm() {
       }
 
       setSent(true);
-      toast.success("Check your email and WhatsApp", "Reset instructions sent if account exists.");
+      toast.success("Check WhatsApp", "Reset link sent if account exists.");
     } catch {
       toast.error("Something went wrong", "Please try again.");
     } finally {
@@ -50,14 +50,14 @@ export default function ForgotPasswordForm() {
           </div>
           <h1 className="text-2xl font-bold">Forgot Password</h1>
           <p className="text-muted mt-2 text-sm">
-            Enter your portal email. We will send a reset link by email and WhatsApp.
+            Enter your portal email. We will send a reset link on WhatsApp.
           </p>
         </div>
 
         <div className="rounded-2xl border border-border bg-background shadow-xl p-6 sm:p-8">
           {sent ? (
             <Alert variant="success" title="Instructions sent">
-              If an account exists for <strong>{email}</strong>, check your email and WhatsApp
+              If an account exists for <strong>{email}</strong>, check WhatsApp
               for a password reset link valid for 1 hour.
             </Alert>
           ) : (

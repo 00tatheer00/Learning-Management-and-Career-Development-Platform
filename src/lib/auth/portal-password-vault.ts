@@ -5,9 +5,12 @@ const ALGORITHM = "aes-256-gcm";
 const KEY_SALT = "eest-portal-password-vault";
 
 function getEncryptionKey(): Buffer {
-  const secret = process.env.PORTAL_PASSWORD_SECRET ?? process.env.NEXTAUTH_SECRET;
+  const secret =
+    process.env.PORTAL_PASSWORD_SECRET ??
+    process.env.NEXTAUTH_SECRET ??
+    process.env.AUTH_SECRET;
   if (!secret) {
-    throw new Error("PORTAL_PASSWORD_SECRET or NEXTAUTH_SECRET is required");
+    throw new Error("PORTAL_PASSWORD_SECRET, NEXTAUTH_SECRET, or AUTH_SECRET is required");
   }
   return scryptSync(secret, KEY_SALT, 32);
 }
@@ -45,23 +48,35 @@ export function decryptPortalPassword(stored: string | null | undefined): string
 export async function savePortalPasswordForStudentEmail(
   email: string,
   plainPassword: string
-): Promise<void> {
-  const portalPasswordEnc = encryptPortalPassword(plainPassword);
-  await prisma.enrollment.updateMany({
-    where: {
-      email: email.toLowerCase(),
-      status: "approved",
-    },
-    data: { portalPasswordEnc },
-  });
+): Promise<boolean> {
+  try {
+    const portalPasswordEnc = encryptPortalPassword(plainPassword);
+    await prisma.enrollment.updateMany({
+      where: {
+        email: email.toLowerCase(),
+        status: "approved",
+      },
+      data: { portalPasswordEnc },
+    });
+    return true;
+  } catch (error) {
+    console.error("Failed to save portal password for email:", email, error);
+    return false;
+  }
 }
 
 export async function savePortalPasswordForEnrollment(
   enrollmentId: string,
   plainPassword: string
-): Promise<void> {
-  await prisma.enrollment.update({
-    where: { id: enrollmentId },
-    data: { portalPasswordEnc: encryptPortalPassword(plainPassword) },
-  });
+): Promise<boolean> {
+  try {
+    await prisma.enrollment.update({
+      where: { id: enrollmentId },
+      data: { portalPasswordEnc: encryptPortalPassword(plainPassword) },
+    });
+    return true;
+  } catch (error) {
+    console.error("Failed to save portal password for enrollment:", enrollmentId, error);
+    return false;
+  }
 }
