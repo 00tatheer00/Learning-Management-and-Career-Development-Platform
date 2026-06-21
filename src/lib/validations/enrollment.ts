@@ -1,5 +1,10 @@
 import { z } from "zod";
 import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
+import {
+  normalizeCnic,
+  normalizeWhatsappNumber,
+  validatePaymentScreenshot,
+} from "@/lib/utils/payment-screenshot";
 
 const cnicRegex = /^\d{13}$/;
 const whatsappRegex = /^03\d{9}$/;
@@ -23,16 +28,19 @@ export const enrollmentSchema = z.object({
     .max(50, "Too long"),
   cnic: z
     .string()
-    .transform((val) => val.replace(/[-\s]/g, ""))
+    .transform((val) => normalizeCnic(val))
     .pipe(z.string().regex(cnicRegex, "CNIC must be 13 numbers only (no dashes)")),
   email: z.string().email("Please enter a valid email"),
   whatsapp: z
     .string()
-    .transform((val) => val.replace(/[\s-]/g, ""))
+    .transform((val) => normalizeWhatsappNumber(val))
     .pipe(
       z
         .string()
-        .regex(whatsappRegex, "WhatsApp must start with 03 and be 11 digits (e.g. 03001234567)")
+        .regex(
+          whatsappRegex,
+          "WhatsApp must be 11 digits starting with 03 (e.g. 03001234567). You can also use +92..."
+        )
     ),
   fieldOfStudy: z
     .string()
@@ -59,15 +67,4 @@ export const enrollmentSchema = z.object({
 
 export type EnrollmentFormData = z.infer<typeof enrollmentSchema>;
 
-export function validatePaymentScreenshot(file: File | undefined): string | null {
-  if (!file || file.size === 0) {
-    return "Please upload your Easypaisa payment screenshot";
-  }
-  if (!file.type.startsWith("image/")) {
-    return "Screenshot must be an image (JPG, PNG, etc.)";
-  }
-  if (file.size > 5 * 1024 * 1024) {
-    return "Screenshot must be smaller than 5MB";
-  }
-  return null;
-}
+export { validatePaymentScreenshot };

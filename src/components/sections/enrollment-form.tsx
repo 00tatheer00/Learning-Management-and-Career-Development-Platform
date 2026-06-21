@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, type FieldErrors } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { Loader2, CheckCircle2 } from "lucide-react";
@@ -22,6 +22,7 @@ import {
   validatePaymentScreenshot,
   type EnrollmentFormData,
 } from "@/lib/validations/enrollment";
+import { preparePaymentScreenshot } from "@/lib/utils/payment-screenshot";
 import { PAYMENT_CONFIG, ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
 import { PaymentInfoCard } from "@/components/shared/payment-info-card";
 import { programs, formatModuleSchedule } from "@/lib/data/programs";
@@ -292,6 +293,53 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
     setScreenshotPreview(URL.createObjectURL(file));
   };
 
+  const scrollToFirstError = (formErrors: FieldErrors<EnrollmentFormData>) => {
+    const orderedFields: (keyof EnrollmentFormData | "paymentScreenshot")[] = [
+      "fullName",
+      "fatherName",
+      "cnic",
+      "whatsapp",
+      "email",
+      "institution",
+      "classSemester",
+      "fieldOfStudy",
+      "program",
+      "level",
+      "hasLaptop",
+      "internetAvailable",
+      "paymentScreenshot",
+      "confirmInfoCorrect",
+      "agreeToPolicies",
+    ];
+
+    for (const field of orderedFields) {
+      if (field === "paymentScreenshot") {
+        if (screenshotError) {
+          document
+            .getElementById("paymentScreenshot")
+            ?.scrollIntoView({ behavior: "smooth", block: "center" });
+          return;
+        }
+        continue;
+      }
+      if (formErrors[field]) {
+        const target =
+          document.getElementById(String(field)) ??
+          document.querySelector(`[name="${String(field)}"]`);
+        target?.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+    }
+  };
+
+  const onInvalid = (formErrors: FieldErrors<EnrollmentFormData>) => {
+    if (!screenshotFile) {
+      setScreenshotError("Please upload your Easypaisa payment screenshot");
+    }
+    scrollToFirstError(formErrors);
+    toast.error("Please complete all required fields", "Scroll up to see highlighted errors.");
+  };
+
   const onSubmit = async (data: EnrollmentFormData) => {
     const fileValidation = validatePaymentScreenshot(screenshotFile ?? undefined);
     if (fileValidation) {
@@ -305,23 +353,36 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
     setError(null);
 
     try {
+      const uploadFile = await preparePaymentScreenshot(screenshotFile!);
       const formData = new FormData();
       Object.entries(data).forEach(([key, value]) => {
         formData.append(key, String(value));
       });
-      if (screenshotFile) {
-        formData.append("paymentScreenshot", screenshotFile);
-      }
+      formData.append("paymentScreenshot", uploadFile);
 
       const response = await fetch("/api/enrollment", {
         method: "POST",
         body: formData,
       });
 
-      const result = await response.json();
+      let result: { success?: boolean; message?: string; error?: string } = {};
+      const contentType = response.headers.get("content-type") ?? "";
+      if (contentType.includes("application/json")) {
+        result = await response.json();
+      } else if (response.status === 413) {
+        throw new Error(
+          "Screenshot is too large for upload. Please use a smaller image under 4MB."
+        );
+      }
 
       if (!response.ok) {
-        throw new Error(result.message || result.error || "Failed to submit registration");
+        throw new Error(
+          result.message ||
+            result.error ||
+            (response.status === 413
+              ? "Screenshot is too large. Please use an image under 4MB."
+              : "Failed to submit registration")
+        );
       }
 
       setIsSuccess(true);
@@ -384,7 +445,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit(onSubmit, onInvalid)}
         className="rounded-2xl border border-border bg-background p-6 lg:p-8 space-y-8 shadow-sm"
         noValidate
       >
@@ -639,15 +700,14 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                 {PAYMENT_CONFIG.registrationFee.toLocaleString()} only
               </RequiredLabel>
               <p className="text-xs text-muted mt-1 mb-2">
-                <strong>Required.</strong> Upload a clear screenshot after sending money to
-                the Easypaisa number above.
+                <strong>Required.</strong> Upload a clear JPG/PNG screenshot after payment. Max size{" "}
+                4MB — large phone photos are auto-compressed when possible.
               </p>
               <Input
                 id="paymentScreenshot"
                 ref={fileInputRef}
                 type="file"
-                accept="image/*"
-                required
+                accept="image/*,.heic,.heif"
                 aria-required="true"
                 className="mt-1 cursor-pointer file:mr-4 file:rounded-md file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-medium file:text-primary-foreground hover:file:bg-accent"
                 onChange={handleScreenshotChange}
