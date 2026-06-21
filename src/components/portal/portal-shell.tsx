@@ -18,6 +18,11 @@ import { ProgramCategoryBadge } from "@/components/portal/program-category-badge
 import { SiteLogo } from "@/components/shared/site-logo";
 import { PortalAvatar } from "@/components/portal/portal-avatar";
 import { StudentWhatsAppGroupPrompt } from "@/components/portal/student-whatsapp-group-prompt";
+import {
+  AdminNotificationsBell,
+  AdminNavBadge,
+} from "@/components/admin/admin-notifications-bell";
+import { useAdminAlertsOptional } from "@/components/admin/admin-alerts-provider";
 import type { PortalUser } from "@/types/portal";
 import { cn } from "@/lib/utils";
 
@@ -87,6 +92,7 @@ export function PortalShell({ user, children }: PortalShellProps) {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {user.role === "admin" && <AdminNotificationsBell />}
             <Button variant="outline" size="sm" asChild className="hidden sm:flex">
               <Link href="/">
                 <House size={16} weight="duotone" />
@@ -120,6 +126,14 @@ function SidebarContent({
   onLogout: () => void;
   onNavigate?: () => void;
 }) {
+  const adminAlerts = useAdminAlertsOptional();
+  const enrollmentBadgeCount =
+    adminAlerts && user.role === "admin"
+      ? adminAlerts.unreadCount > 0
+        ? adminAlerts.unreadCount
+        : adminAlerts.pendingCount
+      : 0;
+
   const gradient =
     user.programSlug && (user.role === "student" || user.role === "trainer")
       ? (getProgramCategory(user.programSlug)?.headerGradient ?? PORTAL_COLORS[user.role])
@@ -178,6 +192,9 @@ function SidebarContent({
                   <p className="text-xs opacity-70 truncate hidden xl:block">{item.description}</p>
                 )}
               </div>
+              {item.href === "/admin/enrollments" && enrollmentBadgeCount > 0 && (
+                <AdminNavBadge count={enrollmentBadgeCount} />
+              )}
               {active && <CaretRight size={16} weight="bold" className="shrink-0" />}
             </Link>
           );
