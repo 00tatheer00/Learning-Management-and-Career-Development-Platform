@@ -3,6 +3,7 @@ import { Key, Envelope, ChatsCircle, Globe } from "@phosphor-icons/react/ssr";
 import { SITE_CONFIG } from "@/lib/constants";
 import { getPortalLoginUrl } from "@/lib/site-url";
 import { getUltraMsgInstanceStatus } from "@/lib/notifications/whatsapp";
+import { AdminNotificationSettings } from "@/components/admin/admin-notification-settings";
 
 export default async function AdminSettingsPage() {
   const whatsappStatus = await getUltraMsgInstanceStatus();
@@ -15,6 +16,8 @@ export default async function AdminSettingsPage() {
       />
 
       <div className="space-y-4 max-w-2xl">
+        <AdminNotificationSettings />
+
         <div className="rounded-2xl border border-border bg-background p-5">
           <div className="flex items-center gap-3 mb-3">
             <Key size={24} weight="duotone" className="text-primary" />

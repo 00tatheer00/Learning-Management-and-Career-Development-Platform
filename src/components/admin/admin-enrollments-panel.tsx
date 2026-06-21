@@ -21,6 +21,7 @@ import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
 import { getProgramCategory } from "@/lib/constants/program-categories";
 import { formatAppliedDate, formatAppliedDateTime, formatAppliedTime } from "@/lib/utils";
 import { toast } from "@/lib/ui/toast";
+import { playPortalSound, primePortalSounds } from "@/lib/ui/portal-sounds";
 import { Alert } from "@/components/ui/alert";
 import type { AdminEnrollmentRow } from "@/lib/api/admin-enrollments";
 
@@ -70,6 +71,7 @@ export function AdminEnrollmentsPanel() {
 
   useEffect(() => {
     load();
+    primePortalSounds();
   }, []);
 
   const programCounts = useMemo(() => {
@@ -149,6 +151,7 @@ export function AdminEnrollmentsPanel() {
     });
     const data = await res.json();
     if (data.success) {
+      playPortalSound(status === "approved" ? "adminApprove" : "adminReject");
       toast.success(data.message ?? "Updated successfully.");
       if (status === "approved" && data.credentials) {
         const enrollment = enrollments.find((item) => item.id === id);
@@ -197,6 +200,7 @@ export function AdminEnrollmentsPanel() {
     });
     const data = await res.json();
     if (data.success) {
+      playPortalSound("adminApprove");
       toast.success(data.message ?? "Bulk approval complete.");
       setSelectedIds([]);
       await load();

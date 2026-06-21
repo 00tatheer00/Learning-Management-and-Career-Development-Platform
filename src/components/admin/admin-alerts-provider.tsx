@@ -11,9 +11,14 @@ import {
 } from "react";
 import { usePathname } from "next/navigation";
 import { toast } from "@/lib/ui/toast";
+import { playPortalSound, primePortalSounds } from "@/lib/ui/portal-sounds";
+import {
+  notifyAdminNewRegistration,
+  requestBrowserNotificationPermission,
+} from "@/lib/ui/browser-notifications";
 
 const SEEN_IDS_KEY = "eest-admin-seen-pending-ids";
-const POLL_MS = 30_000;
+const SSE_RECONNECT_MS = 1_500;
 
 interface PendingAlert {
   id: string;
@@ -60,6 +65,8 @@ export function AdminAlertsProvider({ children }: { children: ReactNode }) {
   const knownIdsRef = useRef<Set<string>>(new Set());
   const initializedRef = useRef(false);
   const pendingRef = useRef<PendingAlert[]>([]);
+  const eventSourceRef = useRef<EventSource | null>(null);
+  const reconnectTimerRef = useRef<number | null>(null);
 
   const applyAlerts = useCallback((items: PendingAlert[], total: number) => {
     pendingRef.current = items;
@@ -78,26 +85,58 @@ export function AdminAlertsProvider({ children }: { children: ReactNode }) {
 
     for (const item of items) {
       if (!knownIdsRef.current.has(item.id) && !seenIds.has(item.id)) {
-        toast.info(
-          "New registration",
-          `${item.fullName} applied for ${item.courseTitle}`
-        );
+        playPortalSound("adminNewRegistration");
+        toast.info("New registration", `${item.fullName} applied for ${item.courseTitle}`);
+        if (document.hidden) {
+          notifyAdminNewRegistration(item.fullName, item.courseTitle);
+        }
       }
     }
 
     knownIdsRef.current = new Set(items.map((item) => item.id));
   }, []);
 
-  const fetchAlerts = useCallback(async () => {
-    try {
-      const res = await fetch("/api/admin/notifications", { cache: "no-store" });
-      const json = await res.json();
-      if (!json.success || !json.data) return;
-      applyAlerts(json.data.pending ?? [], json.data.pendingCount ?? 0);
-    } catch {
-      // ignore polling errors
+  const handleStreamPayload = useCallback(
+    (payload: {
+      type: string;
+      pendingCount?: number;
+      pending?: PendingAlert[];
+    }) => {
+      if (payload.type !== "update") return;
+      applyAlerts(payload.pending ?? [], payload.pendingCount ?? 0);
+    },
+    [applyAlerts]
+  );
+
+  const connectStream = useCallback(() => {
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
+      eventSourceRef.current = null;
     }
-  }, [applyAlerts]);
+
+    const source = new EventSource("/api/admin/notifications/stream");
+    eventSourceRef.current = source;
+
+    source.onmessage = (event) => {
+      try {
+        const payload = JSON.parse(event.data as string) as {
+          type: string;
+          pendingCount?: number;
+          pending?: PendingAlert[];
+        };
+        handleStreamPayload(payload);
+      } catch {
+        // ignore malformed events
+      }
+    };
+
+    source.onerror = () => {
+      source.close();
+      eventSourceRef.current = null;
+      if (reconnectTimerRef.current) window.clearTimeout(reconnectTimerRef.current);
+      reconnectTimerRef.current = window.setTimeout(connectStream, SSE_RECONNECT_MS);
+    };
+  }, [handleStreamPayload]);
 
   const markAllSeen = useCallback(() => {
     const seenIds = readSeenIds();
@@ -109,10 +148,22 @@ export function AdminAlertsProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    void fetchAlerts();
-    const timer = window.setInterval(() => void fetchAlerts(), POLL_MS);
-    return () => window.clearInterval(timer);
-  }, [fetchAlerts]);
+    primePortalSounds();
+    void requestBrowserNotificationPermission();
+    connectStream();
+
+    const onVisible = () => {
+      if (document.visibilityState === "visible") connectStream();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+
+    return () => {
+      document.removeEventListener("visibilitychange", onVisible);
+      if (reconnectTimerRef.current) window.clearTimeout(reconnectTimerRef.current);
+      eventSourceRef.current?.close();
+      eventSourceRef.current = null;
+    };
+  }, [connectStream]);
 
   useEffect(() => {
     if (pathname.startsWith("/admin/enrollments")) {

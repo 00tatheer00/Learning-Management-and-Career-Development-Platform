@@ -8,22 +8,74 @@ import {
   STUDENT_WHATSAPP_GROUP_NAME,
   STUDENT_WHATSAPP_GROUP_URL,
 } from "@/lib/constants/contact";
+import {
+  StudentWelcomeCelebration,
+  shouldShowStudentCelebration,
+} from "@/components/portal/student-welcome-celebration";
 
 const JOINED_KEY = "eest-whatsapp-group-joined";
 const DEFERRED_KEY = "eest-whatsapp-group-deferred";
 
-export function StudentWhatsAppGroupPrompt() {
-  const [open, setOpen] = useState(false);
+interface StudentPortalWelcomeProps {
+  studentName: string;
+}
+
+export function StudentPortalWelcome({ studentName }: StudentPortalWelcomeProps) {
+  const [phase, setPhase] = useState<"celebration" | "whatsapp" | "done">("done");
 
   useEffect(() => {
+    if (shouldShowStudentCelebration()) {
+      setPhase("celebration");
+      return;
+    }
+
     try {
-      if (localStorage.getItem(JOINED_KEY) === "true") return;
-      if (sessionStorage.getItem(DEFERRED_KEY) === "true") return;
-      setOpen(true);
+      if (localStorage.getItem(JOINED_KEY) === "true") {
+        setPhase("done");
+        return;
+      }
+      if (sessionStorage.getItem(DEFERRED_KEY) === "true") {
+        setPhase("done");
+        return;
+      }
+      setPhase("whatsapp");
     } catch {
-      setOpen(true);
+      setPhase("whatsapp");
     }
   }, []);
+
+  if (phase === "celebration") {
+    return (
+      <StudentWelcomeCelebration
+        studentName={studentName}
+        onComplete={() => {
+          try {
+            if (localStorage.getItem(JOINED_KEY) === "true") {
+              setPhase("done");
+              return;
+            }
+            if (sessionStorage.getItem(DEFERRED_KEY) === "true") {
+              setPhase("done");
+              return;
+            }
+          } catch {
+            // ignore storage errors
+          }
+          setPhase("whatsapp");
+        }}
+      />
+    );
+  }
+
+  if (phase === "whatsapp") {
+    return <StudentWhatsAppGroupPrompt onClose={() => setPhase("done")} />;
+  }
+
+  return null;
+}
+
+function StudentWhatsAppGroupPrompt({ onClose }: { onClose: () => void }) {
+  const [open, setOpen] = useState(true);
 
   const handleJoin = () => {
     try {
@@ -33,6 +85,7 @@ export function StudentWhatsAppGroupPrompt() {
       // ignore storage errors
     }
     setOpen(false);
+    onClose();
     window.open(STUDENT_WHATSAPP_GROUP_URL, "_blank", "noopener,noreferrer");
   };
 
@@ -43,18 +96,18 @@ export function StudentWhatsAppGroupPrompt() {
       // ignore storage errors
     }
     setOpen(false);
+    onClose();
   };
 
   return (
-    <Modal open={open} onClose={handleLater} title="Welcome to your portal!">
+    <Modal open={open} onClose={handleLater} title="Join your class WhatsApp group">
       <div className="text-center">
         <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-[#25D366] text-white mb-4">
           <WhatsappLogo size={36} weight="fill" />
         </div>
 
         <p className="text-muted leading-relaxed mb-5">
-          Your registration is approved. Join{" "}
-          <strong className="text-foreground">{STUDENT_WHATSAPP_GROUP_NAME}</strong> now to get
+          Join <strong className="text-foreground">{STUDENT_WHATSAPP_GROUP_NAME}</strong> now to get
           live class links, recorded lectures, and assignment updates.
         </p>
 
@@ -90,7 +143,7 @@ export function StudentWhatsAppGroupPrompt() {
   );
 }
 
-/** Call after a successful student login so the prompt shows again this session. */
+/** Call after a successful student login so welcome flow shows again this session. */
 export function resetWhatsAppGroupPromptForLogin() {
   try {
     sessionStorage.removeItem(DEFERRED_KEY);
@@ -98,3 +151,5 @@ export function resetWhatsAppGroupPromptForLogin() {
     // ignore storage errors
   }
 }
+
+export { resetStudentWelcomeForLogin } from "@/components/portal/student-welcome-celebration";
