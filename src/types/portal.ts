@@ -16,6 +16,11 @@ export interface User {
   trainerId?: string;
   avatarInitials?: string;
   avatarUrl?: string;
+  designation?: string;
+  bio?: string;
+  experience?: string;
+  expertise?: string[];
+  imagePosition?: string;
   isActive: boolean;
   createdAt: string;
 }

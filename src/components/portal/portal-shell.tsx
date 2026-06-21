@@ -18,6 +18,7 @@ import { ProgramCategoryBadge } from "@/components/portal/program-category-badge
 import { SiteLogo } from "@/components/shared/site-logo";
 import { PortalAvatar } from "@/components/portal/portal-avatar";
 import { StudentPortalWelcome } from "@/components/portal/student-portal-welcome";
+import { StudentModuleStartBanner } from "@/components/portal/student-module-start-banner";
 import {
   AdminNotificationsBell,
   AdminNavBadge,
@@ -106,7 +107,14 @@ export function PortalShell({ user, children }: PortalShellProps) {
           </div>
         </header>
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
+        <main className="flex-1 p-4 sm:p-6 lg:p-8">
+          {user.role === "student" && (
+            <div className="mb-6">
+              <StudentModuleStartBanner />
+            </div>
+          )}
+          {children}
+        </main>
         {user.role === "student" && <StudentPortalWelcome studentName={user.name} />}
       </div>
     </div>

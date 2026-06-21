@@ -52,6 +52,11 @@ model User {
   trainerId      String?
   avatarInitials String?
   avatarUrl      String?
+  designation    String?
+  bio            String?
+  experience     String?
+  expertise      String[] @default([])
+  imagePosition  String?
   isActive       Boolean  @default(true)
   createdAt      DateTime @default(now())
 }

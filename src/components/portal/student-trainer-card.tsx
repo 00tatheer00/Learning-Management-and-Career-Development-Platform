@@ -1,26 +1,27 @@
 import Image from "next/image";
 import { ChalkboardTeacher } from "@phosphor-icons/react/ssr";
-import { getTrainersByProgramSlug } from "@/lib/data/trainers";
+import { getDisplayTrainerProfile } from "@/lib/api/admin-trainers";
 import { getProgramCategory } from "@/lib/constants/program-categories";
 import { cn } from "@/lib/utils";
+import type { Trainer } from "@/types";
 
 interface StudentTrainerCardProps {
   programSlug: string;
   trainerId?: string;
   className?: string;
+  /** Preloaded profile (optional — avoids duplicate fetch when parent already loaded). */
+  trainer?: Trainer | null;
 }
 
-export function StudentTrainerCard({
+export async function StudentTrainerCard({
   programSlug,
   trainerId,
   className,
+  trainer: preloaded,
 }: StudentTrainerCardProps) {
   const category = getProgramCategory(programSlug);
-  const trainers = getTrainersByProgramSlug(programSlug);
   const assignedTrainer =
-    (trainerId ? trainers.find((trainer) => trainer.id === trainerId) : undefined) ??
-    trainers.find((trainer) => trainer.featured) ??
-    trainers[0];
+    preloaded ?? (await getDisplayTrainerProfile(trainerId, programSlug));
 
   if (!assignedTrainer || !category) return null;
 

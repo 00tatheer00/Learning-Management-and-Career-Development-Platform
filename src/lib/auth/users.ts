@@ -88,6 +88,11 @@ function mapUser(user: {
   trainerId: string | null;
   avatarInitials: string | null;
   avatarUrl: string | null;
+  designation: string | null;
+  bio: string | null;
+  experience: string | null;
+  expertise: string[];
+  imagePosition: string | null;
   isActive: boolean;
   createdAt: Date;
 }): User {
@@ -104,6 +109,11 @@ function mapUser(user: {
     trainerId: user.trainerId ?? undefined,
     avatarInitials: user.avatarInitials ?? undefined,
     avatarUrl: user.avatarUrl ?? undefined,
+    designation: user.designation ?? undefined,
+    bio: user.bio ?? undefined,
+    experience: user.experience ?? undefined,
+    expertise: user.expertise.length > 0 ? user.expertise : undefined,
+    imagePosition: user.imagePosition ?? undefined,
     isActive: user.isActive,
     createdAt: user.createdAt.toISOString(),
   };
