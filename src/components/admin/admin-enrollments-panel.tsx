@@ -139,28 +139,44 @@ export function AdminEnrollmentsPanel() {
 
   const runAction = async (id: string, status: "approved" | "rejected", adminNotes?: string) => {
     setLoadingId(id);
-    const res = await fetch("/api/admin/enrollments", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id,
-        status,
-        createStudentAccount: status === "approved",
-        adminNotes,
-      }),
-    });
-    const data = await res.json();
-    if (data.success) {
-      playPortalSound(status === "approved" ? "adminApprove" : "adminReject");
-      const msg = data.message ?? "Updated successfully.";
-      if (
-        status === "approved" &&
-        (msg.includes("notifications failed") || msg.includes("WhatsApp not sent"))
-      ) {
-        toast.warning("Approved — WhatsApp failed", msg);
-      } else {
-        toast.success(msg);
+    try {
+      const res = await fetch("/api/admin/enrollments", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id,
+          status,
+          createStudentAccount: status === "approved",
+          adminNotes,
+        }),
+      });
+
+      let data: {
+        success?: boolean;
+        message?: string;
+        error?: string;
+        credentials?: {
+          loginId: string;
+          password: string;
+          loginUrl: string;
+        };
+      } = {};
+
+      try {
+        data = await res.json();
+      } catch {
+        toast.error("Server response error", "Please refresh the page to confirm status.");
+        return;
       }
+
+      if (!data.success) {
+        toast.error(data.message ?? data.error ?? "Action failed.");
+        return;
+      }
+
+      playPortalSound(status === "approved" ? "adminApprove" : "adminReject");
+      toast.success(data.message ?? "Updated successfully.");
+
       if (status === "approved" && data.credentials) {
         const enrollment = enrollments.find((item) => item.id === id);
         setApprovedCredentials({
@@ -170,12 +186,25 @@ export function AdminEnrollmentsPanel() {
           loginUrl: data.credentials.loginUrl,
         });
       }
+
+      setEnrollments((current) =>
+        current.map((item) =>
+          item.id === id
+            ? {
+                ...item,
+                status,
+                reviewedAt: new Date().toISOString(),
+              }
+            : item
+        )
+      );
       setSelectedIds((current) => current.filter((item) => item !== id));
-      await load();
-    } else {
-      toast.error(data.message ?? data.error ?? "Action failed.");
+      void load();
+    } catch {
+      toast.error("Action failed", "Check your connection and refresh if needed.");
+    } finally {
+      setLoadingId(null);
     }
-    setLoadingId(null);
   };
 
   const confirmAction = async () => {
@@ -184,13 +213,16 @@ export function AdminEnrollmentsPanel() {
       toast.error("Rejection reason is required");
       return;
     }
-    await runAction(
-      pendingAction.id,
-      pendingAction.type,
-      pendingAction.type === "rejected" ? rejectReason.trim() : undefined
-    );
-    setPendingAction(null);
-    setRejectReason("");
+    try {
+      await runAction(
+        pendingAction.id,
+        pendingAction.type,
+        pendingAction.type === "rejected" ? rejectReason.trim() : undefined
+      );
+    } finally {
+      setPendingAction(null);
+      setRejectReason("");
+    }
   };
 
   const bulkApprove = async () => {

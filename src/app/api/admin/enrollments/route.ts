@@ -9,6 +9,8 @@ import {
 import { getAdminEnrollmentRows } from "@/lib/api/admin-enrollments";
 import { z } from "zod";
 
+export const maxDuration = 60;
+
 export async function GET() {
   const user = await getCurrentUser();
   if (!user || user.role !== "admin") {

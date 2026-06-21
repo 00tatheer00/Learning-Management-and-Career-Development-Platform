@@ -19,16 +19,6 @@ import { savePortalPasswordForEnrollment } from "@/lib/auth/portal-password-vaul
 import { getPortalLoginUrl } from "@/lib/site-url";
 import type { EnrollmentRecord } from "@/types/portal";
 
-function formatNotificationSummary(
-  parts: string[],
-  warnings: string[],
-  successPrefix: string
-): string {
-  if (parts.length > 0) return ` ${successPrefix} ${parts.join(" and ")}.`;
-  if (warnings.length > 0) return ` ${successPrefix} but notifications failed: ${warnings.join("; ")}`;
-  return "";
-}
-
 export async function approveEnrollmentAndCreateAccount(
   enrollmentId: string,
   adminUserId: string,
@@ -109,28 +99,21 @@ export async function approveEnrollmentAndCreateAccount(
 
   await savePortalPasswordForEnrollment(enrollmentId, plainPassword);
 
-  const notifications = await sendApprovalWelcomeNotifications({
+  void sendApprovalWelcomeNotifications({
     fullName: enrollmentRecord.fullName,
     email: enrollmentRecord.email,
     whatsapp: enrollmentRecord.whatsapp,
     program: enrollmentRecord.program,
     level: enrollmentRecord.level,
     password: plainPassword,
+  }).catch((error) => {
+    console.error("Background approval notifications failed:", error);
   });
-
-  const parts: string[] = [];
-  if (notifications.emailSent) parts.push("email sent");
-  if (notifications.whatsappSent) parts.push("WhatsApp sent");
-
-  const notificationSummary = formatNotificationSummary(
-    parts,
-    notifications.warnings,
-    "Login details"
-  );
 
   return {
     enrollment,
-    message: `Registration approved.${notificationSummary}`,
+    message:
+      "Registration approved. Login details are being sent by email and WhatsApp (use Portal Logins if needed).",
     credentials: {
       loginId: enrollment.email,
       password: plainPassword,
@@ -163,28 +146,20 @@ export async function rejectEnrollment(
     return { enrollment: null, message: "", error: "Failed to update enrollment" };
   }
 
-  const notifications = await sendRejectionNotifications({
+  void sendRejectionNotifications({
     fullName: enrollment.fullName,
     email: enrollment.email,
     whatsapp: enrollment.whatsapp,
     program: enrollment.program,
     level: enrollment.level,
     reason: adminNotes,
+  }).catch((error) => {
+    console.error("Background rejection notifications failed:", error);
   });
-
-  const parts: string[] = [];
-  if (notifications.emailSent) parts.push("email sent");
-  if (notifications.whatsappSent) parts.push("WhatsApp sent");
-
-  const notificationSummary = formatNotificationSummary(
-    parts,
-    notifications.warnings,
-    "Student notified via"
-  );
 
   return {
     enrollment,
-    message: `Registration rejected.${notificationSummary}`,
+    message: "Registration rejected. Student will be notified by email and WhatsApp.",
   };
 }
 
