@@ -30,28 +30,24 @@ const ROLES: {
   label: string;
   icon: typeof GraduationCap;
   hint: string;
-  demo: string;
 }[] = [
   {
     role: "student",
     label: "Student",
     icon: GraduationCap,
     hint: "Access your course, classes & assignments",
-    demo: "student@eest.com / student123",
   },
   {
     role: "trainer",
     label: "Trainer",
     icon: ChalkboardTeacher,
     hint: "Manage students, classes & homework",
-    demo: "tatheer@eest.com / tatheer@321",
   },
   {
     role: "admin",
     label: "Admin",
     icon: ShieldCheck,
     hint: "Approve registrations & manage portal",
-    demo: "admin@eest.com / admin@321",
   },
 ];
 
@@ -63,13 +59,6 @@ export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const fillDemo = () => {
-    const demo = ROLES.find((r) => r.role === selectedRole)?.demo ?? "";
-    const [demoEmail, demoPass] = demo.split(" / ");
-    setEmail(demoEmail);
-    setPassword(demoPass);
-  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -209,13 +198,6 @@ export default function LoginForm() {
           </form>
 
           <div className="mt-6 pt-6 border-t border-border text-center space-y-3">
-            <button
-              type="button"
-              onClick={fillDemo}
-              className="text-sm text-primary font-medium hover:underline"
-            >
-              Use demo login for {selectedRole}
-            </button>
             <p className="text-sm text-muted">
               Not registered yet?{" "}
               <Link href="/register" className="text-primary font-semibold hover:underline">
