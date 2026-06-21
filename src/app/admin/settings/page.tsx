@@ -21,8 +21,9 @@ export default async function AdminSettingsPage() {
             <h2 className="font-bold">Student Accounts</h2>
           </div>
           <p className="text-sm text-muted">
-            When you approve a registration, a random 8-character portal password is created.
-            Login details are sent by email and WhatsApp. Username is the student&apos;s email.
+            When you approve a registration, a random 8-character portal password is created and
+            saved under <strong>Portal Logins</strong>. Login details are also sent by email and
+            WhatsApp. Username is the student&apos;s email.
           </p>
         </div>
 

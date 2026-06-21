@@ -11,6 +11,7 @@ import {
   ChartBar,
   GraduationCap,
   ChalkboardTeacher,
+  Key,
 } from "@phosphor-icons/react";
 
 import type { UserRole } from "@/types/portal";
@@ -44,6 +45,7 @@ export const PORTAL_NAV: Record<UserRole, PortalNavItem[]> = {
     { href: "/admin/dashboard", label: "Home", icon: ChartBar, description: "Overview & stats" },
     { href: "/admin/enrollments", label: "Registrations", icon: ClipboardText, description: "Approve new students" },
     { href: "/admin/students", label: "Students", icon: GraduationCap, description: "All students" },
+    { href: "/admin/credentials", label: "Portal Logins", icon: Key, description: "Student login IDs & passwords" },
     { href: "/admin/trainers", label: "Trainers", icon: Users, description: "All trainers" },
     { href: "/admin/courses", label: "Courses", icon: BookOpen, description: "Materials & content" },
     { href: "/admin/settings", label: "Settings", icon: Gear, description: "Portal settings" },

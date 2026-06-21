@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ClipboardText, Users, GraduationCap, VideoCamera } from "@phosphor-icons/react/ssr";
+import { ClipboardText, Users, GraduationCap, VideoCamera, Key } from "@phosphor-icons/react/ssr";
 import { getPortalStats } from "@/lib/api/portal-data";
 import { PortalPageHeader, StatCard, QuickActionCard } from "@/components/portal/portal-ui";
 import { Button } from "@/components/ui/button";
@@ -42,6 +42,7 @@ export default async function AdminDashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <QuickActionCard href="/admin/enrollments" title="Registrations" description="Approve new student applications" icon={<ClipboardText size={24} weight="duotone" />} />
         <QuickActionCard href="/admin/students" title="Students" description="View all student accounts" icon={<GraduationCap size={24} weight="duotone" />} color="bg-blue-500/10 text-blue-600" />
+        <QuickActionCard href="/admin/credentials" title="Portal Logins" description="Student login IDs and passwords" icon={<Key size={24} weight="duotone" />} color="bg-amber-500/10 text-amber-700" />
         <QuickActionCard href="/admin/trainers" title="Trainers" description="View trainer accounts" icon={<Users size={24} weight="duotone" />} color="bg-indigo-500/10 text-indigo-600" />
         <QuickActionCard href="/admin/courses" title="Courses" description="View course materials" icon={<VideoCamera size={24} weight="duotone" />} color="bg-emerald-500/10 text-emerald-600" />
       </div>

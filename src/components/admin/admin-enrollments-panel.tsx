@@ -11,6 +11,7 @@ import {
   DownloadSimple,
   CheckSquare,
   Trash,
+  Copy,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,6 +42,12 @@ export function AdminEnrollmentsPanel() {
     id: string;
     name: string;
     status: string;
+  } | null>(null);
+  const [approvedCredentials, setApprovedCredentials] = useState<{
+    name: string;
+    loginId: string;
+    password: string;
+    loginUrl: string;
   } | null>(null);
 
   const load = async () => {
@@ -143,6 +150,15 @@ export function AdminEnrollmentsPanel() {
     const data = await res.json();
     if (data.success) {
       toast.success(data.message ?? "Updated successfully.");
+      if (status === "approved" && data.credentials) {
+        const enrollment = enrollments.find((item) => item.id === id);
+        setApprovedCredentials({
+          name: enrollment?.fullName ?? "Student",
+          loginId: data.credentials.loginId,
+          password: data.credentials.password,
+          loginUrl: data.credentials.loginUrl,
+        });
+      }
       setSelectedIds((current) => current.filter((item) => item !== id));
       await load();
     } else {
@@ -594,6 +610,57 @@ export function AdminEnrollmentsPanel() {
                 <Trash size={16} weight="duotone" />
                 Delete Permanently
               </Button>
+            </div>
+          </>
+        )}
+      </Modal>
+
+      <Modal
+        open={Boolean(approvedCredentials)}
+        onClose={() => setApprovedCredentials(null)}
+        title="Portal Login Saved"
+      >
+        {approvedCredentials && (
+          <>
+            <p className="text-sm text-muted">
+              Login saved for <strong>{approvedCredentials.name}</strong>. You can also find this
+              anytime under <strong>Portal Logins</strong> in the sidebar.
+            </p>
+            <div className="mt-4 rounded-xl border border-border bg-surface p-4 space-y-2 text-sm">
+              <p>
+                <span className="text-muted">Login ID:</span>{" "}
+                <strong className="font-mono">{approvedCredentials.loginId}</strong>
+              </p>
+              <p>
+                <span className="text-muted">Password:</span>{" "}
+                <strong className="font-mono">{approvedCredentials.password}</strong>
+              </p>
+              <p>
+                <span className="text-muted">Portal:</span>{" "}
+                <a href={approvedCredentials.loginUrl} className="text-primary underline">
+                  {approvedCredentials.loginUrl}
+                </a>
+              </p>
+            </div>
+            <div className="mt-6 flex justify-end gap-3">
+              <Button
+                variant="secondary"
+                className="gap-2"
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(
+                      `Login ID: ${approvedCredentials.loginId}\nPassword: ${approvedCredentials.password}\nPortal: ${approvedCredentials.loginUrl}`
+                    );
+                    toast.success("Login details copied");
+                  } catch {
+                    toast.error("Could not copy");
+                  }
+                }}
+              >
+                <Copy size={16} />
+                Copy Login
+              </Button>
+              <Button onClick={() => setApprovedCredentials(null)}>Done</Button>
             </div>
           </>
         )}

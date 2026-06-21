@@ -6,6 +6,8 @@ import { hashPassword } from "@/lib/auth/password";
 import { generateStudentPassword } from "@/lib/auth/generate-password";
 import { sendPasswordResetNotifications } from "@/lib/notifications/password-reset-notice";
 import { deleteAdminStudent } from "@/lib/api/admin-students";
+import { savePortalPasswordForStudentEmail } from "@/lib/auth/portal-password-vault";
+import { getPortalLoginUrl } from "@/lib/site-url";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
@@ -72,6 +74,7 @@ export async function PATCH(request: Request) {
     const plainPassword = generateStudentPassword();
     const passwordHash = await hashPassword(plainPassword);
     await updateUserPasswordHash(student.id, passwordHash);
+    await savePortalPasswordForStudentEmail(student.email, plainPassword);
 
     const enrollment = await prisma.enrollment.findFirst({
       where: { email: student.email.toLowerCase(), status: "approved" },
@@ -100,6 +103,11 @@ export async function PATCH(request: Request) {
     return NextResponse.json(
       createApiResponse(true, {
         message: `Password reset.${notificationSummary}`,
+        data: {
+          loginId: student.email,
+          password: plainPassword,
+          loginUrl: getPortalLoginUrl(),
+        },
       })
     );
   }

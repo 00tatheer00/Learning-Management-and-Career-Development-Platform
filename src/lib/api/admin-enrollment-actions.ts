@@ -15,6 +15,8 @@ import { sendApprovalWelcomeNotifications } from "@/lib/notifications/approval-w
 import { sendRejectionNotifications } from "@/lib/notifications/rejection-notice";
 import { deleteCloudinaryImage } from "@/lib/cloudinary";
 import { prisma } from "@/lib/prisma";
+import { savePortalPasswordForEnrollment } from "@/lib/auth/portal-password-vault";
+import { getPortalLoginUrl } from "@/lib/site-url";
 import type { EnrollmentRecord } from "@/types/portal";
 
 function formatNotificationSummary(
@@ -31,7 +33,12 @@ export async function approveEnrollmentAndCreateAccount(
   enrollmentId: string,
   adminUserId: string,
   adminNotes?: string
-): Promise<{ enrollment: EnrollmentRecord | null; message: string; error?: string }> {
+): Promise<{
+  enrollment: EnrollmentRecord | null;
+  message: string;
+  error?: string;
+  credentials?: { loginId: string; password: string; loginUrl: string };
+}> {
   const existing = await getEnrollmentById(enrollmentId);
   if (!existing) {
     return { enrollment: null, message: "", error: "Enrollment not found" };
@@ -100,6 +107,8 @@ export async function approveEnrollmentAndCreateAccount(
     await updateUserPasswordHash(user.id, passwordHash);
   }
 
+  await savePortalPasswordForEnrollment(enrollmentId, plainPassword);
+
   const notifications = await sendApprovalWelcomeNotifications({
     fullName: enrollmentRecord.fullName,
     email: enrollmentRecord.email,
@@ -122,6 +131,11 @@ export async function approveEnrollmentAndCreateAccount(
   return {
     enrollment,
     message: `Registration approved.${notificationSummary}`,
+    credentials: {
+      loginId: enrollment.email,
+      password: plainPassword,
+      loginUrl: getPortalLoginUrl(),
+    },
   };
 }
 

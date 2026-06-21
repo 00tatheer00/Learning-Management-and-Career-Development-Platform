@@ -67,12 +67,18 @@ export async function PATCH(request: Request) {
     });
   }
 
-  return NextResponse.json(
-    createApiResponse(true, {
+  const credentials =
+    parsed.data.status === "approved" && "credentials" in result
+      ? result.credentials
+      : undefined;
+
+  return NextResponse.json({
+    ...createApiResponse(true, {
       data: result.enrollment,
       message: result.message,
-    })
-  );
+    }),
+    ...(credentials ? { credentials } : {}),
+  });
 }
 
 const bulkSchema = z.object({
