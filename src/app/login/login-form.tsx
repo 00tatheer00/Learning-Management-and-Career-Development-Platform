@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { Alert } from "@/components/ui/alert";
 import { toast } from "@/lib/ui/toast";
 import {
   resetWhatsAppGroupPromptForLogin,
@@ -51,7 +52,11 @@ const ROLES: {
   },
 ];
 
-export default function LoginForm() {
+export default function LoginForm({
+  sessionNotice,
+}: {
+  sessionNotice?: "replaced";
+}) {
   const router = useRouter();
   const [selectedRole, setSelectedRole] = useState<UserRole>("student");
   const [email, setEmail] = useState("");
@@ -136,7 +141,20 @@ export default function LoginForm() {
             {ROLES.find((r) => r.role === selectedRole)?.hint}
           </p>
 
+          {sessionNotice === "replaced" && (
+            <Alert variant="warning" title="Logged out from this device" className="mb-6">
+              This account was opened on another phone or computer. For security, only one device
+              can stay logged in at a time. Sign in again if this is your device.
+            </Alert>
+          )}
+
           <form onSubmit={handleLogin} className="space-y-5">
+            {selectedRole === "student" && (
+              <p className="rounded-lg border border-border bg-surface px-3 py-2 text-xs text-muted">
+                Student accounts work on <strong>one device at a time</strong>. Logging in elsewhere
+                will sign out the previous device.
+              </p>
+            )}
             <div>
               <Label htmlFor="email" className="text-base">
                 Email

@@ -209,9 +209,21 @@ interface EnrollmentFormProps {
 export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [submittedApplicationNumber, setSubmittedApplicationNumber] = useState(1);
   const [error, setError] = useState<string | null>(null);
   const [screenshotError, setScreenshotError] = useState<string | null>(null);
   const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
+  const [applicantHistory, setApplicantHistory] = useState<{
+    applicationNumber: number;
+    previousApplications: Array<{
+      courseTitle: string;
+      level: string;
+      status: string;
+      appliedAt: string;
+    }>;
+    isReturningApplicant: boolean;
+  } | null>(null);
+  const [historyLoading, setHistoryLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
 
@@ -260,6 +272,8 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
   });
 
   const selectedProgram = watch("program");
+  const watchedEmail = watch("email");
+  const watchedCnic = watch("cnic");
   const activeProgram = programs.find((p) => p.slug === selectedProgram);
   const isEnrollable = (slug: string) =>
     ENROLLABLE_PROGRAM_SLUGS.includes(slug as (typeof ENROLLABLE_PROGRAM_SLUGS)[number]);
@@ -269,6 +283,36 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
       setValue("program", defaultProgram as EnrollmentFormData["program"]);
     }
   }, [defaultProgram, setValue]);
+
+  useEffect(() => {
+    const email = watchedEmail?.trim().toLowerCase() ?? "";
+    const cnic = watchedCnic?.replace(/[-\s]/g, "") ?? "";
+
+    if (!email.includes("@") || cnic.length !== 13) {
+      setApplicantHistory(null);
+      return;
+    }
+
+    const timer = window.setTimeout(async () => {
+      setHistoryLoading(true);
+      try {
+        const params = new URLSearchParams({ email, cnic });
+        const res = await fetch(`/api/enrollment/history?${params.toString()}`);
+        const json = await res.json();
+        if (json.success && json.data) {
+          setApplicantHistory(json.data);
+        } else {
+          setApplicantHistory(null);
+        }
+      } catch {
+        setApplicantHistory(null);
+      } finally {
+        setHistoryLoading(false);
+      }
+    }, 500);
+
+    return () => window.clearTimeout(timer);
+  }, [watchedEmail, watchedCnic]);
 
   const handleScreenshotChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -365,7 +409,12 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
         body: formData,
       });
 
-      let result: { success?: boolean; message?: string; error?: string } = {};
+      let result: {
+        success?: boolean;
+        message?: string;
+        error?: string;
+        data?: { applicationNumber?: number; isReturningApplicant?: boolean };
+      } = {};
       const contentType = response.headers.get("content-type") ?? "";
       if (contentType.includes("application/json")) {
         result = await response.json();
@@ -385,12 +434,16 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
         );
       }
 
+      setSubmittedApplicationNumber(result.data?.applicationNumber ?? 1);
       setIsSuccess(true);
       toast.success(
-        "Registration submitted!",
-        "We will verify your payment and contact you within 2–3 business days."
+        result.data?.applicationNumber && result.data.applicationNumber > 1
+          ? `Application #${result.data.applicationNumber} submitted!`
+          : "Registration submitted!",
+        result.message ?? "We will verify your payment and contact you within 2–3 business days."
       );
       reset();
+      setApplicantHistory(null);
       setScreenshotFile(null);
       setScreenshotPreview(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -414,11 +467,16 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
         tabIndex={-1}
       >
         <CheckCircle2 className="w-16 h-16 text-primary mx-auto mb-4" aria-hidden="true" />
-        <h2 className="text-2xl font-bold mb-2">Registration Submitted!</h2>
+        <h2 className="text-2xl font-bold mb-2">
+          {submittedApplicationNumber > 1
+            ? `Application #${submittedApplicationNumber} Submitted!`
+            : "Registration Submitted!"}
+        </h2>
         <p className="text-muted mb-6 leading-relaxed max-w-md mx-auto">
-          Thank you for registering. Our team will verify your payment screenshot
-          within 2–3 business days.           Once approved, your portal login details will be
-          sent to your <strong>WhatsApp</strong>.
+          Thank you for registering
+          {submittedApplicationNumber > 1 ? " again" : ""}. Our team will verify your{" "}
+          <strong>new payment screenshot</strong> within 2–3 business days. Once approved, your
+          portal login details will be sent to your <strong>WhatsApp</strong>.
         </p>
         <Button onClick={() => setIsSuccess(false)}>Submit Another Registration</Button>
       </motion.div>
@@ -520,6 +578,34 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                 <FieldError message={errors.email?.message} />
               </div>
             </div>
+
+            {applicantHistory?.isReturningApplicant && (
+              <Alert
+                variant="info"
+                title={`Welcome back — application #${applicantHistory.applicationNumber}`}
+              >
+                <p className="mb-2">
+                  You can register for <strong>another course or module</strong> anytime. Each
+                  registration needs its own <strong>PKR 1,000</strong> payment.
+                </p>
+                <ul className="mb-3 space-y-1 text-sm">
+                  {applicantHistory.previousApplications.map((item) => (
+                    <li key={`${item.courseTitle}-${item.appliedAt}`}>
+                      • {item.courseTitle} ({item.level}) —{" "}
+                      <strong className="capitalize">{item.status}</strong>
+                    </li>
+                  ))}
+                </ul>
+                <p className="font-medium">
+                  Please complete a <strong>new Easypaisa payment</strong> and upload a fresh
+                  screenshot below. Old payment proofs cannot be reused.
+                </p>
+              </Alert>
+            )}
+
+            {historyLoading && (
+              <p className="text-xs text-muted">Checking previous applications…</p>
+            )}
           </FormSection>
 
           <FormSection title="Education Details">

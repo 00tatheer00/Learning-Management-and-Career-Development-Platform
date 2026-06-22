@@ -58,6 +58,7 @@ model User {
   expertise      String[] @default([])
   imagePosition  String?
   isActive       Boolean  @default(true)
+  activeSessionId String?
   createdAt      DateTime @default(now())
 }
 

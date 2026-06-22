@@ -2,11 +2,17 @@ import { prisma } from "@/lib/prisma";
 import { getProgramBySlug } from "@/lib/data/programs";
 import { DEFAULT_BATCH_NAME } from "@/lib/constants/batch";
 import { formatAppliedDateTime } from "@/lib/utils";
+import { enrichRowsWithApplicationMeta } from "@/lib/api/enrollment-history";
+import type { ApplicantApplicationSummary } from "@/lib/api/enrollment-history";
 import type { EnrollmentRecord } from "@/types/portal";
 
 export interface AdminEnrollmentRow extends EnrollmentRecord {
   courseTitle: string;
   reviewerName?: string;
+  applicationNumber: number;
+  totalApplications: number;
+  isReturningApplicant: boolean;
+  previousApplications: ApplicantApplicationSummary[];
 }
 
 export async function getAdminEnrollmentRows(): Promise<AdminEnrollmentRow[]> {
@@ -28,35 +34,37 @@ export async function getAdminEnrollmentRows(): Promise<AdminEnrollmentRow[]> {
 
   const reviewerNameById = new Map(reviewers.map((user) => [user.id, user.name]));
 
-  return records.map((record) => ({
-    id: record.id,
-    fullName: record.fullName,
-    fatherName: record.fatherName,
-    institution: record.institution,
-    classSemester: record.classSemester,
-    cnic: record.cnic,
-    email: record.email,
-    whatsapp: record.whatsapp,
-    fieldOfStudy: record.fieldOfStudy,
-    program: record.program,
-    level: record.level,
-    batch: record.batch ?? DEFAULT_BATCH_NAME,
-    learningMode: record.learningMode,
-    hasLaptop: record.hasLaptop as "yes" | "no",
-    internetAvailable: record.internetAvailable as "yes" | "no",
-    confirmInfoCorrect: record.confirmInfoCorrect,
-    agreeToPolicies: record.agreeToPolicies,
-    paymentScreenshot: record.paymentScreenshot ?? undefined,
-    status: record.status,
-    reviewedAt: record.reviewedAt?.toISOString(),
-    reviewedBy: record.reviewedBy ?? undefined,
-    adminNotes: record.adminNotes ?? undefined,
-    createdAt: record.createdAt.toISOString(),
-    courseTitle: getProgramBySlug(record.program)?.title ?? record.program,
-    reviewerName: record.reviewedBy
-      ? reviewerNameById.get(record.reviewedBy) ?? "Admin"
-      : undefined,
-  }));
+  return enrichRowsWithApplicationMeta(
+    records.map((record) => ({
+      id: record.id,
+      fullName: record.fullName,
+      fatherName: record.fatherName,
+      institution: record.institution,
+      classSemester: record.classSemester,
+      cnic: record.cnic,
+      email: record.email,
+      whatsapp: record.whatsapp,
+      fieldOfStudy: record.fieldOfStudy,
+      program: record.program,
+      level: record.level,
+      batch: record.batch ?? DEFAULT_BATCH_NAME,
+      learningMode: record.learningMode,
+      hasLaptop: record.hasLaptop as "yes" | "no",
+      internetAvailable: record.internetAvailable as "yes" | "no",
+      confirmInfoCorrect: record.confirmInfoCorrect,
+      agreeToPolicies: record.agreeToPolicies,
+      paymentScreenshot: record.paymentScreenshot ?? undefined,
+      status: record.status,
+      reviewedAt: record.reviewedAt?.toISOString(),
+      reviewedBy: record.reviewedBy ?? undefined,
+      adminNotes: record.adminNotes ?? undefined,
+      createdAt: record.createdAt.toISOString(),
+      courseTitle: getProgramBySlug(record.program)?.title ?? record.program,
+      reviewerName: record.reviewedBy
+        ? reviewerNameById.get(record.reviewedBy) ?? "Admin"
+        : undefined,
+    }))
+  );
 }
 
 function escapeCsv(value: string) {

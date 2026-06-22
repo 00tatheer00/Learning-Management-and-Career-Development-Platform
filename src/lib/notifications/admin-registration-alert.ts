@@ -15,6 +15,8 @@ export interface NewRegistrationAlertInput {
   institution: string;
   createdAt: string;
   enrollmentId: string;
+  applicationNumber?: number;
+  isReturningApplicant?: boolean;
 }
 
 function getAdminAlertWhatsApp(): string {
@@ -27,6 +29,7 @@ function buildAdminAlertText(input: NewRegistrationAlertInput): string {
 
   return [
     "New EEST Registration",
+    input.isReturningApplicant ? `⚠️ Returning applicant — application #${input.applicationNumber ?? "?"}` : "",
     "",
     `Name: ${input.fullName}`,
     `Email: ${input.email}`,
@@ -38,7 +41,7 @@ function buildAdminAlertText(input: NewRegistrationAlertInput): string {
     `Applied: ${formatAppliedDateTime(input.createdAt)}`,
     "",
     `Student portal login: ${loginUrl}`,
-  ].join("\n");
+  ].filter(Boolean).join("\n");
 }
 
 export async function sendAdminNewRegistrationAlert(

@@ -19,6 +19,7 @@ import { SiteLogo } from "@/components/shared/site-logo";
 import { PortalAvatar } from "@/components/portal/portal-avatar";
 import { StudentPortalWelcome } from "@/components/portal/student-portal-welcome";
 import { StudentModuleStartBanner } from "@/components/portal/student-module-start-banner";
+import { StudentSingleSessionGuard } from "@/components/portal/student-single-session-guard";
 import {
   AdminNotificationsBell,
   AdminNavBadge,
@@ -43,6 +44,7 @@ export function PortalShell({ user, children }: PortalShellProps) {
 
   return (
     <div className="min-h-screen bg-surface flex">
+      {user.role === "student" && <StudentSingleSessionGuard />}
       {/* Sidebar desktop */}
       <aside className="hidden lg:flex w-72 flex-col fixed inset-y-0 left-0 border-r border-border bg-background z-40">
         <SidebarContent

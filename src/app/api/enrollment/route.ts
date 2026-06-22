@@ -4,6 +4,9 @@ import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
 import { getBatchForProgram } from "@/lib/constants/batch";
 import { createApiResponse } from "@/lib/api/enrollment";
 import { saveEnrollment } from "@/lib/api/portal-data";
+import {
+  findApplicantEnrollments,
+} from "@/lib/api/enrollment-history";
 import { sendAdminNewRegistrationAlert } from "@/lib/notifications/admin-registration-alert";
 import { uploadPaymentScreenshot } from "@/lib/cloudinary";
 import {
@@ -129,6 +132,12 @@ export async function POST(request: Request) {
       );
     }
 
+    const previousRecords = await findApplicantEnrollments(
+      validated.data.email,
+      validated.data.cnic
+    );
+    const applicationNumber = previousRecords.length + 1;
+
     const id = crypto.randomUUID();
     let paymentUpload: { url: string; publicId: string };
     try {
@@ -167,12 +176,17 @@ export async function POST(request: Request) {
       institution: validated.data.institution,
       createdAt,
       enrollmentId: id,
+      applicationNumber,
+      isReturningApplicant: applicationNumber > 1,
     });
 
     return NextResponse.json(
       createApiResponse(true, {
-        data: { id },
-        message: "Registration submitted successfully",
+        data: { id, applicationNumber, isReturningApplicant: applicationNumber > 1 },
+        message:
+          applicationNumber > 1
+            ? `Registration submitted (application #${applicationNumber}). We will verify your new payment screenshot.`
+            : "Registration submitted successfully",
       }),
       { status: 201 }
     );

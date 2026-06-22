@@ -2,6 +2,11 @@ import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { z } from "zod";
 import { verifyPassword } from "@/lib/auth/password";
+import {
+  clearActiveSession,
+  isActiveSession,
+  rotateActiveSession,
+} from "@/lib/auth/session-control";
 import { prisma } from "@/lib/prisma";
 import { checkRateLimit, loginRateLimit } from "@/lib/security/rate-limit";
 import type { UserRole } from "@/types/portal";
@@ -80,7 +85,19 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.role = (user as { role: UserRole }).role;
+        token.sessionInvalid = false;
+
+        if (token.role === "student") {
+          token.sessionId = await rotateActiveSession(user.id);
+        }
+      } else if (token.id && token.role === "student") {
+        const valid = await isActiveSession(
+          token.id as string,
+          token.sessionId as string | undefined
+        );
+        token.sessionInvalid = !valid;
       }
+
       return token;
     },
     async session({ session, token }) {
@@ -88,7 +105,22 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id as string;
         session.user.role = token.role as UserRole;
       }
+
+      session.sessionId = token.sessionId as string | undefined;
+      session.sessionInvalid = Boolean(token.sessionInvalid);
+
+      if (token.sessionInvalid) {
+        session.expires = new Date(0).toISOString();
+      }
+
       return session;
+    },
+  },
+  events: {
+    async signOut({ token }) {
+      if (token?.id && token.role === "student") {
+        await clearActiveSession(token.id as string);
+      }
     },
   },
   secret: process.env.NEXTAUTH_SECRET ?? process.env.AUTH_SECRET,
