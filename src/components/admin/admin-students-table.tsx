@@ -9,6 +9,8 @@ import {
   CheckCircle,
   PencilSimple,
   Trash,
+  CaretLeft,
+  GraduationCap,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,8 +29,13 @@ interface AdminStudentsTableProps {
 
 const BATCH_OPTIONS = [DEFAULT_BATCH_NAME, "Batch 2", "Batch 3"];
 
+type BrowseView = "courses" | "modules" | "list";
+
 export function AdminStudentsTable({ students: initialStudents }: AdminStudentsTableProps) {
   const [students, setStudents] = useState(initialStudents);
+  const [browseView, setBrowseView] = useState<BrowseView>("courses");
+  const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
+  const [selectedModule, setSelectedModule] = useState<string>("all");
   const [search, setSearch] = useState("");
   const [courseFilter, setCourseFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
@@ -38,10 +45,31 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
   const [editBatch, setEditBatch] = useState(DEFAULT_BATCH_NAME);
   const [deleteTarget, setDeleteTarget] = useState<AdminStudentRow | null>(null);
 
+  const courseStudentCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const slug of ENROLLABLE_PROGRAM_SLUGS) {
+      counts[slug] = students.filter((student) => student.programSlug === slug).length;
+    }
+    return counts;
+  }, [students]);
+
+  const moduleCounts = useMemo(() => {
+    if (!selectedCourse) return [];
+    const program = getProgramBySlug(selectedCourse);
+    return (program?.modules ?? []).map((mod) => ({
+      name: mod.name,
+      count: students.filter(
+        (student) => student.programSlug === selectedCourse && student.module === mod.name
+      ).length,
+    }));
+  }, [students, selectedCourse]);
+
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
     return students.filter((student) => {
-      if (courseFilter !== "all" && student.programSlug !== courseFilter) return false;
+      const course = selectedCourse ?? (courseFilter !== "all" ? courseFilter : null);
+      if (course && student.programSlug !== course) return false;
+      if (selectedModule !== "all" && student.module !== selectedModule) return false;
       if (statusFilter === "active" && !student.isActive) return false;
       if (statusFilter === "inactive" && student.isActive) return false;
       if (!query) return true;
@@ -50,7 +78,7 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
         .toLowerCase()
         .includes(query);
     });
-  }, [students, search, courseFilter, statusFilter]);
+  }, [students, search, courseFilter, selectedCourse, selectedModule, statusFilter, browseView]);
 
   const runAction = async (
     id: string,
@@ -135,6 +163,142 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
 
   return (
     <div className="space-y-4">
+      {browseView === "courses" && (
+        <div className="space-y-4">
+          <p className="text-sm text-muted">Choose a course to browse students by module.</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {ENROLLABLE_PROGRAM_SLUGS.map((slug) => {
+              const category = getProgramCategory(slug);
+              const program = getProgramBySlug(slug);
+              const count = courseStudentCounts[slug] ?? 0;
+              return (
+                <button
+                  key={slug}
+                  type="button"
+                  onClick={() => {
+                    setSelectedCourse(slug);
+                    setSelectedModule("all");
+                    setBrowseView("modules");
+                  }}
+                  className="rounded-2xl border-2 border-border bg-background p-6 text-left transition-all hover:border-primary hover:shadow-md"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-wider text-primary">
+                        {category?.shortLabel ?? slug}
+                      </p>
+                      <h3 className="mt-1 text-xl font-bold">{program?.title ?? slug}</h3>
+                      <p className="mt-2 text-sm text-muted">{program?.duration}</p>
+                    </div>
+                    <div className="rounded-xl bg-primary/10 px-4 py-3 text-center">
+                      <p className="text-2xl font-bold text-primary">{count}</p>
+                      <p className="text-xs font-semibold text-muted">students</p>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setBrowseView("list");
+              setSelectedCourse(null);
+              setSelectedModule("all");
+            }}
+          >
+            View all students ({students.length})
+          </Button>
+        </div>
+      )}
+
+      {browseView === "modules" && selectedCourse && (
+        <div className="space-y-4">
+          <button
+            type="button"
+            onClick={() => {
+              setBrowseView("courses");
+              setSelectedCourse(null);
+              setSelectedModule("all");
+            }}
+            className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
+          >
+            <CaretLeft size={16} />
+            Back to courses
+          </button>
+          <div className="rounded-2xl border border-border bg-surface/50 p-4">
+            <h3 className="text-lg font-bold">
+              {getProgramBySlug(selectedCourse)?.title ?? selectedCourse}
+            </h3>
+            <p className="text-sm text-muted mt-1">Pick a module to see enrolled students</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedModule("all");
+                setBrowseView("list");
+              }}
+              className="rounded-xl border border-border bg-background p-4 text-left hover:border-primary"
+            >
+              <p className="font-semibold">All modules</p>
+              <p className="text-sm text-muted mt-1">
+                {courseStudentCounts[selectedCourse] ?? 0} students
+              </p>
+            </button>
+            {moduleCounts.map((mod, index) => (
+              <button
+                key={mod.name}
+                type="button"
+                onClick={() => {
+                  setSelectedModule(mod.name);
+                  setBrowseView("list");
+                }}
+                className="rounded-xl border border-border bg-background p-4 text-left hover:border-primary"
+              >
+                <p className="text-xs font-bold uppercase tracking-wide text-primary">
+                  Module {index + 1}
+                </p>
+                <p className="font-semibold mt-1">{mod.name}</p>
+                <p className="text-sm text-muted mt-1">
+                  {mod.count} student{mod.count === 1 ? "" : "s"}
+                </p>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {browseView === "list" && (
+        <>
+      {selectedCourse && (
+        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-border bg-surface/50 px-4 py-3 text-sm">
+          <GraduationCap size={18} className="text-primary" />
+          <span className="font-semibold">
+            {getProgramBySlug(selectedCourse)?.title ?? selectedCourse}
+            {selectedModule !== "all" ? ` · ${selectedModule}` : ""}
+          </span>
+          <button
+            type="button"
+            onClick={() => setBrowseView("modules")}
+            className="ml-auto text-primary font-semibold hover:underline"
+          >
+            Change module
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setBrowseView("courses");
+              setSelectedCourse(null);
+              setSelectedModule("all");
+            }}
+            className="text-muted font-semibold hover:underline"
+          >
+            All courses
+          </button>
+        </div>
+      )}
+
       <div className="flex flex-wrap gap-2">
         <button
           type="button"
@@ -410,6 +574,8 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
           </>
         )}
       </Modal>
+        </>
+      )}
     </div>
   );
 }

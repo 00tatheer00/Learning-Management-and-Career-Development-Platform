@@ -45,6 +45,7 @@ export function AdminCredentialsPanel() {
   const [showMissingOnly, setShowMissingOnly] = useState(false);
   const [visiblePasswords, setVisiblePasswords] = useState<Set<string>>(new Set());
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [bulkGenerating, setBulkGenerating] = useState(false);
   const [credentialModal, setCredentialModal] = useState<{
     name: string;
     loginId: string;
@@ -131,6 +132,28 @@ export function AdminCredentialsPanel() {
     }
   };
 
+  const handleGenerateMissing = async () => {
+    setBulkGenerating(true);
+    try {
+      const res = await fetch("/api/admin/credentials", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "generateMissing" }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        toast.success(json.message ?? "Missing passwords generated.");
+        await load();
+      } else {
+        toast.error(json.error ?? json.message ?? "Bulk generate failed");
+      }
+    } catch {
+      toast.error("Bulk generate failed");
+    } finally {
+      setBulkGenerating(false);
+    }
+  };
+
   const handleResetPassword = async (row: AdminCredentialRow) => {
     setLoadingId(row.id);
     try {
@@ -203,10 +226,20 @@ export function AdminCredentialsPanel() {
       </div>
 
       {meta.missing > 0 && (
-        <div className="mb-6 rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
-          <strong>{meta.missing} student(s)</strong> were approved before login saving was enabled.
-          Use <strong>Generate &amp; Save</strong> to create a new password you can share manually.
-          Old passwords cannot be recovered from the system.
+        <div className="mb-6 rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <strong>{meta.missing} student(s)</strong> were approved before login saving was enabled.
+            Use <strong>Generate &amp; Save</strong> per row, or fix all missing passwords at once.
+            Old passwords cannot be recovered from the system.
+          </div>
+          <Button
+            disabled={bulkGenerating}
+            onClick={() => void handleGenerateMissing()}
+            className="shrink-0 gap-2"
+          >
+            <ArrowClockwise size={16} />
+            {bulkGenerating ? "Generating..." : `Generate missing (${meta.missing})`}
+          </Button>
         </div>
       )}
 

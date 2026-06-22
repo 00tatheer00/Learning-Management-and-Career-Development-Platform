@@ -90,6 +90,8 @@ model Enrollment {
   reviewedAt                DateTime?
   reviewedBy                String?
   adminNotes                String?
+  approvalWhatsAppSent      Boolean?
+  approvalWhatsAppError     String?
   createdAt                 DateTime         @default(now())
 }
 

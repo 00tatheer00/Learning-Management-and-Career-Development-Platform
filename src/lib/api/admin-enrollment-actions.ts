@@ -28,6 +28,10 @@ export async function approveEnrollmentAndCreateAccount(
   message: string;
   error?: string;
   credentials?: { loginId: string; password: string; loginUrl: string };
+  studentId?: string;
+  whatsappSent?: boolean;
+  whatsappError?: string;
+  passwordSaved?: boolean;
 }> {
   const existing = await getEnrollmentById(enrollmentId);
   if (!existing) {
@@ -106,21 +110,42 @@ export async function approveEnrollmentAndCreateAccount(
     );
   }
 
-  void sendApprovalWelcomeNotifications({
+  const notifications = await sendApprovalWelcomeNotifications({
     fullName: enrollmentRecord.fullName,
     email: enrollmentRecord.email,
     whatsapp: enrollmentRecord.whatsapp,
     program: enrollmentRecord.program,
     level: enrollmentRecord.level,
     password: plainPassword,
-  }).catch((error) => {
-    console.error("Background approval notifications failed:", error);
   });
+
+  const whatsappError = notifications.whatsappSent
+    ? null
+    : (notifications.warnings[0] ?? "WhatsApp not sent");
+
+  await prisma.enrollment.update({
+    where: { id: enrollmentId },
+    data: {
+      approvalWhatsAppSent: notifications.whatsappSent,
+      approvalWhatsAppError: whatsappError,
+    },
+  });
+
+  const student = await getUserByEmail(enrollment.email);
+
+  const message = notifications.whatsappSent
+    ? "Registration approved. Login saved. WhatsApp sent to student."
+    : passwordSaved
+      ? `Registration approved. Login saved. WhatsApp failed: ${whatsappError}`
+      : `Registration approved. WhatsApp failed: ${whatsappError}`;
 
   return {
     enrollment,
-    message:
-      "Registration approved. Login saved in Portal Logins. WhatsApp message is being sent to the student.",
+    message,
+    studentId: student?.id,
+    whatsappSent: notifications.whatsappSent,
+    whatsappError: whatsappError ?? undefined,
+    passwordSaved,
     credentials: {
       loginId: enrollment.email,
       password: plainPassword,

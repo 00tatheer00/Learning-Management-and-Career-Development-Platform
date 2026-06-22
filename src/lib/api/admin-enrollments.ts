@@ -13,6 +13,8 @@ export interface AdminEnrollmentRow extends EnrollmentRecord {
   totalApplications: number;
   isReturningApplicant: boolean;
   previousApplications: ApplicantApplicationSummary[];
+  approvalWhatsAppSent?: boolean | null;
+  approvalWhatsAppError?: string | null;
 }
 
 export async function getAdminEnrollmentRows(): Promise<AdminEnrollmentRow[]> {
@@ -58,6 +60,8 @@ export async function getAdminEnrollmentRows(): Promise<AdminEnrollmentRow[]> {
       reviewedAt: record.reviewedAt?.toISOString(),
       reviewedBy: record.reviewedBy ?? undefined,
       adminNotes: record.adminNotes ?? undefined,
+      approvalWhatsAppSent: record.approvalWhatsAppSent,
+      approvalWhatsAppError: record.approvalWhatsAppError ?? undefined,
       createdAt: record.createdAt.toISOString(),
       courseTitle: getProgramBySlug(record.program)?.title ?? record.program,
       reviewerName: record.reviewedBy

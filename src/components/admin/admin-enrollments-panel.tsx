@@ -12,12 +12,15 @@ import {
   CheckSquare,
   Trash,
   Copy,
+  ChatsCircle,
+  ArrowCounterClockwise,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
 import { PortalPageHeader } from "@/components/portal/portal-ui";
 import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
+import { ADMIN_REJECT_PRESETS } from "@/lib/constants/admin-reject-reasons";
 import { getProgramCategory } from "@/lib/constants/program-categories";
 import { formatAppliedDate, formatAppliedDateTime, formatAppliedTime } from "@/lib/utils";
 import { toast } from "@/lib/ui/toast";
@@ -26,7 +29,22 @@ import { Alert } from "@/components/ui/alert";
 import type { AdminEnrollmentRow } from "@/lib/api/admin-enrollments";
 
 type StatusFilter = "all" | "pending" | "approved" | "rejected";
+type QuickFilter = "all" | "today" | "returning" | "whatsapp-failed" | "no-payment";
 type PendingAction = { id: string; type: "approved" | "rejected"; name: string };
+
+function isCreatedToday(iso: string): boolean {
+  const date = new Date(iso);
+  const now = new Date();
+  return (
+    date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth() &&
+    date.getDate() === now.getDate()
+  );
+}
+
+function hasPaymentScreenshot(url?: string | null): boolean {
+  return Boolean(url?.startsWith("http"));
+}
 
 export function AdminEnrollmentsPanel() {
   const [enrollments, setEnrollments] = useState<AdminEnrollmentRow[]>([]);
@@ -35,6 +53,7 @@ export function AdminEnrollmentsPanel() {
   const [fetchError, setFetchError] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("pending");
   const [programFilter, setProgramFilter] = useState<string>("all");
+  const [quickFilter, setQuickFilter] = useState<QuickFilter>("all");
   const [search, setSearch] = useState("");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
@@ -49,7 +68,11 @@ export function AdminEnrollmentsPanel() {
     loginId: string;
     password: string;
     loginUrl: string;
+    studentId?: string;
+    whatsappSent?: boolean;
+    whatsappError?: string;
   } | null>(null);
+  const [resendLoading, setResendLoading] = useState(false);
 
   const load = async () => {
     setFetchError("");
@@ -92,6 +115,17 @@ export function AdminEnrollmentsPanel() {
     return enrollments.filter((enrollment) => {
       if (statusFilter !== "all" && enrollment.status !== statusFilter) return false;
       if (programFilter !== "all" && enrollment.program !== programFilter) return false;
+      if (quickFilter === "today" && !isCreatedToday(enrollment.createdAt)) return false;
+      if (quickFilter === "returning" && !enrollment.isReturningApplicant) return false;
+      if (
+        quickFilter === "whatsapp-failed" &&
+        !(enrollment.status === "approved" && enrollment.approvalWhatsAppSent === false)
+      ) {
+        return false;
+      }
+      if (quickFilter === "no-payment" && hasPaymentScreenshot(enrollment.paymentScreenshot)) {
+        return false;
+      }
       if (!query) return true;
       return [
         enrollment.fullName,
@@ -105,7 +139,7 @@ export function AdminEnrollmentsPanel() {
         .toLowerCase()
         .includes(query);
     });
-  }, [enrollments, statusFilter, programFilter, search]);
+  }, [enrollments, statusFilter, programFilter, quickFilter, search]);
 
   const pendingCount = enrollments.filter((e) => e.status === "pending").length;
   const pendingFilteredIds = filtered.filter((e) => e.status === "pending").map((e) => e.id);
@@ -159,6 +193,11 @@ export function AdminEnrollmentsPanel() {
           password: string;
           loginUrl: string;
         };
+        notification?: {
+          whatsappSent?: boolean;
+          whatsappError?: string;
+          studentId?: string;
+        };
       } = {};
 
       try {
@@ -174,7 +213,13 @@ export function AdminEnrollmentsPanel() {
       }
 
       playPortalSound(status === "approved" ? "adminApprove" : "adminReject");
-      toast.success(data.message ?? "Updated successfully.");
+      if (status === "approved" && data.notification?.whatsappSent) {
+        toast.success("Approved", data.message ?? "WhatsApp sent to student.");
+      } else if (status === "approved" && data.notification?.whatsappSent === false) {
+        toast.error("Approved but WhatsApp failed", data.notification.whatsappError ?? data.message);
+      } else {
+        toast.success(data.message ?? "Updated successfully.");
+      }
 
       if (status === "approved" && data.credentials) {
         const enrollment = enrollments.find((item) => item.id === id);
@@ -183,6 +228,9 @@ export function AdminEnrollmentsPanel() {
           loginId: data.credentials.loginId,
           password: data.credentials.password,
           loginUrl: data.credentials.loginUrl,
+          studentId: data.notification?.studentId,
+          whatsappSent: data.notification?.whatsappSent,
+          whatsappError: data.notification?.whatsappError,
         });
       }
 
@@ -327,6 +375,31 @@ export function AdminEnrollmentsPanel() {
               Export CSV
             </a>
           </Button>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          {(
+            [
+              { value: "all", label: "All" },
+              { value: "today", label: "Today" },
+              { value: "returning", label: "Returning" },
+              { value: "whatsapp-failed", label: "WhatsApp failed" },
+              { value: "no-payment", label: "No payment SS" },
+            ] as const
+          ).map((item) => (
+            <button
+              key={item.value}
+              type="button"
+              onClick={() => setQuickFilter(item.value)}
+              className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
+                quickFilter === item.value
+                  ? "bg-slate-800 text-white"
+                  : "border border-border bg-background text-muted hover:text-foreground"
+              }`}
+            >
+              {item.label}
+            </button>
+          ))}
         </div>
 
         <div className="flex flex-wrap gap-2">
@@ -643,12 +716,24 @@ export function AdminEnrollmentsPanel() {
             </p>
             <label className="mt-4 block text-sm font-medium">
               Rejection reason
+              <div className="mt-2 flex flex-wrap gap-2">
+                {ADMIN_REJECT_PRESETS.map((preset) => (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    onClick={() => setRejectReason(preset.message)}
+                    className="rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-foreground hover:border-primary hover:bg-primary/5"
+                  >
+                    {preset.label}
+                  </button>
+                ))}
+              </div>
               <textarea
                 value={rejectReason}
                 onChange={(event) => setRejectReason(event.target.value)}
                 rows={4}
                 className="mt-2 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
-                placeholder="e.g. Payment screenshot unclear, wrong amount, duplicate registration..."
+                placeholder="Or type your own custom message..."
               />
             </label>
             <div className="mt-6 flex justify-end gap-3">
@@ -724,6 +809,25 @@ export function AdminEnrollmentsPanel() {
               Login saved for <strong>{approvedCredentials.name}</strong>. You can also find this
               anytime under <strong>Portal Logins</strong> in the sidebar.
             </p>
+
+            <div
+              className={`mt-4 rounded-xl border p-4 text-sm ${
+                approvedCredentials.whatsappSent
+                  ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+                  : "border-red-200 bg-red-50 text-red-900"
+              }`}
+            >
+              <p className="font-semibold flex items-center gap-2">
+                <ChatsCircle size={18} weight="duotone" />
+                {approvedCredentials.whatsappSent
+                  ? "WhatsApp sent to student"
+                  : "WhatsApp failed to send"}
+              </p>
+              {!approvedCredentials.whatsappSent && approvedCredentials.whatsappError && (
+                <p className="mt-1 text-xs opacity-90">{approvedCredentials.whatsappError}</p>
+              )}
+            </div>
+
             <div className="mt-4 rounded-xl border border-border bg-surface p-4 space-y-2 text-sm">
               <p>
                 <span className="text-muted">Login ID:</span>{" "}
@@ -740,7 +844,47 @@ export function AdminEnrollmentsPanel() {
                 </a>
               </p>
             </div>
-            <div className="mt-6 flex justify-end gap-3">
+            <div className="mt-6 flex flex-wrap justify-end gap-3">
+              {!approvedCredentials.whatsappSent && approvedCredentials.studentId && (
+                <Button
+                  variant="secondary"
+                  className="gap-2"
+                  disabled={resendLoading}
+                  onClick={async () => {
+                    if (!approvedCredentials.studentId) return;
+                    setResendLoading(true);
+                    try {
+                      const res = await fetch("/api/admin/whatsapp", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          action: "resendLogin",
+                          studentId: approvedCredentials.studentId,
+                        }),
+                      });
+                      const json = await res.json();
+                      if (json.success) {
+                        toast.success(json.message ?? "WhatsApp resent.");
+                        setApprovedCredentials((current) =>
+                          current
+                            ? { ...current, whatsappSent: true, whatsappError: undefined }
+                            : current
+                        );
+                        void load();
+                      } else {
+                        toast.error(json.error ?? json.message ?? "Resend failed");
+                      }
+                    } catch {
+                      toast.error("Resend failed");
+                    } finally {
+                      setResendLoading(false);
+                    }
+                  }}
+                >
+                  <ArrowCounterClockwise size={16} />
+                  {resendLoading ? "Sending..." : "Resend WhatsApp"}
+                </Button>
+              )}
               <Button
                 variant="secondary"
                 className="gap-2"

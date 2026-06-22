@@ -75,12 +75,23 @@ export async function PATCH(request: Request) {
         ? result.credentials
         : undefined;
 
+    const notification =
+      parsed.data.status === "approved" && result.enrollment
+        ? {
+            whatsappSent: "whatsappSent" in result ? Boolean(result.whatsappSent) : false,
+            whatsappError: "whatsappError" in result ? result.whatsappError : undefined,
+            studentId: "studentId" in result ? result.studentId : undefined,
+            passwordSaved: "passwordSaved" in result ? result.passwordSaved : undefined,
+          }
+        : undefined;
+
     return NextResponse.json({
       ...createApiResponse(true, {
         data: result.enrollment,
         message: result.message,
       }),
       ...(credentials ? { credentials } : {}),
+      ...(notification ? { notification } : {}),
     });
   } catch (error) {
     console.error("Enrollment PATCH failed:", error);
