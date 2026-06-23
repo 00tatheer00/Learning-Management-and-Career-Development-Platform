@@ -1,6 +1,7 @@
 "use client";
 
 import { AdminAlertsProvider } from "@/components/admin/admin-alerts-provider";
+import { AdminRevenueProvider } from "@/components/admin/admin-revenue-side-panel";
 import { PortalShell } from "@/components/portal/portal-shell";
 import type { PortalUser } from "@/types/portal";
 
@@ -13,7 +14,9 @@ export function AdminPortalShell({
 }) {
   return (
     <AdminAlertsProvider>
-      <PortalShell user={user}>{children}</PortalShell>
+      <AdminRevenueProvider>
+        <PortalShell user={user}>{children}</PortalShell>
+      </AdminRevenueProvider>
     </AdminAlertsProvider>
   );
 }

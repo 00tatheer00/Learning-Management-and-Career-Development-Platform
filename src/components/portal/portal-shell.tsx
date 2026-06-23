@@ -24,6 +24,10 @@ import {
   AdminNotificationsBell,
   AdminNavBadge,
 } from "@/components/admin/admin-notifications-bell";
+import {
+  AdminRevenueHeaderButton,
+  AdminRevenueSidebarCard,
+} from "@/components/admin/admin-revenue-side-panel";
 import { useAdminAlertsOptional } from "@/components/admin/admin-alerts-provider";
 import type { PortalUser } from "@/types/portal";
 import { cn } from "@/lib/utils";
@@ -95,6 +99,7 @@ export function PortalShell({ user, children }: PortalShellProps) {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {user.role === "admin" && <AdminRevenueHeaderButton />}
             {user.role === "admin" && <AdminNotificationsBell />}
             <Button variant="outline" size="sm" asChild className="hidden sm:flex">
               <Link href="/">
@@ -211,7 +216,8 @@ function SidebarContent({
         })}
       </nav>
 
-      <div className="p-3 border-t border-border">
+      <div className="p-3 border-t border-border space-y-2">
+        {user.role === "admin" && <AdminRevenueSidebarCard />}
         <button
           type="button"
           onClick={onLogout}

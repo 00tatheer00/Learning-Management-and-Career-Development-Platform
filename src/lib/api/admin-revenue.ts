@@ -1,24 +1,46 @@
 import { prisma } from "@/lib/prisma";
-import { PAYMENT_CONFIG, ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
+import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
+import { REVENUE_SPLIT, revenueFromStudents } from "@/lib/constants/revenue-split";
+import { getProgramCategory } from "@/lib/constants/program-categories";
 import { getProgramBySlug } from "@/lib/data/programs";
+import { trainers } from "@/lib/data/trainers";
+
+export interface AdminRevenueCourseStats {
+  programSlug: string;
+  courseTitle: string;
+  shortLabel: string;
+  trainerName: string;
+  headerGradient: string;
+  approvedCount: number;
+  gross: number;
+  managementShare: number;
+  trainerShare: number;
+  thisWeekCount: number;
+  thisWeekGross: number;
+  thisWeekManagement: number;
+  thisWeekTrainer: number;
+  thisMonthCount: number;
+  thisMonthGross: number;
+}
 
 export interface AdminRevenueStats {
   registrationFee: number;
+  managementShare: number;
+  trainerShare: number;
   currency: string;
   totalApproved: number;
-  totalRevenue: number;
+  totalGross: number;
+  totalManagement: number;
+  totalTrainer: number;
   thisWeekApproved: number;
-  thisWeekRevenue: number;
+  thisWeekGross: number;
+  thisWeekManagement: number;
+  thisWeekTrainer: number;
   thisMonthApproved: number;
-  thisMonthRevenue: number;
-  byCourse: Array<{
-    programSlug: string;
-    courseTitle: string;
-    approvedCount: number;
-    revenue: number;
-    thisWeekCount: number;
-    thisWeekRevenue: number;
-  }>;
+  thisMonthGross: number;
+  thisMonthManagement: number;
+  thisMonthTrainer: number;
+  byCourse: AdminRevenueCourseStats[];
 }
 
 function startOfWeek(date: Date): Date {
@@ -34,8 +56,11 @@ function startOfMonth(date: Date): Date {
   return new Date(date.getFullYear(), date.getMonth(), 1);
 }
 
+function splitForCount(count: number) {
+  return revenueFromStudents(count);
+}
+
 export async function getAdminRevenueStats(): Promise<AdminRevenueStats> {
-  const fee = PAYMENT_CONFIG.registrationFee;
   const now = new Date();
   const weekStart = startOfWeek(now);
   const monthStart = startOfMonth(now);
@@ -51,31 +76,58 @@ export async function getAdminRevenueStats(): Promise<AdminRevenueStats> {
   }));
 
   const totalApproved = dated.length;
-  const thisWeekApproved = dated.filter((row) => row.at >= weekStart).length;
-  const thisMonthApproved = dated.filter((row) => row.at >= monthStart).length;
+  const thisWeekRows = dated.filter((row) => row.at >= weekStart);
+  const thisMonthRows = dated.filter((row) => row.at >= monthStart);
+
+  const totalSplit = splitForCount(totalApproved);
+  const weekSplit = splitForCount(thisWeekRows.length);
+  const monthSplit = splitForCount(thisMonthRows.length);
 
   const byCourse = ENROLLABLE_PROGRAM_SLUGS.map((programSlug) => {
+    const category = getProgramCategory(programSlug);
     const rows = dated.filter((row) => row.program === programSlug);
     const weekRows = rows.filter((row) => row.at >= weekStart);
+    const monthRows = rows.filter((row) => row.at >= monthStart);
+    const all = splitForCount(rows.length);
+    const week = splitForCount(weekRows.length);
+    const trainer = trainers.find((t) => t.id === category?.primaryTrainerSeedId);
+
     return {
       programSlug,
       courseTitle: getProgramBySlug(programSlug)?.title ?? programSlug,
+      shortLabel: category?.shortLabel ?? programSlug,
+      trainerName: trainer?.name ?? "Trainer",
+      headerGradient: category?.headerGradient ?? "from-slate-600 to-slate-800",
       approvedCount: rows.length,
-      revenue: rows.length * fee,
+      gross: all.gross,
+      managementShare: all.management,
+      trainerShare: all.trainer,
       thisWeekCount: weekRows.length,
-      thisWeekRevenue: weekRows.length * fee,
+      thisWeekGross: week.gross,
+      thisWeekManagement: week.management,
+      thisWeekTrainer: week.trainer,
+      thisMonthCount: monthRows.length,
+      thisMonthGross: splitForCount(monthRows.length).gross,
     };
   });
 
   return {
-    registrationFee: fee,
-    currency: PAYMENT_CONFIG.currency,
+    registrationFee: REVENUE_SPLIT.registrationFee,
+    managementShare: REVENUE_SPLIT.managementShare,
+    trainerShare: REVENUE_SPLIT.trainerShare,
+    currency: REVENUE_SPLIT.currency,
     totalApproved,
-    totalRevenue: totalApproved * fee,
-    thisWeekApproved,
-    thisWeekRevenue: thisWeekApproved * fee,
-    thisMonthApproved,
-    thisMonthRevenue: thisMonthApproved * fee,
+    totalGross: totalSplit.gross,
+    totalManagement: totalSplit.management,
+    totalTrainer: totalSplit.trainer,
+    thisWeekApproved: thisWeekRows.length,
+    thisWeekGross: weekSplit.gross,
+    thisWeekManagement: weekSplit.management,
+    thisWeekTrainer: weekSplit.trainer,
+    thisMonthApproved: thisMonthRows.length,
+    thisMonthGross: monthSplit.gross,
+    thisMonthManagement: monthSplit.management,
+    thisMonthTrainer: monthSplit.trainer,
     byCourse,
   };
 }
