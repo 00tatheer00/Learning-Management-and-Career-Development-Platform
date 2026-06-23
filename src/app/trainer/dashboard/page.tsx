@@ -8,6 +8,7 @@ import {
 } from "@/lib/auth/trainer-scope";
 import { getAssignments, getLiveSessions, getSubmissions } from "@/lib/api/portal-data";
 import { getUsersByRole } from "@/lib/auth/users";
+import { groupStudentsByModule } from "@/lib/trainer/group-students-by-module";
 import { PortalPageHeader, StatCard, QuickActionCard } from "@/components/portal/portal-ui";
 import { Button } from "@/components/ui/button";
 
@@ -34,6 +35,7 @@ export default async function TrainerDashboardPage() {
   ]);
 
   const students = filterStudentsByProgram(allStudents, programSlug);
+  const moduleGroups = groupStudentsByModule(students, programSlug);
   const assignments = allAssignments.filter((a) => a.trainerId === trainerId);
   const sessions = allSessions.filter((s) => s.trainerId === trainerId);
   const assignmentIds = new Set(assignments.map((a) => a.id));
@@ -60,6 +62,29 @@ export default async function TrainerDashboardPage() {
         <StatCard label="Upcoming Classes" value={upcomingSessions} accent="green" />
         <StatCard label="To Review" value={pendingReviews} accent="slate" hint="Pending submissions" />
       </div>
+
+      {moduleGroups.length > 0 && (
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-bold">Students by Module</h2>
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/trainer/students">View all</Link>
+            </Button>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {moduleGroups.map((group) => (
+              <Link
+                key={group.moduleName}
+                href={`/trainer/students?module=${encodeURIComponent(group.moduleName)}`}
+                className="rounded-xl border border-border bg-background p-4 hover:border-primary/30 hover:shadow-sm transition-all"
+              >
+                <p className="text-xs font-semibold text-muted truncate">{group.moduleName}</p>
+                <p className="text-2xl font-bold mt-1">{group.students.length}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       <h2 className="text-lg font-bold mb-4">Quick Actions</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
