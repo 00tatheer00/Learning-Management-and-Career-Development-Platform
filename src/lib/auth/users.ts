@@ -75,6 +75,15 @@ export async function updateUserPasswordHash(id: string, passwordHash: string): 
   });
 }
 
+export async function deleteUser(id: string): Promise<boolean> {
+  try {
+    await prisma.user.delete({ where: { id } });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function mapUser(user: {
   id: string;
   email: string;

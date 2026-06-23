@@ -29,14 +29,22 @@ export default async function AdminDashboardPage() {
           label="Paid Registrations"
           value={stats.approvedEnrollments}
           accent="green"
-          hint="Approved & paid"
+          hint={
+            stats.returningRegistrations > 0
+              ? `${stats.returningRegistrations} returning · ${stats.students} portal accounts`
+              : `${stats.students} portal accounts`
+          }
         />
         <StatCard label="Total Registrations" value={stats.totalEnrollments} accent="slate" />
         <StatCard
           label="Login Accounts"
           value={stats.students}
           accent="blue"
-          hint="Can access portal"
+          hint={
+            stats.missingTrainerAssignments > 0
+              ? `${stats.trainerAssignedStudents} with trainer · ${stats.missingTrainerAssignments} need sync`
+              : `${stats.trainerAssignedStudents} assigned to trainers`
+          }
         />
         <StatCard label="Assignments" value={stats.assignments} accent="orange" />
         <StatCard label="Upcoming Classes" value={stats.upcomingSessions} accent="green" />

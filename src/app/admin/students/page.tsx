@@ -1,34 +1,43 @@
 import { getAdminStudentRows } from "@/lib/api/admin-students";
+import { getAdminProgramStats } from "@/lib/api/admin-program-stats";
 import { AdminStudentsTable } from "@/components/admin/admin-students-table";
 import { PortalPageHeader, EmptyState } from "@/components/portal/portal-ui";
-import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
 import { getProgramCategory } from "@/lib/constants/program-categories";
 
 export default async function AdminStudentsPage() {
-  const students = await getAdminStudentRows();
-  const webCount = students.filter((s) => s.programSlug === "web-development").length;
-  const appCount = students.filter((s) => s.programSlug === "app-development").length;
+  const [students, programStats] = await Promise.all([
+    getAdminStudentRows(),
+    getAdminProgramStats(),
+  ]);
 
   return (
     <div>
       <PortalPageHeader
         title="Students by Program"
-        description="Web and App students are separated by category. Approving a registration automatically assigns the correct program and trainer."
+        description="Active portal accounts by course. Paid registration count may be higher when students re-register for a new module."
       />
 
       {students.length > 0 && (
         <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="rounded-xl border border-border bg-background p-4">
-            <p className="text-sm text-muted">Total Students</p>
-            <p className="text-2xl font-bold">{students.length}</p>
+            <p className="text-sm text-muted">Active Students</p>
+            <p className="text-2xl font-bold">{programStats.activeStudents}</p>
+            {programStats.inactiveStudents > 0 && (
+              <p className="text-xs text-muted mt-1">
+                +{programStats.inactiveStudents} inactive
+              </p>
+            )}
           </div>
-          {ENROLLABLE_PROGRAM_SLUGS.map((slug) => {
-            const category = getProgramCategory(slug);
-            const count = slug === "web-development" ? webCount : appCount;
+          {programStats.byProgram.map((row) => {
+            const category = getProgramCategory(row.programSlug);
             return (
-              <div key={slug} className="rounded-xl border border-border bg-background p-4">
-                <p className="text-sm text-muted">{category?.title ?? slug}</p>
-                <p className="text-2xl font-bold">{count}</p>
+              <div key={row.programSlug} className="rounded-xl border border-border bg-background p-4">
+                <p className="text-sm text-muted">{category?.title ?? row.programSlug}</p>
+                <p className="text-2xl font-bold">{row.students}</p>
+                <p className="text-xs text-muted mt-1">
+                  {row.registrations} paid registration{row.registrations === 1 ? "" : "s"} ·{" "}
+                  {row.trainerAssigned} with trainer
+                </p>
               </div>
             );
           })}

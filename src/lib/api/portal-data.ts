@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { getUsersByRole } from "@/lib/auth/users";
+import { getAdminProgramStats } from "@/lib/api/admin-program-stats";
 import { DEFAULT_BATCH_NAME } from "@/lib/constants/batch";
 import type {
   Assignment,
@@ -321,9 +321,8 @@ export async function createLiveSession(
 }
 
 export async function getPortalStats() {
-  const [enrollments, students, assignments, sessions] = await Promise.all([
-    prisma.enrollment.findMany(),
-    getUsersByRole("student"),
+  const [programStats, assignments, sessions] = await Promise.all([
+    getAdminProgramStats(),
     prisma.assignment.findMany(),
     prisma.liveSession.findMany(),
   ]);
@@ -331,10 +330,13 @@ export async function getPortalStats() {
   const today = new Date().toISOString().split("T")[0];
 
   return {
-    pendingEnrollments: enrollments.filter((e) => e.status === "pending").length,
-    approvedEnrollments: enrollments.filter((e) => e.status === "approved").length,
-    totalEnrollments: enrollments.length,
-    students: students.length,
+    pendingEnrollments: programStats.pendingEnrollments,
+    approvedEnrollments: programStats.approvedRegistrations,
+    totalEnrollments: programStats.totalEnrollments,
+    students: programStats.activeStudents,
+    trainerAssignedStudents: programStats.trainerAssignedStudents,
+    missingTrainerAssignments: programStats.missingTrainerAssignments,
+    returningRegistrations: programStats.returningRegistrations,
     assignments: assignments.length,
     upcomingSessions: sessions.filter((s) => s.date >= today).length,
   };

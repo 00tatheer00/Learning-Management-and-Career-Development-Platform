@@ -12,6 +12,7 @@ export interface AdminRevenueCourseStats {
   trainerName: string;
   headerGradient: string;
   approvedCount: number;
+  uniqueStudents: number;
   gross: number;
   managementShare: number;
   trainerShare: number;
@@ -65,10 +66,16 @@ export async function getAdminRevenueStats(): Promise<AdminRevenueStats> {
   const weekStart = startOfWeek(now);
   const monthStart = startOfMonth(now);
 
-  const approved = await prisma.enrollment.findMany({
-    where: { status: "approved" },
-    select: { program: true, createdAt: true, reviewedAt: true },
-  });
+  const [approved, activeStudents] = await Promise.all([
+    prisma.enrollment.findMany({
+      where: { status: "approved" },
+      select: { program: true, createdAt: true, reviewedAt: true },
+    }),
+    prisma.user.findMany({
+      where: { role: "student", isActive: true },
+      select: { programSlug: true },
+    }),
+  ]);
 
   const dated = approved.map((row) => ({
     program: row.program,
@@ -92,6 +99,10 @@ export async function getAdminRevenueStats(): Promise<AdminRevenueStats> {
     const week = splitForCount(weekRows.length);
     const trainer = trainers.find((t) => t.id === category?.primaryTrainerSeedId);
 
+    const uniqueStudents = activeStudents.filter(
+      (student) => student.programSlug === programSlug
+    ).length;
+
     return {
       programSlug,
       courseTitle: getProgramBySlug(programSlug)?.title ?? programSlug,
@@ -99,6 +110,7 @@ export async function getAdminRevenueStats(): Promise<AdminRevenueStats> {
       trainerName: trainer?.name ?? "Trainer",
       headerGradient: category?.headerGradient ?? "from-slate-600 to-slate-800",
       approvedCount: rows.length,
+      uniqueStudents,
       gross: all.gross,
       managementShare: all.management,
       trainerShare: all.trainer,

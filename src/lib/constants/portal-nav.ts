@@ -39,6 +39,7 @@ export const PORTAL_NAV: Record<UserRole, PortalNavItem[]> = {
     { href: "/trainer/classes", label: "Live Classes", icon: VideoCamera, description: "Schedule & links" },
     { href: "/trainer/assignments", label: "Assignments", icon: ClipboardText, description: "Create & review work" },
     { href: "/trainer/materials", label: "Course Videos", icon: BookOpen, description: "Learning materials" },
+    { href: "/trainer/settings", label: "Settings", icon: Gear, description: "Edit your profile" },
     { href: "/trainer/profile", label: "My Profile", icon: UserCircle, description: "Your account" },
   ],
   admin: [

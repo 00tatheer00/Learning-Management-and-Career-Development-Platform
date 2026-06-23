@@ -1,18 +1,32 @@
+import Link from "next/link";
+import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getTrainerCourseTitle, getTrainerDesignation } from "@/lib/auth/trainer-scope";
+import { prisma } from "@/lib/prisma";
 import { PortalPageHeader } from "@/components/portal/portal-ui";
-import { UserCircle, Envelope, Phone, BookOpen } from "@phosphor-icons/react/ssr";
+import { UserCircle, Envelope, Phone, BookOpen, PencilSimple } from "@phosphor-icons/react/ssr";
+import { Button } from "@/components/ui/button";
 
 export default async function TrainerProfilePage() {
-  const user = await getCurrentUser();
-  if (!user) return null;
+  const sessionUser = await getCurrentUser();
+  if (!sessionUser) redirect("/login");
 
-  const designation = getTrainerDesignation(user.programSlug);
+  const user = await prisma.user.findUnique({ where: { id: sessionUser.id } });
+  if (!user) redirect("/login");
+
+  const designation = user.designation ?? getTrainerDesignation(user.programSlug ?? undefined);
   const courseTitle = user.programSlug ? getTrainerCourseTitle(user.programSlug) : "—";
 
   return (
     <div>
-      <PortalPageHeader title="My Profile" description="Your trainer account details." />
+      <PortalPageHeader title="My Profile" description="Your trainer account details.">
+        <Button size="lg" asChild className="gap-2">
+          <Link href="/trainer/settings">
+            <PencilSimple size={18} />
+            Edit Profile
+          </Link>
+        </Button>
+      </PortalPageHeader>
       <div className="rounded-2xl border border-border bg-background max-w-xl overflow-hidden">
         <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white">
           <p className="text-xl font-bold">{user.name}</p>

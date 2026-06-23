@@ -416,9 +416,11 @@ function AdminRevenueSidePanel() {
                               </p>
                             </div>
                             <div className="text-right shrink-0">
-                              <p className="text-lg font-bold">{cp.students}</p>
+                              <p className="text-lg font-bold">
+                                {period === "all" ? course.uniqueStudents : cp.students}
+                              </p>
                               <p className="text-[10px] uppercase tracking-wider text-white/75">
-                                students
+                                {period === "all" ? "portal students" : "registrations"}
                               </p>
                             </div>
                           </div>
@@ -456,6 +458,13 @@ function AdminRevenueSidePanel() {
                               </p>
                             </div>
                           </div>
+                          {period === "all" && course.approvedCount !== course.uniqueStudents && (
+                            <p className="text-xs text-amber-800 bg-amber-50 rounded-lg px-3 py-2 border border-amber-100">
+                              {course.approvedCount} paid registration
+                              {course.approvedCount === 1 ? "" : "s"} (
+                              {course.approvedCount - course.uniqueStudents} returning)
+                            </p>
+                          )}
                           {period === "all" && course.thisWeekCount > 0 && (
                             <p className="text-xs text-emerald-700 bg-emerald-50 rounded-lg px-3 py-2 border border-emerald-100">
                               +{course.thisWeekCount} this week (
