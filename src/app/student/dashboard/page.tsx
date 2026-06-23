@@ -6,15 +6,16 @@ import {
 } from "@phosphor-icons/react/ssr";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getAssignments, getLiveSessionsPreview, getMaterials } from "@/lib/api/portal-data";
-import { getProgramBySlug } from "@/lib/data/programs";
 import { PortalPageHeader, StatCard, QuickActionCard } from "@/components/portal/portal-ui";
 import { Button } from "@/components/ui/button";
-import { JoinClassButton } from "@/components/portal/join-class-button";
 import { StudentTrainerCard } from "@/components/portal/student-trainer-card";
 import { StudentWhatsAppGroupCard } from "@/components/portal/student-whatsapp-group-card";
+import { StudentNextClassCard } from "@/components/portal/student-next-class-card";
+import { StudentModuleRoadmap } from "@/components/portal/student-module-roadmap";
 import { ProgramCategoryBadge } from "@/components/portal/program-category-badge";
 import { HELP_CONFIG } from "@/lib/constants/help";
 import { getProgramCategory } from "@/lib/constants/program-categories";
+import { findNextUpcomingSession } from "@/lib/utils/session-datetime";
 
 export default async function StudentDashboardPage() {
   const user = await getCurrentUser();
@@ -26,17 +27,14 @@ export default async function StudentDashboardPage() {
     getAssignments(programSlug),
     getLiveSessionsPreview(programSlug),
   ]);
-  const program = getProgramBySlug(programSlug);
   const category = getProgramCategory(programSlug);
-  const nextSession = sessions.find(
-    (s) => s.date >= new Date().toISOString().split("T")[0]
-  );
+  const nextSession = findNextUpcomingSession(sessions);
 
   return (
     <div>
       <PortalPageHeader
         title={`Welcome, ${user.name.split(" ")[0]}!`}
-        description={`You are in ${category?.sidebarLabel ?? program?.title ?? "your course"}. Classes, lessons, and trainer are only for your program.`}
+        description={`You are in ${category?.sidebarLabel ?? "your course"}. Classes, lessons, and trainer are only for your program.`}
       >
         <div className="flex flex-wrap items-center gap-3">
           <ProgramCategoryBadge programSlug={programSlug} />
@@ -50,6 +48,20 @@ export default async function StudentDashboardPage() {
         <StudentWhatsAppGroupCard variant="banner" />
       </div>
 
+      {nextSession ? (
+        <StudentNextClassCard session={nextSession} />
+      ) : (
+        <div className="rounded-2xl border border-dashed border-border bg-surface p-5 mb-8 text-sm text-muted">
+          No upcoming live class scheduled yet. Check WhatsApp or{" "}
+          <Link href="/student/classes" className="text-primary font-semibold underline">
+            Live Classes
+          </Link>{" "}
+          later.
+        </div>
+      )}
+
+      <StudentModuleRoadmap programSlug={programSlug} currentModule={user.level} />
+
       <div className="mb-8">
         <StudentTrainerCard programSlug={programSlug} trainerId={user.trainerId} />
       </div>
@@ -60,19 +72,6 @@ export default async function StudentDashboardPage() {
         <StatCard label="Live Classes" value={sessions.length} accent="green" />
         <StatCard label="Your Module" value={user.level ?? "—"} accent="slate" />
       </div>
-
-      {nextSession && (
-        <div className="rounded-2xl border-2 border-primary/30 bg-primary/5 p-5 sm:p-6 mb-8">
-          <p className="text-sm font-semibold text-primary uppercase tracking-wider mb-1">
-            Next Live Class
-          </p>
-          <h2 className="text-xl font-bold mb-1">{nextSession.title}</h2>
-          <p className="text-muted mb-4">
-            {nextSession.date} at {nextSession.time} · {nextSession.trainerName}
-          </p>
-          <JoinClassButton sessionId={nextSession.id} label="Join Class Now" />
-        </div>
-      )}
 
       <h2 className="text-lg font-bold mb-4">Quick Links</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

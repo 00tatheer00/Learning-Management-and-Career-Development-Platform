@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
+import { ImageLightbox } from "@/components/ui/image-lightbox";
 import { PortalPageHeader } from "@/components/portal/portal-ui";
 import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
 import { ADMIN_REJECT_PRESETS } from "@/lib/constants/admin-reject-reasons";
@@ -73,6 +74,10 @@ export function AdminEnrollmentsPanel() {
     whatsappError?: string;
   } | null>(null);
   const [resendLoading, setResendLoading] = useState(false);
+  const [zoomScreenshot, setZoomScreenshot] = useState<{ url: string; caption: string } | null>(
+    null
+  );
+  const [bulkConfirmOpen, setBulkConfirmOpen] = useState(false);
 
   const load = async () => {
     setFetchError("");
@@ -141,6 +146,10 @@ export function AdminEnrollmentsPanel() {
     });
   }, [enrollments, statusFilter, programFilter, quickFilter, search]);
 
+  const pendingSelectedCount = selectedIds.filter((id) => {
+    const enrollment = enrollments.find((item) => item.id === id);
+    return enrollment?.status === "pending";
+  }).length;
   const pendingCount = enrollments.filter((e) => e.status === "pending").length;
   const pendingFilteredIds = filtered.filter((e) => e.status === "pending").map((e) => e.id);
   const allPendingSelected =
@@ -291,6 +300,7 @@ export function AdminEnrollmentsPanel() {
       playPortalSound("adminApprove");
       toast.success(data.message ?? "Bulk approval complete.");
       setSelectedIds([]);
+      setBulkConfirmOpen(false);
       await load();
     } else {
       toast.error(data.message ?? data.error ?? "Bulk approval failed.");
@@ -429,15 +439,15 @@ export function AdminEnrollmentsPanel() {
               <CheckSquare size={18} />
               {allPendingSelected ? "Deselect all" : "Select all pending"}
             </button>
-            {selectedIds.length > 0 && (
+            {pendingSelectedCount > 0 && (
               <Button
                 size="sm"
                 className="gap-2"
                 disabled={bulkLoading}
-                onClick={bulkApprove}
+                onClick={() => setBulkConfirmOpen(true)}
               >
                 <CheckCircle size={16} weight="duotone" />
-                Approve selected ({selectedIds.length})
+                Approve selected ({pendingSelectedCount})
               </Button>
             )}
           </div>
@@ -593,21 +603,28 @@ export function AdminEnrollmentsPanel() {
                     {screenshotUrl && (
                       <div className="shrink-0">
                         <p className="mb-2 text-sm font-semibold">Payment Screenshot</p>
-                        <a
-                          href={screenshotUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="relative block h-52 w-40 overflow-hidden rounded-xl border-2 border-border transition-colors hover:border-primary"
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setZoomScreenshot({
+                              url: screenshotUrl,
+                              caption: `${enrollment.fullName} — payment proof`,
+                            })
+                          }
+                          className="group relative block h-52 w-40 overflow-hidden rounded-xl border-2 border-border transition-colors hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
                         >
                           <Image
                             src={screenshotUrl}
                             alt="Payment"
                             fill
-                            className="object-cover"
+                            className="object-cover transition-transform group-hover:scale-105"
                             unoptimized
                           />
-                        </a>
-                        <p className="mt-1 text-xs text-muted">Tap to enlarge</p>
+                          <span className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-1.5 bg-black/60 py-2 text-xs font-semibold text-white">
+                            <MagnifyingGlass size={14} weight="bold" />
+                            Zoom
+                          </span>
+                        </button>
                       </div>
                     )}
                   </div>
@@ -680,6 +697,38 @@ export function AdminEnrollmentsPanel() {
           })
         )}
       </div>
+
+      <ImageLightbox
+        open={Boolean(zoomScreenshot)}
+        onClose={() => setZoomScreenshot(null)}
+        src={zoomScreenshot?.url ?? ""}
+        alt="Payment screenshot"
+        caption={zoomScreenshot?.caption}
+      />
+
+      <Modal
+        open={bulkConfirmOpen}
+        onClose={() => setBulkConfirmOpen(false)}
+        title="Bulk Approve Registrations"
+      >
+        <p className="text-sm text-muted">
+          Approve <strong>{pendingSelectedCount}</strong> pending registration
+          {pendingSelectedCount === 1 ? "" : "s"}? Each student gets a portal account, password
+          saved under Portal Logins, and WhatsApp notification sent.
+        </p>
+        <p className="mt-3 text-sm text-amber-800 rounded-xl bg-amber-50 border border-amber-200 px-3 py-2">
+          Review payment screenshots first — especially returning students with a 2nd application.
+        </p>
+        <div className="mt-6 flex justify-end gap-3">
+          <Button variant="secondary" onClick={() => setBulkConfirmOpen(false)}>
+            Cancel
+          </Button>
+          <Button disabled={bulkLoading} className="gap-2" onClick={() => void bulkApprove()}>
+            <CheckCircle size={18} weight="duotone" />
+            {bulkLoading ? "Approving…" : `Approve ${pendingSelectedCount}`}
+          </Button>
+        </div>
+      </Modal>
 
       <Modal
         open={Boolean(pendingAction)}
