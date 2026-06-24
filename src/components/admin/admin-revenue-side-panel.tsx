@@ -120,10 +120,6 @@ export function AdminRevenueProvider({ children }: { children: ReactNode }) {
     }
   }, [open, stats, loading, refresh]);
 
-  useEffect(() => {
-    void refresh();
-  }, [refresh]);
-
   return (
     <AdminRevenueContext.Provider value={{ open, setOpen, stats, loading, refresh }}>
       {children}
@@ -163,11 +159,6 @@ export function AdminRevenueSidebarCard() {
   const ctx = useAdminRevenueOptional();
   if (!ctx) return null;
 
-  const weekHint =
-    ctx.stats && ctx.stats.thisWeekApproved > 0
-      ? `+${formatMoney(ctx.stats.thisWeekGross, ctx.stats.currency)} this week`
-      : "Tap for full breakdown";
-
   return (
     <button
       type="button"
@@ -182,12 +173,8 @@ export function AdminRevenueSidebarCard() {
           <p className="text-xs font-bold uppercase tracking-wider text-emerald-800">
             Registration Revenue
           </p>
-          <p className="text-sm font-semibold text-emerald-950 truncate">
-            {ctx.stats
-              ? formatMoney(ctx.stats.totalGross, ctx.stats.currency)
-              : "Open panel"}
-          </p>
-          <p className="text-[11px] text-emerald-700/80 truncate">{weekHint}</p>
+          <p className="text-sm font-semibold text-emerald-950 truncate">Open panel</p>
+          <p className="text-[11px] text-emerald-700/80 truncate">Tap for full breakdown</p>
         </div>
         <CaretRight
           size={14}
