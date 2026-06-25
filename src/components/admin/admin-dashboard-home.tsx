@@ -1,326 +1,462 @@
 "use client";
 
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import CountUp from "react-countup";
 import {
   ArrowRight,
-  BookOpen,
-  ChartLineUp,
+  ChartBar,
   ClipboardText,
+  CurrencyCircleDollar,
   GraduationCap,
   Key,
-  Sparkle,
-  Users,
+  TrendDown,
+  TrendUp,
   VideoCamera,
 } from "@phosphor-icons/react";
+import { AdminDashboardSkeleton } from "@/components/admin/admin-dashboard-skeleton";
+import type { AdminDashboardData } from "@/lib/api/admin-dashboard";
 import { cn } from "@/lib/utils";
-
-export interface AdminDashboardStats {
-  pendingEnrollments: number;
-  approvedEnrollments: number;
-  totalEnrollments: number;
-  students: number;
-  trainerAssignedStudents: number;
-  missingTrainerAssignments: number;
-  returningRegistrations: number;
-  assignments: number;
-  upcomingSessions: number;
-}
 
 const pressable =
   "cursor-pointer transition-all duration-150 ease-out hover:scale-[1.02] active:scale-90 select-none";
 
-interface AdminDashboardHomeProps {
-  stats: AdminDashboardStats;
+export function AdminDashboardLoader() {
+  const [data, setData] = useState<AdminDashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/admin/dashboard", { cache: "no-store" });
+      const json = await res.json();
+      if (json.success && json.data) {
+        setData(json.data);
+      } else {
+        setError(json.error ?? "Could not load dashboard");
+      }
+    } catch {
+      setError("Could not load dashboard");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  if (loading) return <AdminDashboardSkeleton />;
+  if (error || !data) {
+    return (
+      <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center">
+        <p className="text-sm font-semibold text-red-800">{error ?? "Something went wrong"}</p>
+        <button
+          type="button"
+          onClick={() => void load()}
+          className={cn(pressable, "mt-3 text-sm font-semibold text-red-700 underline")}
+        >
+          Try again
+        </button>
+      </div>
+    );
+  }
+
+  return <AdminDashboardHome data={data} />;
 }
 
-export function AdminDashboardHome({ stats }: AdminDashboardHomeProps) {
+function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
+  const maxChart = Math.max(...data.chart.flatMap((d) => [d.approved, d.pending]), 1);
+
   return (
-    <div className="flex flex-col h-[calc(100dvh-3.5rem-2.5rem)] max-h-[calc(100dvh-3.5rem-2.5rem)] overflow-hidden">
-      {/* Hero */}
-      <div className="shrink-0 relative overflow-hidden rounded-2xl border border-orange-100/80 bg-gradient-to-br from-orange-500 via-orange-500 to-amber-500 px-4 py-3.5 sm:px-5 sm:py-4 shadow-lg shadow-orange-500/20">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.22)_0%,transparent_55%)]" />
-        <div className="relative flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <div className="flex items-center gap-1.5 text-white/80 text-[10px] font-semibold uppercase tracking-widest">
-              <Sparkle size={12} weight="fill" />
-              Command Center
-            </div>
-            <h1 className="text-lg sm:text-xl font-bold text-white mt-1 tracking-tight">
-              Admin Overview
-            </h1>
-            <p className="text-xs text-white/75 mt-0.5 hidden sm:block">
-              Registrations, students & portal at a glance
-            </p>
-          </div>
+    <div className="flex flex-col h-[calc(100dvh-3.5rem-2.5rem)] max-h-[calc(100dvh-3.5rem-2.5rem)] overflow-hidden gap-2.5">
+      {/* Title row */}
+      <div className="shrink-0 flex items-end justify-between gap-3">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-muted">Overview</p>
+          <h1 className="text-xl font-bold text-foreground tracking-tight">Dashboard</h1>
+        </div>
+        {data.pendingEnrollments > 0 && (
           <Link
             href="/admin/enrollments"
             className={cn(
               pressable,
-              "inline-flex items-center gap-1.5 rounded-xl bg-white/95 px-3 py-2 text-xs font-semibold text-orange-700 shadow-sm hover:bg-white hover:shadow-md shrink-0"
+              "inline-flex items-center gap-1 rounded-xl bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm"
             )}
           >
-            Review
-            <ArrowRight size={14} weight="bold" />
+            {data.pendingEnrollments} pending
+            <ArrowRight size={12} weight="bold" />
           </Link>
-        </div>
+        )}
       </div>
 
-      {/* Metrics */}
-      <div className="shrink-0 grid grid-cols-2 lg:grid-cols-3 gap-2 mt-3">
-        <MetricTile
+      {/* Row 1 — pastel summary cards */}
+      <div className="shrink-0 grid grid-cols-2 lg:grid-cols-4 gap-2">
+        <SummaryCard
           href="/admin/enrollments"
-          label="Pending"
-          value={stats.pendingEnrollments}
-          hint="Awaiting approval"
-          tone="amber"
+          label="Total Registrations"
+          value={data.totalEnrollments}
+          trend="All time submissions"
+          tone="rose"
           icon={<ClipboardText size={18} weight="duotone" />}
-          highlight={stats.pendingEnrollments > 0}
         />
-        <MetricTile
+        <SummaryCard
           href="/admin/enrollments"
-          label="Paid"
-          value={stats.approvedEnrollments}
-          hint={
-            stats.returningRegistrations > 0
-              ? `${stats.returningRegistrations} returning`
-              : "Approved registrations"
-          }
+          label="Paid / Approved"
+          value={data.approvedEnrollments}
+          trend={data.trends.approved}
           tone="emerald"
-          icon={<ChartLineUp size={18} weight="duotone" />}
+          icon={<ChartBar size={18} weight="duotone" />}
         />
-        <MetricTile
+        <SummaryCard
+          href="/admin/enrollments"
+          label="Pending Review"
+          value={data.pendingEnrollments}
+          trend={data.trends.pending}
+          tone="sky"
+          icon={<ClipboardText size={18} weight="duotone" />}
+          pulse={data.pendingEnrollments > 0}
+        />
+        <SummaryCard
           href="/admin/students"
-          label="Students"
-          value={stats.students}
-          hint={
-            stats.missingTrainerAssignments > 0
-              ? `${stats.missingTrainerAssignments} need sync`
-              : `${stats.trainerAssignedStudents} with trainer`
-          }
-          tone="blue"
+          label="Active Students"
+          value={data.students}
+          trend={data.trends.students}
+          tone="amber"
           icon={<GraduationCap size={18} weight="duotone" />}
         />
-        <MetricTile
-          label="Total"
-          value={stats.totalEnrollments}
-          hint="All registrations"
-          tone="slate"
-          icon={<ClipboardText size={18} weight="duotone" />}
+      </div>
+
+      {/* Row 2 — detail cards */}
+      <div className="shrink-0 grid grid-cols-1 md:grid-cols-3 gap-2">
+        <DetailCard
+          href="/admin/enrollments"
+          label="Est. Registration Revenue"
+          value={data.estimatedRevenue}
+          prefix="Rs "
+          trend={data.trends.revenue}
+          icon={<CurrencyCircleDollar size={20} weight="duotone" />}
         />
-        <MetricTile
+        <DetailCard
           href="/admin/credentials"
           label="Portal Logins"
-          value={stats.students}
-          hint="Login accounts"
-          tone="violet"
-          icon={<Key size={18} weight="duotone" />}
+          value={data.loggedInStudents}
+          suffix={` / ${data.students}`}
+          trend={`${data.neverLoggedInStudents} never logged in`}
+          icon={<Key size={20} weight="duotone" />}
         />
-        <MetricTile
+        <DetailCard
           href="/admin/courses"
-          label="Classes"
-          value={stats.upcomingSessions}
-          hint={`${stats.assignments} assignments`}
-          tone="teal"
-          icon={<VideoCamera size={18} weight="duotone" />}
+          label="Upcoming Classes"
+          value={data.upcomingSessions}
+          trend={`${data.assignments} assignments live`}
+          icon={<VideoCamera size={20} weight="duotone" />}
         />
       </div>
 
-      {/* Alert */}
-      {stats.pendingEnrollments > 0 && (
-        <Link
-          href="/admin/enrollments"
-          className={cn(
-            pressable,
-            "shrink-0 mt-2 flex items-center justify-between gap-3 rounded-xl border border-amber-200/80 bg-amber-50/90 px-3 py-2.5 shadow-sm hover:border-amber-300 hover:bg-amber-50"
-          )}
-        >
-          <p className="text-xs font-semibold text-amber-900">
-            {stats.pendingEnrollments} registration{stats.pendingEnrollments === 1 ? "" : "s"} need
-            your review
-          </p>
-          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-800 shrink-0">
-            Open
-            <ArrowRight size={12} weight="bold" />
-          </span>
-        </Link>
-      )}
+      {/* Row 3 — chart + overview */}
+      <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-5 gap-2">
+        {/* Bar chart */}
+        <div className="lg:col-span-3 rounded-xl border border-zinc-200/80 bg-white p-3 shadow-sm flex flex-col min-h-0">
+          <div className="shrink-0 flex items-center justify-between gap-2 mb-2">
+            <div>
+              <h2 className="text-sm font-bold text-foreground">Registrations Activity</h2>
+              <p className="text-[10px] text-muted">Approved vs pending · last 7 days</p>
+            </div>
+            <span className="text-[10px] font-medium text-muted rounded-lg border border-zinc-200 px-2 py-1">
+              This week
+            </span>
+          </div>
+          <div className="flex-1 min-h-0 flex flex-col">
+            <div className="flex-1 flex items-end gap-1.5 sm:gap-2 min-h-[100px] pb-1">
+              {data.chart.map((point) => (
+                <div key={point.label} className="flex-1 flex flex-col items-center gap-1 h-full justify-end">
+                  <div className="w-full flex items-end justify-center gap-0.5 h-[85%]">
+                    <div
+                      className="w-[42%] rounded-t-md bg-orange-300 transition-all duration-500"
+                      style={{ height: `${Math.max(6, (point.approved / maxChart) * 100)}%` }}
+                      title={`Approved: ${point.approved}`}
+                    />
+                    <div
+                      className="w-[42%] rounded-t-md bg-orange-500 transition-all duration-500"
+                      style={{ height: `${Math.max(6, (point.pending / maxChart) * 100)}%` }}
+                      title={`Pending: ${point.pending}`}
+                    />
+                  </div>
+                  <span className="text-[9px] text-muted truncate w-full text-center">{point.label}</span>
+                </div>
+              ))}
+            </div>
+            <div className="shrink-0 flex items-center gap-4 pt-2 border-t border-zinc-100">
+              <span className="inline-flex items-center gap-1.5 text-[10px] text-muted">
+                <span className="h-2 w-2 rounded-sm bg-orange-300" /> Approved
+              </span>
+              <span className="inline-flex items-center gap-1.5 text-[10px] text-muted">
+                <span className="h-2 w-2 rounded-sm bg-orange-500" /> Pending
+              </span>
+            </div>
+          </div>
+        </div>
 
-      {/* Quick access */}
-      <div className="flex-1 min-h-0 flex flex-col mt-3">
-        <p className="shrink-0 text-[10px] font-bold uppercase tracking-widest text-muted mb-2 px-0.5">
-          Quick Access
-        </p>
-        <div className="flex-1 min-h-0 grid grid-cols-2 lg:grid-cols-3 gap-2 content-start">
-          <NavTile
-            href="/admin/enrollments"
-            title="Registrations"
-            subtitle="Approve applications"
-            icon={<ClipboardText size={20} weight="duotone" />}
-            gradient="from-orange-500 to-amber-500"
-          />
-          <NavTile
-            href="/admin/students"
-            title="Students"
-            subtitle="Browse all accounts"
-            icon={<GraduationCap size={20} weight="duotone" />}
-            gradient="from-blue-500 to-indigo-500"
-          />
-          <NavTile
-            href="/admin/credentials"
-            title="Portal Logins"
-            subtitle="IDs & passwords"
-            icon={<Key size={20} weight="duotone" />}
-            gradient="from-amber-500 to-orange-600"
-          />
-          <NavTile
-            href="/admin/trainers"
-            title="Trainers"
-            subtitle="Manage trainers"
-            icon={<Users size={20} weight="duotone" />}
-            gradient="from-violet-500 to-purple-600"
-          />
-          <NavTile
-            href="/admin/courses"
-            title="Courses"
-            subtitle="Materials & content"
-            icon={<BookOpen size={20} weight="duotone" />}
-            gradient="from-emerald-500 to-teal-600"
-          />
+        {/* Overview panel */}
+        <div className="lg:col-span-2 rounded-xl border border-zinc-200/80 bg-white p-3 shadow-sm flex flex-col min-h-0">
+          <div className="shrink-0 flex items-center justify-between gap-2 mb-2">
+            <div>
+              <h2 className="text-sm font-bold text-foreground">Overall Information</h2>
+              <p className="text-[10px] text-muted">Portal & program breakdown</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 shrink-0">
+            <DonutChart
+              first={data.firstTimeRegistrations}
+              returning={data.returningRegistrations}
+            />
+            <div className="flex-1 space-y-2 min-w-0">
+              <OverviewStat
+                label="First-time"
+                value={data.firstTimeRegistrations}
+                badge={data.trends.approved}
+                positive
+              />
+              <OverviewStat
+                label="Returning"
+                value={data.returningRegistrations}
+                badge={`${data.returningRegistrations} re-enrolled`}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-1.5 mt-3 shrink-0">
+            <MiniStat label="Trainers" value={data.trainers} href="/admin/trainers" />
+            <MiniStat label="Web" value={data.webStudents} href="/admin/students" />
+            <MiniStat label="App" value={data.appStudents} href="/admin/students" />
+          </div>
+
+          {data.missingTrainerAssignments > 0 && (
+            <Link
+              href="/admin/settings"
+              className={cn(
+                pressable,
+                "mt-2 shrink-0 rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-2 text-[10px] font-semibold text-amber-900"
+              )}
+            >
+              {data.missingTrainerAssignments} students need trainer sync →
+            </Link>
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-function MetricTile({
+function SummaryCard({
   label,
   value,
-  hint,
+  trend,
   tone,
   icon,
   href,
-  highlight,
+  pulse,
 }: {
   label: string;
   value: number;
-  hint?: string;
-  tone: "amber" | "emerald" | "blue" | "slate" | "violet" | "teal";
+  trend: string;
+  tone: "rose" | "emerald" | "sky" | "amber";
   icon: React.ReactNode;
   href?: string;
-  highlight?: boolean;
+  pulse?: boolean;
 }) {
   const tones = {
-    amber: {
-      wrap: "border-amber-100 bg-gradient-to-br from-amber-50 to-white hover:border-amber-200",
-      icon: "bg-amber-500/10 text-amber-600",
-      value: "text-amber-950",
-    },
-    emerald: {
-      wrap: "border-emerald-100 bg-gradient-to-br from-emerald-50 to-white hover:border-emerald-200",
-      icon: "bg-emerald-500/10 text-emerald-600",
-      value: "text-emerald-950",
-    },
-    blue: {
-      wrap: "border-blue-100 bg-gradient-to-br from-blue-50 to-white hover:border-blue-200",
-      icon: "bg-blue-500/10 text-blue-600",
-      value: "text-blue-950",
-    },
-    slate: {
-      wrap: "border-zinc-100 bg-gradient-to-br from-zinc-50 to-white hover:border-zinc-200",
-      icon: "bg-zinc-500/10 text-zinc-600",
-      value: "text-zinc-950",
-    },
-    violet: {
-      wrap: "border-violet-100 bg-gradient-to-br from-violet-50 to-white hover:border-violet-200",
-      icon: "bg-violet-500/10 text-violet-600",
-      value: "text-violet-950",
-    },
-    teal: {
-      wrap: "border-teal-100 bg-gradient-to-br from-teal-50 to-white hover:border-teal-200",
-      icon: "bg-teal-500/10 text-teal-600",
-      value: "text-teal-950",
-    },
+    rose: { bg: "bg-rose-50", icon: "bg-rose-500 text-white", text: "text-rose-700" },
+    emerald: { bg: "bg-emerald-50", icon: "bg-emerald-500 text-white", text: "text-emerald-700" },
+    sky: { bg: "bg-sky-50", icon: "bg-sky-500 text-white", text: "text-sky-700" },
+    amber: { bg: "bg-amber-50", icon: "bg-amber-500 text-white", text: "text-amber-700" },
   };
-
-  const style = tones[tone];
+  const t = tones[tone];
 
   const inner = (
     <>
-      <div className="flex items-start justify-between gap-2">
-        <div className={cn("flex h-8 w-8 items-center justify-center rounded-lg", style.icon)}>
+      <div className="flex items-center gap-2.5">
+        <div className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-lg", t.icon)}>
           {icon}
         </div>
-        {highlight && (
-          <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse shrink-0 mt-1" />
-        )}
+        <div className="min-w-0">
+          <p className="text-[10px] font-medium text-muted truncate">{label}</p>
+          <p className={cn("text-xl font-bold tabular-nums leading-tight", t.text)}>
+            <CountUp end={value} duration={1.2} separator="," />
+          </p>
+        </div>
+        {pulse && <span className="h-2 w-2 rounded-full bg-sky-500 animate-pulse shrink-0" />}
       </div>
-      <p className="text-[10px] font-semibold uppercase tracking-wide text-muted mt-2">{label}</p>
-      <p className={cn("text-2xl font-bold tabular-nums tracking-tight leading-none mt-0.5", style.value)}>
-        {value}
-      </p>
-      {hint && <p className="text-[10px] text-muted mt-1 line-clamp-1">{hint}</p>}
+      <TrendLine text={trend} />
     </>
   );
 
-  const baseClass = cn(
-    "rounded-xl border p-2.5 shadow-sm text-left block",
-    style.wrap,
-    href && "shadow-sm hover:shadow-md"
-  );
+  const className = cn("rounded-xl border border-zinc-100 p-2.5 block", t.bg);
 
   if (href) {
     return (
-      <Link href={href} className={cn(pressable, baseClass)}>
+      <Link href={href} className={cn(pressable, className, "hover:shadow-sm")}>
         {inner}
       </Link>
     );
   }
-
-  return <div className={baseClass}>{inner}</div>;
+  return <div className={className}>{inner}</div>;
 }
 
-function NavTile({
-  href,
-  title,
-  subtitle,
+function DetailCard({
+  label,
+  value,
+  prefix = "",
+  suffix = "",
+  trend,
   icon,
-  gradient,
+  href,
 }: {
-  href: string;
-  title: string;
-  subtitle: string;
+  label: string;
+  value: number;
+  prefix?: string;
+  suffix?: string;
+  trend: string;
   icon: React.ReactNode;
-  gradient: string;
+  href: string;
 }) {
   return (
     <Link
       href={href}
       className={cn(
         pressable,
-        "group relative overflow-hidden rounded-xl border border-zinc-200/70 bg-white p-3 shadow-sm hover:border-orange-200/60 hover:shadow-md"
+        "rounded-xl border border-zinc-200/80 bg-white p-3 shadow-sm hover:border-orange-200/60 hover:shadow-md block"
       )}
     >
-      <div className="flex items-center gap-3">
-        <div
-          className={cn(
-            "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-white shadow-sm",
-            gradient
-          )}
-        >
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <p className="text-xl font-bold tabular-nums tracking-tight text-foreground">
+            {prefix}
+            <CountUp end={value} duration={1.2} separator="," />
+            {suffix && <span className="text-sm font-semibold text-muted">{suffix}</span>}
+          </p>
+          <p className="text-[11px] text-muted mt-0.5">{label}</p>
+        </div>
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 text-muted">
           {icon}
         </div>
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors truncate">
-            {title}
-          </p>
-          <p className="text-[11px] text-muted truncate">{subtitle}</p>
-        </div>
-        <ArrowRight
-          size={14}
-          weight="bold"
-          className="shrink-0 text-muted opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all"
-        />
       </div>
+      <div className="flex items-center justify-between mt-3 pt-2 border-t border-zinc-100">
+        <TrendLine text={trend} small />
+        <span className="text-[10px] font-semibold text-primary underline underline-offset-2">View</span>
+      </div>
+    </Link>
+  );
+}
+
+function TrendLine({ text, small }: { text: string; small?: boolean }) {
+  const isPositive = text.startsWith("+");
+  const isNegative = text.startsWith("-");
+  const isNeutral = !isPositive && !isNegative;
+
+  return (
+    <p
+      className={cn(
+        "flex items-center gap-1 mt-2 text-[10px]",
+        small && "mt-0",
+        isNegative ? "text-red-600" : isPositive ? "text-emerald-600" : "text-muted"
+      )}
+    >
+      {isPositive && <TrendUp size={11} weight="bold" />}
+      {isNegative && <TrendDown size={11} weight="bold" />}
+      {isNeutral ? text : text}
+    </p>
+  );
+}
+
+function DonutChart({ first, returning }: { first: number; returning: number }) {
+  const total = Math.max(first + returning, 1);
+  const firstPct = (first / total) * 100;
+  const radius = 36;
+  const circumference = 2 * Math.PI * radius;
+  const firstLen = (firstPct / 100) * circumference;
+  const returnLen = circumference - firstLen;
+
+  return (
+    <div className="relative h-24 w-24 shrink-0">
+      <svg viewBox="0 0 96 96" className="h-full w-full -rotate-90">
+        <circle cx="48" cy="48" r={radius} fill="none" stroke="#f4f4f5" strokeWidth="10" />
+        <circle
+          cx="48"
+          cy="48"
+          r={radius}
+          fill="none"
+          stroke="#fb923c"
+          strokeWidth="10"
+          strokeDasharray={`${firstLen} ${returnLen}`}
+          strokeLinecap="round"
+        />
+        <circle
+          cx="48"
+          cy="48"
+          r={radius}
+          fill="none"
+          stroke="#22c55e"
+          strokeWidth="10"
+          strokeDasharray={`${returnLen} ${firstLen}`}
+          strokeDashoffset={-firstLen}
+          strokeLinecap="round"
+        />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span className="text-sm font-bold tabular-nums">{total}</span>
+        <span className="text-[8px] text-muted uppercase">Total</span>
+      </div>
+    </div>
+  );
+}
+
+function OverviewStat({
+  label,
+  value,
+  badge,
+  positive,
+}: {
+  label: string;
+  value: number;
+  badge: string;
+  positive?: boolean;
+}) {
+  return (
+    <div>
+      <p className="text-sm font-bold tabular-nums">
+        <CountUp end={value} duration={1} separator="," />{" "}
+        <span className="text-[11px] font-medium text-muted">{label}</span>
+      </p>
+      <span
+        className={cn(
+          "inline-block mt-0.5 rounded px-1.5 py-0.5 text-[9px] font-bold",
+          positive ? "bg-emerald-100 text-emerald-700" : "bg-orange-100 text-orange-700"
+        )}
+      >
+        {badge}
+      </span>
+    </div>
+  );
+}
+
+function MiniStat({ label, value, href }: { label: string; value: number; href: string }) {
+  return (
+    <Link
+      href={href}
+      className={cn(
+        pressable,
+        "rounded-lg border border-zinc-100 bg-zinc-50/80 px-2 py-2 text-center hover:bg-white hover:border-zinc-200"
+      )}
+    >
+      <p className="text-base font-bold tabular-nums leading-none">
+        <CountUp end={value} duration={1} />
+      </p>
+      <p className="text-[9px] text-muted mt-0.5 font-medium">{label}</p>
     </Link>
   );
 }
