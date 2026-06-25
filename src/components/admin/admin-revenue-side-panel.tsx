@@ -155,26 +155,39 @@ export function AdminRevenueHeaderButton() {
   );
 }
 
-export function AdminRevenueSidebarCard() {
+export function AdminRevenueSidebarCard({ compact = false }: { compact?: boolean }) {
   const ctx = useAdminRevenueOptional();
   if (!ctx) return null;
+
+  if (compact) {
+    return (
+      <button
+        type="button"
+        onClick={() => ctx.setOpen(true)}
+        title="Registration Revenue"
+        aria-label="Open registration revenue panel"
+        className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl border border-emerald-200/80 bg-gradient-to-br from-emerald-50 to-white text-emerald-700 transition-all hover:border-emerald-300 hover:shadow-md"
+      >
+        <CurrencyCircleDollar size={20} weight="duotone" />
+      </button>
+    );
+  }
 
   return (
     <button
       type="button"
       onClick={() => ctx.setOpen(true)}
-      className="w-full rounded-xl border border-emerald-200/80 bg-gradient-to-br from-emerald-50 to-white p-3.5 text-left transition-all hover:border-emerald-300 hover:shadow-md group"
+      className="w-full rounded-xl border border-emerald-200/80 bg-gradient-to-br from-emerald-50 to-white p-3 text-left transition-all hover:border-emerald-300 hover:shadow-md group"
     >
       <div className="flex items-center gap-2.5">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-600 text-white">
-          <CurrencyCircleDollar size={18} weight="duotone" />
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-600 text-white">
+          <CurrencyCircleDollar size={16} weight="duotone" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-bold uppercase tracking-wider text-emerald-800">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-800">
             Registration Revenue
           </p>
           <p className="text-sm font-semibold text-emerald-950 truncate">Open panel</p>
-          <p className="text-[11px] text-emerald-700/80 truncate">Tap for full breakdown</p>
         </div>
         <CaretRight
           size={14}
