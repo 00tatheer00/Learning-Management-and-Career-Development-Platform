@@ -18,7 +18,7 @@ import { PortalPageHeader } from "@/components/portal/portal-ui";
 import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
 import { getProgramCategory } from "@/lib/constants/program-categories";
 import { buildApprovalWhatsAppMessage } from "@/lib/notifications/approval-templates";
-import { formatAppliedDateTime } from "@/lib/utils";
+import { cn, formatAppliedDateTime } from "@/lib/utils";
 import { toast } from "@/lib/ui/toast";
 import type { AdminCredentialRow } from "@/lib/api/admin-credentials";
 
@@ -26,6 +26,8 @@ interface CredentialsMeta {
   total: number;
   saved: number;
   missing: number;
+  loggedIn: number;
+  neverLoggedIn: number;
 }
 
 async function copyText(label: string, value: string) {
@@ -39,11 +41,18 @@ async function copyText(label: string, value: string) {
 
 export function AdminCredentialsPanel() {
   const [rows, setRows] = useState<AdminCredentialRow[]>([]);
-  const [meta, setMeta] = useState<CredentialsMeta>({ total: 0, saved: 0, missing: 0 });
+  const [meta, setMeta] = useState<CredentialsMeta>({
+    total: 0,
+    saved: 0,
+    missing: 0,
+    loggedIn: 0,
+    neverLoggedIn: 0,
+  });
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [programFilter, setProgramFilter] = useState("all");
   const [showMissingOnly, setShowMissingOnly] = useState(false);
+  const [showNeverLoggedInOnly, setShowNeverLoggedInOnly] = useState(false);
   const [visiblePasswords, setVisiblePasswords] = useState<Set<string>>(new Set());
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [bulkGenerating, setBulkGenerating] = useState(false);
@@ -66,7 +75,7 @@ export function AdminCredentialsPanel() {
       const json = await res.json();
       if (json.success) {
         setRows(json.data?.rows ?? []);
-        setMeta(json.data?.meta ?? { total: 0, saved: 0, missing: 0 });
+        setMeta(json.data?.meta ?? { total: 0, saved: 0, missing: 0, loggedIn: 0, neverLoggedIn: 0 });
       } else {
         toast.error(json.error ?? "Could not load portal logins");
       }
@@ -86,13 +95,14 @@ export function AdminCredentialsPanel() {
     return rows.filter((row) => {
       if (programFilter !== "all" && row.programSlug !== programFilter) return false;
       if (showMissingOnly && row.hasStoredPassword) return false;
+      if (showNeverLoggedInOnly && row.hasLoggedIn) return false;
       if (!query) return true;
       return [row.name, row.email, row.whatsapp, row.course, row.module]
         .join(" ")
         .toLowerCase()
         .includes(query);
     });
-  }, [rows, search, programFilter, showMissingOnly]);
+  }, [rows, search, programFilter, showMissingOnly, showNeverLoggedInOnly]);
 
   const togglePassword = (id: string) => {
     setVisiblePasswords((current) => {
@@ -268,7 +278,7 @@ export function AdminCredentialsPanel() {
         description="View and share student portal username and password. Saved automatically on approval."
       />
 
-      <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
         <div className="rounded-xl border border-border bg-background p-4">
           <p className="text-sm text-muted">Approved Students</p>
           <p className="text-2xl font-bold">{meta.total}</p>
@@ -281,7 +291,24 @@ export function AdminCredentialsPanel() {
           <p className="text-sm text-amber-800">Need Password Saved</p>
           <p className="text-2xl font-bold text-amber-900">{meta.missing}</p>
         </div>
+        <div className="rounded-xl border border-blue-200 bg-blue-50 p-4">
+          <p className="text-sm text-blue-800">Portal Login Done</p>
+          <p className="text-2xl font-bold text-blue-900">{meta.loggedIn}</p>
+        </div>
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4">
+          <p className="text-sm text-red-800">Never Logged In</p>
+          <p className="text-2xl font-bold text-red-900">{meta.neverLoggedIn}</p>
+        </div>
       </div>
+
+      {meta.neverLoggedIn > 0 && (
+        <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-900">
+          <strong>{meta.neverLoggedIn} student(s)</strong> have not logged into the portal yet.
+          Use the <strong>No login yet</strong> filter below, then resend login details on WhatsApp.
+          Login tracking starts from this update — students who logged in before may show here until
+          they sign in again.
+        </div>
+      )}
 
       {meta.missing > 0 && (
         <div className="mb-6 rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -333,7 +360,10 @@ export function AdminCredentialsPanel() {
         })}
         <button
           type="button"
-          onClick={() => setShowMissingOnly((value) => !value)}
+          onClick={() => {
+            setShowMissingOnly((value) => !value);
+            if (!showMissingOnly) setShowNeverLoggedInOnly(false);
+          }}
           className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
             showMissingOnly
               ? "bg-amber-600 text-white"
@@ -341,6 +371,20 @@ export function AdminCredentialsPanel() {
           }`}
         >
           Missing only ({meta.missing})
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setShowNeverLoggedInOnly((value) => !value);
+            if (!showNeverLoggedInOnly) setShowMissingOnly(false);
+          }}
+          className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+            showNeverLoggedInOnly
+              ? "bg-red-600 text-white"
+              : "border border-border bg-background text-muted hover:text-foreground"
+          }`}
+        >
+          No login yet ({meta.neverLoggedIn})
         </button>
       </div>
 
@@ -369,12 +413,13 @@ export function AdminCredentialsPanel() {
 
       <div className="overflow-hidden rounded-2xl border border-border bg-background shadow-sm">
         <div className="overflow-x-auto">
-          <table className="min-w-[1100px] w-full text-sm">
+          <table className="min-w-[1200px] w-full text-sm">
             <thead className="border-b border-border bg-surface">
               <tr>
                 <th className="px-4 py-3 text-left font-semibold">Student</th>
                 <th className="px-4 py-3 text-left font-semibold">WhatsApp</th>
                 <th className="px-4 py-3 text-left font-semibold">Course</th>
+                <th className="px-4 py-3 text-left font-semibold">Portal Login</th>
                 <th className="px-4 py-3 text-left font-semibold">Login ID</th>
                 <th className="px-4 py-3 text-left font-semibold">Password</th>
                 <th className="px-4 py-3 text-left font-semibold">Approved</th>
@@ -386,7 +431,13 @@ export function AdminCredentialsPanel() {
                 filtered.map((row) => {
                   const visible = visiblePasswords.has(row.id);
                   return (
-                    <tr key={row.id} className="align-top hover:bg-surface/50">
+                    <tr
+                      key={row.id}
+                      className={cn(
+                        "align-top hover:bg-surface/50",
+                        !row.hasLoggedIn && "bg-red-50/40"
+                      )}
+                    >
                       <td className="px-4 py-4">
                         <p className="font-semibold">{row.name}</p>
                       </td>
@@ -410,6 +461,27 @@ export function AdminCredentialsPanel() {
                         <p className="mt-1 text-xs text-muted">
                           {row.module} · {row.batch}
                         </p>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        {row.hasLoggedIn ? (
+                          <div>
+                            <span className="inline-flex rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-800">
+                              Logged in
+                            </span>
+                            <p className="mt-1.5 text-xs text-muted">
+                              First: {row.firstLoginAt ? formatAppliedDateTime(row.firstLoginAt) : "—"}
+                            </p>
+                            {row.lastLoginAt && row.lastLoginAt !== row.firstLoginAt && (
+                              <p className="text-xs text-muted">
+                                Last: {formatAppliedDateTime(row.lastLoginAt)}
+                              </p>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="inline-flex rounded-full bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-800">
+                            Not yet
+                          </span>
+                        )}
                       </td>
                       <td className="px-4 py-4">
                         <div className="flex items-center gap-2">

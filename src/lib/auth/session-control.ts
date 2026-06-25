@@ -10,6 +10,23 @@ export async function rotateActiveSession(userId: string): Promise<string> {
   return sessionId;
 }
 
+export async function recordUserLogin(userId: string): Promise<void> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { firstLoginAt: true },
+  });
+  if (!user) return;
+
+  const now = new Date();
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      lastLoginAt: now,
+      ...(user.firstLoginAt ? {} : { firstLoginAt: now }),
+    },
+  });
+}
+
 export async function clearActiveSession(userId: string): Promise<void> {
   await prisma.user.update({
     where: { id: userId },

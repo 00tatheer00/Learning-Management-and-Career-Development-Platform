@@ -18,6 +18,7 @@ export async function GET() {
 
   const rows = await getAdminCredentialRows();
   const missingCount = rows.filter((row) => !row.hasStoredPassword).length;
+  const neverLoggedInCount = rows.filter((row) => !row.hasLoggedIn).length;
 
   return NextResponse.json(
     createApiResponse(true, {
@@ -27,6 +28,8 @@ export async function GET() {
           total: rows.length,
           saved: rows.length - missingCount,
           missing: missingCount,
+          loggedIn: rows.length - neverLoggedInCount,
+          neverLoggedIn: neverLoggedInCount,
         },
       },
     })

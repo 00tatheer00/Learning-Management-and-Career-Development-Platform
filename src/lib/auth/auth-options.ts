@@ -5,6 +5,7 @@ import { verifyPassword } from "@/lib/auth/password";
 import {
   clearActiveSession,
   isActiveSession,
+  recordUserLogin,
   rotateActiveSession,
 } from "@/lib/auth/session-control";
 import { prisma } from "@/lib/prisma";
@@ -86,6 +87,8 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
         token.role = (user as { role: UserRole }).role;
         token.sessionInvalid = false;
+
+        await recordUserLogin(user.id);
 
         if (token.role === "student") {
           token.sessionId = await rotateActiveSession(user.id);

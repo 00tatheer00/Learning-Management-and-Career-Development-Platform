@@ -15,6 +15,9 @@ export interface AdminCredentialRow {
   batch: string;
   password: string | null;
   hasStoredPassword: boolean;
+  hasLoggedIn: boolean;
+  firstLoginAt: string | null;
+  lastLoginAt: string | null;
   approvedAt: string | null;
   loginUrl: string;
 }
@@ -61,6 +64,9 @@ export async function getAdminCredentialRows(): Promise<AdminCredentialRow[]> {
       batch: student.batch ?? enrollment?.batch ?? "—",
       password,
       hasStoredPassword: Boolean(password),
+      hasLoggedIn: Boolean(student.firstLoginAt),
+      firstLoginAt: student.firstLoginAt?.toISOString() ?? null,
+      lastLoginAt: student.lastLoginAt?.toISOString() ?? null,
       approvedAt: enrollment?.reviewedAt?.toISOString() ?? student.createdAt.toISOString(),
       loginUrl,
     };

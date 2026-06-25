@@ -59,6 +59,8 @@ model User {
   imagePosition  String?
   isActive       Boolean  @default(true)
   activeSessionId String?
+  firstLoginAt   DateTime?
+  lastLoginAt    DateTime?
   createdAt      DateTime @default(now())
 }
 
