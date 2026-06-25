@@ -105,7 +105,7 @@ export function QuickActionCard({
     <a
       href={href}
       className={cn(
-        "group flex items-center border border-border bg-background hover:border-primary/30 hover:shadow-sm transition-all",
+        "group flex items-center border border-border bg-background hover:border-primary/30 hover:shadow-sm transition-all duration-150 ease-out cursor-pointer hover:scale-[1.02] active:scale-90 select-none",
         compact ? "gap-2.5 rounded-xl p-2.5" : "items-start gap-4 rounded-2xl p-5 hover:shadow-md"
       )}
     >

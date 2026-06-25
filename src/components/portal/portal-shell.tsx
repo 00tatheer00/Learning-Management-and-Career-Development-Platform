@@ -228,7 +228,7 @@ function SidebarContent({
               onClick={onToggleCollapse}
               title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
               aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-              className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/15 text-white/90 hover:bg-white/25 hover:text-white transition-all"
+              className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/15 text-white/90 hover:bg-white/25 hover:text-white transition-all duration-150 ease-out cursor-pointer hover:scale-[1.02] active:scale-90 select-none"
             >
               <SidebarSimple
                 size={18}
@@ -309,7 +309,7 @@ function SidebarContent({
               title={collapsed ? item.label : item.description}
               aria-label={item.label}
               className={cn(
-                "relative flex items-center rounded-lg transition-all duration-150",
+                "relative flex items-center rounded-lg transition-all duration-150 ease-out cursor-pointer hover:scale-[1.02] active:scale-90 select-none",
                 collapsed ? "justify-center p-2.5" : "gap-2.5 px-3 py-2",
                 active
                   ? "bg-white text-primary font-semibold shadow-sm ring-1 ring-orange-100"
@@ -347,7 +347,7 @@ function SidebarContent({
           onClick={onLogout}
           title={collapsed ? "Logout" : undefined}
           className={cn(
-            "flex w-full items-center rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors",
+            "flex w-full items-center rounded-lg text-sm font-medium transition-all duration-150 ease-out cursor-pointer hover:scale-[1.02] active:scale-90 select-none text-red-600 hover:bg-red-50",
             collapsed ? "justify-center p-2.5" : "gap-2.5 px-3 py-2"
           )}
         >

@@ -173,7 +173,7 @@ export function AdminRevenueSidebarCard({
         title="Registration Revenue"
         aria-label="Open registration revenue panel"
         className={cn(
-          "mx-auto flex h-9 w-9 items-center justify-center rounded-lg transition-all",
+          "mx-auto flex h-9 w-9 items-center justify-center rounded-lg transition-all duration-150 ease-out cursor-pointer hover:scale-[1.02] active:scale-90 select-none",
           dark
             ? "border border-emerald-500/20 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
             : "border border-emerald-200/80 bg-emerald-50 text-emerald-700 hover:border-emerald-300"
@@ -189,7 +189,7 @@ export function AdminRevenueSidebarCard({
       type="button"
       onClick={() => ctx.setOpen(true)}
       className={cn(
-        "w-full rounded-lg p-2.5 text-left transition-all group",
+        "w-full rounded-lg p-2.5 text-left transition-all duration-150 ease-out cursor-pointer hover:scale-[1.02] active:scale-90 select-none group",
         dark
           ? "border border-emerald-500/20 bg-emerald-500/10 hover:bg-emerald-500/15"
           : "border border-emerald-200/80 bg-gradient-to-br from-emerald-50 to-white hover:border-emerald-300 hover:shadow-sm"
