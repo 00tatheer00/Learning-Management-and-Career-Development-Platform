@@ -2,7 +2,10 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth/session";
 import { createApiResponse } from "@/lib/api/enrollment";
-import { getAdminCredentialRows } from "@/lib/api/admin-credentials";
+import {
+  getAdminCredentialRows,
+  updateStudentLoginDetails,
+} from "@/lib/api/admin-credentials";
 import { generateMissingPortalPasswords } from "@/lib/api/admin-credentials-bulk";
 
 export async function GET() {
@@ -26,6 +29,55 @@ export async function GET() {
           missing: missingCount,
         },
       },
+    })
+  );
+}
+
+const patchSchema = z.object({
+  id: z.string(),
+  email: z.string().email().optional(),
+  phone: z.string().optional(),
+});
+
+export async function PATCH(request: Request) {
+  const user = await getCurrentUser();
+  if (!user || user.role !== "admin") {
+    return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), {
+      status: 403,
+    });
+  }
+
+  const body = await request.json();
+  const parsed = patchSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      createApiResponse(false, { message: parsed.error.issues[0]?.message }),
+      { status: 400 }
+    );
+  }
+
+  if (!parsed.data.email && parsed.data.phone === undefined) {
+    return NextResponse.json(
+      createApiResponse(false, { message: "Provide login ID or phone to update." }),
+      { status: 400 }
+    );
+  }
+
+  const result = await updateStudentLoginDetails(parsed.data.id, {
+    email: parsed.data.email,
+    phone: parsed.data.phone,
+  });
+
+  if (!result.success) {
+    return NextResponse.json(createApiResponse(false, { error: result.error }), {
+      status: result.error === "Student not found" ? 404 : 409,
+    });
+  }
+
+  return NextResponse.json(
+    createApiResponse(true, {
+      message: result.message,
+      data: { email: result.email, phone: result.phone },
     })
   );
 }

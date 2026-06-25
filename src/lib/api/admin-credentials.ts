@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { decryptPortalPassword } from "@/lib/auth/portal-password-vault";
+import { getUserByEmail, updateUser } from "@/lib/auth/users";
 import { getProgramBySlug } from "@/lib/data/programs";
 import { getPortalLoginUrl } from "@/lib/site-url";
 
@@ -64,4 +65,49 @@ export async function getAdminCredentialRows(): Promise<AdminCredentialRow[]> {
       loginUrl,
     };
   });
+}
+
+export async function updateStudentLoginDetails(
+  studentId: string,
+  updates: { email?: string; phone?: string }
+): Promise<{ success: boolean; error?: string; message?: string; email?: string; phone?: string }> {
+  const student = await prisma.user.findUnique({ where: { id: studentId } });
+  if (!student || student.role !== "student") {
+    return { success: false, error: "Student not found" };
+  }
+
+  let nextEmail = student.email;
+  let nextPhone = student.phone ?? undefined;
+
+  const emailInput = updates.email?.trim().toLowerCase();
+  if (emailInput && emailInput !== student.email.toLowerCase()) {
+    const existing = await getUserByEmail(emailInput);
+    if (existing && existing.id !== studentId) {
+      return { success: false, error: "This login ID (email) is already in use." };
+    }
+
+    const oldEmail = student.email.toLowerCase();
+    await prisma.user.update({
+      where: { id: studentId },
+      data: { email: emailInput },
+    });
+    await prisma.enrollment.updateMany({
+      where: { email: oldEmail },
+      data: { email: emailInput },
+    });
+    nextEmail = emailInput;
+  }
+
+  if (updates.phone !== undefined) {
+    const trimmed = updates.phone.trim();
+    await updateUser(studentId, { phone: trimmed || undefined });
+    nextPhone = trimmed || undefined;
+  }
+
+  return {
+    success: true,
+    message: "Login details updated.",
+    email: nextEmail,
+    phone: nextPhone ?? "",
+  };
 }

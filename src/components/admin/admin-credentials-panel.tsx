@@ -9,6 +9,7 @@ import {
   MagnifyingGlass,
   ArrowClockwise,
   ChatsCircle,
+  PencilSimple,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -54,6 +55,9 @@ export function AdminCredentialsPanel() {
     course: string;
     module: string;
   } | null>(null);
+  const [editRow, setEditRow] = useState<AdminCredentialRow | null>(null);
+  const [editEmail, setEditEmail] = useState("");
+  const [editPhone, setEditPhone] = useState("");
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -151,6 +155,60 @@ export function AdminCredentialsPanel() {
       toast.error("Bulk generate failed");
     } finally {
       setBulkGenerating(false);
+    }
+  };
+
+  const openEditLogin = (row: AdminCredentialRow) => {
+    setEditRow(row);
+    setEditEmail(row.email);
+    setEditPhone(row.whatsapp === "—" ? "" : row.whatsapp);
+  };
+
+  const saveEditLogin = async () => {
+    if (!editRow) return;
+    const email = editEmail.trim();
+    if (!email) {
+      toast.error("Login ID (email) is required");
+      return;
+    }
+
+    setLoadingId(editRow.id);
+    try {
+      const res = await fetch("/api/admin/credentials", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: editRow.id,
+          email,
+          phone: editPhone.trim(),
+        }),
+      });
+      const json = await res.json();
+      if (!json.success) {
+        toast.error(json.error ?? json.message ?? "Update failed");
+        return;
+      }
+
+      const updatedEmail = (json.data?.email as string | undefined) ?? email;
+      const updatedPhone = (json.data?.phone as string | undefined) ?? editPhone.trim();
+
+      setRows((current) =>
+        current.map((item) =>
+          item.id === editRow.id
+            ? {
+                ...item,
+                email: updatedEmail,
+                whatsapp: updatedPhone || "—",
+              }
+            : item
+        )
+      );
+      toast.success(json.message ?? "Login details updated.");
+      setEditRow(null);
+    } catch {
+      toast.error("Update failed");
+    } finally {
+      setLoadingId(null);
     }
   };
 
@@ -315,6 +373,7 @@ export function AdminCredentialsPanel() {
             <thead className="border-b border-border bg-surface">
               <tr>
                 <th className="px-4 py-3 text-left font-semibold">Student</th>
+                <th className="px-4 py-3 text-left font-semibold">WhatsApp</th>
                 <th className="px-4 py-3 text-left font-semibold">Course</th>
                 <th className="px-4 py-3 text-left font-semibold">Login ID</th>
                 <th className="px-4 py-3 text-left font-semibold">Password</th>
@@ -330,7 +389,21 @@ export function AdminCredentialsPanel() {
                     <tr key={row.id} className="align-top hover:bg-surface/50">
                       <td className="px-4 py-4">
                         <p className="font-semibold">{row.name}</p>
-                        <p className="mt-1 text-muted">{row.whatsapp}</p>
+                      </td>
+                      <td className="px-4 py-4">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm">{row.whatsapp}</span>
+                          {row.whatsapp !== "—" && (
+                            <button
+                              type="button"
+                              title="Copy WhatsApp"
+                              onClick={() => void copyText("WhatsApp", row.whatsapp)}
+                              className="rounded-lg border border-border p-1.5 hover:bg-surface shrink-0"
+                            >
+                              <Copy size={14} />
+                            </button>
+                          )}
+                        </div>
                       </td>
                       <td className="px-4 py-4">
                         <p className="font-medium">{row.course}</p>
@@ -341,6 +414,14 @@ export function AdminCredentialsPanel() {
                       <td className="px-4 py-4">
                         <div className="flex items-center gap-2">
                           <span className="font-mono text-xs">{row.email}</span>
+                          <button
+                            type="button"
+                            title="Edit login ID"
+                            onClick={() => openEditLogin(row)}
+                            className="rounded-lg border border-border p-1.5 hover:bg-surface"
+                          >
+                            <PencilSimple size={14} />
+                          </button>
                           <button
                             type="button"
                             title="Copy login ID"
@@ -447,6 +528,47 @@ export function AdminCredentialsPanel() {
           </table>
         </div>
       </div>
+
+      <Modal
+        open={Boolean(editRow)}
+        onClose={() => setEditRow(null)}
+        title="Edit Login Details"
+      >
+        {editRow && (
+          <div className="space-y-4">
+            <p className="text-sm text-muted">
+              Update portal login for <strong>{editRow.name}</strong>. Changing the login ID updates
+              their email for sign-in and linked registrations.
+            </p>
+            <label className="block text-sm">
+              <span className="font-medium">Login ID (email)</span>
+              <Input
+                type="email"
+                value={editEmail}
+                onChange={(e) => setEditEmail(e.target.value)}
+                className="mt-1.5 font-mono text-sm"
+              />
+            </label>
+            <label className="block text-sm">
+              <span className="font-medium">WhatsApp / phone</span>
+              <Input
+                value={editPhone}
+                onChange={(e) => setEditPhone(e.target.value)}
+                placeholder="03xx-xxxxxxx"
+                className="mt-1.5"
+              />
+            </label>
+            <div className="flex justify-end gap-3 pt-2">
+              <Button variant="secondary" onClick={() => setEditRow(null)}>
+                Cancel
+              </Button>
+              <Button disabled={loadingId === editRow.id} onClick={() => void saveEditLogin()}>
+                Save Changes
+              </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
 
       <Modal
         open={Boolean(credentialModal)}
