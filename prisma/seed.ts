@@ -12,7 +12,7 @@ const DEFAULT_USERS = [
     email: "admin@eest.com",
     password: "admin@321",
     role: "admin" as const,
-    name: "Admin User",
+    name: "Tatheer Hussain",
     phone: "03374005515",
     avatarInitials: "AU",
   },

@@ -35,6 +35,7 @@ interface StatCardProps {
   value: string | number;
   hint?: string;
   accent?: "orange" | "green" | "blue" | "slate";
+  compact?: boolean;
 }
 
 const accentStyles = {
@@ -44,12 +45,25 @@ const accentStyles = {
   slate: "border-slate-200 bg-slate-50 text-slate-700",
 };
 
-export function StatCard({ label, value, hint, accent = "orange" }: StatCardProps) {
+export function StatCard({ label, value, hint, accent = "orange", compact = false }: StatCardProps) {
   return (
-    <div className={cn("rounded-2xl border-2 p-5 sm:p-6", accentStyles[accent])}>
-      <p className="text-sm font-medium opacity-80">{label}</p>
-      <p className="text-3xl sm:text-4xl font-bold mt-1">{value}</p>
-      {hint && <p className="text-xs mt-2 opacity-70">{hint}</p>}
+    <div
+      className={cn(
+        accentStyles[accent],
+        compact ? "rounded-xl border p-2.5" : "rounded-2xl border-2 p-5 sm:p-6"
+      )}
+    >
+      <p className={cn("font-medium opacity-80", compact ? "text-[10px] leading-tight" : "text-sm")}>
+        {label}
+      </p>
+      <p className={cn("font-bold", compact ? "text-xl mt-0.5" : "text-3xl sm:text-4xl mt-1")}>
+        {value}
+      </p>
+      {hint && (
+        <p className={cn("opacity-70", compact ? "text-[9px] mt-1 line-clamp-2" : "text-xs mt-2")}>
+          {hint}
+        </p>
+      )}
     </div>
   );
 }
@@ -76,6 +90,7 @@ interface QuickActionCardProps {
   href: string;
   icon: React.ReactNode;
   color?: string;
+  compact?: boolean;
 }
 
 export function QuickActionCard({
@@ -84,20 +99,37 @@ export function QuickActionCard({
   href,
   icon,
   color = "bg-primary/10 text-primary",
+  compact = false,
 }: QuickActionCardProps) {
   return (
     <a
       href={href}
-      className="group flex items-start gap-4 rounded-2xl border border-border bg-background p-5 hover:border-primary/30 hover:shadow-md transition-all"
+      className={cn(
+        "group flex items-center border border-border bg-background hover:border-primary/30 hover:shadow-sm transition-all",
+        compact ? "gap-2.5 rounded-xl p-2.5" : "items-start gap-4 rounded-2xl p-5 hover:shadow-md"
+      )}
     >
-      <div className={cn("flex h-12 w-12 shrink-0 items-center justify-center rounded-xl", color)}>
+      <div
+        className={cn(
+          "flex shrink-0 items-center justify-center rounded-lg",
+          compact ? "h-8 w-8" : "h-12 w-12 rounded-xl",
+          color
+        )}
+      >
         {icon}
       </div>
-      <div>
-        <p className="font-semibold text-foreground group-hover:text-primary transition-colors">
+      <div className="min-w-0">
+        <p
+          className={cn(
+            "font-semibold text-foreground group-hover:text-primary transition-colors",
+            compact ? "text-xs" : ""
+          )}
+        >
           {title}
         </p>
-        <p className="text-sm text-muted mt-0.5">{description}</p>
+        <p className={cn("text-muted", compact ? "text-[10px] mt-0.5 line-clamp-1" : "text-sm mt-0.5")}>
+          {description}
+        </p>
       </div>
     </a>
   );

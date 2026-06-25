@@ -56,7 +56,7 @@ export const PORTAL_NAV: Record<UserRole, PortalNavItem[]> = {
 export const PORTAL_LABELS: Record<UserRole, string> = {
   student: "Student Portal",
   trainer: "Trainer Portal",
-  admin: "Admin Panel",
+  admin: "Super Admin",
 };
 
 export const PORTAL_COLORS: Record<UserRole, string> = {
