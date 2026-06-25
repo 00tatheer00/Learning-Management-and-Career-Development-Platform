@@ -7,7 +7,6 @@ import {
   ArrowRight,
   ChartBar,
   ClipboardText,
-  CurrencyCircleDollar,
   GraduationCap,
   Key,
   TrendDown,
@@ -69,12 +68,12 @@ export function AdminDashboardLoader() {
 
 function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
   return (
-    <div className="flex flex-col h-[calc(100dvh-3.5rem-2.5rem)] max-h-[calc(100dvh-3.5rem-2.5rem)] overflow-hidden gap-2.5">
+    <div className="flex flex-col h-[calc(100dvh-3.5rem-2.5rem)] max-h-[calc(100dvh-3.5rem-2.5rem)] overflow-hidden gap-3">
       {/* Title row */}
       <div className="shrink-0 flex items-end justify-between gap-3">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-widest text-muted">Overview</p>
-          <h1 className="text-xl font-bold text-foreground tracking-tight">Dashboard</h1>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">Dashboard</h1>
         </div>
         {data.pendingEnrollments > 0 && (
           <Link
@@ -91,7 +90,7 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
       </div>
 
       {/* Row 1 — pastel summary cards */}
-      <div className="shrink-0 grid grid-cols-2 lg:grid-cols-4 gap-2">
+      <div className="shrink-0 grid grid-cols-2 lg:grid-cols-4 gap-3">
         <SummaryCard
           href="/admin/enrollments"
           label="Total Registrations"
@@ -128,43 +127,35 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
       </div>
 
       {/* Row 2 — detail cards */}
-      <div className="shrink-0 grid grid-cols-1 md:grid-cols-3 gap-2">
-        <DetailCard
-          href="/admin/enrollments"
-          label="Est. Registration Revenue"
-          value={data.estimatedRevenue}
-          prefix="Rs "
-          trend={data.trends.revenue}
-          icon={<CurrencyCircleDollar size={20} weight="duotone" />}
-        />
+      <div className="shrink-0 grid grid-cols-1 md:grid-cols-2 gap-3">
         <DetailCard
           href="/admin/credentials"
           label="Portal Logins"
           value={data.loggedInStudents}
           suffix={` / ${data.students}`}
           trend={`${data.neverLoggedInStudents} never logged in`}
-          icon={<Key size={20} weight="duotone" />}
+          icon={<Key size={22} weight="duotone" />}
         />
         <DetailCard
           href="/admin/courses"
           label="Upcoming Classes"
           value={data.upcomingSessions}
           trend={`${data.assignments} assignments live`}
-          icon={<VideoCamera size={20} weight="duotone" />}
+          icon={<VideoCamera size={22} weight="duotone" />}
         />
       </div>
 
       {/* Row 3 — overview + quick access */}
-      <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-2 gap-2 min-h-0">
-        <div className="rounded-xl border border-zinc-200/80 bg-white p-3 shadow-sm flex flex-col">
-          <div className="shrink-0 mb-2">
-            <h2 className="text-sm font-bold text-foreground">Overall Information</h2>
-            <p className="text-[10px] text-muted">Portal & program breakdown</p>
+      <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <div className="rounded-xl border border-zinc-200/80 bg-white p-4 shadow-sm flex flex-col justify-between min-h-0">
+          <div className="shrink-0 mb-3">
+            <h2 className="text-base font-bold text-foreground">Overall Information</h2>
+            <p className="text-xs text-muted mt-0.5">Portal & program breakdown</p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4 flex-1 py-2">
             <DonutChart first={data.firstTimeRegistrations} returning={data.returningRegistrations} />
-            <div className="flex-1 space-y-2 min-w-0">
+            <div className="flex-1 space-y-3 min-w-0">
               <OverviewStat
                 label="First-time"
                 value={data.firstTimeRegistrations}
@@ -179,7 +170,7 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-1.5 mt-3">
+          <div className="grid grid-cols-3 gap-2 mt-auto pt-3 shrink-0">
             <MiniStat label="Trainers" value={data.trainers} href="/admin/trainers" />
             <MiniStat label="Web" value={data.webStudents} href="/admin/students" />
             <MiniStat label="App" value={data.appStudents} href="/admin/students" />
@@ -198,14 +189,14 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
           )}
         </div>
 
-        <div className="rounded-xl border border-zinc-200/80 bg-white p-3 shadow-sm flex flex-col min-h-0">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Quick Access</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 flex-1 content-start">
-            <NavTile href="/admin/enrollments" title="Registrations" subtitle="Approve applications" icon={<ClipboardText size={18} weight="duotone" />} gradient="from-orange-500 to-amber-500" />
-            <NavTile href="/admin/students" title="Students" subtitle="All accounts" icon={<GraduationCap size={18} weight="duotone" />} gradient="from-blue-500 to-indigo-500" />
-            <NavTile href="/admin/credentials" title="Portal Logins" subtitle="IDs & passwords" icon={<Key size={18} weight="duotone" />} gradient="from-amber-500 to-orange-600" />
-            <NavTile href="/admin/trainers" title="Trainers" subtitle="Manage trainers" icon={<ChartBar size={18} weight="duotone" />} gradient="from-violet-500 to-purple-600" />
-            <NavTile href="/admin/courses" title="Courses" subtitle="Materials" icon={<VideoCamera size={18} weight="duotone" />} gradient="from-emerald-500 to-teal-600" />
+        <div className="rounded-xl border border-zinc-200/80 bg-white p-4 shadow-sm flex flex-col min-h-0">
+          <p className="text-xs font-bold uppercase tracking-widest text-zinc-400 mb-3">Quick Access</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 flex-1 content-stretch">
+            <NavTile href="/admin/enrollments" title="Registrations" subtitle="Approve applications" icon={<ClipboardText size={20} weight="duotone" />} gradient="from-orange-500 to-amber-500" />
+            <NavTile href="/admin/students" title="Students" subtitle="All accounts" icon={<GraduationCap size={20} weight="duotone" />} gradient="from-blue-500 to-indigo-500" />
+            <NavTile href="/admin/credentials" title="Portal Logins" subtitle="IDs & passwords" icon={<Key size={20} weight="duotone" />} gradient="from-amber-500 to-orange-600" />
+            <NavTile href="/admin/trainers" title="Trainers" subtitle="Manage trainers" icon={<ChartBar size={20} weight="duotone" />} gradient="from-violet-500 to-purple-600" />
+            <NavTile href="/admin/courses" title="Courses" subtitle="Materials" icon={<VideoCamera size={20} weight="duotone" />} gradient="from-emerald-500 to-teal-600" />
           </div>
         </div>
       </div>
@@ -240,13 +231,13 @@ function SummaryCard({
 
   const inner = (
     <>
-      <div className="flex items-center gap-2.5">
-        <div className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-lg", t.icon)}>
+      <div className="flex items-center gap-3">
+        <div className={cn("flex h-11 w-11 shrink-0 items-center justify-center rounded-xl", t.icon)}>
           {icon}
         </div>
         <div className="min-w-0">
-          <p className="text-[10px] font-medium text-muted truncate">{label}</p>
-          <p className={cn("text-xl font-bold tabular-nums leading-tight", t.text)}>
+          <p className="text-xs font-medium text-muted truncate">{label}</p>
+          <p className={cn("text-2xl font-bold tabular-nums leading-tight", t.text)}>
             <CountUp end={value} duration={1.2} separator="," />
           </p>
         </div>
@@ -256,7 +247,7 @@ function SummaryCard({
     </>
   );
 
-  const className = cn("rounded-xl border border-zinc-100 p-2.5 block", t.bg);
+  const className = cn("rounded-xl border border-zinc-100 p-3.5 block", t.bg);
 
   if (href) {
     return (
@@ -290,25 +281,25 @@ function DetailCard({
       href={href}
       className={cn(
         pressable,
-        "rounded-xl border border-zinc-200/80 bg-white p-3 shadow-sm hover:border-orange-200/60 hover:shadow-md block"
+        "rounded-xl border border-zinc-200/80 bg-white p-5 shadow-sm hover:border-orange-200/60 hover:shadow-md block h-full"
       )}
     >
-      <div className="flex items-start justify-between gap-2">
+      <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xl font-bold tabular-nums tracking-tight text-foreground">
+          <p className="text-3xl font-bold tabular-nums tracking-tight text-foreground">
             {prefix}
             <CountUp end={value} duration={1.2} separator="," />
-            {suffix && <span className="text-sm font-semibold text-muted">{suffix}</span>}
+            {suffix && <span className="text-lg font-semibold text-muted">{suffix}</span>}
           </p>
-          <p className="text-[11px] text-muted mt-0.5">{label}</p>
+          <p className="text-sm text-muted mt-1">{label}</p>
         </div>
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 text-muted">
+        <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-zinc-200 text-muted bg-zinc-50">
           {icon}
         </div>
       </div>
-      <div className="flex items-center justify-between mt-3 pt-2 border-t border-zinc-100">
+      <div className="flex items-center justify-between mt-4 pt-3 border-t border-zinc-100">
         <TrendLine text={trend} small />
-        <span className="text-[10px] font-semibold text-primary underline underline-offset-2">View</span>
+        <span className="text-xs font-semibold text-primary underline underline-offset-2">View</span>
       </div>
     </Link>
   );
@@ -343,7 +334,7 @@ function DonutChart({ first, returning }: { first: number; returning: number }) 
   const returnLen = circumference - firstLen;
 
   return (
-    <div className="relative h-24 w-24 shrink-0">
+    <div className="relative h-28 w-28 shrink-0">
       <svg viewBox="0 0 96 96" className="h-full w-full -rotate-90">
         <circle cx="48" cy="48" r={radius} fill="none" stroke="#f4f4f5" strokeWidth="10" />
         <circle
@@ -369,8 +360,8 @@ function DonutChart({ first, returning }: { first: number; returning: number }) 
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-sm font-bold tabular-nums">{total}</span>
-        <span className="text-[8px] text-muted uppercase">Total</span>
+        <span className="text-base font-bold tabular-nums">{total}</span>
+        <span className="text-[9px] text-muted uppercase">Total</span>
       </div>
     </div>
   );
@@ -389,7 +380,7 @@ function OverviewStat({
 }) {
   return (
     <div>
-      <p className="text-sm font-bold tabular-nums">
+      <p className="text-base font-bold tabular-nums">
         <CountUp end={value} duration={1} separator="," />{" "}
         <span className="text-[11px] font-medium text-muted">{label}</span>
       </p>
@@ -411,13 +402,13 @@ function MiniStat({ label, value, href }: { label: string; value: number; href: 
       href={href}
       className={cn(
         pressable,
-        "rounded-lg border border-zinc-100 bg-zinc-50/80 px-2 py-2 text-center hover:bg-white hover:border-zinc-200"
+        "rounded-xl border border-zinc-100 bg-zinc-50/80 px-3 py-3 text-center hover:bg-white hover:border-zinc-200"
       )}
     >
-      <p className="text-base font-bold tabular-nums leading-none">
+      <p className="text-lg font-bold tabular-nums leading-none">
         <CountUp end={value} duration={1} />
       </p>
-      <p className="text-[9px] text-muted mt-0.5 font-medium">{label}</p>
+      <p className="text-[10px] text-muted mt-1 font-medium">{label}</p>
     </Link>
   );
 }
@@ -440,20 +431,20 @@ function NavTile({
       href={href}
       className={cn(
         pressable,
-        "group flex items-center gap-2.5 rounded-xl border border-zinc-200/70 bg-white p-2.5 hover:border-orange-200/60 hover:shadow-sm"
+        "group flex items-center gap-3 rounded-xl border border-zinc-200/70 bg-white p-3.5 hover:border-orange-200/60 hover:shadow-sm h-full min-h-[4.5rem]"
       )}
     >
       <div
         className={cn(
-          "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br text-white shadow-sm",
+          "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-white shadow-sm",
           gradient
         )}
       >
         {icon}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="text-xs font-semibold text-foreground group-hover:text-primary truncate">{title}</p>
-        <p className="text-[10px] text-muted truncate">{subtitle}</p>
+        <p className="text-sm font-semibold text-foreground group-hover:text-primary truncate">{title}</p>
+        <p className="text-xs text-muted truncate mt-0.5">{subtitle}</p>
       </div>
     </Link>
   );
