@@ -3,12 +3,6 @@ import { getAdminProgramStats } from "@/lib/api/admin-program-stats";
 import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
 import { revenueFromStudents } from "@/lib/constants/revenue-split";
 
-export interface DashboardChartPoint {
-  label: string;
-  approved: number;
-  pending: number;
-}
-
 export interface AdminDashboardData {
   pendingEnrollments: number;
   approvedEnrollments: number;
@@ -26,17 +20,12 @@ export interface AdminDashboardData {
   firstTimeRegistrations: number;
   webStudents: number;
   appStudents: number;
-  chart: DashboardChartPoint[];
   trends: {
     approved: string;
     pending: string;
     students: string;
     revenue: string;
   };
-}
-
-function formatShortDate(date: Date) {
-  return date.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
 }
 
 function percentChange(current: number, previous: number) {
@@ -56,9 +45,6 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const prevMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-  const chartStart = new Date(now);
-  chartStart.setDate(chartStart.getDate() - 6);
-  chartStart.setHours(0, 0, 0, 0);
 
   const [
     programStats,
@@ -66,7 +52,6 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     sessions,
     trainers,
     studentsWithLogin,
-    enrollmentsForChart,
     approvedThisMonth,
     approvedPrevMonth,
     pendingThisMonth,
@@ -80,11 +65,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     prisma.user.count({ where: { role: "trainer", isActive: true } }),
     prisma.user.findMany({
       where: { role: "student", isActive: true },
-      select: { firstLoginAt: true, programSlug: true, createdAt: true },
-    }),
-    prisma.enrollment.findMany({
-      where: { createdAt: { gte: chartStart } },
-      select: { status: true, createdAt: true, email: true },
+      select: { firstLoginAt: true, programSlug: true },
     }),
     prisma.enrollment.count({
       where: { status: "approved", reviewedAt: { gte: monthStart } },
@@ -130,24 +111,6 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   const firstTimeRegistrations =
     programStats.approvedRegistrations - programStats.returningRegistrations;
 
-  const chart: DashboardChartPoint[] = [];
-  for (let i = 0; i < 7; i++) {
-    const day = new Date(chartStart);
-    day.setDate(chartStart.getDate() + i);
-    const nextDay = new Date(day);
-    nextDay.setDate(day.getDate() + 1);
-
-    const dayRows = enrollmentsForChart.filter(
-      (row) => row.createdAt >= day && row.createdAt < nextDay
-    );
-
-    chart.push({
-      label: formatShortDate(day),
-      approved: dayRows.filter((row) => row.status === "approved").length,
-      pending: dayRows.filter((row) => row.status === "pending").length,
-    });
-  }
-
   const revenue = revenueFromStudents(programStats.approvedRegistrations);
 
   return {
@@ -167,7 +130,6 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     firstTimeRegistrations,
     webStudents,
     appStudents,
-    chart,
     trends: {
       approved: trendLabel(percentChange(approvedThisMonth, approvedPrevMonth)),
       pending: trendLabel(percentChange(pendingThisMonth, pendingPrevMonth)),

@@ -9,8 +9,16 @@ import {
 import { getAssignments, getLiveSessions, getSubmissions } from "@/lib/api/portal-data";
 import { getUsersByRole } from "@/lib/auth/users";
 import { groupStudentsByModule } from "@/lib/trainer/group-students-by-module";
-import { PortalPageHeader, StatCard, QuickActionCard } from "@/components/portal/portal-ui";
+import {
+  PortalPageHeader,
+  PortalSectionTitle,
+  PortalSurfaceCard,
+  StatCard,
+  QuickActionCard,
+  portalPressable,
+} from "@/components/portal/portal-ui";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export default async function TrainerDashboardPage() {
   const user = await getCurrentUser();
@@ -19,7 +27,9 @@ export default async function TrainerDashboardPage() {
   const programSlug = user.programSlug;
   if (!programSlug) {
     return (
-      <p className="text-muted">Your trainer account is not linked to a course yet. Contact admin.</p>
+      <PortalSurfaceCard className="p-6 text-sm text-zinc-500">
+        Your trainer account is not linked to a course yet. Contact admin.
+      </PortalSurfaceCard>
     );
   }
 
@@ -46,52 +56,60 @@ export default async function TrainerDashboardPage() {
   const upcomingSessions = sessions.filter((s) => s.date >= today).length;
 
   return (
-    <div>
+    <div className="space-y-4">
       <PortalPageHeader
+        eyebrow="Trainer Portal"
         title={`Welcome, ${user.name.split(" ")[0]}!`}
-        description={`${designation} · ${courseTitle}. Manage your students, classes, and assignments here.`}
+        description={`${designation} · ${courseTitle}`}
       >
-        <Button size="lg" asChild>
+        <Button size="sm" asChild className="h-8 text-xs">
           <Link href="/trainer/classes">Schedule Class</Link>
         </Button>
       </PortalPageHeader>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard label="My Students" value={students.length} accent="blue" />
-        <StatCard label="Assignments" value={assignments.length} accent="orange" />
-        <StatCard label="Upcoming Classes" value={upcomingSessions} accent="green" />
-        <StatCard label="To Review" value={pendingReviews} accent="slate" hint="Pending submissions" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+        <StatCard compact label="My Students" value={students.length} accent="blue" icon={<Users size={16} weight="duotone" />} href="/trainer/students" />
+        <StatCard compact label="Assignments" value={assignments.length} accent="orange" icon={<ClipboardText size={16} weight="duotone" />} href="/trainer/assignments" />
+        <StatCard compact label="Upcoming Classes" value={upcomingSessions} accent="green" icon={<VideoCamera size={16} weight="duotone" />} href="/trainer/classes" />
+        <StatCard compact label="To Review" value={pendingReviews} accent="slate" hint="Pending submissions" icon={<ClipboardText size={16} weight="duotone" />} href="/trainer/assignments" />
       </div>
 
       {moduleGroups.length > 0 && (
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold">Students by Module</h2>
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/trainer/students">View all</Link>
-            </Button>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div>
+          <PortalSectionTitle
+            title="Students by Module"
+            action={
+              <Button variant="outline" size="sm" asChild className="h-7 text-xs">
+                <Link href="/trainer/students">View all</Link>
+              </Button>
+            }
+          />
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {moduleGroups.map((group) => (
               <Link
                 key={group.moduleName}
                 href={`/trainer/students?module=${encodeURIComponent(group.moduleName)}`}
-                className="rounded-xl border border-border bg-background p-4 hover:border-primary/30 hover:shadow-sm transition-all"
+                className={cn(
+                  portalPressable,
+                  "rounded-xl border border-zinc-200/80 bg-white p-3 shadow-sm hover:border-orange-200/60 hover:shadow-md block"
+                )}
               >
-                <p className="text-xs font-semibold text-muted truncate">{group.moduleName}</p>
-                <p className="text-2xl font-bold mt-1">{group.students.length}</p>
+                <p className="text-[10px] font-semibold text-zinc-500 truncate">{group.moduleName}</p>
+                <p className="text-xl font-bold tabular-nums text-zinc-900 mt-0.5">{group.students.length}</p>
               </Link>
             ))}
           </div>
         </div>
       )}
 
-      <h2 className="text-lg font-bold mb-4">Quick Actions</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <QuickActionCard href="/trainer/students" title="View Students" description={`Students in ${courseTitle}`} icon={<Users size={24} weight="duotone" />} color="bg-blue-500/10 text-blue-600" />
-        <QuickActionCard href="/trainer/classes" title="Live Classes" description="Schedule and share class links" icon={<VideoCamera size={24} weight="duotone" />} />
-        <QuickActionCard href="/trainer/assignments" title="Assignments" description="Create homework and review submissions" icon={<ClipboardText size={24} weight="duotone" />} color="bg-orange-500/10 text-orange-600" />
-        <QuickActionCard href="/trainer/materials" title="Course Videos" description="View learning materials for your course" icon={<BookOpen size={24} weight="duotone" />} color="bg-emerald-500/10 text-emerald-600" />
+      <div>
+        <PortalSectionTitle title="Quick Access" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <QuickActionCard compact href="/trainer/students" title="View Students" description={`Students in ${courseTitle}`} icon={<Users size={18} weight="duotone" />} gradient="from-blue-500 to-indigo-500" />
+          <QuickActionCard compact href="/trainer/classes" title="Live Classes" description="Schedule & share links" icon={<VideoCamera size={18} weight="duotone" />} gradient="from-orange-500 to-amber-500" />
+          <QuickActionCard compact href="/trainer/assignments" title="Assignments" description="Create & review work" icon={<ClipboardText size={18} weight="duotone" />} gradient="from-violet-500 to-purple-600" />
+          <QuickActionCard compact href="/trainer/materials" title="Course Videos" description="Learning materials" icon={<BookOpen size={18} weight="duotone" />} gradient="from-emerald-500 to-teal-600" />
+        </div>
       </div>
     </div>
   );

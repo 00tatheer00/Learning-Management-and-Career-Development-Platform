@@ -68,8 +68,6 @@ export function AdminDashboardLoader() {
 }
 
 function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
-  const maxChart = Math.max(...data.chart.flatMap((d) => [d.approved, d.pending]), 1);
-
   return (
     <div className="flex flex-col h-[calc(100dvh-3.5rem-2.5rem)] max-h-[calc(100dvh-3.5rem-2.5rem)] overflow-hidden gap-2.5">
       {/* Title row */}
@@ -156,64 +154,16 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
         />
       </div>
 
-      {/* Row 3 — chart + overview */}
-      <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-5 gap-2">
-        {/* Bar chart */}
-        <div className="lg:col-span-3 rounded-xl border border-zinc-200/80 bg-white p-3 shadow-sm flex flex-col min-h-0">
-          <div className="shrink-0 flex items-center justify-between gap-2 mb-2">
-            <div>
-              <h2 className="text-sm font-bold text-foreground">Registrations Activity</h2>
-              <p className="text-[10px] text-muted">Approved vs pending · last 7 days</p>
-            </div>
-            <span className="text-[10px] font-medium text-muted rounded-lg border border-zinc-200 px-2 py-1">
-              This week
-            </span>
-          </div>
-          <div className="flex-1 min-h-0 flex flex-col">
-            <div className="flex-1 flex items-end gap-1.5 sm:gap-2 min-h-[100px] pb-1">
-              {data.chart.map((point) => (
-                <div key={point.label} className="flex-1 flex flex-col items-center gap-1 h-full justify-end">
-                  <div className="w-full flex items-end justify-center gap-0.5 h-[85%]">
-                    <div
-                      className="w-[42%] rounded-t-md bg-orange-300 transition-all duration-500"
-                      style={{ height: `${Math.max(6, (point.approved / maxChart) * 100)}%` }}
-                      title={`Approved: ${point.approved}`}
-                    />
-                    <div
-                      className="w-[42%] rounded-t-md bg-orange-500 transition-all duration-500"
-                      style={{ height: `${Math.max(6, (point.pending / maxChart) * 100)}%` }}
-                      title={`Pending: ${point.pending}`}
-                    />
-                  </div>
-                  <span className="text-[9px] text-muted truncate w-full text-center">{point.label}</span>
-                </div>
-              ))}
-            </div>
-            <div className="shrink-0 flex items-center gap-4 pt-2 border-t border-zinc-100">
-              <span className="inline-flex items-center gap-1.5 text-[10px] text-muted">
-                <span className="h-2 w-2 rounded-sm bg-orange-300" /> Approved
-              </span>
-              <span className="inline-flex items-center gap-1.5 text-[10px] text-muted">
-                <span className="h-2 w-2 rounded-sm bg-orange-500" /> Pending
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Overview panel */}
-        <div className="lg:col-span-2 rounded-xl border border-zinc-200/80 bg-white p-3 shadow-sm flex flex-col min-h-0">
-          <div className="shrink-0 flex items-center justify-between gap-2 mb-2">
-            <div>
-              <h2 className="text-sm font-bold text-foreground">Overall Information</h2>
-              <p className="text-[10px] text-muted">Portal & program breakdown</p>
-            </div>
+      {/* Row 3 — overview + quick access */}
+      <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-2 gap-2 min-h-0">
+        <div className="rounded-xl border border-zinc-200/80 bg-white p-3 shadow-sm flex flex-col">
+          <div className="shrink-0 mb-2">
+            <h2 className="text-sm font-bold text-foreground">Overall Information</h2>
+            <p className="text-[10px] text-muted">Portal & program breakdown</p>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
-            <DonutChart
-              first={data.firstTimeRegistrations}
-              returning={data.returningRegistrations}
-            />
+          <div className="flex items-center gap-3">
+            <DonutChart first={data.firstTimeRegistrations} returning={data.returningRegistrations} />
             <div className="flex-1 space-y-2 min-w-0">
               <OverviewStat
                 label="First-time"
@@ -229,7 +179,7 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-1.5 mt-3 shrink-0">
+          <div className="grid grid-cols-3 gap-1.5 mt-3">
             <MiniStat label="Trainers" value={data.trainers} href="/admin/trainers" />
             <MiniStat label="Web" value={data.webStudents} href="/admin/students" />
             <MiniStat label="App" value={data.appStudents} href="/admin/students" />
@@ -240,12 +190,23 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
               href="/admin/settings"
               className={cn(
                 pressable,
-                "mt-2 shrink-0 rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-2 text-[10px] font-semibold text-amber-900"
+                "mt-2 rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-2 text-[10px] font-semibold text-amber-900"
               )}
             >
               {data.missingTrainerAssignments} students need trainer sync →
             </Link>
           )}
+        </div>
+
+        <div className="rounded-xl border border-zinc-200/80 bg-white p-3 shadow-sm flex flex-col min-h-0">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Quick Access</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 flex-1 content-start">
+            <NavTile href="/admin/enrollments" title="Registrations" subtitle="Approve applications" icon={<ClipboardText size={18} weight="duotone" />} gradient="from-orange-500 to-amber-500" />
+            <NavTile href="/admin/students" title="Students" subtitle="All accounts" icon={<GraduationCap size={18} weight="duotone" />} gradient="from-blue-500 to-indigo-500" />
+            <NavTile href="/admin/credentials" title="Portal Logins" subtitle="IDs & passwords" icon={<Key size={18} weight="duotone" />} gradient="from-amber-500 to-orange-600" />
+            <NavTile href="/admin/trainers" title="Trainers" subtitle="Manage trainers" icon={<ChartBar size={18} weight="duotone" />} gradient="from-violet-500 to-purple-600" />
+            <NavTile href="/admin/courses" title="Courses" subtitle="Materials" icon={<VideoCamera size={18} weight="duotone" />} gradient="from-emerald-500 to-teal-600" />
+          </div>
         </div>
       </div>
     </div>
@@ -457,6 +418,43 @@ function MiniStat({ label, value, href }: { label: string; value: number; href: 
         <CountUp end={value} duration={1} />
       </p>
       <p className="text-[9px] text-muted mt-0.5 font-medium">{label}</p>
+    </Link>
+  );
+}
+
+function NavTile({
+  href,
+  title,
+  subtitle,
+  icon,
+  gradient,
+}: {
+  href: string;
+  title: string;
+  subtitle: string;
+  icon: React.ReactNode;
+  gradient: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className={cn(
+        pressable,
+        "group flex items-center gap-2.5 rounded-xl border border-zinc-200/70 bg-white p-2.5 hover:border-orange-200/60 hover:shadow-sm"
+      )}
+    >
+      <div
+        className={cn(
+          "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br text-white shadow-sm",
+          gradient
+        )}
+      >
+        {icon}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-xs font-semibold text-foreground group-hover:text-primary truncate">{title}</p>
+        <p className="text-[10px] text-muted truncate">{subtitle}</p>
+      </div>
     </Link>
   );
 }

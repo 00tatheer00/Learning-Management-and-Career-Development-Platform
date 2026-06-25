@@ -3,10 +3,19 @@ import {
   BookOpen,
   ClipboardText,
   ChatsCircle,
+  GraduationCap,
+  VideoCamera,
+  ChalkboardTeacher,
 } from "@phosphor-icons/react/ssr";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getAssignments, getLiveSessionsPreview, getMaterials } from "@/lib/api/portal-data";
-import { PortalPageHeader, StatCard, QuickActionCard } from "@/components/portal/portal-ui";
+import {
+  PortalPageHeader,
+  PortalSectionTitle,
+  PortalSurfaceCard,
+  StatCard,
+  QuickActionCard,
+} from "@/components/portal/portal-ui";
 import { Button } from "@/components/ui/button";
 import { StudentTrainerCard } from "@/components/portal/student-trainer-card";
 import { StudentWhatsAppGroupCard } from "@/components/portal/student-whatsapp-group-card";
@@ -31,84 +40,52 @@ export default async function StudentDashboardPage() {
   const nextSession = findNextUpcomingSession(sessions);
 
   return (
-    <div>
+    <div className="space-y-4">
       <PortalPageHeader
+        eyebrow="Student Portal"
         title={`Welcome, ${user.name.split(" ")[0]}!`}
-        description={`You are in ${category?.sidebarLabel ?? "your course"}. Classes, lessons, and trainer are only for your program.`}
+        description={`${category?.sidebarLabel ?? "Your course"} · classes, lessons & trainer for your program.`}
       >
-        <div className="flex flex-wrap items-center gap-3">
-          <ProgramCategoryBadge programSlug={programSlug} />
-          <Button size="lg" asChild>
-            <Link href="/student/classes">Join Live Class</Link>
-          </Button>
-        </div>
+        <ProgramCategoryBadge programSlug={programSlug} />
+        <Button size="sm" asChild className="h-8 text-xs">
+          <Link href="/student/classes">Join Live Class</Link>
+        </Button>
       </PortalPageHeader>
 
-      <div className="mb-8">
-        <StudentWhatsAppGroupCard variant="banner" />
-      </div>
+      <StudentWhatsAppGroupCard variant="banner" />
 
       {nextSession ? (
         <StudentNextClassCard session={nextSession} />
       ) : (
-        <div className="rounded-2xl border border-dashed border-border bg-surface p-5 mb-8 text-sm text-muted">
+        <PortalSurfaceCard className="p-4 text-sm text-zinc-500 border-dashed">
           No upcoming live class scheduled yet. Check WhatsApp or{" "}
           <Link href="/student/classes" className="text-primary font-semibold underline">
             Live Classes
-          </Link>{" "}
-          later.
-        </div>
+          </Link>
+          .
+        </PortalSurfaceCard>
       )}
 
       <StudentModuleRoadmap programSlug={programSlug} currentModule={user.level} />
 
-      <div className="mb-8">
-        <StudentTrainerCard programSlug={programSlug} trainerId={user.trainerId} />
+      <StudentTrainerCard programSlug={programSlug} trainerId={user.trainerId} />
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+        <StatCard compact label="Video Lessons" value={materials.length} accent="orange" icon={<BookOpen size={16} weight="duotone" />} href="/student/course" />
+        <StatCard compact label="Assignments" value={assignments.length} accent="blue" icon={<ClipboardText size={16} weight="duotone" />} href="/student/assignments" />
+        <StatCard compact label="Live Classes" value={sessions.length} accent="green" icon={<VideoCamera size={16} weight="duotone" />} href="/student/classes" />
+        <StatCard compact label="Your Module" value={user.level ?? "—"} accent="slate" icon={<GraduationCap size={16} weight="duotone" />} />
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard label="Video Lessons" value={materials.length} accent="orange" />
-        <StatCard label="Assignments" value={assignments.length} accent="blue" />
-        <StatCard label="Live Classes" value={sessions.length} accent="green" />
-        <StatCard label="Your Module" value={user.level ?? "—"} accent="slate" />
-      </div>
-
-      <h2 className="text-lg font-bold mb-4">Quick Links</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <QuickActionCard
-          href="/student/course"
-          title="Watch Lessons"
-          description="Open your course videos and materials"
-          icon={<BookOpen size={24} weight="duotone" />}
-        />
-        <QuickActionCard
-          href="/student/assignments"
-          title="Submit Homework"
-          description="See and submit your assignments"
-          icon={<ClipboardText size={24} weight="duotone" />}
-          color="bg-blue-500/10 text-blue-600"
-        />
-        <QuickActionCard
-          href="/student/trainer"
-          title="My Trainer"
-          description="See your program trainer"
-          icon={<BookOpen size={24} weight="duotone" />}
-          color="bg-violet-500/10 text-violet-600"
-        />
-        <QuickActionCard
-          href="/student/whatsapp"
-          title="WhatsApp Group"
-          description="Join the class group now"
-          icon={<ChatsCircle size={24} weight="duotone" />}
-          color="bg-emerald-500/10 text-emerald-600"
-        />
-        <QuickActionCard
-          href={HELP_CONFIG.whatsappUrl}
-          title="Need Help?"
-          description="Message us on WhatsApp anytime"
-          icon={<ChatsCircle size={24} weight="fill" />}
-          color="bg-[#25D366]/10 text-[#25D366]"
-        />
+      <div>
+        <PortalSectionTitle title="Quick Access" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <QuickActionCard compact href="/student/course" title="Watch Lessons" description="Course videos & materials" icon={<BookOpen size={18} weight="duotone" />} gradient="from-orange-500 to-amber-500" />
+          <QuickActionCard compact href="/student/assignments" title="Submit Homework" description="View & submit assignments" icon={<ClipboardText size={18} weight="duotone" />} gradient="from-blue-500 to-indigo-500" />
+          <QuickActionCard compact href="/student/trainer" title="My Trainer" description="Your program trainer" icon={<ChalkboardTeacher size={18} weight="duotone" />} gradient="from-violet-500 to-purple-600" />
+          <QuickActionCard compact href="/student/whatsapp" title="WhatsApp Group" description="Join the class group" icon={<ChatsCircle size={18} weight="duotone" />} gradient="from-emerald-500 to-teal-600" />
+          <QuickActionCard compact href={HELP_CONFIG.whatsappUrl} title="Need Help?" description="Message us anytime" icon={<ChatsCircle size={18} weight="fill" />} gradient="from-[#25D366] to-[#128C7E]" />
+        </div>
       </div>
     </div>
   );
