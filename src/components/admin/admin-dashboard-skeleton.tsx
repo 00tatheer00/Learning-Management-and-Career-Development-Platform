@@ -1,5 +1,4 @@
 import type { CSSProperties } from "react";
-import type { CSSProperties } from "react";
 import { cn } from "@/lib/utils";
 
 function Bone({ className, style }: { className?: string; style?: CSSProperties }) {
