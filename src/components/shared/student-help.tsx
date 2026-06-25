@@ -16,7 +16,7 @@ export function HelpWhatsApp({ className }: HelpWhatsAppProps) {
       target="_blank"
       rel="noopener noreferrer"
       className={cn(
-        "fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full bg-[#25D366] px-4 py-3.5 text-white font-semibold shadow-lg shadow-[#25D366]/30 hover:scale-105 transition-transform",
+        "fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full bg-[#25D366] px-4 py-3.5 text-white font-semibold shadow-lg shadow-[#25D366]/30 cursor-pointer",
         className
       )}
       aria-label={`Get help on WhatsApp — ${HELP_CONFIG.whatsappDisplay}`}

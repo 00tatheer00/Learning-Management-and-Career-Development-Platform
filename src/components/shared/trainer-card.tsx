@@ -45,7 +45,7 @@ function TrainerPortrait({ trainer }: { trainer: Trainer }) {
           alt={trainer.name}
           fill
           unoptimized={isLocalImage}
-          className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+          className="object-cover"
           style={{ objectPosition: trainer.imagePosition ?? "center top" }}
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           priority={trainer.featured}

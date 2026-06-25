@@ -80,7 +80,7 @@ export function LearningJourneySection() {
               >
                 <div className="relative z-10 mx-auto mb-4 w-fit">
                   <PremiumIcon icon={step.icon} size="xl" />
-                  <span className="absolute -top-2 -right-2 z-20 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground shadow-md shadow-primary/30 transition-transform duration-300 group-hover:scale-110">
+                  <span className="absolute -top-2 -right-2 z-20 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground shadow-md shadow-primary/30">
                     {index + 1}
                   </span>
                 </div>

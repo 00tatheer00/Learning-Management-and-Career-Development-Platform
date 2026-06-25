@@ -17,8 +17,7 @@ import { AdminDashboardSkeleton } from "@/components/admin/admin-dashboard-skele
 import type { AdminDashboardData } from "@/lib/api/admin-dashboard";
 import { cn } from "@/lib/utils";
 
-const pressable =
-  "cursor-pointer transition-all duration-150 ease-out hover:scale-[1.02] active:scale-90 select-none";
+const pressable = "cursor-pointer select-none";
 
 export function AdminDashboardLoader() {
   const [data, setData] = useState<AdminDashboardData | null>(null);

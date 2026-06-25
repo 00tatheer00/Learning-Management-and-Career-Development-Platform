@@ -34,8 +34,7 @@ import { cn } from "@/lib/utils";
 
 const SIDEBAR_COLLAPSED_KEY = "portal-sidebar-collapsed";
 
-const pressable =
-  "cursor-pointer transition-all duration-150 ease-out hover:scale-[1.02] active:scale-90 select-none";
+const pressable = "cursor-pointer select-none";
 
 function getAdminDisplayName(name: string) {
   const parts = name.trim().split(/\s+/).filter(Boolean);

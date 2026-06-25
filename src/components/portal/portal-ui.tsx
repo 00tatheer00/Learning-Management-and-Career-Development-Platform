@@ -4,8 +4,7 @@ import Link from "next/link";
 import { ArrowRight } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 
-export const portalPressable =
-  "cursor-pointer transition-all duration-150 ease-out hover:scale-[1.02] active:scale-90 select-none";
+export const portalPressable = "cursor-pointer select-none";
 
 interface PortalPageHeaderProps {
   title: string;

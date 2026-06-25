@@ -617,7 +617,7 @@ export function AdminEnrollmentsPanel() {
                             src={screenshotUrl}
                             alt="Payment"
                             fill
-                            className="object-cover transition-transform group-hover:scale-105"
+                            className="object-cover"
                             unoptimized
                           />
                           <span className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-1.5 bg-black/60 py-2 text-xs font-semibold text-white">

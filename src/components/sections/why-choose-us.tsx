@@ -164,7 +164,7 @@ export function WhyChooseUsSection() {
                     src={feature.image}
                     alt={feature.imageAlt}
                     fill
-                    className="object-cover transition-transform duration-700 hover:scale-105"
+                    className="object-cover"
                     sizes="(max-width: 1024px) 100vw, 50vw"
                     priority={activeIndex === 0}
                   />
