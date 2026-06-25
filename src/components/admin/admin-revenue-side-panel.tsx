@@ -155,7 +155,13 @@ export function AdminRevenueHeaderButton() {
   );
 }
 
-export function AdminRevenueSidebarCard({ compact = false }: { compact?: boolean }) {
+export function AdminRevenueSidebarCard({
+  compact = false,
+  dark = false,
+}: {
+  compact?: boolean;
+  dark?: boolean;
+}) {
   const ctx = useAdminRevenueOptional();
   if (!ctx) return null;
 
@@ -166,9 +172,14 @@ export function AdminRevenueSidebarCard({ compact = false }: { compact?: boolean
         onClick={() => ctx.setOpen(true)}
         title="Registration Revenue"
         aria-label="Open registration revenue panel"
-        className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl border border-emerald-200/80 bg-gradient-to-br from-emerald-50 to-white text-emerald-700 transition-all hover:border-emerald-300 hover:shadow-md"
+        className={cn(
+          "mx-auto flex h-9 w-9 items-center justify-center rounded-lg transition-all",
+          dark
+            ? "border border-emerald-500/20 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
+            : "border border-emerald-200/80 bg-emerald-50 text-emerald-700 hover:border-emerald-300"
+        )}
       >
-        <CurrencyCircleDollar size={20} weight="duotone" />
+        <CurrencyCircleDollar size={18} weight="duotone" />
       </button>
     );
   }
@@ -177,23 +188,40 @@ export function AdminRevenueSidebarCard({ compact = false }: { compact?: boolean
     <button
       type="button"
       onClick={() => ctx.setOpen(true)}
-      className="w-full rounded-xl border border-emerald-200/80 bg-gradient-to-br from-emerald-50 to-white p-3 text-left transition-all hover:border-emerald-300 hover:shadow-md group"
+      className={cn(
+        "w-full rounded-lg p-2.5 text-left transition-all group",
+        dark
+          ? "border border-emerald-500/20 bg-emerald-500/10 hover:bg-emerald-500/15"
+          : "border border-emerald-200/80 bg-gradient-to-br from-emerald-50 to-white hover:border-emerald-300 hover:shadow-sm"
+      )}
     >
-      <div className="flex items-center gap-2.5">
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-600 text-white">
-          <CurrencyCircleDollar size={16} weight="duotone" />
+      <div className="flex items-center gap-2">
+        <div
+          className={cn(
+            "flex h-7 w-7 shrink-0 items-center justify-center rounded-md",
+            dark ? "bg-emerald-500/20 text-emerald-400" : "bg-emerald-600 text-white"
+          )}
+        >
+          <CurrencyCircleDollar size={15} weight="duotone" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-800">
-            Registration Revenue
+          <p
+            className={cn(
+              "text-[9px] font-bold uppercase tracking-wider",
+              dark ? "text-emerald-500/80" : "text-emerald-800"
+            )}
+          >
+            Revenue
           </p>
-          <p className="text-sm font-semibold text-emerald-950 truncate">Open panel</p>
+          <p
+            className={cn(
+              "text-xs font-semibold truncate",
+              dark ? "text-emerald-300" : "text-emerald-950"
+            )}
+          >
+            Open panel
+          </p>
         </div>
-        <CaretRight
-          size={14}
-          weight="bold"
-          className="shrink-0 text-emerald-600 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all"
-        />
       </div>
     </button>
   );

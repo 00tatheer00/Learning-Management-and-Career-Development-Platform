@@ -14,7 +14,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
-import { PortalPageHeader } from "@/components/portal/portal-ui";
 import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
 import { getProgramCategory } from "@/lib/constants/program-categories";
 import { buildApprovalWhatsAppMessage } from "@/lib/notifications/approval-templates";
@@ -272,158 +271,122 @@ export function AdminCredentialsPanel() {
   };
 
   return (
-    <div>
-      <PortalPageHeader
-        title="Portal Logins"
-        description="View and share student portal username and password. Saved automatically on approval."
-      />
-
-      <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
-        <div className="rounded-xl border border-border bg-background p-4">
-          <p className="text-sm text-muted">Approved Students</p>
-          <p className="text-2xl font-bold">{meta.total}</p>
-        </div>
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-          <p className="text-sm text-emerald-800">Password Saved</p>
-          <p className="text-2xl font-bold text-emerald-900">{meta.saved}</p>
-        </div>
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
-          <p className="text-sm text-amber-800">Need Password Saved</p>
-          <p className="text-2xl font-bold text-amber-900">{meta.missing}</p>
-        </div>
-        <div className="rounded-xl border border-blue-200 bg-blue-50 p-4">
-          <p className="text-sm text-blue-800">Portal Login Done</p>
-          <p className="text-2xl font-bold text-blue-900">{meta.loggedIn}</p>
-        </div>
-        <div className="rounded-xl border border-red-200 bg-red-50 p-4">
-          <p className="text-sm text-red-800">Never Logged In</p>
-          <p className="text-2xl font-bold text-red-900">{meta.neverLoggedIn}</p>
-        </div>
-      </div>
-
-      {meta.neverLoggedIn > 0 && (
-        <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-900">
-          <strong>{meta.neverLoggedIn} student(s)</strong> have not logged into the portal yet.
-          Use the <strong>No login yet</strong> filter below, then resend login details on WhatsApp.
-          Login tracking starts from this update — students who logged in before may show here until
-          they sign in again.
-        </div>
-      )}
-
-      {meta.missing > 0 && (
-        <div className="mb-6 rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="flex flex-col h-[calc(100dvh-3.5rem-2.5rem)] max-h-[calc(100dvh-3.5rem-2.5rem)] gap-3">
+      {/* Header + stats row */}
+      <div className="shrink-0 space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <div>
-            <strong>{meta.missing} student(s)</strong> were approved before login saving was enabled.
-            Use <strong>Generate &amp; Save</strong> per row, or fix all missing passwords at once.
-            Old passwords cannot be recovered from the system.
+            <h1 className="text-xl font-bold text-foreground">Portal Logins</h1>
+            <p className="text-xs text-muted mt-0.5">
+              Student credentials · share via WhatsApp
+            </p>
           </div>
-          <Button
-            disabled={bulkGenerating}
-            onClick={() => void handleGenerateMissing()}
-            className="shrink-0 gap-2"
-          >
-            <ArrowClockwise size={16} />
-            {bulkGenerating ? "Generating..." : `Generate missing (${meta.missing})`}
-          </Button>
-        </div>
-      )}
-
-      <div className="mb-4 flex flex-wrap gap-2">
-        <button
-          type="button"
-          onClick={() => setProgramFilter("all")}
-          className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
-            programFilter === "all"
-              ? "bg-primary text-primary-foreground"
-              : "border border-border bg-background text-muted hover:text-foreground"
-          }`}
-        >
-          All ({rows.length})
-        </button>
-        {ENROLLABLE_PROGRAM_SLUGS.map((slug) => {
-          const category = getProgramCategory(slug);
-          const count = rows.filter((row) => row.programSlug === slug).length;
-          return (
-            <button
-              key={slug}
-              type="button"
-              onClick={() => setProgramFilter(slug)}
-              className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
-                programFilter === slug
-                  ? "bg-primary text-primary-foreground"
-                  : "border border-border bg-background text-muted hover:text-foreground"
-              }`}
+          <div className="flex items-center gap-2">
+            {meta.missing > 0 && (
+              <Button
+                size="sm"
+                variant="secondary"
+                disabled={bulkGenerating}
+                onClick={() => void handleGenerateMissing()}
+                className="h-8 gap-1.5 text-xs"
+              >
+                <ArrowClockwise size={14} />
+                {bulkGenerating ? "Generating..." : `Fix ${meta.missing} missing`}
+              </Button>
+            )}
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => void load()}
+              className="h-8 gap-1.5 text-xs shrink-0"
             >
-              {category?.shortLabel ?? slug} ({count})
-            </button>
-          );
-        })}
-        <button
-          type="button"
-          onClick={() => {
-            setShowMissingOnly((value) => !value);
-            if (!showMissingOnly) setShowNeverLoggedInOnly(false);
-          }}
-          className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
-            showMissingOnly
-              ? "bg-amber-600 text-white"
-              : "border border-border bg-background text-muted hover:text-foreground"
-          }`}
-        >
-          Missing only ({meta.missing})
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            setShowNeverLoggedInOnly((value) => !value);
-            if (!showNeverLoggedInOnly) setShowMissingOnly(false);
-          }}
-          className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
-            showNeverLoggedInOnly
-              ? "bg-red-600 text-white"
-              : "border border-border bg-background text-muted hover:text-foreground"
-          }`}
-        >
-          No login yet ({meta.neverLoggedIn})
-        </button>
-      </div>
-
-      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <div className="relative flex-1">
-          <MagnifyingGlass
-            size={18}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"
-          />
-          <Input
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search by name, email, WhatsApp..."
-            className="pl-10"
-          />
+              <ArrowClockwise size={14} />
+              Refresh
+            </Button>
+          </div>
         </div>
-        <Button variant="secondary" onClick={() => void load()} className="gap-2 shrink-0">
-          <ArrowClockwise size={18} />
-          Refresh
-        </Button>
+
+        {/* Compact stat chips */}
+        <div className="flex flex-wrap gap-1.5">
+          <StatChip label="Total" value={meta.total} />
+          <StatChip label="Saved" value={meta.saved} tone="emerald" />
+          <StatChip label="Missing pwd" value={meta.missing} tone="amber" />
+          <StatChip label="Logged in" value={meta.loggedIn} tone="blue" />
+          <StatChip label="No login" value={meta.neverLoggedIn} tone="red" />
+        </div>
+
+        {/* Toolbar: search + filters */}
+        <div className="flex flex-col lg:flex-row gap-2">
+          <div className="relative flex-1 min-w-0">
+            <MagnifyingGlass
+              size={16}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+            />
+            <Input
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search name, email, WhatsApp..."
+              className="pl-9 h-9 text-sm"
+            />
+          </div>
+          <div className="flex gap-1.5 overflow-x-auto scrollbar-none pb-0.5 shrink-0">
+            <FilterPill
+              active={programFilter === "all"}
+              onClick={() => setProgramFilter("all")}
+              label={`All ${rows.length}`}
+            />
+            {ENROLLABLE_PROGRAM_SLUGS.map((slug) => {
+              const category = getProgramCategory(slug);
+              const count = rows.filter((row) => row.programSlug === slug).length;
+              return (
+                <FilterPill
+                  key={slug}
+                  active={programFilter === slug}
+                  onClick={() => setProgramFilter(slug)}
+                  label={`${category?.shortLabel ?? slug} ${count}`}
+                />
+              );
+            })}
+            <FilterPill
+              active={showMissingOnly}
+              onClick={() => {
+                setShowMissingOnly((v) => !v);
+                if (!showMissingOnly) setShowNeverLoggedInOnly(false);
+              }}
+              label={`Missing ${meta.missing}`}
+              variant="amber"
+            />
+            <FilterPill
+              active={showNeverLoggedInOnly}
+              onClick={() => {
+                setShowNeverLoggedInOnly((v) => !v);
+                if (!showNeverLoggedInOnly) setShowMissingOnly(false);
+              }}
+              label={`No login ${meta.neverLoggedIn}`}
+              variant="red"
+            />
+          </div>
+        </div>
+
+        <p className="text-xs text-muted">
+          {loading ? "Loading..." : `${filtered.length} of ${rows.length} students`}
+        </p>
       </div>
 
-      <p className="mb-3 text-sm text-muted">
-        {loading ? "Loading..." : `${filtered.length} of ${rows.length} students shown`}
-      </p>
-
-      <div className="overflow-hidden rounded-2xl border border-border bg-background shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="min-w-[1200px] w-full text-sm">
-            <thead className="border-b border-border bg-surface">
+      {/* Table fills remaining height */}
+      <div className="flex-1 min-h-0 overflow-hidden rounded-xl border border-border bg-background shadow-sm">
+        <div className="h-full overflow-auto scrollbar-none">
+          <table className="min-w-[960px] w-full text-sm">
+            <thead className="sticky top-0 z-10 border-b border-border bg-surface/95 backdrop-blur-sm">
               <tr>
-                <th className="px-4 py-3 text-left font-semibold">Student</th>
-                <th className="px-4 py-3 text-left font-semibold">WhatsApp</th>
-                <th className="px-4 py-3 text-left font-semibold">Course</th>
-                <th className="px-4 py-3 text-left font-semibold">Portal Login</th>
-                <th className="px-4 py-3 text-left font-semibold">Login ID</th>
-                <th className="px-4 py-3 text-left font-semibold">Password</th>
-                <th className="px-4 py-3 text-left font-semibold">Approved</th>
-                <th className="px-4 py-3 text-left font-semibold">Share</th>
+                <th className="px-3 py-2.5 text-left text-xs font-semibold">Student</th>
+                <th className="px-3 py-2.5 text-left text-xs font-semibold">WhatsApp</th>
+                <th className="px-3 py-2.5 text-left text-xs font-semibold">Course</th>
+                <th className="px-3 py-2.5 text-left text-xs font-semibold">Login</th>
+                <th className="px-3 py-2.5 text-left text-xs font-semibold">Login ID</th>
+                <th className="px-3 py-2.5 text-left text-xs font-semibold">Password</th>
+                <th className="px-3 py-2.5 text-left text-xs font-semibold">Approved</th>
+                <th className="px-3 py-2.5 text-left text-xs font-semibold">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -438,118 +401,108 @@ export function AdminCredentialsPanel() {
                         !row.hasLoggedIn && "bg-red-50/40"
                       )}
                     >
-                      <td className="px-4 py-4">
-                        <p className="font-semibold">{row.name}</p>
+                      <td className="px-3 py-2.5">
+                        <p className="font-medium text-sm">{row.name}</p>
                       </td>
-                      <td className="px-4 py-4">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm">{row.whatsapp}</span>
+                      <td className="px-3 py-2.5">
+                        <div className="flex items-center gap-1">
+                          <span className="text-xs">{row.whatsapp}</span>
                           {row.whatsapp !== "—" && (
                             <button
                               type="button"
                               title="Copy WhatsApp"
                               onClick={() => void copyText("WhatsApp", row.whatsapp)}
-                              className="rounded-lg border border-border p-1.5 hover:bg-surface shrink-0"
+                              className="rounded p-1 hover:bg-surface shrink-0 text-muted"
                             >
-                              <Copy size={14} />
+                              <Copy size={12} />
                             </button>
                           )}
                         </div>
                       </td>
-                      <td className="px-4 py-4">
-                        <p className="font-medium">{row.course}</p>
-                        <p className="mt-1 text-xs text-muted">
-                          {row.module} · {row.batch}
-                        </p>
+                      <td className="px-3 py-2.5">
+                        <p className="text-xs font-medium">{row.course}</p>
+                        <p className="text-[11px] text-muted">{row.module}</p>
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap">
+                      <td className="px-3 py-2.5 whitespace-nowrap">
                         {row.hasLoggedIn ? (
-                          <div>
-                            <span className="inline-flex rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-800">
-                              Logged in
-                            </span>
-                            <p className="mt-1.5 text-xs text-muted">
-                              First: {row.firstLoginAt ? formatAppliedDateTime(row.firstLoginAt) : "—"}
-                            </p>
-                            {row.lastLoginAt && row.lastLoginAt !== row.firstLoginAt && (
-                              <p className="text-xs text-muted">
-                                Last: {formatAppliedDateTime(row.lastLoginAt)}
-                              </p>
-                            )}
-                          </div>
+                          <span
+                            title={
+                              row.firstLoginAt
+                                ? `First: ${formatAppliedDateTime(row.firstLoginAt)}`
+                                : undefined
+                            }
+                            className="inline-flex rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-800"
+                          >
+                            Done
+                          </span>
                         ) : (
-                          <span className="inline-flex rounded-full bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-800">
-                            Not yet
+                          <span className="inline-flex rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-semibold text-red-800">
+                            Pending
                           </span>
                         )}
                       </td>
-                      <td className="px-4 py-4">
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono text-xs">{row.email}</span>
+                      <td className="px-3 py-2.5">
+                        <div className="flex items-center gap-1">
+                          <span className="font-mono text-[11px] max-w-[140px] truncate">{row.email}</span>
                           <button
                             type="button"
                             title="Edit login ID"
                             onClick={() => openEditLogin(row)}
-                            className="rounded-lg border border-border p-1.5 hover:bg-surface"
+                            className="rounded p-1 hover:bg-surface text-muted"
                           >
-                            <PencilSimple size={14} />
+                            <PencilSimple size={12} />
                           </button>
                           <button
                             type="button"
                             title="Copy login ID"
                             onClick={() => void copyText("Login ID", row.email)}
-                            className="rounded-lg border border-border p-1.5 hover:bg-surface"
+                            className="rounded p-1 hover:bg-surface text-muted"
                           >
-                            <Copy size={14} />
+                            <Copy size={12} />
                           </button>
                         </div>
                       </td>
-                      <td className="px-4 py-4">
+                      <td className="px-3 py-2.5">
                         {row.password ? (
-                          <div className="flex items-center gap-2">
-                            <span className="font-mono text-xs">
-                              {visible ? row.password : "••••••••"}
+                          <div className="flex items-center gap-1">
+                            <span className="font-mono text-[11px]">
+                              {visible ? row.password : "••••••"}
                             </span>
                             <button
                               type="button"
-                              title={visible ? "Hide password" : "Show password"}
+                              title={visible ? "Hide" : "Show"}
                               onClick={() => togglePassword(row.id)}
-                              className="rounded-lg border border-border p-1.5 hover:bg-surface"
+                              className="rounded p-1 hover:bg-surface text-muted"
                             >
-                              {visible ? <EyeSlash size={14} /> : <Eye size={14} />}
+                              {visible ? <EyeSlash size={12} /> : <Eye size={12} />}
                             </button>
                             <button
                               type="button"
                               title="Copy password"
                               onClick={() => void copyText("Password", row.password!)}
-                              className="rounded-lg border border-border p-1.5 hover:bg-surface"
+                              className="rounded p-1 hover:bg-surface text-muted"
                             >
-                              <Copy size={14} />
+                              <Copy size={12} />
                             </button>
                           </div>
                         ) : (
-                          <div className="space-y-2">
-                            <span className="inline-flex rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-800">
-                              Not saved
-                            </span>
-                            <Button
-                              size="sm"
-                              variant="secondary"
-                              disabled={loadingId === row.id}
-                              onClick={() => void handleResetPassword(row)}
-                              className="gap-1.5"
-                            >
-                              <Key size={14} />
-                              Generate &amp; Save
-                            </Button>
-                          </div>
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            disabled={loadingId === row.id}
+                            onClick={() => void handleResetPassword(row)}
+                            className="h-7 gap-1 text-[11px] px-2"
+                          >
+                            <Key size={12} />
+                            Generate
+                          </Button>
                         )}
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-muted">
+                      <td className="px-3 py-2.5 whitespace-nowrap text-[11px] text-muted">
                         {row.approvedAt ? formatAppliedDateTime(row.approvedAt) : "—"}
                       </td>
-                      <td className="px-4 py-4">
-                        <div className="flex flex-wrap gap-2">
+                      <td className="px-3 py-2.5">
+                        <div className="flex gap-1">
                           <button
                             type="button"
                             title="Copy full login details"
@@ -560,36 +513,36 @@ export function AdminCredentialsPanel() {
                                 `Login ID: ${row.email}\nPassword: ${row.password}\nPortal: ${row.loginUrl}`
                               )
                             }
-                            className="rounded-lg border border-border p-2 hover:bg-surface disabled:opacity-40"
+                            className="rounded border border-border p-1.5 hover:bg-surface disabled:opacity-40"
                           >
-                            <Copy size={16} />
+                            <Copy size={14} />
                           </button>
                           <button
                             type="button"
                             title="Send login on WhatsApp"
                             disabled={!row.password || loadingId === row.id}
                             onClick={() => void handleResendWhatsApp(row)}
-                            className="rounded-lg border border-[#25D366]/40 bg-[#25D366]/10 p-2 text-[#128C7E] hover:bg-[#25D366]/20 disabled:opacity-40"
+                            className="rounded border border-[#25D366]/40 bg-[#25D366]/10 p-1.5 text-[#128C7E] hover:bg-[#25D366]/20 disabled:opacity-40"
                           >
-                            <ChatsCircle size={16} weight="fill" />
+                            <ChatsCircle size={14} weight="fill" />
                           </button>
                           <button
                             type="button"
                             title="Copy WhatsApp message"
                             disabled={!row.password}
                             onClick={() => void copyText("WhatsApp message", buildWhatsAppMessage(row))}
-                            className="rounded-lg border border-border p-2 hover:bg-surface disabled:opacity-40"
+                            className="rounded border border-border p-1.5 hover:bg-surface disabled:opacity-40"
                           >
-                            <ChatsCircle size={16} weight="duotone" />
+                            <ChatsCircle size={14} weight="duotone" />
                           </button>
                           <button
                             type="button"
                             title="Reset password"
                             disabled={loadingId === row.id}
                             onClick={() => void handleResetPassword(row)}
-                            className="rounded-lg border border-border p-2 hover:bg-surface"
+                            className="rounded border border-border p-1.5 hover:bg-surface"
                           >
-                            <ArrowClockwise size={16} />
+                            <ArrowClockwise size={14} />
                           </button>
                         </div>
                       </td>
@@ -708,5 +661,68 @@ export function AdminCredentialsPanel() {
         )}
       </Modal>
     </div>
+  );
+}
+
+function StatChip({
+  label,
+  value,
+  tone = "default",
+}: {
+  label: string;
+  value: number;
+  tone?: "default" | "emerald" | "amber" | "blue" | "red";
+}) {
+  const styles = {
+    default: "border-border bg-background text-foreground",
+    emerald: "border-emerald-200 bg-emerald-50 text-emerald-800",
+    amber: "border-amber-200 bg-amber-50 text-amber-800",
+    blue: "border-blue-200 bg-blue-50 text-blue-800",
+    red: "border-red-200 bg-red-50 text-red-800",
+  };
+
+  return (
+    <div
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs",
+        styles[tone]
+      )}
+    >
+      <span className="opacity-70">{label}</span>
+      <span className="font-bold tabular-nums">{value}</span>
+    </div>
+  );
+}
+
+function FilterPill({
+  active,
+  onClick,
+  label,
+  variant = "default",
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+  variant?: "default" | "amber" | "red";
+}) {
+  const activeStyles = {
+    default: "bg-primary text-primary-foreground border-primary",
+    amber: "bg-amber-600 text-white border-amber-600",
+    red: "bg-red-600 text-white border-red-600",
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "shrink-0 rounded-full border px-3 py-1 text-xs font-semibold transition-colors whitespace-nowrap",
+        active
+          ? activeStyles[variant]
+          : "border-border bg-background text-muted hover:text-foreground"
+      )}
+    >
+      {label}
+    </button>
   );
 }
