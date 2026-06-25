@@ -12,11 +12,11 @@ import {
   SidebarSimple,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
-import { PORTAL_COLORS, PORTAL_LABELS, PORTAL_NAV } from "@/lib/constants/portal-nav";
-import { getProgramCategory } from "@/lib/constants/program-categories";
+import { PORTAL_LABELS, PORTAL_NAV_GROUPS } from "@/lib/constants/portal-nav";
 import { ProgramCategoryBadge } from "@/components/portal/program-category-badge";
 import { SiteLogo } from "@/components/shared/site-logo";
 import { PortalAvatar } from "@/components/portal/portal-avatar";
+import { SITE_CONFIG } from "@/lib/constants";
 import { StudentPortalWelcome } from "@/components/portal/student-portal-welcome";
 import { StudentModuleStartBanner } from "@/components/portal/student-module-start-banner";
 import { StudentSingleSessionGuard } from "@/components/portal/student-single-session-guard";
@@ -33,6 +33,9 @@ import type { PortalUser } from "@/types/portal";
 import { cn } from "@/lib/utils";
 
 const SIDEBAR_COLLAPSED_KEY = "portal-sidebar-collapsed";
+
+const pressable =
+  "cursor-pointer transition-all duration-150 ease-out hover:scale-[1.02] active:scale-90 select-none";
 
 function getAdminDisplayName(name: string) {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -52,7 +55,6 @@ export function PortalShell({ user, children }: PortalShellProps) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const navItems = PORTAL_NAV[user.role];
   const isAdmin = user.role === "admin";
   const headerTitle = isAdmin ? getAdminDisplayName(user.name) : `Hello, ${user.name.split(" ")[0]} 👋`;
 
@@ -76,18 +78,18 @@ export function PortalShell({ user, children }: PortalShellProps) {
   };
 
   return (
-    <div className="min-h-screen lg:h-dvh lg:overflow-hidden bg-surface flex">
+    <div className="min-h-screen lg:h-dvh lg:overflow-hidden bg-zinc-50 flex">
       {user.role === "student" && <StudentSingleSessionGuard />}
       {/* Sidebar desktop */}
       <aside
         className={cn(
-          "hidden lg:flex flex-col fixed inset-y-0 left-0 z-40 bg-white border-r border-zinc-200/80 transition-[width] duration-300 ease-in-out shadow-[2px_0_20px_-8px_rgba(0,0,0,0.08)]",
+          "hidden lg:flex flex-col fixed inset-y-0 left-0 z-40 bg-white border-r border-zinc-200/70 transition-[width] duration-300 ease-in-out",
           sidebarCollapsed ? "w-[4.5rem]" : "w-64"
         )}
       >
         <SidebarContent
           user={user}
-          navItems={navItems}
+          navGroups={PORTAL_NAV_GROUPS[user.role]}
           pathname={pathname}
           onLogout={handleLogout}
           collapsed={sidebarCollapsed}
@@ -106,7 +108,7 @@ export function PortalShell({ user, children }: PortalShellProps) {
           <aside className="relative w-72 max-w-[85vw] h-full bg-white shadow-2xl">
             <SidebarContent
               user={user}
-              navItems={navItems}
+              navGroups={PORTAL_NAV_GROUPS[user.role]}
               pathname={pathname}
               onLogout={handleLogout}
               onNavigate={() => setSidebarOpen(false)}
@@ -122,7 +124,7 @@ export function PortalShell({ user, children }: PortalShellProps) {
           sidebarCollapsed ? "lg:pl-[4.5rem]" : "lg:pl-64"
         )}
       >
-        <header className="shrink-0 sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur-md px-4 sm:px-5 h-14 flex items-center justify-between gap-4">
+        <header className="shrink-0 sticky top-0 z-30 border-b border-zinc-200/80 bg-white/95 backdrop-blur-md px-4 sm:px-5 h-14 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <button
               type="button"
@@ -171,7 +173,7 @@ export function PortalShell({ user, children }: PortalShellProps) {
 
 function SidebarContent({
   user,
-  navItems,
+  navGroups,
   pathname,
   onLogout,
   onNavigate,
@@ -179,7 +181,7 @@ function SidebarContent({
   onToggleCollapse,
 }: {
   user: PortalUser;
-  navItems: (typeof PORTAL_NAV)["student"];
+  navGroups: (typeof PORTAL_NAV_GROUPS)["admin"];
   pathname: string;
   onLogout: () => void;
   onNavigate?: () => void;
@@ -196,31 +198,36 @@ function SidebarContent({
 
   const isAdmin = user.role === "admin";
   const displayName = isAdmin ? getAdminDisplayName(user.name) : user.name;
-
-  const headerGradient =
-    isAdmin
-      ? "from-orange-500 via-orange-500 to-amber-500"
-      : user.programSlug && (user.role === "student" || user.role === "trainer")
-        ? (getProgramCategory(user.programSlug)?.headerGradient ?? PORTAL_COLORS[user.role])
-        : PORTAL_COLORS[user.role];
+  const portalSubtitle =
+    user.role === "admin"
+      ? "Admin Portal"
+      : user.role === "trainer"
+        ? "Trainer Portal"
+        : "Student Portal";
 
   return (
-    <div className="relative flex flex-col h-full overflow-hidden">
-      {/* Brand header */}
+    <div className="relative flex flex-col h-full overflow-hidden bg-white">
+      {/* Logo + collapse */}
       <div
         className={cn(
-          "shrink-0 bg-gradient-to-br text-white transition-all duration-300",
-          headerGradient,
-          collapsed ? "px-2 py-3" : "px-3.5 py-3.5"
+          "shrink-0 border-b border-zinc-100",
+          collapsed ? "px-2 py-3" : "px-4 py-4"
         )}
       >
-        <div
-          className={cn(
-            "flex items-center gap-2",
-            collapsed ? "flex-col" : "justify-between"
+        <div className={cn("flex items-center gap-2", collapsed ? "flex-col" : "justify-between")}>
+          {!collapsed ? (
+            <Link href="/" className={cn(pressable, "flex items-center gap-2.5 min-w-0")}>
+              <SiteLogo variant="portal" href={null} className="h-8 shrink-0" />
+              <div className="min-w-0 leading-tight">
+                <p className="text-sm font-bold text-zinc-900 truncate">{SITE_CONFIG.shortName}</p>
+                <p className="text-[10px] text-zinc-400 truncate">{portalSubtitle}</p>
+              </div>
+            </Link>
+          ) : (
+            <Link href="/" className={cn(pressable, "flex justify-center")} title={SITE_CONFIG.shortName}>
+              <SiteLogo variant="portal" href={null} className="h-7" />
+            </Link>
           )}
-        >
-          <SiteLogo variant="portal" href="/" onDark className={collapsed ? "h-7" : "h-8"} />
 
           {onToggleCollapse && (
             <button
@@ -228,7 +235,10 @@ function SidebarContent({
               onClick={onToggleCollapse}
               title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
               aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-              className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/15 text-white/90 hover:bg-white/25 hover:text-white transition-all duration-150 ease-out cursor-pointer hover:scale-[1.02] active:scale-90 select-none"
+              className={cn(
+                pressable,
+                "flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-500 hover:bg-zinc-50 hover:text-zinc-800 shadow-sm"
+              )}
             >
               <SidebarSimple
                 size={18}
@@ -242,7 +252,7 @@ function SidebarContent({
             <button
               type="button"
               onClick={onNavigate}
-              className="p-1.5 rounded-lg hover:bg-white/20 text-white/90 lg:hidden"
+              className={cn(pressable, "p-1.5 rounded-lg hover:bg-zinc-100 text-zinc-500 lg:hidden")}
             >
               <X size={18} weight="bold" />
             </button>
@@ -250,30 +260,21 @@ function SidebarContent({
         </div>
 
         {!collapsed && (
-          <>
-            <p className="text-[10px] uppercase tracking-widest mt-3 mb-2 font-semibold text-white/75">
-              {PORTAL_LABELS[user.role]}
-            </p>
-            <div className="flex items-center gap-2.5">
-              <PortalAvatar
-                name={user.name}
-                avatarUrl={user.avatarUrl}
-                avatarInitials={user.avatarInitials}
-                size="sm"
-              />
-              <div className="min-w-0 flex-1">
-                <p className="font-semibold truncate text-sm">{displayName}</p>
-                <p className="text-[11px] truncate text-white/75">{user.email}</p>
-                {!isAdmin && user.programSlug && (user.role === "student" || user.role === "trainer") && (
-                  <ProgramCategoryBadge
-                    programSlug={user.programSlug}
-                    variant="onDark"
-                    className="mt-1"
-                  />
-                )}
-              </div>
+          <div className="mt-3 flex items-center gap-2.5 rounded-xl border border-zinc-100 bg-zinc-50/80 px-2.5 py-2">
+            <PortalAvatar
+              name={user.name}
+              avatarUrl={user.avatarUrl}
+              avatarInitials={user.avatarInitials}
+              size="sm"
+            />
+            <div className="min-w-0 flex-1">
+              <p className="font-semibold truncate text-xs text-zinc-900">{displayName}</p>
+              <p className="text-[10px] truncate text-zinc-400">{user.email}</p>
+              {!isAdmin && user.programSlug && (user.role === "student" || user.role === "trainer") && (
+                <ProgramCategoryBadge programSlug={user.programSlug} className="mt-0.5" />
+              )}
             </div>
-          </>
+          </div>
         )}
 
         {collapsed && (
@@ -288,57 +289,71 @@ function SidebarContent({
         )}
       </div>
 
-      {/* Nav */}
+      {/* Nav groups */}
       <nav
         className={cn(
-          "flex-1 min-h-0 overflow-y-auto overflow-x-hidden scrollbar-none py-2 bg-zinc-50/50",
-          collapsed ? "px-2 space-y-0.5" : "px-2.5 space-y-0.5"
+          "flex-1 min-h-0 overflow-y-auto overflow-x-hidden scrollbar-none",
+          collapsed ? "px-2 py-2" : "px-3 py-3"
         )}
       >
-        {navItems.map((item) => {
-          const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
-          const Icon = item.icon;
-          const showEnrollmentBadge =
-            item.href === "/admin/enrollments" && enrollmentBadgeCount > 0;
+        {navGroups.map((group, groupIndex) => (
+          <div key={group.label} className={cn(groupIndex > 0 && "mt-4")}>
+            {!collapsed && (
+              <p className="px-2 mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-zinc-400">
+                {group.label}
+              </p>
+            )}
+            <div className="space-y-0.5">
+              {group.items.map((item) => {
+                const active =
+                  pathname === item.href || pathname.startsWith(`${item.href}/`);
+                const Icon = item.icon;
+                const showEnrollmentBadge =
+                  item.href === "/admin/enrollments" && enrollmentBadgeCount > 0;
 
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={onNavigate}
-              title={collapsed ? item.label : item.description}
-              aria-label={item.label}
-              className={cn(
-                "relative flex items-center rounded-lg transition-all duration-150 ease-out cursor-pointer hover:scale-[1.02] active:scale-90 select-none",
-                collapsed ? "justify-center p-2.5" : "gap-2.5 px-3 py-2",
-                active
-                  ? "bg-white text-primary font-semibold shadow-sm ring-1 ring-orange-100"
-                  : "text-zinc-600 hover:bg-white hover:text-zinc-900 hover:shadow-sm"
-              )}
-            >
-              {active && !collapsed && (
-                <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-0.5 rounded-full bg-primary" />
-              )}
-              <Icon size={20} weight={active ? "fill" : "duotone"} className="shrink-0" />
-              {!collapsed && (
-                <>
-                  <span className="flex-1 min-w-0 text-sm truncate">{item.label}</span>
-                  {showEnrollmentBadge && <AdminNavBadge count={enrollmentBadgeCount} />}
-                </>
-              )}
-              {collapsed && showEnrollmentBadge && (
-                <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" />
-              )}
-            </Link>
-          );
-        })}
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={onNavigate}
+                    title={collapsed ? item.label : item.description}
+                    aria-label={item.label}
+                    className={cn(
+                      pressable,
+                      "relative flex items-center rounded-lg text-sm font-medium",
+                      collapsed ? "justify-center p-2.5" : "gap-2.5 px-2.5 py-2",
+                      active
+                        ? "bg-orange-50 text-orange-600"
+                        : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900"
+                    )}
+                  >
+                    <Icon
+                      size={20}
+                      weight={active ? "fill" : "regular"}
+                      className="shrink-0"
+                    />
+                    {!collapsed && (
+                      <>
+                        <span className="flex-1 min-w-0 truncate">{item.label}</span>
+                        {showEnrollmentBadge && <AdminNavBadge count={enrollmentBadgeCount} />}
+                      </>
+                    )}
+                    {collapsed && showEnrollmentBadge && (
+                      <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" />
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </nav>
 
-      {/* Footer */}
+      {/* Footer — revenue + logout unchanged */}
       <div
         className={cn(
-          "shrink-0 border-t border-zinc-100 bg-white py-2",
-          collapsed ? "px-2 space-y-1" : "px-2.5 space-y-1"
+          "shrink-0 border-t border-zinc-100 bg-white py-2.5",
+          collapsed ? "px-2 space-y-1.5" : "px-3 space-y-1.5"
         )}
       >
         {user.role === "admin" && <AdminRevenueSidebarCard compact={collapsed} />}
@@ -347,8 +362,9 @@ function SidebarContent({
           onClick={onLogout}
           title={collapsed ? "Logout" : undefined}
           className={cn(
-            "flex w-full items-center rounded-lg text-sm font-medium transition-all duration-150 ease-out cursor-pointer hover:scale-[1.02] active:scale-90 select-none text-red-600 hover:bg-red-50",
-            collapsed ? "justify-center p-2.5" : "gap-2.5 px-3 py-2"
+            pressable,
+            "flex w-full items-center rounded-lg text-sm font-medium text-red-600 hover:bg-red-50",
+            collapsed ? "justify-center p-2.5" : "gap-2.5 px-2.5 py-2"
           )}
         >
           <SignOut size={18} weight="bold" />

@@ -53,6 +53,26 @@ export const PORTAL_NAV: Record<UserRole, PortalNavItem[]> = {
   ],
 };
 
+export interface PortalNavGroup {
+  label: string;
+  items: PortalNavItem[];
+}
+
+function groupNavItems(items: PortalNavItem[], settingsHref: string): PortalNavGroup[] {
+  const main = items.filter((item) => item.href !== settingsHref);
+  const settings = items.filter((item) => item.href === settingsHref);
+  return [
+    { label: "Main", items: main },
+    ...(settings.length > 0 ? [{ label: "Account", items: settings }] : []),
+  ];
+}
+
+export const PORTAL_NAV_GROUPS: Record<UserRole, PortalNavGroup[]> = {
+  student: groupNavItems(PORTAL_NAV.student, "/student/profile"),
+  trainer: groupNavItems(PORTAL_NAV.trainer, "/trainer/settings"),
+  admin: groupNavItems(PORTAL_NAV.admin, "/admin/settings"),
+};
+
 export const PORTAL_LABELS: Record<UserRole, string> = {
   student: "Student Portal",
   trainer: "Trainer Portal",
