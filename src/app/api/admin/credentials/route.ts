@@ -7,6 +7,7 @@ import {
   updateStudentLoginDetails,
 } from "@/lib/api/admin-credentials";
 import { generateMissingPortalPasswords } from "@/lib/api/admin-credentials-bulk";
+import { bulkResendLoginWhatsApp } from "@/lib/api/admin-credentials-bulk-whatsapp";
 
 export async function GET() {
   const user = await getCurrentUser();
@@ -85,9 +86,16 @@ export async function PATCH(request: Request) {
   );
 }
 
-const postSchema = z.object({
-  action: z.literal("generateMissing"),
-});
+const postSchema = z.discriminatedUnion("action", [
+  z.object({
+    action: z.literal("generateMissing"),
+  }),
+  z.object({
+    action: z.literal("bulkResendLogin"),
+    studentIds: z.array(z.string()).optional(),
+    neverLoggedInOnly: z.boolean().optional(),
+  }),
+]);
 
 export async function POST(request: Request) {
   const user = await getCurrentUser();
@@ -103,6 +111,28 @@ export async function POST(request: Request) {
     return NextResponse.json(createApiResponse(false, { message: "Invalid action" }), {
       status: 400,
     });
+  }
+
+  if (parsed.data.action === "bulkResendLogin") {
+    const result = await bulkResendLoginWhatsApp({
+      studentIds: parsed.data.studentIds,
+      neverLoggedInOnly: parsed.data.neverLoggedInOnly,
+    });
+
+    const message =
+      result.sent > 0
+        ? `WhatsApp sent to ${result.sent} student(s).`
+        : "No WhatsApp messages were sent.";
+
+    return NextResponse.json(
+      createApiResponse(true, {
+        data: result,
+        message:
+          result.errors.length > 0
+            ? `${message} ${result.errors.length} failed.`
+            : message,
+      })
+    );
   }
 
   const result = await generateMissingPortalPasswords();

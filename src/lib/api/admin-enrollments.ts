@@ -3,7 +3,10 @@ import { getProgramBySlug } from "@/lib/data/programs";
 import { DEFAULT_BATCH_NAME } from "@/lib/constants/batch";
 import { formatAppliedDateTime } from "@/lib/utils";
 import { enrichRowsWithApplicationMeta } from "@/lib/api/enrollment-history";
-import type { ApplicantApplicationSummary } from "@/lib/api/enrollment-history";
+import type {
+  ApplicantApplicationSummary,
+  DuplicateMatchInfo,
+} from "@/lib/api/enrollment-history";
 import type { EnrollmentRecord } from "@/types/portal";
 
 export interface AdminEnrollmentRow extends EnrollmentRecord {
@@ -13,6 +16,7 @@ export interface AdminEnrollmentRow extends EnrollmentRecord {
   totalApplications: number;
   isReturningApplicant: boolean;
   previousApplications: ApplicantApplicationSummary[];
+  duplicateMatch: DuplicateMatchInfo | null;
   approvalWhatsAppSent?: boolean | null;
   approvalWhatsAppError?: string | null;
 }

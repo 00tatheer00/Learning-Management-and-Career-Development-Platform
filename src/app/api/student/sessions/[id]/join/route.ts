@@ -3,6 +3,8 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { getLiveSessionById } from "@/lib/api/portal-data";
 import { isWithinJoinWindow } from "@/lib/sessions/join-window";
 import { createApiResponse } from "@/lib/api/enrollment";
+import { recordClassJoin } from "@/lib/api/class-attendance";
+import { recordUserActivity } from "@/lib/auth/user-activity";
 
 export async function GET(
   _request: Request,
@@ -39,9 +41,23 @@ export async function GET(
     );
   }
 
+  void recordUserActivity(user.id);
+
+  const attendance = await recordClassJoin({
+    sessionId: session.id,
+    studentId: user.id,
+    studentName: user.name,
+    programSlug: session.programSlug,
+    sessionDate: session.date,
+    sessionTime: session.time,
+  });
+
   return NextResponse.json(
     createApiResponse(true, {
-      data: { meetLink: session.meetLink },
+      data: {
+        meetLink: session.meetLink,
+        attendance: attendance.status,
+      },
     })
   );
 }

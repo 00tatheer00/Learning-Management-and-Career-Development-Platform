@@ -61,6 +61,7 @@ model User {
   activeSessionId String?
   firstLoginAt   DateTime?
   lastLoginAt    DateTime?
+  lastActiveAt   DateTime?
   createdAt      DateTime @default(now())
 }
 
@@ -139,4 +140,25 @@ model LiveSession {
   trainerId   String
   trainerName String
   notes       String?
+}
+
+model AutomationSendLog {
+  id     String   @id @map("_id")
+  key    String   @unique
+  type   String
+  sentAt DateTime @default(now())
+}
+
+model ClassAttendance {
+  id          String   @id @map("_id")
+  sessionId   String
+  studentId   String
+  studentName String
+  programSlug String
+  sessionDate String
+  sessionTime String
+  joinedAt    DateTime @default(now())
+  status      String
+
+  @@unique([sessionId, studentId])
 }

@@ -55,6 +55,7 @@ export function AdminCredentialsPanel() {
   const [visiblePasswords, setVisiblePasswords] = useState<Set<string>>(new Set());
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [bulkGenerating, setBulkGenerating] = useState(false);
+  const [bulkSendingWhatsApp, setBulkSendingWhatsApp] = useState(false);
   const [credentialModal, setCredentialModal] = useState<{
     name: string;
     loginId: string;
@@ -142,6 +143,37 @@ export function AdminCredentialsPanel() {
       toast.error("WhatsApp send failed");
     } finally {
       setLoadingId(null);
+    }
+  };
+
+  const handleBulkWhatsApp = async () => {
+    const eligible = filtered.filter((row) => row.hasStoredPassword);
+    if (eligible.length === 0) {
+      toast.error("No students with saved passwords in this filter.");
+      return;
+    }
+
+    setBulkSendingWhatsApp(true);
+    try {
+      const res = await fetch("/api/admin/credentials", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "bulkResendLogin",
+          studentIds: eligible.map((row) => row.id),
+          neverLoggedInOnly: showNeverLoggedInOnly,
+        }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        toast.success(json.message ?? "Bulk WhatsApp complete.");
+      } else {
+        toast.error(json.error ?? json.message ?? "Bulk send failed");
+      }
+    } catch {
+      toast.error("Bulk send failed");
+    } finally {
+      setBulkSendingWhatsApp(false);
     }
   };
 
@@ -282,6 +314,20 @@ export function AdminCredentialsPanel() {
             </p>
           </div>
           <div className="flex items-center gap-2">
+            {filtered.some((row) => row.hasStoredPassword) && (
+              <Button
+                size="sm"
+                variant="secondary"
+                disabled={bulkSendingWhatsApp}
+                onClick={() => void handleBulkWhatsApp()}
+                className="h-8 gap-1.5 text-xs"
+              >
+                <ChatsCircle size={14} />
+                {bulkSendingWhatsApp
+                  ? "Sending..."
+                  : `WhatsApp ${filtered.filter((r) => r.hasStoredPassword).length}`}
+              </Button>
+            )}
             {meta.missing > 0 && (
               <Button
                 size="sm"

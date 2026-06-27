@@ -22,6 +22,7 @@ export async function recordUserLogin(userId: string): Promise<void> {
     where: { id: userId },
     data: {
       lastLoginAt: now,
+      lastActiveAt: now,
       ...(user.firstLoginAt ? {} : { firstLoginAt: now }),
     },
   });

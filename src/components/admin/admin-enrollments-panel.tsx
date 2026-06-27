@@ -23,14 +23,14 @@ import { PortalPageHeader } from "@/components/portal/portal-ui";
 import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
 import { ADMIN_REJECT_PRESETS } from "@/lib/constants/admin-reject-reasons";
 import { getProgramCategory } from "@/lib/constants/program-categories";
-import { formatAppliedDate, formatAppliedDateTime, formatAppliedTime } from "@/lib/utils";
+import { formatAppliedDate, formatAppliedDateTime, formatAppliedTime, cn } from "@/lib/utils";
 import { toast } from "@/lib/ui/toast";
 import { playPortalSound, primePortalSounds } from "@/lib/ui/portal-sounds";
 import { Alert } from "@/components/ui/alert";
 import type { AdminEnrollmentRow } from "@/lib/api/admin-enrollments";
 
 type StatusFilter = "all" | "pending" | "approved" | "rejected";
-type QuickFilter = "all" | "today" | "returning" | "whatsapp-failed" | "no-payment";
+type QuickFilter = "all" | "today" | "returning" | "duplicates" | "whatsapp-failed" | "no-payment";
 type PendingAction = { id: string; type: "approved" | "rejected"; name: string };
 
 function isCreatedToday(iso: string): boolean {
@@ -122,6 +122,7 @@ export function AdminEnrollmentsPanel() {
       if (programFilter !== "all" && enrollment.program !== programFilter) return false;
       if (quickFilter === "today" && !isCreatedToday(enrollment.createdAt)) return false;
       if (quickFilter === "returning" && !enrollment.isReturningApplicant) return false;
+      if (quickFilter === "duplicates" && !enrollment.duplicateMatch) return false;
       if (
         quickFilter === "whatsapp-failed" &&
         !(enrollment.status === "approved" && enrollment.approvalWhatsAppSent === false)
@@ -393,6 +394,7 @@ export function AdminEnrollmentsPanel() {
               { value: "all", label: "All" },
               { value: "today", label: "Today" },
               { value: "returning", label: "Returning" },
+              { value: "duplicates", label: "Duplicate CNIC/Email" },
               { value: "whatsapp-failed", label: "WhatsApp failed" },
               { value: "no-payment", label: "No payment SS" },
             ] as const
@@ -467,7 +469,14 @@ export function AdminEnrollmentsPanel() {
             return (
               <div
                 key={enrollment.id}
-                className="overflow-hidden rounded-2xl border border-border bg-background"
+                className={cn(
+                  "overflow-hidden rounded-2xl border bg-background",
+                  enrollment.duplicateMatch?.hasApprovedMatch
+                    ? "border-violet-300 ring-1 ring-violet-100"
+                    : enrollment.duplicateMatch?.hasPendingMatch
+                      ? "border-amber-300 ring-1 ring-amber-100"
+                      : "border-border"
+                )}
               >
                 <div className="p-5 sm:p-6">
                   <div className="flex flex-col gap-6 lg:flex-row">
@@ -497,6 +506,23 @@ export function AdminEnrollmentsPanel() {
                         {enrollment.isReturningApplicant && (
                           <span className="inline-flex items-center rounded-full border border-violet-200 bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-800">
                             Returning Student
+                          </span>
+                        )}
+                        {enrollment.duplicateMatch && (
+                          <span
+                            className={cn(
+                              "inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold",
+                              enrollment.duplicateMatch.hasApprovedMatch
+                                ? "border-violet-200 bg-violet-50 text-violet-800"
+                                : "border-amber-200 bg-amber-50 text-amber-900"
+                            )}
+                            title={enrollment.duplicateMatch.label}
+                          >
+                            {enrollment.duplicateMatch.field === "both"
+                              ? "Same Email & CNIC"
+                              : enrollment.duplicateMatch.field === "email"
+                                ? "Same Email"
+                                : "Same CNIC"}
                           </span>
                         )}
                         <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium text-muted">

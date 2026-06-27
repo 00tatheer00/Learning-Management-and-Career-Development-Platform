@@ -64,6 +64,13 @@ export function PortalShell({ user, children }: PortalShellProps) {
     }
   }, []);
 
+  useEffect(() => {
+    const key = "portal-activity-pinged";
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, "1");
+    void fetch("/api/portal/activity", { method: "POST" }).catch(() => undefined);
+  }, []);
+
   const toggleSidebarCollapsed = () => {
     setSidebarCollapsed((value) => {
       const next = !value;

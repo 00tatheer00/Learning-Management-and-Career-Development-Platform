@@ -4,12 +4,22 @@ import type { EnrollmentStatus } from "@/types/portal";
 
 export interface ApplicantApplicationSummary {
   id: string;
+  fullName?: string;
   courseTitle: string;
   program: string;
   level: string;
   status: EnrollmentStatus;
   appliedAt: string;
   paymentScreenshot?: string;
+}
+
+export type DuplicateMatchField = "email" | "cnic" | "both" | null;
+
+export interface DuplicateMatchInfo {
+  field: DuplicateMatchField;
+  label: string;
+  hasApprovedMatch: boolean;
+  hasPendingMatch: boolean;
 }
 
 function normalizeEmail(email: string) {
@@ -80,6 +90,51 @@ export function mapApplicationSummaries(
   }));
 }
 
+export function getDuplicateMatchInfo<
+  T extends {
+    id: string;
+    fullName: string;
+    email: string;
+    cnic: string;
+    status: EnrollmentStatus;
+  }
+>(row: T, related: T[]): DuplicateMatchInfo | null {
+  const others = related.filter((item) => item.id !== row.id);
+  if (others.length === 0) return null;
+
+  const emailMatch = others.some(
+    (item) => normalizeEmail(item.email) === normalizeEmail(row.email)
+  );
+  const cnicMatch = others.some(
+    (item) => normalizeCnic(item.cnic) === normalizeCnic(row.cnic)
+  );
+
+  if (!emailMatch && !cnicMatch) return null;
+
+  const field: DuplicateMatchField =
+    emailMatch && cnicMatch ? "both" : emailMatch ? "email" : "cnic";
+
+  const hasApprovedMatch = others.some((item) => item.status === "approved");
+  const hasPendingMatch = others.some((item) => item.status === "pending");
+  const matchName = others[0]?.fullName ?? "another applicant";
+
+  const fieldLabel =
+    field === "both" ? "Same email & CNIC" : field === "email" ? "Same email" : "Same CNIC";
+
+  const statusLabel = hasApprovedMatch
+    ? "as approved student"
+    : hasPendingMatch
+      ? "as pending registration"
+      : "as previous applicant";
+
+  return {
+    field,
+    label: `${fieldLabel} ${statusLabel}: ${matchName}`,
+    hasApprovedMatch,
+    hasPendingMatch,
+  };
+}
+
 export function getApplicationNumber<
   T extends { id: string; email: string; cnic: string; createdAt: string | Date }
 >(target: T, related: T[]): number {
@@ -93,13 +148,14 @@ export function getApplicationNumber<
 export function enrichRowsWithApplicationMeta<
   T extends {
     id: string;
+    fullName: string;
     email: string;
     cnic: string;
     createdAt: string;
+    status: EnrollmentStatus;
     courseTitle: string;
     program: string;
     level: string;
-    status: EnrollmentStatus;
     paymentScreenshot?: string;
   },
 >(rows: T[]) {
@@ -113,6 +169,7 @@ export function enrichRowsWithApplicationMeta<
       .filter((item) => item.id !== row.id)
       .map((item) => ({
         id: item.id,
+        fullName: "fullName" in item ? (item as { fullName: string }).fullName : undefined,
         courseTitle: item.courseTitle,
         program: item.program,
         level: item.level,
@@ -122,12 +179,15 @@ export function enrichRowsWithApplicationMeta<
       }))
       .sort((a, b) => new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime());
 
+    const duplicateMatch = getDuplicateMatchInfo(row, related);
+
     return {
       ...row,
       applicationNumber,
       totalApplications: related.length,
       isReturningApplicant: applicationNumber > 1,
       previousApplications,
+      duplicateMatch,
     };
   });
 }

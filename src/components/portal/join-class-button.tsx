@@ -36,7 +36,9 @@ export function JoinClassButton({
         return;
       }
 
-      toast.success("Opening class link...");
+      toast.success(
+        data.data?.attendance === "late" ? "Opening class — marked late" : "Opening class — marked present"
+      );
       window.open(data.data.meetLink, "_blank", "noopener,noreferrer");
     } catch {
       toast.error("Could not open class link. Please try again.");
