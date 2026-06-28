@@ -1,5 +1,6 @@
 import type { Program, ProgramModule } from "@/types";
 import { WEB_DEV_SYLLABUS } from "@/lib/data/web-dev-syllabus";
+import { FLUTTER_SYLLABUS } from "@/lib/data/flutter-syllabus";
 
 export const MODULE_SCHEDULE = {
   daysPerWeek: 3,
@@ -90,9 +91,27 @@ export const programs: Program[] = [
       "Publish apps to the Play Store and App Store",
     ],
     modules: [
-      createProgramModule("Dart & OOP", "Programming foundations for mobile development", "3 weeks"),
-      createProgramModule("Flutter Frontend", "Widgets, layouts, and polished mobile UI", "3 weeks"),
-      createProgramModule("Firebase & APIs", "Authentication, cloud data, and backend integration", "3 weeks"),
+      createProgramModule(
+        "Dart & OOP",
+        "Programming foundations for mobile development",
+        "3 weeks",
+        MODULE_SCHEDULE,
+        FLUTTER_SYLLABUS["Dart & OOP"]
+      ),
+      createProgramModule(
+        "Flutter Frontend",
+        "Widgets, layouts, and polished mobile UI",
+        "3 weeks",
+        MODULE_SCHEDULE,
+        FLUTTER_SYLLABUS["Flutter Frontend"]
+      ),
+      createProgramModule(
+        "Firebase & APIs",
+        "Authentication, cloud data, and backend integration",
+        "3 weeks",
+        MODULE_SCHEDULE,
+        FLUTTER_SYLLABUS["Firebase & APIs"]
+      ),
     ],
   },
   {
