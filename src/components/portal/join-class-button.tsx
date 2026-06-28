@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { VideoCamera } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -19,6 +20,7 @@ export function JoinClassButton({
   size = "lg",
   label = "Join Class",
 }: JoinClassButtonProps) {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const handleJoin = async () => {
@@ -36,12 +38,24 @@ export function JoinClassButton({
         return;
       }
 
-      toast.success(
-        data.data?.attendance === "late" ? "Opening class — marked late" : "Opening class — marked present"
-      );
-      window.open(data.data.meetLink, "_blank", "noopener,noreferrer");
+      const attendanceLabel =
+        data.data?.attendance === "late" ? "marked late" : "marked present";
+
+      if (data.data?.roomType === "portal" && data.data?.livePath) {
+        toast.success(`Entering class — ${attendanceLabel}`);
+        router.push(data.data.livePath);
+        return;
+      }
+
+      if (data.data?.meetLink) {
+        toast.success(`Opening class — ${attendanceLabel}`);
+        window.open(data.data.meetLink, "_blank", "noopener,noreferrer");
+        return;
+      }
+
+      toast.error("Class link not available");
     } catch {
-      toast.error("Could not open class link. Please try again.");
+      toast.error("Could not join class. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -57,7 +71,7 @@ export function JoinClassButton({
         disabled={loading}
       >
         <VideoCamera size={22} weight="duotone" />
-        {loading ? "Opening..." : label}
+        {loading ? "Joining..." : label}
       </Button>
     </div>
   );

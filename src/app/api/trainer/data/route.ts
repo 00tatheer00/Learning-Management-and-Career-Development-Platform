@@ -14,6 +14,7 @@ import {
   getSubmissions,
 } from "@/lib/api/portal-data";
 import { createApiResponse } from "@/lib/api/enrollment";
+import { isLiveKitConfigured } from "@/lib/livekit/config";
 
 export async function GET() {
   const user = await getCurrentUser();
@@ -54,6 +55,7 @@ export async function GET() {
             courseTitle: getTrainerCourseTitle(programSlug),
             designation: getTrainerDesignation(programSlug),
           },
+          portalVideoEnabled: isLiveKitConfigured(),
         },
       })
     );

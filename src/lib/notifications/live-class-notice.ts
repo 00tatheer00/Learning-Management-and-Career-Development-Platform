@@ -33,6 +33,8 @@ export async function notifyStudentsOfLiveClass(input: LiveClassNoticeInput): Pr
     "",
     `Join from your portal: ${loginUrl}`,
     "",
+    "Open Live Classes → Join Class (inside portal, no external link).",
+    "",
     "— EEST Team",
   ].join("\n");
 

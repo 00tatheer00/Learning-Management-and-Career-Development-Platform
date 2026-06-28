@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { getSessionRoomName } from "@/lib/livekit/config";
 import { getAdminProgramStats } from "@/lib/api/admin-program-stats";
 import { DEFAULT_BATCH_NAME } from "@/lib/constants/batch";
 import type {
@@ -274,6 +275,8 @@ function mapLiveSession(s: {
   date: string;
   time: string;
   meetLink: string;
+  roomType?: string | null;
+  roomName?: string | null;
   trainerId: string;
   trainerName: string;
   notes: string | null;
@@ -285,6 +288,8 @@ function mapLiveSession(s: {
     date: s.date,
     time: s.time,
     meetLink: s.meetLink,
+    roomType: s.roomType === "portal" ? "portal" : "meet",
+    roomName: s.roomName ?? undefined,
     trainerId: s.trainerId,
     trainerName: s.trainerName,
     notes: s.notes ?? undefined,
@@ -294,30 +299,27 @@ function mapLiveSession(s: {
 export async function createLiveSession(
   data: Omit<LiveSession, "id">
 ): Promise<LiveSession> {
+  const id = crypto.randomUUID();
+  const roomType = data.roomType ?? "meet";
+  const roomName =
+    roomType === "portal" ? getSessionRoomName(id) : data.roomName;
+
   const session = await prisma.liveSession.create({
     data: {
-      id: crypto.randomUUID(),
+      id,
       programSlug: data.programSlug,
       title: data.title,
       date: data.date,
       time: data.time,
-      meetLink: data.meetLink,
+      meetLink: data.meetLink ?? "",
+      roomType,
+      roomName,
       trainerId: data.trainerId,
       trainerName: data.trainerName,
       notes: data.notes,
     },
   });
-  return {
-    id: session.id,
-    programSlug: session.programSlug,
-    title: session.title,
-    date: session.date,
-    time: session.time,
-    meetLink: session.meetLink,
-    trainerId: session.trainerId,
-    trainerName: session.trainerName,
-    notes: session.notes ?? undefined,
-  };
+  return mapLiveSession(session);
 }
 
 export async function getPortalStats() {

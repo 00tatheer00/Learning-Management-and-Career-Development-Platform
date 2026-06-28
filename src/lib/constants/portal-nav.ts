@@ -12,6 +12,7 @@ import {
   GraduationCap,
   ChalkboardTeacher,
   Key,
+  Broadcast,
   ListChecks,
 } from "@phosphor-icons/react";
 
@@ -49,6 +50,7 @@ export const PORTAL_NAV: Record<UserRole, PortalNavItem[]> = {
     { href: "/admin/students", label: "Students", icon: GraduationCap, description: "All students" },
     { href: "/admin/credentials", label: "Portal Logins", icon: Key, description: "Student login IDs & passwords" },
     { href: "/admin/attendance", label: "Attendance", icon: ListChecks, description: "Class join records" },
+    { href: "/admin/live-classes", label: "Portal Classes", icon: Broadcast, description: "In-portal video rooms" },
     { href: "/admin/trainers", label: "Trainers", icon: Users, description: "All trainers" },
     { href: "/admin/courses", label: "Courses", icon: BookOpen, description: "Materials & content" },
     { href: "/admin/settings", label: "Settings", icon: Gear, description: "Portal settings" },

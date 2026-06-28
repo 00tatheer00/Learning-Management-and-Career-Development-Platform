@@ -136,7 +136,9 @@ model LiveSession {
   title       String
   date        String
   time        String
-  meetLink    String
+  meetLink    String  @default("")
+  roomType    String  @default("meet")
+  roomName    String?
   trainerId   String
   trainerName String
   notes       String?

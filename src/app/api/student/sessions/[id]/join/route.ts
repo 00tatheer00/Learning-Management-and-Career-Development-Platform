@@ -5,6 +5,7 @@ import { isWithinJoinWindow } from "@/lib/sessions/join-window";
 import { createApiResponse } from "@/lib/api/enrollment";
 import { recordClassJoin } from "@/lib/api/class-attendance";
 import { recordUserActivity } from "@/lib/auth/user-activity";
+import { isPortalRoomSession } from "@/lib/livekit/config";
 
 export async function GET(
   _request: Request,
@@ -54,10 +55,17 @@ export async function GET(
 
   return NextResponse.json(
     createApiResponse(true, {
-      data: {
-        meetLink: session.meetLink,
-        attendance: attendance.status,
-      },
+      data: isPortalRoomSession(session)
+        ? {
+            roomType: "portal" as const,
+            livePath: `/student/classes/${session.id}/live`,
+            attendance: attendance.status,
+          }
+        : {
+            roomType: "meet" as const,
+            meetLink: session.meetLink,
+            attendance: attendance.status,
+          },
     })
   );
 }

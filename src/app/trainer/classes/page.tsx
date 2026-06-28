@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { VideoCamera } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PortalPageHeader } from "@/components/portal/portal-ui";
 import { toast } from "@/lib/ui/toast";
+import { cn } from "@/lib/utils";
 
 interface LiveSession {
   id: string;
@@ -14,6 +16,7 @@ interface LiveSession {
   date: string;
   time: string;
   meetLink: string;
+  roomType: "portal" | "meet";
   programSlug: string;
 }
 
@@ -26,12 +29,14 @@ interface TrainerInfo {
 export default function TrainerClassesPage() {
   const [sessions, setSessions] = useState<LiveSession[]>([]);
   const [trainer, setTrainer] = useState<TrainerInfo | null>(null);
+  const [portalEnabled, setPortalEnabled] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     title: "",
     date: "",
     time: "07:00 PM",
+    roomType: "portal" as "portal" | "meet",
     meetLink: "",
     notes: "",
   });
@@ -43,11 +48,12 @@ export default function TrainerClassesPage() {
         if (d.success) {
           setSessions(d.data.sessions ?? []);
           setTrainer(d.data.trainer ?? null);
+          setPortalEnabled(Boolean(d.data.portalVideoEnabled));
         }
       });
 
   useEffect(() => {
-    load();
+    void load();
   }, []);
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -62,9 +68,21 @@ export default function TrainerClassesPage() {
       });
       const data = await res.json();
       if (data.success) {
-        toast.success("Class scheduled!", "Students notified on WhatsApp.");
+        toast.success(
+          form.roomType === "portal"
+            ? "Portal class scheduled!"
+            : "Class scheduled!",
+          "Students notified on WhatsApp."
+        );
         setShowForm(false);
-        setForm({ title: "", date: "", time: "07:00 PM", meetLink: "", notes: "" });
+        setForm({
+          title: "",
+          date: "",
+          time: "07:00 PM",
+          roomType: portalEnabled ? "portal" : "meet",
+          meetLink: "",
+          notes: "",
+        });
         load();
       } else {
         toast.error(data.message || data.error || "Failed to create class.");
@@ -82,8 +100,8 @@ export default function TrainerClassesPage() {
         title="Live Classes"
         description={
           trainer
-            ? `Schedule online classes for ${trainer.courseTitle}.`
-            : "Schedule online classes and share the meeting link with students."
+            ? `Schedule classes for ${trainer.courseTitle}. Portal rooms stay inside EEST — no shareable Meet link.`
+            : "Schedule online classes for your students."
         }
       >
         <Button size="lg" onClick={() => setShowForm(!showForm)}>
@@ -98,6 +116,27 @@ export default function TrainerClassesPage() {
         >
           <h2 className="font-bold text-lg">Schedule a New Class</h2>
           <p className="text-sm text-muted">Course: {trainer.courseTitle}</p>
+
+          <div className="flex flex-wrap gap-2">
+            <RoomTypePill
+              active={form.roomType === "portal"}
+              disabled={!portalEnabled}
+              label="Portal room (recommended)"
+              onClick={() => setForm({ ...form, roomType: "portal", meetLink: "" })}
+            />
+            <RoomTypePill
+              active={form.roomType === "meet"}
+              label="External Meet / Zoom"
+              onClick={() => setForm({ ...form, roomType: "meet" })}
+            />
+          </div>
+
+          {!portalEnabled && (
+            <p className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+              Portal video not configured yet — use external link or ask admin to add LiveKit keys.
+            </p>
+          )}
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="sm:col-span-2">
               <Label className="text-base">Class Title</Label>
@@ -129,16 +168,18 @@ export default function TrainerClassesPage() {
                 required
               />
             </div>
-            <div className="sm:col-span-2">
-              <Label className="text-base">Meeting Link (Google Meet / Zoom)</Label>
-              <Input
-                className="mt-2 h-12"
-                value={form.meetLink}
-                onChange={(e) => setForm({ ...form, meetLink: e.target.value })}
-                placeholder="https://meet.google.com/..."
-                required
-              />
-            </div>
+            {form.roomType === "meet" && (
+              <div className="sm:col-span-2">
+                <Label className="text-base">Meeting Link (Google Meet / Zoom)</Label>
+                <Input
+                  className="mt-2 h-12"
+                  value={form.meetLink}
+                  onChange={(e) => setForm({ ...form, meetLink: e.target.value })}
+                  placeholder="https://meet.google.com/..."
+                  required
+                />
+              </div>
+            )}
           </div>
           <Button type="submit" size="lg" disabled={loading}>
             {loading ? "Saving..." : "Save Class"}
@@ -156,20 +197,68 @@ export default function TrainerClassesPage() {
               className="rounded-2xl border border-border bg-background p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
             >
               <div>
-                <p className="font-bold text-lg">{session.title}</p>
+                <div className="flex items-center gap-2 mb-1">
+                  <p className="font-bold text-lg">{session.title}</p>
+                  <span
+                    className={cn(
+                      "text-[10px] font-bold uppercase rounded-full px-2 py-0.5",
+                      session.roomType === "portal"
+                        ? "bg-orange-100 text-orange-800"
+                        : "bg-zinc-100 text-zinc-600"
+                    )}
+                  >
+                    {session.roomType === "portal" ? "Portal" : "External"}
+                  </span>
+                </div>
                 <p className="text-muted text-sm">
                   {session.date} · {session.time}
                 </p>
               </div>
-              <Button asChild>
-                <a href={session.meetLink} target="_blank" rel="noopener noreferrer">
-                  <VideoCamera size={18} weight="duotone" /> Open Link
-                </a>
-              </Button>
+              {session.roomType === "portal" ? (
+                <Button asChild>
+                  <Link href={`/trainer/classes/${session.id}/live`}>
+                    <VideoCamera size={18} weight="duotone" /> Start / Join Class
+                  </Link>
+                </Button>
+              ) : (
+                <Button asChild>
+                  <a href={session.meetLink} target="_blank" rel="noopener noreferrer">
+                    <VideoCamera size={18} weight="duotone" /> Open Link
+                  </a>
+                </Button>
+              )}
             </div>
           ))
         )}
       </div>
     </div>
+  );
+}
+
+function RoomTypePill({
+  active,
+  disabled,
+  label,
+  onClick,
+}: {
+  active: boolean;
+  disabled?: boolean;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onClick}
+      className={cn(
+        "rounded-full px-4 py-2 text-sm font-semibold border cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",
+        active
+          ? "border-primary bg-primary text-white"
+          : "border-border bg-background text-muted hover:text-foreground"
+      )}
+    >
+      {label}
+    </button>
   );
 }
