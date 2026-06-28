@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/session";
 import { createApiResponse } from "@/lib/api/enrollment";
 import { prisma } from "@/lib/prisma";
-import { isLiveKitConfigured } from "@/lib/livekit/config";
 import { getProgramBySlug } from "@/lib/data/programs";
+import { getJitsiDomain } from "@/lib/portal-video/config";
 
 export async function GET() {
   const user = await getCurrentUser();
@@ -32,7 +32,8 @@ export async function GET() {
   return NextResponse.json(
     createApiResponse(true, {
       data: {
-        configured: isLiveKitConfigured(),
+        configured: true,
+        jitsiDomain: getJitsiDomain(),
         portalCount: rows.filter((row) => row.roomType === "portal").length,
         meetCount: rows.filter((row) => row.roomType === "meet").length,
         rows,

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { VideoCamera, CheckCircle, WarningCircle } from "@phosphor-icons/react";
+import { VideoCamera, CheckCircle } from "@phosphor-icons/react";
 import { PortalPageHeader } from "@/components/portal/portal-ui";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -21,7 +21,7 @@ interface LiveClassRow {
 
 export default function AdminLiveClassesPage() {
   const [rows, setRows] = useState<LiveClassRow[]>([]);
-  const [configured, setConfigured] = useState(false);
+  const [jitsiDomain, setJitsiDomain] = useState("meet.jit.si");
   const [portalCount, setPortalCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -32,7 +32,7 @@ export default function AdminLiveClassesPage() {
       const json = await res.json();
       if (json.success) {
         setRows(json.data?.rows ?? []);
-        setConfigured(Boolean(json.data?.configured));
+        setJitsiDomain(json.data?.jitsiDomain ?? "meet.jit.si");
         setPortalCount(json.data?.portalCount ?? 0);
       }
     } finally {
@@ -48,30 +48,21 @@ export default function AdminLiveClassesPage() {
     <div className="space-y-4">
       <PortalPageHeader
         title="Portal Live Classes"
-        description="In-portal video rooms — no Google Meet link to share. Video runs on LiveKit cloud, not Vercel."
+        description="100% free in-portal video (Jitsi). No API keys. Vercel sirf page serve karta hai — video alag server par."
       />
 
-      <div
-        className={cn(
-          "rounded-2xl border p-4 flex items-start gap-3",
-          configured
-            ? "border-emerald-200 bg-emerald-50"
-            : "border-amber-200 bg-amber-50"
-        )}
-      >
-        {configured ? (
-          <CheckCircle size={24} className="text-emerald-600 shrink-0" weight="fill" />
-        ) : (
-          <WarningCircle size={24} className="text-amber-600 shrink-0" weight="fill" />
-        )}
-        <div className="text-sm">
-          <p className="font-bold text-foreground">
-            {configured ? "LiveKit connected" : "LiveKit not configured"}
+      <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 flex items-start gap-3">
+        <CheckCircle size={24} className="text-emerald-600 shrink-0" weight="fill" />
+        <div className="text-sm space-y-2">
+          <p className="font-bold text-foreground">Free — koi LiveKit / paid plan nahi</p>
+          <p className="text-muted">
+            Server: <strong>{jitsiDomain}</strong> · {portalCount} portal class(es). Mic, camera,
+            screen share, chat, raise hand — sab built-in.
           </p>
-          <p className="text-muted mt-1">
-            {configured
-              ? `${portalCount} portal class(es) scheduled. Trainers create portal rooms from Live Classes.`
-              : "Add LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET on Vercel. Until then, trainers can use external Meet links."}
+          <p className="text-xs text-amber-900 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+            <strong>150 students:</strong> public meet.jit.si par limit ho sakti hai. Bari batch ke
+            liye baad mein Oracle free VPS par apna Jitsi (still $0) — env{" "}
+            <code className="text-[11px]">JITSI_DOMAIN</code> set karo.
           </p>
         </div>
       </div>
@@ -121,14 +112,14 @@ export default function AdminLiveClassesPage() {
                             : "bg-zinc-100 text-zinc-700"
                         )}
                       >
-                        {row.roomType === "portal" ? "Portal room" : "External link"}
+                        {row.roomType === "portal" ? "Portal (free)" : "External link"}
                       </span>
                     </td>
                     <td className="px-4 py-3">
                       {row.roomType === "portal" ? (
                         <Button size="sm" asChild>
                           <Link href={`/admin/live-classes/${row.id}/live`}>
-                            <VideoCamera size={16} /> Join as admin
+                            <VideoCamera size={16} /> Join
                           </Link>
                         </Button>
                       ) : row.meetLink ? (

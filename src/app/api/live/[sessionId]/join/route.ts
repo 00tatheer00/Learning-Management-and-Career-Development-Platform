@@ -3,9 +3,8 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { getLiveSessionById } from "@/lib/api/portal-data";
 import { isWithinJoinWindow } from "@/lib/sessions/join-window";
 import { createApiResponse } from "@/lib/api/enrollment";
-import { isLiveKitConfigured, getLiveKitConfig } from "@/lib/livekit/config";
-import { createLiveKitAccessToken } from "@/lib/livekit/tokens";
-import { resolveLiveSessionAccess } from "@/lib/livekit/session-access";
+import { getJitsiDomain, getSessionRoomName } from "@/lib/portal-video/config";
+import { resolveLiveSessionAccess } from "@/lib/portal-video/session-access";
 
 export async function POST(
   _request: Request,
@@ -16,15 +15,6 @@ export async function POST(
     return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), {
       status: 401,
     });
-  }
-
-  if (!isLiveKitConfigured()) {
-    return NextResponse.json(
-      createApiResponse(false, {
-        message: "Portal video is not configured yet. Ask admin to add LiveKit keys.",
-      }),
-      { status: 503 }
-    );
   }
 
   const { sessionId } = await params;
@@ -52,25 +42,14 @@ export async function POST(
     );
   }
 
-  const waitingRoom = access.role === "student";
-  const token = await createLiveKitAccessToken({
-    sessionId: session.id,
-    userId: user.id,
-    userName: user.name,
-    role: access.role,
-    waitingRoom,
-  });
-
-  const { url } = getLiveKitConfig();
-
   return NextResponse.json(
     createApiResponse(true, {
       data: {
-        token,
-        url,
-        sessionTitle: session.title,
+        domain: getJitsiDomain(),
+        roomName: session.roomName ?? getSessionRoomName(session.id),
+        displayName: user.name,
+        password: session.roomPassword ?? undefined,
         role: access.role,
-        waitingRoom,
       },
     })
   );

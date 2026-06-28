@@ -1,7 +1,7 @@
 import type { LiveSession } from "@/types/portal";
 import type { PortalUser } from "@/types/portal";
-import type { LiveRoomRole } from "@/lib/livekit/config";
-import { isPortalRoomSession } from "@/lib/livekit/config";
+import type { LiveRoomRole } from "@/lib/portal-video/config";
+import { isPortalRoomSession } from "@/lib/portal-video/config";
 
 export function resolveLiveSessionAccess(
   session: LiveSession,

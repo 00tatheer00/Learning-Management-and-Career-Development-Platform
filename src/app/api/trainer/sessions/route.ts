@@ -5,7 +5,6 @@ import { requireTrainerProgram } from "@/lib/auth/trainer-scope";
 import { createLiveSession } from "@/lib/api/portal-data";
 import { createApiResponse } from "@/lib/api/enrollment";
 import { notifyStudentsOfLiveClass } from "@/lib/notifications/live-class-notice";
-import { isLiveKitConfigured } from "@/lib/livekit/config";
 
 const schema = z
   .object({
@@ -23,13 +22,6 @@ const schema = z
         code: z.ZodIssueCode.custom,
         message: "Meeting link is required for external classes",
         path: ["meetLink"],
-      });
-    }
-    if (data.roomType === "portal" && !isLiveKitConfigured()) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Portal video is not configured. Use external link or ask admin to add LiveKit keys.",
-        path: ["roomType"],
       });
     }
   });

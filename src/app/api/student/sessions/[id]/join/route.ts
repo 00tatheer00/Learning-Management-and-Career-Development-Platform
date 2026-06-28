@@ -5,7 +5,7 @@ import { isWithinJoinWindow } from "@/lib/sessions/join-window";
 import { createApiResponse } from "@/lib/api/enrollment";
 import { recordClassJoin } from "@/lib/api/class-attendance";
 import { recordUserActivity } from "@/lib/auth/user-activity";
-import { isPortalRoomSession } from "@/lib/livekit/config";
+import { isPortalRoomSession } from "@/lib/portal-video/config";
 
 export async function GET(
   _request: Request,

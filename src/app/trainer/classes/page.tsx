@@ -133,7 +133,7 @@ export default function TrainerClassesPage() {
 
           {!portalEnabled && (
             <p className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-              Portal video not configured yet — use external link or ask admin to add LiveKit keys.
+              Portal video loading… refresh if this stays.
             </p>
           )}
 

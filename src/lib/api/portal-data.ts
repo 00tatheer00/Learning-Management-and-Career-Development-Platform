@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { getSessionRoomName } from "@/lib/livekit/config";
+import { getSessionRoomName, generateRoomPassword } from "@/lib/portal-video/config";
 import { getAdminProgramStats } from "@/lib/api/admin-program-stats";
 import { DEFAULT_BATCH_NAME } from "@/lib/constants/batch";
 import type {
@@ -9,8 +9,14 @@ import type {
   EnrollmentRecord,
   EnrollmentStatus,
   LiveSession,
+  LiveSessionPublic,
 } from "@/types/portal";
 import type { EnrollmentPayload } from "@/types";
+
+function stripSessionPassword(session: LiveSession): LiveSessionPublic {
+  const { roomPassword: _roomPassword, ...publicSession } = session;
+  return publicSession;
+}
 
 function mapEnrollment(record: {
   id: string;
@@ -66,7 +72,7 @@ function mapEnrollment(record: {
   };
 }
 
-export type LiveSessionPreview = Omit<LiveSession, "meetLink">;
+export type LiveSessionPreview = Omit<LiveSessionPublic, "meetLink">;
 
 export async function getEnrollmentByEmail(email: string) {
   return prisma.enrollment.findFirst({
@@ -250,12 +256,12 @@ export async function updateSubmission(
   }
 }
 
-export async function getLiveSessions(programSlug?: string): Promise<LiveSession[]> {
+export async function getLiveSessions(programSlug?: string): Promise<LiveSessionPublic[]> {
   const sessions = await prisma.liveSession.findMany({
     where: programSlug ? { programSlug } : undefined,
     orderBy: { date: "asc" },
   });
-  return sessions.map(mapLiveSession);
+  return sessions.map(mapLiveSession).map(stripSessionPassword);
 }
 
 export async function getLiveSessionsPreview(programSlug?: string): Promise<LiveSessionPreview[]> {
@@ -277,6 +283,7 @@ function mapLiveSession(s: {
   meetLink: string;
   roomType?: string | null;
   roomName?: string | null;
+  roomPassword?: string | null;
   trainerId: string;
   trainerName: string;
   notes: string | null;
@@ -290,6 +297,7 @@ function mapLiveSession(s: {
     meetLink: s.meetLink,
     roomType: s.roomType === "portal" ? "portal" : "meet",
     roomName: s.roomName ?? undefined,
+    roomPassword: s.roomPassword ?? undefined,
     trainerId: s.trainerId,
     trainerName: s.trainerName,
     notes: s.notes ?? undefined,
@@ -301,8 +309,8 @@ export async function createLiveSession(
 ): Promise<LiveSession> {
   const id = crypto.randomUUID();
   const roomType = data.roomType ?? "meet";
-  const roomName =
-    roomType === "portal" ? getSessionRoomName(id) : data.roomName;
+  const roomName = roomType === "portal" ? getSessionRoomName(id) : data.roomName;
+  const roomPassword = roomType === "portal" ? generateRoomPassword() : undefined;
 
   const session = await prisma.liveSession.create({
     data: {
@@ -314,6 +322,7 @@ export async function createLiveSession(
       meetLink: data.meetLink ?? "",
       roomType,
       roomName,
+      roomPassword,
       trainerId: data.trainerId,
       trainerName: data.trainerName,
       notes: data.notes,

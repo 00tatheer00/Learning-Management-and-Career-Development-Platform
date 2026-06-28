@@ -81,10 +81,13 @@ export interface LiveSession {
   meetLink: string;
   roomType: "meet" | "portal";
   roomName?: string;
+  roomPassword?: string;
   trainerId: string;
   trainerName: string;
   notes?: string;
 }
+
+export type LiveSessionPublic = Omit<LiveSession, "roomPassword">;
 
 export interface PortalUser {
   id: string;

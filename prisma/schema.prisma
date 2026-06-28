@@ -139,6 +139,7 @@ model LiveSession {
   meetLink    String  @default("")
   roomType    String  @default("meet")
   roomName    String?
+  roomPassword String?
   trainerId   String
   trainerName String
   notes       String?

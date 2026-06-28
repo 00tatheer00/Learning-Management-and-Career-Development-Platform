@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getLiveSessionById } from "@/lib/api/portal-data";
 import { PortalLiveRoom } from "@/components/portal/portal-live-room";
-import { isPortalRoomSession } from "@/lib/livekit/config";
+import { isPortalRoomSession } from "@/lib/portal-video/config";
 
 export default async function TrainerLiveClassPage({
   params,
