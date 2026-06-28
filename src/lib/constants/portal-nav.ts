@@ -38,7 +38,7 @@ export const PORTAL_NAV: Record<UserRole, PortalNavItem[]> = {
   trainer: [
     { href: "/trainer/dashboard", label: "Home", icon: House, description: "Trainer dashboard" },
     { href: "/trainer/students", label: "My Students", icon: Users, description: "See enrolled students" },
-    { href: "/trainer/classes", label: "Live Classes", icon: VideoCamera, description: "Schedule & links" },
+    { href: "/trainer/classes", label: "Portal Classes", icon: VideoCamera, description: "Free in-portal live video" },
     { href: "/trainer/assignments", label: "Assignments", icon: ClipboardText, description: "Create & review work" },
     { href: "/trainer/materials", label: "Course Videos", icon: BookOpen, description: "Learning materials" },
     { href: "/trainer/settings", label: "Settings", icon: Gear, description: "Edit your profile" },
@@ -46,11 +46,11 @@ export const PORTAL_NAV: Record<UserRole, PortalNavItem[]> = {
   ],
   admin: [
     { href: "/admin/dashboard", label: "Home", icon: ChartBar, description: "Overview & stats" },
+    { href: "/admin/live-classes", label: "Portal Classes", icon: Broadcast, description: "In-portal video rooms" },
     { href: "/admin/enrollments", label: "Registrations", icon: ClipboardText, description: "Approve new students" },
     { href: "/admin/students", label: "Students", icon: GraduationCap, description: "All students" },
     { href: "/admin/credentials", label: "Portal Logins", icon: Key, description: "Student login IDs & passwords" },
     { href: "/admin/attendance", label: "Attendance", icon: ListChecks, description: "Class join records" },
-    { href: "/admin/live-classes", label: "Portal Classes", icon: Broadcast, description: "In-portal video rooms" },
     { href: "/admin/trainers", label: "Trainers", icon: Users, description: "All trainers" },
     { href: "/admin/courses", label: "Courses", icon: BookOpen, description: "Materials & content" },
     { href: "/admin/settings", label: "Settings", icon: Gear, description: "Portal settings" },

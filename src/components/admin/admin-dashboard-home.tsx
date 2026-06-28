@@ -5,6 +5,7 @@ import Link from "next/link";
 import CountUp from "react-countup";
 import {
   ArrowRight,
+  Broadcast,
   ChartBar,
   ClipboardText,
   GraduationCap,
@@ -191,6 +192,7 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
         <div className="rounded-xl border border-zinc-200/80 bg-white p-4 shadow-sm flex flex-col min-h-0">
           <p className="text-xs font-bold uppercase tracking-widest text-zinc-400 mb-3">Quick Access</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 flex-1 content-stretch">
+            <NavTile href="/admin/live-classes" title="Portal Classes" subtitle="Free in-portal video" icon={<Broadcast size={20} weight="duotone" />} gradient="from-orange-500 to-red-500" />
             <NavTile href="/admin/enrollments" title="Registrations" subtitle="Approve applications" icon={<ClipboardText size={20} weight="duotone" />} gradient="from-orange-500 to-amber-500" />
             <NavTile href="/admin/students" title="Students" subtitle="All accounts" icon={<GraduationCap size={20} weight="duotone" />} gradient="from-blue-500 to-indigo-500" />
             <NavTile href="/admin/credentials" title="Portal Logins" subtitle="IDs & passwords" icon={<Key size={20} weight="duotone" />} gradient="from-amber-500 to-orange-600" />

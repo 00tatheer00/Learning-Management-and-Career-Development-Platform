@@ -63,7 +63,7 @@ export default async function TrainerDashboardPage() {
         description={`${designation} · ${courseTitle}`}
       >
         <Button size="sm" asChild className="h-8 text-xs">
-          <Link href="/trainer/classes">Schedule Class</Link>
+          <Link href="/trainer/classes">Portal Classes</Link>
         </Button>
       </PortalPageHeader>
 
@@ -106,7 +106,7 @@ export default async function TrainerDashboardPage() {
         <PortalSectionTitle title="Quick Access" />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           <QuickActionCard compact href="/trainer/students" title="View Students" description={`Students in ${courseTitle}`} icon={<Users size={18} weight="duotone" />} gradient="from-blue-500 to-indigo-500" />
-          <QuickActionCard compact href="/trainer/classes" title="Live Classes" description="Schedule & share links" icon={<VideoCamera size={18} weight="duotone" />} gradient="from-orange-500 to-amber-500" />
+          <QuickActionCard compact href="/trainer/classes" title="Portal Classes" description="Free in-portal live video" icon={<VideoCamera size={18} weight="duotone" />} gradient="from-orange-500 to-amber-500" />
           <QuickActionCard compact href="/trainer/assignments" title="Assignments" description="Create & review work" icon={<ClipboardText size={18} weight="duotone" />} gradient="from-violet-500 to-purple-600" />
           <QuickActionCard compact href="/trainer/materials" title="Course Videos" description="Learning materials" icon={<BookOpen size={18} weight="duotone" />} gradient="from-emerald-500 to-teal-600" />
         </div>

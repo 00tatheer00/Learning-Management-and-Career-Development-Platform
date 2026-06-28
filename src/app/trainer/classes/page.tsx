@@ -29,7 +29,7 @@ interface TrainerInfo {
 export default function TrainerClassesPage() {
   const [sessions, setSessions] = useState<LiveSession[]>([]);
   const [trainer, setTrainer] = useState<TrainerInfo | null>(null);
-  const [portalEnabled, setPortalEnabled] = useState(false);
+  const [portalEnabled, setPortalEnabled] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
@@ -97,11 +97,11 @@ export default function TrainerClassesPage() {
   return (
     <div>
       <PortalPageHeader
-        title="Live Classes"
+        title="Portal Classes"
         description={
           trainer
-            ? `Schedule classes for ${trainer.courseTitle}. Portal rooms stay inside EEST — no shareable Meet link.`
-            : "Schedule online classes for your students."
+            ? `Free in-portal video for ${trainer.courseTitle}. No Google Meet link to share.`
+            : "Schedule portal classes for your students."
         }
       >
         <Button size="lg" onClick={() => setShowForm(!showForm)}>
