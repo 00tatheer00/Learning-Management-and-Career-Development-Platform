@@ -1,6 +1,7 @@
 import { getMaterials, getAssignments, getLiveSessions } from "@/lib/api/portal-data";
 import { programs } from "@/lib/data/programs";
 import { PortalPageHeader } from "@/components/portal/portal-ui";
+import { CourseSyllabusBrowser } from "@/components/portal/course-modules-syllabus";
 import { BookOpen, ClipboardText, VideoCamera } from "@phosphor-icons/react/ssr";
 
 export default async function AdminCoursesPage() {
@@ -30,6 +31,14 @@ export default async function AdminCoursesPage() {
           <p className="text-3xl font-bold">{sessions.length}</p>
           <p className="text-sm text-muted">Live Classes</p>
         </div>
+      </div>
+
+      <h2 className="text-lg font-bold mb-2">Course Syllabus</h2>
+      <p className="text-sm text-muted mb-4">
+        Click a course, then a module, to view all topics students will study.
+      </p>
+      <div className="mb-10">
+        <CourseSyllabusBrowser programs={programs} />
       </div>
 
       <h2 className="text-lg font-bold mb-4">All Programs</h2>

@@ -1,4 +1,5 @@
 import type { Program, ProgramModule } from "@/types";
+import { WEB_DEV_SYLLABUS } from "@/lib/data/web-dev-syllabus";
 
 export const MODULE_SCHEDULE = {
   daysPerWeek: 3,
@@ -9,7 +10,8 @@ function createProgramModule(
   name: string,
   subtitle: string,
   duration: string,
-  schedule: { daysPerWeek: number; hoursPerDay: number } = MODULE_SCHEDULE
+  schedule: { daysPerWeek: number; hoursPerDay: number } = MODULE_SCHEDULE,
+  topics?: string[]
 ): ProgramModule {
   return {
     name,
@@ -17,6 +19,7 @@ function createProgramModule(
     duration,
     daysPerWeek: schedule.daysPerWeek,
     hoursPerDay: schedule.hoursPerDay,
+    ...(topics && topics.length > 0 ? { topics } : {}),
   };
 }
 
@@ -42,22 +45,30 @@ export const programs: Program[] = [
       createProgramModule(
         "HTML & CSS",
         "For very beginners learning web for the first time",
-        "1 month"
+        "1 month",
+        MODULE_SCHEDULE,
+        WEB_DEV_SYLLABUS["HTML & CSS"]
       ),
       createProgramModule(
         "JavaScript",
         "For those who want to learn a programming language easily",
-        "3 weeks"
+        "3 weeks",
+        MODULE_SCHEDULE,
+        WEB_DEV_SYLLABUS.JavaScript
       ),
       createProgramModule(
         "React",
         "To build websites with fast, modern UI",
-        "3 weeks"
+        "3 weeks",
+        MODULE_SCHEDULE,
+        WEB_DEV_SYLLABUS.React
       ),
       createProgramModule(
         "Backend + Database",
         "Node.js, Express, and MongoDB for full-stack apps",
-        "1 month"
+        "1 month",
+        MODULE_SCHEDULE,
+        WEB_DEV_SYLLABUS["Backend + Database"]
       ),
     ],
   },

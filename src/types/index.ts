@@ -4,6 +4,7 @@ export interface ProgramModule {
   duration: string;
   daysPerWeek: number;
   hoursPerDay: number;
+  topics?: string[];
 }
 
 /** @deprecated Use ProgramModule */
