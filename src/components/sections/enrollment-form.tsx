@@ -25,7 +25,8 @@ import {
 import { preparePaymentScreenshot } from "@/lib/utils/payment-screenshot";
 import { PAYMENT_CONFIG, ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
 import { PaymentInfoCard } from "@/components/shared/payment-info-card";
-import { programs, formatModuleSchedule } from "@/lib/data/programs";
+import { ProgramSyllabusSection } from "@/components/shared/program-syllabus-section";
+import { programs, formatModuleSchedule, programHasSyllabus } from "@/lib/data/programs";
 import type { ProgramModule } from "@/types";
 import { cn } from "@/lib/utils";
 import { Alert } from "@/components/ui/alert";
@@ -113,6 +114,11 @@ function EnrollmentModulePicker({
                     <CalendarDots size={14} weight="duotone" className="text-primary" aria-hidden="true" />
                     {formatModuleSchedule(mod)}
                   </span>
+                  {(mod.topics?.length ?? 0) > 0 && (
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-2.5 py-1 text-xs font-semibold text-primary">
+                      {mod.topics!.length} topics
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -715,6 +721,11 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                   )}
                 />
                 <FieldError message={errors.level?.message} />
+                {activeProgram && programHasSyllabus(activeProgram) && (
+                  <div className="rounded-2xl border border-primary/15 bg-primary/[0.03] p-4 sm:p-5">
+                    <ProgramSyllabusSection program={activeProgram} compact />
+                  </div>
+                )}
               </div>
 
               <div className="sm:col-span-2">

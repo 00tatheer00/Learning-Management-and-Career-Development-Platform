@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, Clock, Layers } from "lucide-react";
 import { PageHero } from "@/components/shared/page-hero";
+import { ProgramSyllabusSection } from "@/components/shared/program-syllabus-section";
 import { ProgramModuleTimeline } from "@/components/shared/program-module-timeline";
 import { TrainerCard } from "@/components/shared/trainer-card";
 import { BreadcrumbSchema, CourseSchema } from "@/components/seo/json-ld";
@@ -9,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { createMetadata } from "@/lib/seo/metadata";
 import { SITE_CONFIG } from "@/lib/constants";
-import { programs, getProgramBySlug } from "@/lib/data/programs";
+import { programs, getProgramBySlug, getProgramTopicCount, programHasSyllabus } from "@/lib/data/programs";
 import { getTrainersByProgramSlug } from "@/lib/data/trainers";
 
 interface ProgramPageProps {
@@ -80,9 +81,16 @@ export default async function ProgramDetailPage({ params }: ProgramPageProps) {
                 {program.modules.length} modules
               </span>
             )}
+            {programHasSyllabus(program) && (
+              <span className="flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-sm font-medium text-primary">
+                {getProgramTopicCount(program)} topics
+              </span>
+            )}
           </div>
 
-          {program.modules.length > 0 && (
+          {programHasSyllabus(program) ? (
+            <ProgramSyllabusSection program={program} />
+          ) : program.modules.length > 0 ? (
             <div className="mb-14">
               <div className="mb-6">
                 <p className="text-sm font-bold uppercase tracking-[0.18em] text-primary">
@@ -95,7 +103,7 @@ export default async function ProgramDetailPage({ params }: ProgramPageProps) {
               </div>
               <ProgramModuleTimeline modules={program.modules} />
             </div>
-          )}
+          ) : null}
 
           <div className="mb-14">
             <div className="mb-6">

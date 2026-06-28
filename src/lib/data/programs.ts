@@ -199,3 +199,11 @@ export function getProgramBySlug(slug: string): Program | undefined {
 export function formatModuleSchedule(mod: ProgramModule) {
   return `${mod.daysPerWeek} days/week · ${mod.hoursPerDay} hr/class`;
 }
+
+export function getProgramTopicCount(program: Program): number {
+  return program.modules.reduce((sum, mod) => sum + (mod.topics?.length ?? 0), 0);
+}
+
+export function programHasSyllabus(program: Program): boolean {
+  return program.modules.some((mod) => (mod.topics?.length ?? 0) > 0);
+}

@@ -12,11 +12,13 @@ import {
   Megaphone,
   PaintBrushBroad,
   CalendarDots,
+  ListBullets,
   Stack,
 } from "@phosphor-icons/react";
 import type { Icon } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { getProgramAccent } from "@/lib/constants/program-accents";
+import { getProgramTopicCount, programHasSyllabus } from "@/lib/data/programs";
 import type { Program } from "@/types";
 
 const PROGRAM_ICONS: Record<string, Icon> = {
@@ -38,6 +40,8 @@ export function ProgramCard({ program, className }: ProgramCardProps) {
   const accent = getProgramAccent(program.slug);
   const Icon = PROGRAM_ICONS[program.slug] ?? Code;
   const isActive = program.category === "active";
+  const topicCount = getProgramTopicCount(program);
+  const hasSyllabus = programHasSyllabus(program);
 
   return (
     <Link
@@ -101,6 +105,12 @@ export function ProgramCard({ program, className }: ProgramCardProps) {
               <span className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-surface/80 px-3 py-1 text-xs font-medium text-muted">
                 <Stack size={14} weight="duotone" className="text-primary" aria-hidden="true" />
                 {program.modules.length} modules
+              </span>
+            )}
+            {hasSyllabus && (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-semibold text-primary">
+                <ListBullets size={14} weight="duotone" aria-hidden="true" />
+                {topicCount} topics
               </span>
             )}
           </div>
