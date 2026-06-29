@@ -38,7 +38,7 @@ const footerLinks = {
 export function Footer() {
   return (
     <footer className="border-t border-border bg-surface section-alt" role="contentinfo">
-      <div className="container-custom section-padding pb-8">
+      <div className="container-custom px-4 sm:px-6 lg:px-8 pt-12 pb-8 sm:pt-16 sm:pb-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10 lg:gap-8">
           <div className="lg:col-span-2">
             <SiteLogo variant="footer" className="mb-4" />
@@ -51,21 +51,21 @@ export function Footer() {
             <div className="space-y-2 text-sm text-muted">
               <a
                 href={`mailto:${SITE_CONFIG.email}`}
-                className="flex items-center gap-2 hover:text-primary transition-colors"
+                className="flex items-center gap-2 hover:text-primary transition-colors min-w-0"
               >
-                <Mail className="w-4 h-4 text-primary" strokeWidth={1.75} aria-hidden="true" />
-                {SITE_CONFIG.email}
+                <Mail className="w-4 h-4 text-primary shrink-0" strokeWidth={1.75} aria-hidden="true" />
+                <span className="break-all">{SITE_CONFIG.email}</span>
               </a>
               <a
                 href={getOfficialTelHref()}
-                className="flex items-center gap-2 hover:text-primary transition-colors"
+                className="flex items-center gap-2 hover:text-primary transition-colors min-w-0"
               >
-                <Phone className="w-4 h-4 text-primary" strokeWidth={1.75} aria-hidden="true" />
-                {SITE_CONFIG.phone}
+                <Phone className="w-4 h-4 text-primary shrink-0" strokeWidth={1.75} aria-hidden="true" />
+                <span className="break-words">{SITE_CONFIG.phone}</span>
               </a>
-              <span className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-primary" strokeWidth={1.75} aria-hidden="true" />
-                {SITE_CONFIG.address}
+              <span className="flex items-start gap-2 min-w-0">
+                <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" strokeWidth={1.75} aria-hidden="true" />
+                <span className="break-words">{SITE_CONFIG.address}</span>
               </span>
             </div>
           </div>
@@ -95,7 +95,7 @@ export function Footer() {
           <p className="text-sm text-muted">
             &copy; {new Date().getFullYear()} {SITE_CONFIG.name}. All rights reserved.
           </p>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap justify-center sm:justify-end gap-x-4 gap-y-2">
             {Object.entries(SITE_CONFIG.social).map(([platform, url]) => (
               <a
                 key={platform}

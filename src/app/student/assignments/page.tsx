@@ -127,7 +127,7 @@ export default function StudentAssignmentsPage() {
                       className="mt-2 w-full rounded-xl border border-border bg-background px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary/30"
                     />
                   </div>
-                  <div className="flex gap-3">
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                     <Button
                       size="lg"
                       onClick={() => handleSubmit(assignment.id)}

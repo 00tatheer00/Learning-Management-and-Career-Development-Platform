@@ -114,7 +114,7 @@ export function Navbar() {
             aria-label="Close menu overlay"
             onClick={() => setIsMobileOpen(false)}
           />
-          <div className="lg:hidden glass-strong border-t border-border relative z-50">
+          <div className="lg:hidden glass-strong border-t border-border relative z-50 max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain">
             <div className="container-custom px-4 py-6 flex flex-col gap-1">
               {NAV_LINKS.map((link) => {
                 const active = isNavLinkActive(pathname, hash, link.href, navHrefs);

@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { cn } from "@/lib/utils";
+import { PORTAL_VIEWPORT_PANEL } from "@/lib/constants/portal-layout";
 
 function Bone({ className, style }: { className?: string; style?: CSSProperties }) {
   return <div className={cn("animate-pulse rounded-lg bg-zinc-200/70", className)} style={style} />;
@@ -7,7 +8,7 @@ function Bone({ className, style }: { className?: string; style?: CSSProperties 
 
 export function AdminDashboardSkeleton() {
   return (
-    <div className="flex flex-col h-[calc(100dvh-3.5rem-2.5rem)] max-h-[calc(100dvh-3.5rem-2.5rem)] overflow-hidden gap-3">
+    <div className={PORTAL_VIEWPORT_PANEL}>
       <div className="shrink-0 flex items-end justify-between gap-3">
         <div className="space-y-2">
           <Bone className="h-3 w-16" />
@@ -16,7 +17,7 @@ export function AdminDashboardSkeleton() {
         <Bone className="h-9 w-28 rounded-xl" />
       </div>
 
-      <div className="shrink-0 grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="shrink-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {Array.from({ length: 4 }).map((_, i) => (
           <div key={i} className="rounded-xl border border-zinc-100 bg-white p-3.5">
             <div className="flex items-center gap-3">
@@ -59,7 +60,7 @@ export function AdminDashboardSkeleton() {
               <Bone className="h-5 w-3/4" />
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-2 mt-auto pt-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-auto pt-3">
             {Array.from({ length: 3 }).map((_, i) => (
               <Bone key={i} className="h-14 rounded-xl" />
             ))}

@@ -41,7 +41,7 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
         aria-modal="true"
         aria-labelledby="modal-title"
         className={cn(
-          "relative z-10 w-full max-w-lg rounded-2xl border border-border bg-background p-6 shadow-xl",
+          "relative z-10 flex w-full max-w-lg max-h-[calc(100dvh-2rem)] flex-col rounded-2xl border border-border bg-background p-6 shadow-xl overflow-y-auto overscroll-contain",
           className
         )}
       >

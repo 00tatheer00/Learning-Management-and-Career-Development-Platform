@@ -8,6 +8,7 @@ import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
 import { getProgramCategory } from "@/lib/constants/program-categories";
 import { formatAppliedDateTime } from "@/lib/utils";
 import { cn } from "@/lib/utils";
+import { PORTAL_VIEWPORT_PANEL } from "@/lib/constants/portal-layout";
 import type { AttendanceReportRow } from "@/lib/api/class-attendance";
 
 interface AttendanceMeta {
@@ -57,7 +58,7 @@ export default function AdminAttendancePage() {
   }, [rows, search]);
 
   return (
-    <div className="flex flex-col h-[calc(100dvh-3.5rem-2.5rem)] max-h-[calc(100dvh-3.5rem-2.5rem)] gap-3">
+    <div className={PORTAL_VIEWPORT_PANEL}>
       <PortalPageHeader
         title="Class Attendance"
         description="Recorded when students tap Join Class in the portal (present / late)."
@@ -108,7 +109,33 @@ export default function AdminAttendancePage() {
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 overflow-auto rounded-xl border border-border bg-background">
+      <div className="md:hidden space-y-3">
+        {loading ? (
+          <p className="text-center text-sm text-muted py-8">Loading...</p>
+        ) : filtered.length === 0 ? (
+          <p className="text-center text-sm text-muted py-8">
+            No attendance records yet. Students appear here after joining class from the portal.
+          </p>
+        ) : (
+          filtered.map((row) => (
+            <div key={row.id} className="rounded-xl border border-border bg-background p-4">
+              <div className="flex items-start justify-between gap-2">
+                <p className="font-semibold text-sm">{row.studentName}</p>
+                <StatusBadge status={row.status} />
+              </div>
+              <p className="mt-2 text-sm">{row.sessionTitle}</p>
+              <p className="mt-1 text-xs text-muted">
+                {row.sessionDate} · {row.sessionTime}
+              </p>
+              <p className="mt-1 text-xs text-muted">
+                Joined {formatAppliedDateTime(row.joinedAt)}
+              </p>
+            </div>
+          ))
+        )}
+      </div>
+
+      <div className="hidden md:block flex-1 min-h-0 overflow-auto rounded-xl border border-border bg-background">
         <table className="min-w-[800px] w-full text-sm">
           <thead className="sticky top-0 bg-surface border-b border-border">
             <tr>

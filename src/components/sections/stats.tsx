@@ -16,7 +16,7 @@ export function StatsSection() {
       />
       <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5" aria-hidden="true" />
       <div className="container-custom relative px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-16">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-10 lg:gap-16">
           {stats.map((stat, index) => (
             <motion.div
               key={stat.label}
@@ -33,7 +33,7 @@ export function StatsSection() {
                   prefix={stat.prefix}
                 />
               </div>
-              <p className="text-xs sm:text-sm text-muted leading-snug max-w-[9rem] sm:max-w-none mx-auto">
+              <p className="text-xs sm:text-sm text-muted leading-snug mx-auto">
                 {stat.label}
               </p>
             </motion.div>

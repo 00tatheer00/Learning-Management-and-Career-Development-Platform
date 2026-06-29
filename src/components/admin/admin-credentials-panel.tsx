@@ -18,6 +18,7 @@ import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
 import { getProgramCategory } from "@/lib/constants/program-categories";
 import { buildApprovalWhatsAppMessage } from "@/lib/notifications/approval-templates";
 import { cn, formatAppliedDateTime } from "@/lib/utils";
+import { PORTAL_VIEWPORT_PANEL } from "@/lib/constants/portal-layout";
 import { toast } from "@/lib/ui/toast";
 import type { AdminCredentialRow } from "@/lib/api/admin-credentials";
 
@@ -303,7 +304,7 @@ export function AdminCredentialsPanel() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100dvh-3.5rem-2.5rem)] max-h-[calc(100dvh-3.5rem-2.5rem)] gap-3">
+    <div className={PORTAL_VIEWPORT_PANEL}>
       {/* Header + stats row */}
       <div className="shrink-0 space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
@@ -313,7 +314,7 @@ export function AdminCredentialsPanel() {
               Student credentials · share via WhatsApp
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {filtered.some((row) => row.hasStoredPassword) && (
               <Button
                 size="sm"

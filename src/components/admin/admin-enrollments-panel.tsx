@@ -356,7 +356,8 @@ export function AdminEnrollmentsPanel() {
               className="pl-10"
             />
           </div>
-          <div className="inline-flex rounded-xl bg-secondary/60 p-1 text-xs sm:text-sm">
+          <div className="overflow-x-auto scrollbar-none pb-0.5 -mx-1 px-1">
+          <div className="inline-flex rounded-xl bg-secondary/60 p-1 text-xs sm:text-sm min-w-max">
             {[
               { value: "all", label: "All courses", count: programCounts.all },
               ...ENROLLABLE_PROGRAM_SLUGS.map((slug) => ({
@@ -379,6 +380,7 @@ export function AdminEnrollmentsPanel() {
                 {item.count > 0 ? ` (${item.count})` : ""}
               </button>
             ))}
+          </div>
           </div>
           <Button asChild variant="secondary" className="gap-2 shrink-0">
             <a href={exportUrl} download>

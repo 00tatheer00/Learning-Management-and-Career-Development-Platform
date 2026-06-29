@@ -730,10 +730,12 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
 
               <div className="sm:col-span-2">
                 <Label>Learning Mode</Label>
-                <div className="mt-2 flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/5 px-4 py-3">
-                  <GlobeHemisphereWest size={20} weight="duotone" className="text-primary shrink-0" />
-                  <span className="font-medium text-primary">{PAYMENT_CONFIG.learningMode}</span>
-                  <span className="text-sm text-muted">— All classes are conducted online</span>
+                <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center rounded-lg border border-primary/30 bg-primary/5 px-4 py-3">
+                  <div className="flex items-center gap-2">
+                    <GlobeHemisphereWest size={20} weight="duotone" className="text-primary shrink-0" />
+                    <span className="font-medium text-primary">{PAYMENT_CONFIG.learningMode}</span>
+                  </div>
+                  <span className="text-sm text-muted">All classes are conducted online</span>
                 </div>
                 <input type="hidden" {...register("learningMode")} />
               </div>
@@ -800,15 +802,17 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                 <strong>Required.</strong> Upload a clear JPG/PNG screenshot after payment. Max size{" "}
                 4MB — large phone photos are auto-compressed when possible.
               </p>
+              <div className="mt-1 max-w-full overflow-hidden">
               <Input
                 id="paymentScreenshot"
                 ref={fileInputRef}
                 type="file"
                 accept="image/*,.heic,.heif"
                 aria-required="true"
-                className="mt-1 cursor-pointer file:mr-4 file:rounded-md file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-medium file:text-primary-foreground hover:file:bg-accent"
+                className="mt-1 w-full max-w-full cursor-pointer file:mr-2 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-2 file:text-xs sm:file:text-sm file:font-medium file:text-primary-foreground hover:file:bg-accent"
                 onChange={handleScreenshotChange}
               />
+              </div>
               <FieldError message={screenshotError ?? undefined} />
 
               {screenshotPreview && (

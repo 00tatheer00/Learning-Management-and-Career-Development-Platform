@@ -122,8 +122,14 @@ export function WhyChooseUsSection() {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.05 }}
                 onMouseEnter={() => setActiveIndex(index)}
+                onClick={() => setActiveIndex(index)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") setActiveIndex(index);
+                }}
                 className={cn(
-                  "group text-left p-5 rounded-xl border transition-all duration-300",
+                  "group text-left p-5 rounded-xl border transition-all duration-300 cursor-pointer",
                   activeIndex === index
                     ? "bg-background border-primary/40 shadow-lg shadow-primary/10 -translate-y-0.5"
                     : "border-border bg-background hover:border-primary/30 hover:shadow-md hover:-translate-y-1"

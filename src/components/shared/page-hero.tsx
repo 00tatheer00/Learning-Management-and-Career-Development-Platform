@@ -27,11 +27,11 @@ export function PageHero({ label, title, description }: PageHeroProps) {
               {label}
             </span>
           )}
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-4">
+          <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold tracking-tight mb-4 text-balance">
             {title}
           </h1>
           {description && (
-            <p className="text-lg text-muted leading-relaxed max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg text-muted leading-relaxed max-w-2xl mx-auto">
               {description}
             </p>
           )}

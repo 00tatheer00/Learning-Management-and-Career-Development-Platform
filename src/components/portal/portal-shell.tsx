@@ -147,8 +147,12 @@ export function PortalShell({ user, children }: PortalShellProps) {
               <p className="font-semibold text-sm truncate">{headerTitle}</p>
             </div>
           </div>
-          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-            {user.role === "admin" && <AdminRevenueHeaderButton />}
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+            {user.role === "admin" && (
+              <span className="hidden md:inline-flex">
+                <AdminRevenueHeaderButton />
+              </span>
+            )}
             {user.role === "admin" && <AdminNotificationsBell />}
             <Button variant="outline" size="sm" asChild className="hidden sm:flex h-8 text-xs">
               <Link href="/">

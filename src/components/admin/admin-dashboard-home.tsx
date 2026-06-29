@@ -17,6 +17,7 @@ import {
 import { AdminDashboardSkeleton } from "@/components/admin/admin-dashboard-skeleton";
 import type { AdminDashboardData } from "@/lib/api/admin-dashboard";
 import { cn } from "@/lib/utils";
+import { PORTAL_VIEWPORT_PANEL } from "@/lib/constants/portal-layout";
 
 const pressable = "cursor-pointer select-none";
 
@@ -68,7 +69,7 @@ export function AdminDashboardLoader() {
 
 function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
   return (
-    <div className="flex flex-col h-[calc(100dvh-3.5rem-2.5rem)] max-h-[calc(100dvh-3.5rem-2.5rem)] overflow-hidden gap-3">
+    <div className={PORTAL_VIEWPORT_PANEL}>
       {/* Title row */}
       <div className="shrink-0 flex items-end justify-between gap-3">
         <div>
@@ -90,7 +91,7 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
       </div>
 
       {/* Row 1 — pastel summary cards */}
-      <div className="shrink-0 grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="shrink-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <SummaryCard
           href="/admin/enrollments"
           label="Total Registrations"
@@ -153,7 +154,7 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
             <p className="text-xs text-muted mt-0.5">Portal & program breakdown</p>
           </div>
 
-          <div className="flex items-center gap-4 flex-1 py-2">
+          <div className="flex flex-col sm:flex-row items-center gap-4 flex-1 py-2">
             <DonutChart first={data.firstTimeRegistrations} returning={data.returningRegistrations} />
             <div className="flex-1 space-y-3 min-w-0">
               <OverviewStat
@@ -170,7 +171,7 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 mt-auto pt-3 shrink-0">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-auto pt-3 shrink-0">
             <MiniStat label="Trainers" value={data.trainers} href="/admin/trainers" />
             <MiniStat label="Web" value={data.webStudents} href="/admin/students" />
             <MiniStat label="App" value={data.appStudents} href="/admin/students" />

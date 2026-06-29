@@ -67,7 +67,7 @@ export default async function TrainerDashboardPage() {
         </Button>
       </PortalPageHeader>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
         <StatCard compact label="My Students" value={students.length} accent="blue" icon={<Users size={16} weight="duotone" />} href="/trainer/students" />
         <StatCard compact label="Assignments" value={assignments.length} accent="orange" icon={<ClipboardText size={16} weight="duotone" />} href="/trainer/assignments" />
         <StatCard compact label="Upcoming Classes" value={upcomingSessions} accent="green" icon={<VideoCamera size={16} weight="duotone" />} href="/trainer/classes" />
@@ -84,7 +84,7 @@ export default async function TrainerDashboardPage() {
               </Button>
             }
           />
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
             {moduleGroups.map((group) => (
               <Link
                 key={group.moduleName}

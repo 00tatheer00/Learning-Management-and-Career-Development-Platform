@@ -65,7 +65,7 @@ export default async function StudentCoursePage() {
                 href={material.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-start gap-4 rounded-2xl border border-border bg-background p-5 hover:border-primary/30 hover:shadow-md transition-all group"
+                className="flex flex-col sm:flex-row items-start gap-4 rounded-2xl border border-border bg-background p-5 hover:border-primary/30 hover:shadow-md transition-all group"
               >
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary font-bold">
                   {index + 1}
@@ -82,7 +82,7 @@ export default async function StudentCoursePage() {
                   </p>
                   <p className="text-sm text-muted mt-0.5">{material.description}</p>
                 </div>
-                <span className="text-primary font-semibold text-sm shrink-0">Open →</span>
+                <span className="text-primary font-semibold text-sm shrink-0 sm:ml-auto">Open →</span>
               </a>
             );
           })}

@@ -70,7 +70,7 @@ export default async function StudentDashboardPage() {
 
       <StudentTrainerCard programSlug={programSlug} trainerId={user.trainerId} />
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
         <StatCard compact label="Video Lessons" value={materials.length} accent="orange" icon={<BookOpen size={16} weight="duotone" />} href="/student/course" />
         <StatCard compact label="Assignments" value={assignments.length} accent="blue" icon={<ClipboardText size={16} weight="duotone" />} href="/student/assignments" />
         <StatCard compact label="Live Classes" value={sessions.length} accent="green" icon={<VideoCamera size={16} weight="duotone" />} href="/student/classes" />

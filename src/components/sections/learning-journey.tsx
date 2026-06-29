@@ -68,7 +68,7 @@ export function LearningJourneySection() {
             aria-hidden="true"
           />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-6 lg:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-6 lg:gap-4">
             {steps.map((step, index) => (
               <motion.div
                 key={step.title}

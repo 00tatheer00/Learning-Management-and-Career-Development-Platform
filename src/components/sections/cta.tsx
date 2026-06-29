@@ -26,7 +26,7 @@ export function CTASection() {
             aria-hidden="true"
           />
 
-          <div className="relative z-10 px-8 py-16 lg:py-20 text-center">
+          <div className="relative z-10 px-4 sm:px-8 py-12 sm:py-16 lg:py-20 text-center">
             <div className="flex justify-center mb-6">
               <FreeCoursePromo variant="compact" />
             </div>

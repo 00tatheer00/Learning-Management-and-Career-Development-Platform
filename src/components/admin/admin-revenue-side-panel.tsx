@@ -359,7 +359,7 @@ function AdminRevenueSidePanel() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="rounded-2xl border border-violet-200/70 bg-gradient-to-br from-violet-50 to-white p-4">
                   <div className="flex items-center gap-2 text-violet-700 mb-2">
                     <Buildings size={16} weight="duotone" />
@@ -462,7 +462,7 @@ function AdminRevenueSidePanel() {
                             </span>
                           </div>
                           <div className="h-px bg-border" />
-                          <div className="grid grid-cols-2 gap-3">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div className="rounded-xl bg-violet-50 border border-violet-100 px-3 py-2.5">
                               <p className="text-[10px] font-bold uppercase text-violet-600">
                                 Management

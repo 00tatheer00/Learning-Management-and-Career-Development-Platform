@@ -167,7 +167,7 @@ export default function TrainerAssignmentsPage() {
                   value={feedbackMap[sub.id] ?? ""}
                   onChange={(e) => setFeedbackMap({ ...feedbackMap, [sub.id]: e.target.value })}
                 />
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <Button onClick={() => reviewSubmission(sub.id, "approved")} className="gap-2">
                     <CheckCircle size={18} weight="duotone" /> Approve
                   </Button>

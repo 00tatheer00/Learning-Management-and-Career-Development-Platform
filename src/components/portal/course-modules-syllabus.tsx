@@ -135,12 +135,16 @@ export function CourseModulesSyllabus({
                   <p className="text-xs font-bold uppercase tracking-wide text-primary">
                     Module {index + 1}
                   </p>
-                  <p className="mt-1 font-bold text-lg">{mod.name}</p>
+                  <p className="mt-1 font-bold text-lg break-words">{mod.name}</p>
                   {mod.subtitle && (
                     <p className="mt-1.5 text-sm text-muted line-clamp-2">{mod.subtitle}</p>
                   )}
-                  <p className="mt-3 text-xs font-medium text-muted">
-                    {topicCount} topics · {mod.duration} · {formatModuleSchedule(mod)}
+                  <p className="mt-3 text-xs font-medium text-muted leading-relaxed">
+                    {topicCount} topics · {mod.duration}
+                    <span className="hidden sm:inline"> · {formatModuleSchedule(mod)}</span>
+                  </p>
+                  <p className="mt-1 text-xs font-medium text-muted sm:hidden">
+                    {formatModuleSchedule(mod)}
                   </p>
                 </div>
                 <CaretRight

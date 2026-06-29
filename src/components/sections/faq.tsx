@@ -25,11 +25,11 @@ export function FAQSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <Accordion type="single" collapsible className="rounded-2xl border border-border bg-background px-6 shadow-sm">
+          <Accordion type="single" collapsible className="rounded-2xl border border-border bg-background px-4 sm:px-6 shadow-sm">
             {faqs.map((faq) => (
               <AccordionItem key={faq.id} value={faq.id}>
                 <AccordionTrigger className="text-left hover:no-underline">
-                  {faq.question}
+                  <span className="min-w-0 flex-1 pr-4">{faq.question}</span>
                 </AccordionTrigger>
                 <AccordionContent>{faq.answer}</AccordionContent>
               </AccordionItem>

@@ -369,7 +369,86 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
         {filtered.length} of {students.length} students shown
       </p>
 
-      <div className="overflow-hidden rounded-2xl border border-border bg-background shadow-sm">
+      <div className="md:hidden space-y-3">
+        {filtered.map((student) => (
+          <div
+            key={student.id}
+            className="rounded-2xl border border-border bg-background p-4 shadow-sm"
+          >
+            <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                {student.name
+                  .split(" ")
+                  .map((part) => part[0])
+                  .join("")
+                  .slice(0, 2)
+                  .toUpperCase()}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="font-semibold">{student.name}</p>
+                <p className="text-xs text-muted mt-0.5">{student.fatherName}</p>
+                <p className="text-sm text-muted mt-2 break-all">{student.email}</p>
+                <p className="text-sm text-muted">{student.whatsapp}</p>
+              </div>
+              <span
+                className={`shrink-0 inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                  student.isActive
+                    ? "bg-emerald-100 text-emerald-800"
+                    : "bg-red-100 text-red-800"
+                }`}
+              >
+                {student.isActive ? "Active" : "Inactive"}
+              </span>
+            </div>
+            <div className="mt-3 flex flex-wrap gap-2 text-xs">
+              <span className="rounded-full bg-primary/10 px-2.5 py-1 font-semibold text-primary">
+                {student.course}
+              </span>
+              <span className="rounded-full border border-border px-2.5 py-1">{student.module}</span>
+              <span className="rounded-full border border-border px-2.5 py-1">{student.batch}</span>
+            </div>
+            <p className="mt-2 text-xs text-muted font-mono break-all">{student.cnic}</p>
+            <div className="mt-3 flex flex-wrap gap-2 border-t border-border pt-3">
+              <button
+                type="button"
+                title="Edit"
+                disabled={loadingId === student.id}
+                onClick={() => openEdit(student)}
+                className="rounded-lg border border-border px-3 py-2 text-xs font-semibold hover:bg-surface"
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                title="Reset password"
+                disabled={loadingId === student.id}
+                onClick={() => handleResetPassword(student)}
+                className="rounded-lg border border-border px-3 py-2 text-xs font-semibold hover:bg-surface"
+              >
+                Reset pwd
+              </button>
+              <button
+                type="button"
+                disabled={loadingId === student.id}
+                onClick={() => handleToggleActive(student)}
+                className="rounded-lg border border-border px-3 py-2 text-xs font-semibold hover:bg-surface"
+              >
+                {student.isActive ? "Deactivate" : "Activate"}
+              </button>
+              <button
+                type="button"
+                disabled={loadingId === student.id}
+                onClick={() => setDeleteTarget(student)}
+                className="rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="hidden md:block overflow-hidden rounded-2xl border border-border bg-background shadow-sm">
         <div className="overflow-x-auto">
           <table className="min-w-[1280px] w-full text-sm">
             <thead className="border-b border-border bg-surface">
