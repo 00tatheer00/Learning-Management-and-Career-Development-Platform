@@ -28,20 +28,20 @@ export default async function AdminSettingsPage() {
           </p>
         </div>
 
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+        <div className="rounded-2xl portal-callout-amber p-5">
           <div className="flex items-center gap-3 mb-3">
-            <Envelope size={24} weight="duotone" className="text-amber-700" />
-            <h2 className="font-bold text-amber-900">Email (Resend)</h2>
+            <Envelope size={24} weight="duotone" className="opacity-80" />
+            <h2 className="font-bold">Email (Resend)</h2>
           </div>
-          <p className="text-sm text-amber-900/90 leading-relaxed">
+          <p className="text-sm leading-relaxed opacity-90">
             Student notifications currently use <strong>WhatsApp only</strong>. Email (Resend) is
             disabled until domain verification is complete. When ready, verify{" "}
             <strong>emergingedge.tech</strong> at{" "}
             <a href="https://resend.com/domains" className="underline" target="_blank" rel="noopener noreferrer">
               resend.com/domains
             </a>
-            . Then set Vercel env <code className="bg-white/80 px-1 rounded">EMAIL_FROM</code> to{" "}
-            <code className="bg-white/80 px-1 rounded">EEST &lt;noreply@emergingedge.tech&gt;</code>.
+            . Then set Vercel env <code className="portal-code-inline px-1 rounded text-[11px]">EMAIL_FROM</code> to{" "}
+            <code className="portal-code-inline px-1 rounded text-[11px]">EEST &lt;noreply@emergingedge.tech&gt;</code>.
             Gmail addresses cannot be used as the sender.
           </p>
         </div>

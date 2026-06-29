@@ -40,7 +40,7 @@ export function AdminReadOnlyBanner() {
   if (!isReadOnly) return null;
 
   return (
-    <div className="portal-readonly-banner mb-4 rounded-xl border border-amber-200/90 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+    <div className="portal-readonly-banner mb-4 rounded-xl border px-4 py-3 text-sm">
       <strong>View only.</strong> Aap admin portal dekh sakti hain — approve, edit ya delete nahi kar
       sakti. Changes ke liye Tatheer se rabta karein.
     </div>

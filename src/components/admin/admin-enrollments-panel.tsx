@@ -497,7 +497,7 @@ export function AdminEnrollmentsPanel() {
                         )}
                         <StatusBadge status={enrollment.status} />
                         {enrollment.applicationNumber > 1 && (
-                          <span className="inline-flex items-center rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-xs font-bold text-amber-900">
+                          <span className="inline-flex items-center rounded-full portal-tag-amber px-3 py-1 text-xs font-bold">
                             {enrollment.applicationNumber}
                             {enrollment.applicationNumber === 2
                               ? "nd"
@@ -508,7 +508,7 @@ export function AdminEnrollmentsPanel() {
                           </span>
                         )}
                         {enrollment.isReturningApplicant && (
-                          <span className="inline-flex items-center rounded-full border border-violet-200 bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-800">
+                          <span className="inline-flex items-center rounded-full portal-tag-violet px-3 py-1 text-xs font-semibold">
                             Returning Student
                           </span>
                         )}
@@ -517,8 +517,8 @@ export function AdminEnrollmentsPanel() {
                             className={cn(
                               "inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold",
                               enrollment.duplicateMatch.hasApprovedMatch
-                                ? "border-violet-200 bg-violet-50 text-violet-800"
-                                : "border-amber-200 bg-amber-50 text-amber-900"
+                                ? "portal-tag-violet"
+                                : "portal-tag-amber"
                             )}
                             title={enrollment.duplicateMatch.label}
                           >
@@ -592,11 +592,11 @@ export function AdminEnrollmentsPanel() {
                           </div>
                         )}
                         {enrollment.previousApplications.length > 0 && (
-                          <div className="sm:col-span-2 rounded-xl border border-amber-200 bg-amber-50/80 p-4">
-                            <p className="text-xs font-semibold uppercase tracking-wide text-amber-900">
+                          <div className="sm:col-span-2 rounded-xl portal-callout-amber-subtle p-4">
+                            <p className="text-xs font-semibold uppercase tracking-wide opacity-90">
                               Previous Applications ({enrollment.totalApplications - 1})
                             </p>
-                            <p className="mt-1 text-sm text-amber-900/90">
+                            <p className="mt-1 text-sm opacity-90">
                               Returning student — confirm this is a <strong>new PKR 1,000</strong>{" "}
                               payment screenshot before approving.
                             </p>
@@ -604,7 +604,7 @@ export function AdminEnrollmentsPanel() {
                               {enrollment.previousApplications.map((prev) => (
                                 <li
                                   key={prev.id}
-                                  className="flex flex-wrap items-center gap-2 rounded-lg border border-amber-200/80 bg-white/80 px-3 py-2 text-sm"
+                                  className="flex flex-wrap items-center gap-2 rounded-lg portal-callout-item px-3 py-2 text-sm"
                                 >
                                   <span className="font-medium">{prev.courseTitle}</span>
                                   <span className="text-muted">({prev.level})</span>
@@ -748,7 +748,7 @@ export function AdminEnrollmentsPanel() {
           {pendingSelectedCount === 1 ? "" : "s"}? Each student gets a portal account, password
           saved under Portal Logins, and WhatsApp notification sent.
         </p>
-        <p className="mt-3 text-sm text-amber-800 rounded-xl bg-amber-50 border border-amber-200 px-3 py-2">
+        <p className="mt-3 text-sm rounded-xl portal-callout-amber px-3 py-2">
           Review payment screenshots first — especially returning students with a 2nd application.
         </p>
         <div className="mt-6 flex justify-end gap-3">
@@ -892,11 +892,12 @@ export function AdminEnrollmentsPanel() {
             </p>
 
             <div
-              className={`mt-4 rounded-xl border p-4 text-sm ${
+              className={cn(
+                "mt-4 rounded-xl p-4 text-sm",
                 approvedCredentials.whatsappSent
-                  ? "border-emerald-200 bg-emerald-50 text-emerald-900"
-                  : "border-red-200 bg-red-50 text-red-900"
-              }`}
+                  ? "portal-callout-success"
+                  : "portal-callout-error"
+              )}
             >
               <p className="font-semibold flex items-center gap-2">
                 <ChatsCircle size={18} weight="duotone" />
@@ -1011,9 +1012,9 @@ function Field({
 
 function StatusBadge({ status }: { status: string }) {
   const styles = {
-    pending: "bg-amber-100 text-amber-800",
-    approved: "bg-emerald-100 text-emerald-800",
-    rejected: "bg-red-100 text-red-800",
+    pending: "portal-status-pending",
+    approved: "portal-status-approved",
+    rejected: "portal-status-rejected",
   };
   const icons = { pending: Clock, approved: CheckCircle, rejected: XCircle };
   const Icon = icons[status as keyof typeof icons] ?? Clock;

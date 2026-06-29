@@ -20,7 +20,7 @@ export function AdminNotificationsBell() {
         }}
         className={cn(
           "relative inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-background transition-colors hover:bg-secondary",
-          unreadCount > 0 && "border-amber-300 bg-amber-50"
+          unreadCount > 0 && "portal-notif-active"
         )}
         aria-label={`Notifications${unreadCount > 0 ? `, ${unreadCount} new` : ""}`}
       >

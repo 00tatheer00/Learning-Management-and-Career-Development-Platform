@@ -277,7 +277,7 @@ export function AdminTrainersPanel({
         {programStats.byProgram.map((row) => {
           const category = getProgramCategory(row.programSlug);
           return (
-            <div key={row.programSlug} className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+            <div key={row.programSlug} className="rounded-xl portal-callout-emerald p-4">
               <p className="text-sm text-emerald-800">{category?.shortLabel ?? row.programSlug}</p>
               <p className="text-2xl font-bold text-emerald-900">{row.trainerAssigned}</p>
               <p className="text-xs text-emerald-700/80 mt-1">

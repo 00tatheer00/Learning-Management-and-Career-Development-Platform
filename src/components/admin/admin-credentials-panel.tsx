@@ -731,11 +731,11 @@ function StatChip({
   tone?: "default" | "emerald" | "amber" | "blue" | "red";
 }) {
   const styles = {
-    default: "border-border bg-background text-foreground",
-    emerald: "border-emerald-200 bg-emerald-50 text-emerald-800",
-    amber: "border-amber-200 bg-amber-50 text-amber-800",
-    blue: "border-blue-200 bg-blue-50 text-blue-800",
-    red: "border-red-200 bg-red-50 text-red-800",
+    default: "portal-stat-chip",
+    emerald: "portal-stat-chip-emerald",
+    amber: "portal-stat-chip-amber",
+    blue: "portal-stat-chip-blue",
+    red: "portal-stat-chip-red",
   };
 
   return (

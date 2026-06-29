@@ -65,13 +65,13 @@ export default function AdminAttendancePage() {
       />
 
       <div className="shrink-0 flex flex-wrap gap-2">
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm">
-          <span className="font-bold text-emerald-800">{meta.present}</span>{" "}
-          <span className="text-emerald-700">Present</span>
+        <div className="rounded-xl portal-callout-emerald px-3 py-2 text-sm">
+          <span className="font-bold">{meta.present}</span>{" "}
+          <span className="opacity-80">Present</span>
         </div>
-        <div className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm">
-          <span className="font-bold text-amber-800">{meta.late}</span>{" "}
-          <span className="text-amber-700">Late</span>
+        <div className="rounded-xl portal-callout-amber px-3 py-2 text-sm">
+          <span className="font-bold">{meta.late}</span>{" "}
+          <span className="opacity-80">Late</span>
         </div>
         <div className="rounded-xl border border-border bg-background px-3 py-2 text-sm">
           <span className="font-bold">{meta.total}</span>{" "}

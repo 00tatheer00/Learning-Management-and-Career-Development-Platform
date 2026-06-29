@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ChatsCircle, ArrowSquareOut } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/lib/ui/toast";
+import { cn } from "@/lib/utils";
 import { useAdminPermissions } from "@/components/admin/admin-permissions";
 
 interface WhatsAppStatus {
@@ -65,11 +66,10 @@ export function AdminWhatsAppSettings() {
 
   return (
     <div
-      className={`rounded-2xl border p-5 ${
-        status?.connected
-          ? "border-emerald-200 bg-emerald-50"
-          : "border-red-200 bg-red-50"
-      }`}
+      className={cn(
+        "rounded-2xl border p-5",
+        status?.connected ? "portal-callout-emerald" : "portal-callout-error"
+      )}
     >
       <div className="flex items-center gap-3 mb-3">
         <ChatsCircle size={24} weight="duotone" className="text-emerald-600" />

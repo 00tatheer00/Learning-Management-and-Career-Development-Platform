@@ -279,6 +279,232 @@ body {
   background-color: rgb(39 39 42 / 0.75);
 }
 
+/* Admin callouts, tags, and status chips (dark-mode aware) */
+.portal-callout-emerald {
+  border: 1px solid rgb(167 243 208);
+  background: rgb(236 253 245);
+  color: rgb(6 95 70);
+}
+.portal-callout-amber {
+  border: 1px solid rgb(253 230 138);
+  background: rgb(255 251 235);
+  color: rgb(120 53 15);
+}
+.portal-callout-amber-subtle {
+  border: 1px solid rgb(253 230 138 / 0.85);
+  background: rgb(255 251 235 / 0.85);
+  color: rgb(120 53 15);
+}
+.portal-callout-item {
+  border: 1px solid rgb(253 230 138 / 0.75);
+  background: var(--pt-surface);
+  color: var(--pt-text);
+}
+
+.portal-shell[data-portal-theme="dark"] .portal-callout-emerald {
+  border-color: rgb(16 185 129 / 0.28);
+  background: rgb(6 78 59 / 0.28);
+  color: rgb(209 250 229);
+}
+.portal-shell[data-portal-theme="dark"] .portal-callout-amber {
+  border-color: rgb(245 158 11 / 0.28);
+  background: rgb(120 53 15 / 0.28);
+  color: rgb(254 243 199);
+}
+.portal-shell[data-portal-theme="dark"] .portal-callout-amber-subtle {
+  border-color: rgb(245 158 11 / 0.22);
+  background: rgb(120 53 15 / 0.2);
+  color: rgb(254 243 199);
+}
+.portal-shell[data-portal-theme="dark"] .portal-callout-item {
+  border-color: rgb(245 158 11 / 0.2);
+  background: rgb(24 24 27 / 0.6);
+}
+
+.portal-tag-amber {
+  border: 1px solid rgb(252 211 77);
+  background: rgb(255 251 235);
+  color: rgb(146 64 14);
+}
+.portal-tag-violet {
+  border: 1px solid rgb(221 214 254);
+  background: rgb(245 243 255);
+  color: rgb(91 33 182);
+}
+.portal-tag-orange {
+  border: 1px solid rgb(254 215 170);
+  background: rgb(255 237 213);
+  color: rgb(154 52 18);
+}
+.portal-tag-muted {
+  border: 1px solid var(--pt-border);
+  background: var(--pt-muted);
+  color: var(--pt-text-secondary);
+}
+
+.portal-shell[data-portal-theme="dark"] .portal-tag-amber {
+  border-color: rgb(245 158 11 / 0.35);
+  background: rgb(120 53 15 / 0.4);
+  color: rgb(252 211 77);
+}
+.portal-shell[data-portal-theme="dark"] .portal-tag-violet {
+  border-color: rgb(139 92 246 / 0.35);
+  background: rgb(76 29 149 / 0.35);
+  color: rgb(196 181 253);
+}
+.portal-shell[data-portal-theme="dark"] .portal-tag-orange {
+  border-color: rgb(234 88 12 / 0.35);
+  background: rgb(124 45 18 / 0.35);
+  color: rgb(253 186 116);
+}
+.portal-shell[data-portal-theme="dark"] .portal-tag-muted {
+  border-color: var(--pt-border);
+  background: var(--pt-elevated);
+  color: var(--pt-text-secondary);
+}
+
+.portal-stat-chip {
+  border: 1px solid var(--pt-border);
+  background: var(--pt-surface);
+  color: var(--pt-text);
+}
+.portal-stat-chip-emerald {
+  border-color: rgb(167 243 208);
+  background: rgb(236 253 245);
+  color: rgb(4 120 87);
+}
+.portal-stat-chip-amber {
+  border-color: rgb(253 230 138);
+  background: rgb(255 251 235);
+  color: rgb(146 64 14);
+}
+.portal-stat-chip-blue {
+  border-color: rgb(191 219 254);
+  background: rgb(239 246 255);
+  color: rgb(29 78 216);
+}
+.portal-stat-chip-red {
+  border-color: rgb(254 202 202);
+  background: rgb(254 242 242);
+  color: rgb(185 28 28);
+}
+
+.portal-shell[data-portal-theme="dark"] .portal-stat-chip-emerald {
+  border-color: rgb(16 185 129 / 0.28);
+  background: rgb(6 78 59 / 0.35);
+  color: rgb(110 231 183);
+}
+.portal-shell[data-portal-theme="dark"] .portal-stat-chip-amber {
+  border-color: rgb(245 158 11 / 0.28);
+  background: rgb(120 53 15 / 0.35);
+  color: rgb(252 211 77);
+}
+.portal-shell[data-portal-theme="dark"] .portal-stat-chip-blue {
+  border-color: rgb(59 130 246 / 0.28);
+  background: rgb(30 58 138 / 0.35);
+  color: rgb(147 197 253);
+}
+.portal-shell[data-portal-theme="dark"] .portal-stat-chip-red {
+  border-color: rgb(248 113 113 / 0.28);
+  background: rgb(127 29 29 / 0.35);
+  color: rgb(252 165 165);
+}
+
+.portal-status-pending {
+  background: rgb(254 243 199);
+  color: rgb(146 64 14);
+}
+.portal-status-approved {
+  background: rgb(209 250 229);
+  color: rgb(4 120 87);
+}
+.portal-status-rejected {
+  background: rgb(254 202 202);
+  color: rgb(185 28 28);
+}
+
+.portal-shell[data-portal-theme="dark"] .portal-status-pending {
+  background: rgb(120 53 15 / 0.45);
+  color: rgb(252 211 77);
+}
+.portal-shell[data-portal-theme="dark"] .portal-status-approved {
+  background: rgb(6 78 59 / 0.45);
+  color: rgb(110 231 183);
+}
+.portal-shell[data-portal-theme="dark"] .portal-status-rejected {
+  background: rgb(127 29 29 / 0.45);
+  color: rgb(252 165 165);
+}
+
+.portal-alert-link {
+  border: 1px solid rgb(253 230 138 / 0.85);
+  background: rgb(255 251 235 / 0.85);
+  color: rgb(120 53 15);
+}
+.portal-shell[data-portal-theme="dark"] .portal-alert-link {
+  border-color: rgb(245 158 11 / 0.25);
+  background: rgb(120 53 15 / 0.25);
+  color: rgb(254 243 199);
+}
+.portal-shell[data-portal-theme="dark"] .portal-alert-link:hover {
+  background: rgb(120 53 15 / 0.38);
+}
+
+.portal-code-inline {
+  background: var(--pt-muted);
+  color: var(--pt-text);
+  border: 1px solid var(--pt-border-subtle);
+}
+
+.portal-notif-active {
+  border-color: rgb(252 211 77) !important;
+  background: rgb(255 251 235) !important;
+}
+.portal-shell[data-portal-theme="dark"] .portal-notif-active {
+  border-color: rgb(245 158 11 / 0.35) !important;
+  background: rgb(120 53 15 / 0.35) !important;
+}
+
+.portal-callout-success {
+  border: 1px solid rgb(167 243 208);
+  background: rgb(236 253 245);
+  color: rgb(6 95 70);
+}
+.portal-callout-error {
+  border: 1px solid rgb(254 202 202);
+  background: rgb(254 242 242);
+  color: rgb(153 27 27);
+}
+.portal-shell[data-portal-theme="dark"] .portal-callout-success {
+  border-color: rgb(16 185 129 / 0.28);
+  background: rgb(6 78 59 / 0.28);
+  color: rgb(209 250 229);
+}
+.portal-shell[data-portal-theme="dark"] .portal-callout-error {
+  border-color: rgb(248 113 113 / 0.28);
+  background: rgb(127 29 29 / 0.28);
+  color: rgb(254 202 202);
+}
+
+.portal-revenue-trigger {
+  border: 1px solid rgb(167 243 208 / 0.85);
+  background: linear-gradient(to bottom right, rgb(236 253 245 / 0.95), var(--pt-surface));
+  color: rgb(4 120 87);
+}
+.portal-revenue-trigger:hover {
+  border-color: rgb(110 231 183);
+  background: linear-gradient(to bottom right, rgb(209 250 229 / 0.6), var(--pt-surface));
+}
+.portal-shell[data-portal-theme="dark"] .portal-revenue-trigger {
+  border-color: rgb(16 185 129 / 0.28);
+  background: linear-gradient(to bottom right, rgb(6 78 59 / 0.35), var(--pt-surface));
+  color: rgb(110 231 183);
+}
+.portal-shell[data-portal-theme="dark"] .portal-revenue-trigger:hover {
+  border-color: rgb(16 185 129 / 0.45);
+  background: linear-gradient(to bottom right, rgb(6 78 59 / 0.5), var(--pt-surface));
+}
+
 ::selection {
   background: rgba(234, 88, 12, 0.15);
   color: var(--foreground);

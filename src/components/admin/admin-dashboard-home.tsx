@@ -357,11 +357,11 @@ function StudentMixPanel({ data }: { data: AdminDashboardData }) {
           href="/admin/settings"
           className={cn(
             pressable,
-            "mt-4 flex items-center gap-2 rounded-lg border border-amber-200/80 bg-amber-50/80 px-3 py-2.5 text-xs font-medium text-amber-950 hover:bg-amber-50"
+            "mt-4 flex items-center gap-2 rounded-lg portal-alert-link px-3 py-2.5 text-xs font-medium hover:opacity-90"
           )}
         >
           {data.missingTrainerAssignments} students need trainer assignment sync
-          <ArrowRight size={12} className="ml-auto text-amber-700/70" />
+          <ArrowRight size={12} className="ml-auto opacity-70" />
         </Link>
       )}
     </div>

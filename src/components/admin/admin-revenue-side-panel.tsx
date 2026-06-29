@@ -18,6 +18,7 @@ import {
   CaretRight,
 } from "@phosphor-icons/react";
 import type { AdminRevenueStats } from "@/lib/api/admin-revenue";
+import { usePortalThemeOptional } from "@/components/portal/portal-theme-provider";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -147,7 +148,7 @@ export function AdminRevenueHeaderButton() {
       variant="outline"
       size="sm"
       onClick={() => ctx.setOpen(true)}
-      className="gap-2 border-emerald-200 bg-emerald-50/80 text-emerald-800 hover:bg-emerald-100 hover:text-emerald-900"
+      className="gap-2 portal-revenue-trigger hover:opacity-95"
     >
       <CurrencyCircleDollar size={18} weight="duotone" />
       <span className="hidden sm:inline">Revenue</span>
@@ -157,12 +158,14 @@ export function AdminRevenueHeaderButton() {
 
 export function AdminRevenueSidebarCard({
   compact = false,
-  dark = false,
+  dark: darkProp = false,
 }: {
   compact?: boolean;
   dark?: boolean;
 }) {
   const ctx = useAdminRevenueOptional();
+  const portalTheme = usePortalThemeOptional();
+  const dark = darkProp || Boolean(portalTheme?.isDark);
   if (!ctx) return null;
 
   if (compact) {
@@ -192,7 +195,7 @@ export function AdminRevenueSidebarCard({
         "w-full rounded-lg p-2.5 text-left transition-colors duration-150 ease-out cursor-pointer select-none group",
         dark
           ? "border border-emerald-500/20 bg-emerald-500/10 hover:bg-emerald-500/15"
-          : "border border-emerald-200/80 bg-gradient-to-br from-emerald-50 to-white hover:border-emerald-300 hover:shadow-sm"
+          : "portal-revenue-trigger hover:opacity-95"
       )}
     >
       <div className="flex items-center gap-2">
@@ -343,7 +346,7 @@ function AdminRevenueSidePanel() {
 
           {stats && periodStats && (
             <>
-              <div className="rounded-2xl border border-emerald-200/60 bg-gradient-to-br from-emerald-50 via-white to-emerald-50/30 p-5 shadow-sm">
+              <div className="rounded-2xl portal-callout-emerald p-5 shadow-sm">
                 <div className="flex items-center gap-2 text-emerald-700 mb-1">
                   <TrendUp size={16} weight="duotone" />
                   <p className="text-xs font-bold uppercase tracking-wider">
@@ -487,14 +490,14 @@ function AdminRevenueSidePanel() {
                             </div>
                           </div>
                           {period === "all" && course.approvedCount !== course.uniqueStudents && (
-                            <p className="text-xs text-amber-800 bg-amber-50 rounded-lg px-3 py-2 border border-amber-100">
+                            <p className="text-xs portal-callout-amber rounded-lg px-3 py-2">
                               {course.approvedCount} paid registration
                               {course.approvedCount === 1 ? "" : "s"} (
                               {course.approvedCount - course.uniqueStudents} returning)
                             </p>
                           )}
                           {period === "all" && course.thisWeekCount > 0 && (
-                            <p className="text-xs text-emerald-700 bg-emerald-50 rounded-lg px-3 py-2 border border-emerald-100">
+                            <p className="text-xs portal-callout-emerald rounded-lg px-3 py-2">
                               +{course.thisWeekCount} this week (
                               {formatMoney(course.thisWeekGross, stats.currency)} gross)
                             </p>

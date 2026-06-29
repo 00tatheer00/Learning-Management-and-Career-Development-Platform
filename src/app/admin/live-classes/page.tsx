@@ -53,7 +53,7 @@ export default function AdminLiveClassesPage() {
         description="100% free in-portal video (Jitsi). No API keys. Vercel sirf page serve karta hai — video alag server par."
       />
 
-      <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 flex items-start gap-3">
+      <div className="rounded-2xl portal-callout-emerald p-4 flex items-start gap-3">
         <CheckCircle size={24} className="text-emerald-600 shrink-0" weight="fill" />
         <div className="text-sm space-y-2">
           <p className="font-bold text-foreground">Free — koi LiveKit / paid plan nahi</p>
@@ -61,7 +61,7 @@ export default function AdminLiveClassesPage() {
             Server: <strong>{jitsiDomain}</strong> · {portalCount} portal class(es). Mic, camera,
             screen share, chat, raise hand — sab built-in.
           </p>
-          <p className="text-xs text-amber-900 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+          <p className="text-xs portal-callout-amber rounded-lg px-3 py-2">
             <strong>150 students:</strong> public meet.jit.si par limit ho sakti hai. Bari batch ke
             liye baad mein Oracle free VPS par apna Jitsi (still $0) — env{" "}
             <code className="text-[11px]">JITSI_DOMAIN</code> set karo.
@@ -110,8 +110,8 @@ export default function AdminLiveClassesPage() {
                         className={cn(
                           "inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold",
                           row.roomType === "portal"
-                            ? "bg-orange-100 text-orange-800"
-                            : "bg-zinc-100 text-zinc-700"
+                            ? "portal-tag-orange"
+                            : "portal-tag-muted"
                         )}
                       >
                         {row.roomType === "portal" ? "Portal (free)" : "External link"}
