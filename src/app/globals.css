@@ -64,6 +64,221 @@ body {
   letter-spacing: -0.011em;
 }
 
+/* ── Portal theme (scoped to .portal-shell — public site stays light) ── */
+.portal-shell[data-portal-theme="light"] {
+  --pt-bg: #f8fafc;
+  --pt-surface: #ffffff;
+  --pt-muted: #f4f4f5;
+  --pt-elevated: #ffffff;
+  --pt-border: rgba(228, 228, 231, 0.95);
+  --pt-border-subtle: #f4f4f5;
+  --pt-text: #18181b;
+  --pt-text-secondary: #3f3f46;
+  --pt-text-muted: #71717a;
+  --pt-text-faint: #a1a1aa;
+  --pt-nav-hover: #f4f4f5;
+  --pt-nav-active-bg: #fff7ed;
+  --pt-nav-active-text: #ea580c;
+  --pt-header-bg: rgba(255, 255, 255, 0.92);
+  --pt-overlay: rgba(0, 0, 0, 0.4);
+  --pt-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --pt-shadow-md: 0 4px 14px rgba(15, 23, 42, 0.06);
+  --pt-progress-track: #f4f4f5;
+  --background: var(--pt-bg);
+  --foreground: var(--pt-text);
+  --card: var(--pt-surface);
+  --card-border: var(--pt-border);
+  --secondary: var(--pt-muted);
+  --border: var(--pt-border);
+  --surface: var(--pt-muted);
+  --surface-muted: var(--pt-border-subtle);
+  --muted-foreground: var(--pt-text-muted);
+  color-scheme: light;
+}
+
+.portal-shell[data-portal-theme="dark"] {
+  --pt-bg: #09090b;
+  --pt-surface: #111113;
+  --pt-muted: #18181b;
+  --pt-elevated: #1a1a1d;
+  --pt-border: rgba(255, 255, 255, 0.09);
+  --pt-border-subtle: rgba(255, 255, 255, 0.06);
+  --pt-text: #f4f4f5;
+  --pt-text-secondary: #d4d4d8;
+  --pt-text-muted: #a1a1aa;
+  --pt-text-faint: #71717a;
+  --pt-nav-hover: rgba(255, 255, 255, 0.05);
+  --pt-nav-active-bg: rgba(234, 88, 12, 0.14);
+  --pt-nav-active-text: #fb923c;
+  --pt-header-bg: rgba(9, 9, 11, 0.88);
+  --pt-overlay: rgba(0, 0, 0, 0.65);
+  --pt-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+  --pt-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --pt-progress-track: rgba(255, 255, 255, 0.08);
+  --background: var(--pt-bg);
+  --foreground: var(--pt-text);
+  --card: var(--pt-surface);
+  --card-border: var(--pt-border);
+  --secondary: var(--pt-muted);
+  --border: var(--pt-border);
+  --surface: var(--pt-muted);
+  --surface-muted: var(--pt-elevated);
+  --muted: var(--pt-text-muted);
+  --muted-foreground: var(--pt-text-faint);
+  color-scheme: dark;
+}
+
+.bg-pt-bg { background-color: var(--pt-bg); }
+.bg-pt-surface { background-color: var(--pt-surface); }
+.bg-pt-muted { background-color: var(--pt-muted); }
+.bg-pt-elevated { background-color: var(--pt-elevated); }
+.bg-pt-header { background-color: var(--pt-header-bg); }
+.text-pt { color: var(--pt-text); }
+.text-pt-secondary { color: var(--pt-text-secondary); }
+.text-pt-muted { color: var(--pt-text-muted); }
+.text-pt-faint { color: var(--pt-text-faint); }
+.border-pt { border-color: var(--pt-border); }
+.border-pt-subtle { border-color: var(--pt-border-subtle); }
+.shadow-pt { box-shadow: var(--pt-shadow); }
+.shadow-pt-md { box-shadow: var(--pt-shadow-md); }
+
+.portal-card {
+  background-color: var(--pt-surface);
+  border: 1px solid var(--pt-border);
+  box-shadow: var(--pt-shadow);
+}
+
+.portal-card-muted {
+  background-color: color-mix(in srgb, var(--pt-muted) 70%, var(--pt-surface));
+  border: 1px solid var(--pt-border);
+}
+
+/* Dashboard / stat tone cards — light + dark */
+.portal-tone-slate { border-color: rgb(226 232 240 / 0.9); background: linear-gradient(to bottom right, rgb(248 250 252), var(--pt-surface)); }
+.portal-tone-emerald { border-color: rgb(167 243 208 / 0.8); background: linear-gradient(to bottom right, rgb(236 253 245 / 0.9), var(--pt-surface)); }
+.portal-tone-amber { border-color: rgb(253 230 138 / 0.8); background: linear-gradient(to bottom right, rgb(255 251 235 / 0.9), var(--pt-surface)); }
+.portal-tone-indigo { border-color: rgb(199 210 254 / 0.8); background: linear-gradient(to bottom right, rgb(238 242 255 / 0.9), var(--pt-surface)); }
+.portal-tone-violet { border-color: rgb(221 214 254 / 0.8); background: linear-gradient(to bottom right, rgb(245 243 255 / 0.9), var(--pt-surface)); }
+.portal-tone-sky { border-color: rgb(186 230 253 / 0.8); background: linear-gradient(to bottom right, rgb(240 249 255 / 0.9), var(--pt-surface)); }
+.portal-tone-rose { border-color: rgb(254 205 211 / 0.8); background: linear-gradient(to bottom right, rgb(255 241 242 / 0.9), var(--pt-surface)); }
+.portal-tone-teal { border-color: rgb(153 246 228 / 0.8); background: linear-gradient(to bottom right, rgb(240 253 250 / 0.9), var(--pt-surface)); }
+
+.portal-shell[data-portal-theme="dark"] .portal-tone-slate { border-color: rgb(113 113 122 / 0.35); background: linear-gradient(to bottom right, rgb(39 39 42 / 0.55), var(--pt-surface)); }
+.portal-shell[data-portal-theme="dark"] .portal-tone-emerald { border-color: rgb(16 185 129 / 0.28); background: linear-gradient(to bottom right, rgb(6 78 59 / 0.35), var(--pt-surface)); }
+.portal-shell[data-portal-theme="dark"] .portal-tone-amber { border-color: rgb(245 158 11 / 0.28); background: linear-gradient(to bottom right, rgb(120 53 15 / 0.35), var(--pt-surface)); }
+.portal-shell[data-portal-theme="dark"] .portal-tone-indigo { border-color: rgb(99 102 241 / 0.28); background: linear-gradient(to bottom right, rgb(49 46 129 / 0.35), var(--pt-surface)); }
+.portal-shell[data-portal-theme="dark"] .portal-tone-violet { border-color: rgb(139 92 246 / 0.28); background: linear-gradient(to bottom right, rgb(76 29 149 / 0.35), var(--pt-surface)); }
+.portal-shell[data-portal-theme="dark"] .portal-tone-sky { border-color: rgb(14 165 233 / 0.28); background: linear-gradient(to bottom right, rgb(12 74 110 / 0.35), var(--pt-surface)); }
+.portal-shell[data-portal-theme="dark"] .portal-tone-rose { border-color: rgb(244 63 94 / 0.28); background: linear-gradient(to bottom right, rgb(136 19 55 / 0.35), var(--pt-surface)); }
+.portal-shell[data-portal-theme="dark"] .portal-tone-teal { border-color: rgb(20 184 166 / 0.28); background: linear-gradient(to bottom right, rgb(19 78 74 / 0.35), var(--pt-surface)); }
+
+.portal-tone-icon-slate { background: rgb(241 245 249); color: rgb(71 85 105); }
+.portal-tone-icon-emerald { background: rgb(209 250 229); color: rgb(4 120 87); }
+.portal-tone-icon-amber { background: rgb(254 243 199); color: rgb(146 64 14); }
+.portal-tone-icon-indigo { background: rgb(224 231 255); color: rgb(67 56 202); }
+.portal-tone-icon-violet { background: rgb(237 233 254); color: rgb(109 40 217); }
+.portal-tone-icon-sky { background: rgb(224 242 254); color: rgb(3 105 161); }
+.portal-tone-icon-rose { background: rgb(255 228 230); color: rgb(190 18 60); }
+.portal-tone-icon-teal { background: rgb(204 251 241); color: rgb(15 118 110); }
+
+.portal-shell[data-portal-theme="dark"] .portal-tone-icon-slate { background: rgb(39 39 42 / 0.8); color: rgb(161 161 170); }
+.portal-shell[data-portal-theme="dark"] .portal-tone-icon-emerald { background: rgb(6 78 59 / 0.55); color: rgb(110 231 183); }
+.portal-shell[data-portal-theme="dark"] .portal-tone-icon-amber { background: rgb(120 53 15 / 0.55); color: rgb(252 211 77); }
+.portal-shell[data-portal-theme="dark"] .portal-tone-icon-indigo { background: rgb(49 46 129 / 0.55); color: rgb(165 180 252); }
+.portal-shell[data-portal-theme="dark"] .portal-tone-icon-violet { background: rgb(76 29 149 / 0.55); color: rgb(196 181 253); }
+.portal-shell[data-portal-theme="dark"] .portal-tone-icon-sky { background: rgb(12 74 110 / 0.55); color: rgb(125 211 252); }
+.portal-shell[data-portal-theme="dark"] .portal-tone-icon-rose { background: rgb(136 19 55 / 0.55); color: rgb(251 113 133); }
+.portal-shell[data-portal-theme="dark"] .portal-tone-icon-teal { background: rgb(19 78 74 / 0.55); color: rgb(94 234 212); }
+
+.portal-shell[data-portal-theme="dark"] .portal-readonly-banner {
+  background: rgb(120 53 15 / 0.22);
+  border-color: rgb(245 158 11 / 0.25);
+  color: rgb(254 243 199);
+}
+
+.portal-stat-accent-rose { background: rgb(255 241 242); border-color: rgb(254 205 211); }
+.portal-stat-accent-orange { background: rgb(255 251 235); border-color: rgb(253 230 138); }
+.portal-stat-accent-green { background: rgb(236 253 245); border-color: rgb(167 243 208); }
+.portal-stat-accent-blue { background: rgb(239 246 255); border-color: rgb(191 219 254); }
+.portal-stat-accent-sky { background: rgb(240 249 255); border-color: rgb(186 230 253); }
+.portal-stat-accent-slate { background: rgb(250 250 250); border-color: rgb(244 244 245); }
+
+.portal-stat-text-rose { color: rgb(159 18 57); }
+.portal-stat-text-orange { color: rgb(146 64 14); }
+.portal-stat-text-green { color: rgb(4 120 87); }
+.portal-stat-text-blue { color: rgb(30 64 175); }
+.portal-stat-text-sky { color: rgb(3 105 161); }
+.portal-stat-text-slate { color: rgb(39 39 42); }
+
+.portal-shell[data-portal-theme="dark"] .portal-stat-accent-rose { background: rgb(136 19 55 / 0.35); border-color: rgb(244 63 94 / 0.25); }
+.portal-shell[data-portal-theme="dark"] .portal-stat-accent-orange { background: rgb(120 53 15 / 0.35); border-color: rgb(245 158 11 / 0.25); }
+.portal-shell[data-portal-theme="dark"] .portal-stat-accent-green { background: rgb(6 78 59 / 0.35); border-color: rgb(16 185 129 / 0.25); }
+.portal-shell[data-portal-theme="dark"] .portal-stat-accent-blue { background: rgb(30 58 138 / 0.35); border-color: rgb(59 130 246 / 0.25); }
+.portal-shell[data-portal-theme="dark"] .portal-stat-accent-sky { background: rgb(12 74 110 / 0.35); border-color: rgb(14 165 233 / 0.25); }
+.portal-shell[data-portal-theme="dark"] .portal-stat-accent-slate { background: rgb(39 39 42 / 0.55); border-color: rgb(113 113 122 / 0.25); }
+
+.portal-shell[data-portal-theme="dark"] .portal-stat-text-rose { color: rgb(251 113 133); }
+.portal-shell[data-portal-theme="dark"] .portal-stat-text-orange { color: rgb(252 211 77); }
+.portal-shell[data-portal-theme="dark"] .portal-stat-text-green { color: rgb(110 231 183); }
+.portal-shell[data-portal-theme="dark"] .portal-stat-text-blue { color: rgb(147 197 253); }
+.portal-shell[data-portal-theme="dark"] .portal-stat-text-sky { color: rgb(125 211 252); }
+.portal-shell[data-portal-theme="dark"] .portal-stat-text-slate { color: rgb(212 212 216); }
+
+.portal-nav-link {
+  color: var(--pt-text-secondary);
+}
+.portal-nav-link:hover {
+  background-color: var(--pt-nav-hover);
+  color: var(--pt-text);
+}
+.portal-nav-link-active {
+  background-color: var(--pt-nav-active-bg);
+  color: var(--pt-nav-active-text);
+}
+
+.portal-panel {
+  border-radius: 0.75rem;
+  border: 1px solid var(--pt-border);
+  background-color: var(--pt-surface);
+  box-shadow: var(--pt-shadow);
+}
+
+.portal-shell[data-portal-theme="light"] .portal-panel-sky {
+  border-color: rgb(186 230 253 / 0.7);
+  background: linear-gradient(to bottom right, rgb(240 249 255 / 0.4), var(--pt-surface));
+}
+.portal-shell[data-portal-theme="dark"] .portal-panel-sky {
+  border-color: rgb(14 165 233 / 0.28);
+  background: linear-gradient(to bottom right, rgb(12 74 110 / 0.35), var(--pt-surface));
+}
+
+.portal-shell[data-portal-theme="light"] .portal-panel-slate {
+  border-color: rgb(226 232 240 / 0.8);
+  background: linear-gradient(to bottom right, rgb(248 250 252 / 0.5), var(--pt-surface));
+}
+.portal-shell[data-portal-theme="dark"] .portal-panel-slate {
+  border-color: rgb(113 113 122 / 0.35);
+  background: linear-gradient(to bottom right, rgb(39 39 42 / 0.45), var(--pt-surface));
+}
+
+.portal-progress-track {
+  background-color: var(--pt-progress-track);
+}
+
+.portal-shell[data-portal-theme="dark"] .portal-error-panel {
+  background: rgb(127 29 29 / 0.25);
+  border-color: rgb(248 113 113 / 0.25);
+  color: rgb(254 202 202);
+}
+
+.portal-shell[data-portal-theme="light"] .portal-skeleton {
+  background-color: rgb(244 244 245);
+}
+
+.portal-shell[data-portal-theme="dark"] .portal-skeleton {
+  background-color: rgb(39 39 42 / 0.75);
+}
+
 ::selection {
   background: rgba(234, 88, 12, 0.15);
   color: var(--foreground);

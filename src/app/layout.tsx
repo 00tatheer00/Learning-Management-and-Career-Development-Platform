@@ -7,6 +7,7 @@ import { HelpWhatsApp } from "@/components/shared/student-help";
 import { OrganizationSchema } from "@/components/seo/json-ld";
 import { createMetadata } from "@/lib/seo/metadata";
 import { SITE_CONFIG } from "@/lib/constants";
+import { PORTAL_THEME_STORAGE_KEY } from "@/lib/constants/portal-theme";
 import "./globals.css";
 
 const inter = Inter({
@@ -42,6 +43,11 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <OrganizationSchema />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem("${PORTAL_THEME_STORAGE_KEY}");if(t==="dark")document.documentElement.dataset.portalThemeInit="dark"}catch(e){}})();`,
+          }}
+        />
       </head>
       <body
         className={`${inter.variable} ${geistMono.variable} ${plusJakarta.variable} antialiased bg-background text-foreground`}

@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 function Bone({ className, style }: { className?: string; style?: CSSProperties }) {
   return (
-    <div className={cn("animate-pulse rounded-xl bg-zinc-100", className)} style={style} />
+    <div className={cn("animate-pulse rounded-xl portal-skeleton", className)} style={style} />
   );
 }
 
@@ -12,7 +12,7 @@ const SHELL = "flex flex-col gap-4 pb-4";
 export function AdminDashboardSkeleton() {
   return (
     <div className={SHELL}>
-      <Bone className="h-16 shrink-0 rounded-none border-b border-zinc-100" />
+      <Bone className="h-16 shrink-0 rounded-none border-b border-pt-subtle" />
 
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
         {Array.from({ length: 4 }).map((_, i) => (

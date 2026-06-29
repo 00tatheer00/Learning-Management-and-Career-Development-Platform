@@ -30,6 +30,11 @@ import {
 } from "@/components/admin/admin-revenue-side-panel";
 import { useAdminAlertsOptional } from "@/components/admin/admin-alerts-provider";
 import { isAdminRole } from "@/lib/auth/admin-roles";
+import {
+  PortalThemeProvider,
+  usePortalTheme,
+} from "@/components/portal/portal-theme-provider";
+import { PortalThemeToggle } from "@/components/portal/portal-theme-toggle";
 import type { PortalUser, UserRole } from "@/types/portal";
 import { cn } from "@/lib/utils";
 
@@ -56,9 +61,18 @@ interface PortalShellProps {
 }
 
 export function PortalShell({ user, children }: PortalShellProps) {
+  return (
+    <PortalThemeProvider>
+      <PortalShellInner user={user}>{children}</PortalShellInner>
+    </PortalThemeProvider>
+  );
+}
+
+function PortalShellInner({ user, children }: PortalShellProps) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const { theme } = usePortalTheme();
   const isAdmin = isAdminRole(user.role);
   const headerTitle = isAdmin
     ? getAdminDisplayName(user.name, user.role)
@@ -91,12 +105,16 @@ export function PortalShell({ user, children }: PortalShellProps) {
   };
 
   return (
-    <div className="portal-font min-h-screen lg:h-dvh lg:overflow-hidden bg-zinc-50 flex">
+    <div
+      className="portal-shell portal-font min-h-screen lg:h-dvh lg:overflow-hidden bg-pt-bg flex text-pt"
+      data-portal-theme={theme}
+      suppressHydrationWarning
+    >
       {user.role === "student" && <StudentSingleSessionGuard />}
       {/* Sidebar desktop */}
       <aside
         className={cn(
-          "hidden lg:flex flex-col fixed inset-y-0 left-0 z-40 bg-white border-r border-zinc-200/70 transition-[width] duration-300 ease-in-out",
+          "hidden lg:flex flex-col fixed inset-y-0 left-0 z-40 bg-pt-surface border-r border-pt transition-[width] duration-300 ease-in-out",
           sidebarCollapsed ? "w-[4.5rem]" : "w-64"
         )}
       >
@@ -114,11 +132,11 @@ export function PortalShell({ user, children }: PortalShellProps) {
       {sidebarOpen && (
         <div className="lg:hidden fixed inset-0 z-50 flex">
           <div
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            className="absolute inset-0 bg-pt-overlay backdrop-blur-sm"
             onClick={() => setSidebarOpen(false)}
             aria-hidden="true"
           />
-          <aside className="relative w-72 max-w-[85vw] h-full bg-white shadow-2xl">
+          <aside className="relative w-72 max-w-[85vw] h-full bg-pt-surface shadow-pt-md">
             <SidebarContent
               user={user}
               navGroups={PORTAL_NAV_GROUPS[user.role]}
@@ -137,21 +155,21 @@ export function PortalShell({ user, children }: PortalShellProps) {
           sidebarCollapsed ? "lg:pl-[4.5rem]" : "lg:pl-64"
         )}
       >
-        <header className="shrink-0 sticky top-0 z-30 border-b border-zinc-200/80 bg-white/95 backdrop-blur-md px-4 sm:px-5 h-14 flex items-center justify-between gap-4">
+        <header className="shrink-0 sticky top-0 z-30 border-b border-pt bg-pt-header backdrop-blur-md px-4 sm:px-5 h-14 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <button
               type="button"
-              className="lg:hidden p-2 rounded-lg hover:bg-secondary"
+              className="lg:hidden p-2 rounded-lg hover:bg-pt-muted text-pt-secondary"
               onClick={() => setSidebarOpen(true)}
               aria-label="Open menu"
             >
               <List size={22} weight="bold" />
             </button>
             <div className="min-w-0">
-              <p className="text-[11px] text-muted uppercase tracking-wide">
+              <p className="text-[11px] text-pt-muted uppercase tracking-wide">
                 {PORTAL_LABELS[user.role]}
               </p>
-              <p className="font-semibold text-sm truncate">{headerTitle}</p>
+              <p className="font-semibold text-sm truncate text-pt">{headerTitle}</p>
             </div>
           </div>
           <div className="flex items-center gap-1 sm:gap-2 shrink-0">
@@ -161,7 +179,8 @@ export function PortalShell({ user, children }: PortalShellProps) {
               </span>
             )}
             {isAdmin && <AdminNotificationsBell />}
-            <Button variant="outline" size="sm" asChild className="hidden sm:flex h-8 text-xs">
+            <PortalThemeToggle />
+            <Button variant="outline" size="sm" asChild className="hidden sm:flex h-8 text-xs border-pt">
               <Link href="/">
                 <House size={15} weight="duotone" />
                 Website
@@ -224,11 +243,11 @@ function SidebarContent({
       : "Student Portal";
 
   return (
-    <div className="relative flex flex-col h-full overflow-hidden bg-white">
+    <div className="relative flex flex-col h-full overflow-hidden bg-pt-surface">
       {/* Logo + collapse */}
       <div
         className={cn(
-          "shrink-0 border-b border-zinc-100",
+          "shrink-0 border-b border-pt-subtle",
           collapsed ? "px-2 py-3" : "px-4 py-4"
         )}
       >
@@ -237,8 +256,8 @@ function SidebarContent({
             <Link href="/" className={cn(pressable, "flex items-center gap-2.5 min-w-0")}>
               <SiteLogo variant="portal" href={null} className="h-8 shrink-0" />
               <div className="min-w-0 leading-tight">
-                <p className="text-sm font-bold text-zinc-900 truncate">{SITE_CONFIG.shortName}</p>
-                <p className="text-[10px] text-zinc-400 truncate">{portalSubtitle}</p>
+                <p className="text-sm font-bold text-pt truncate">{SITE_CONFIG.shortName}</p>
+                <p className="text-[10px] text-pt-faint truncate">{portalSubtitle}</p>
               </div>
             </Link>
           ) : (
@@ -255,7 +274,7 @@ function SidebarContent({
               aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
               className={cn(
                 pressable,
-                "flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-500 hover:bg-zinc-50 hover:text-zinc-800 shadow-sm"
+                "flex h-8 w-8 items-center justify-center rounded-lg border border-pt bg-pt-surface text-pt-muted hover:bg-pt-muted hover:text-pt shadow-pt"
               )}
             >
               <SidebarSimple
@@ -270,7 +289,7 @@ function SidebarContent({
             <button
               type="button"
               onClick={onNavigate}
-              className={cn(pressable, "p-1.5 rounded-lg hover:bg-zinc-100 text-zinc-500 lg:hidden")}
+              className={cn(pressable, "p-1.5 rounded-lg hover:bg-pt-muted text-pt-muted lg:hidden")}
             >
               <X size={18} weight="bold" />
             </button>
@@ -278,7 +297,7 @@ function SidebarContent({
         </div>
 
         {!collapsed && (
-          <div className="mt-3 flex items-center gap-2.5 rounded-xl border border-zinc-100 bg-zinc-50/80 px-2.5 py-2">
+          <div className="mt-3 flex items-center gap-2.5 rounded-xl border border-pt-subtle bg-pt-muted px-2.5 py-2">
             <PortalAvatar
               name={user.name}
               avatarUrl={user.avatarUrl}
@@ -286,8 +305,8 @@ function SidebarContent({
               size="sm"
             />
             <div className="min-w-0 flex-1">
-              <p className="font-semibold truncate text-xs text-zinc-900">{displayName}</p>
-              <p className="text-[10px] truncate text-zinc-400">{user.email}</p>
+              <p className="font-semibold truncate text-xs text-pt">{displayName}</p>
+              <p className="text-[10px] truncate text-pt-faint">{user.email}</p>
               {!isAdmin && user.programSlug && (user.role === "student" || user.role === "trainer") && (
                 <ProgramCategoryBadge programSlug={user.programSlug} className="mt-0.5" />
               )}
@@ -317,7 +336,7 @@ function SidebarContent({
         {navGroups.map((group, groupIndex) => (
           <div key={group.label} className={cn(groupIndex > 0 && "mt-4")}>
             {!collapsed && (
-              <p className="px-2 mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-zinc-400">
+              <p className="px-2 mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-pt-faint">
                 {group.label}
               </p>
             )}
@@ -340,9 +359,7 @@ function SidebarContent({
                       pressable,
                       "relative flex items-center rounded-lg text-sm font-medium",
                       collapsed ? "justify-center p-2.5" : "gap-2.5 px-2.5 py-2",
-                      active
-                        ? "bg-orange-50 text-orange-600"
-                        : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900"
+                      active ? "portal-nav-link-active" : "portal-nav-link hover:bg-pt-muted"
                     )}
                   >
                     <Icon
@@ -357,7 +374,7 @@ function SidebarContent({
                       </>
                     )}
                     {collapsed && showEnrollmentBadge && (
-                      <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" />
+                      <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-red-500 ring-2 ring-[var(--pt-surface)]" />
                     )}
                   </Link>
                 );
@@ -370,7 +387,7 @@ function SidebarContent({
       {/* Footer — revenue + logout unchanged */}
       <div
         className={cn(
-          "shrink-0 border-t border-zinc-100 bg-white py-2.5",
+          "shrink-0 border-t border-pt-subtle bg-pt-surface py-2.5",
           collapsed ? "px-2 space-y-1.5" : "px-3 space-y-1.5"
         )}
       >
@@ -381,7 +398,7 @@ function SidebarContent({
           title={collapsed ? "Logout" : undefined}
           className={cn(
             pressable,
-            "flex w-full items-center rounded-lg text-sm font-medium text-red-600 hover:bg-red-50",
+            "flex w-full items-center rounded-lg text-sm font-medium text-red-600 hover:bg-red-500/10",
             collapsed ? "justify-center p-2.5" : "gap-2.5 px-2.5 py-2"
           )}
         >

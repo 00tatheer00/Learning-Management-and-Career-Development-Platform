@@ -27,50 +27,50 @@ const pressable = "cursor-pointer select-none transition-all duration-200";
 /** Muted executive palette — tinted surfaces, not loud gradients */
 const tones = {
   slate: {
-    card: "border-slate-200/90 bg-gradient-to-br from-slate-50 to-white hover:border-slate-300",
-    icon: "bg-slate-100 text-slate-600",
+    card: "portal-tone-slate border shadow-pt hover:shadow-pt-md",
+    icon: "portal-tone-icon portal-tone-icon-slate",
     bar: "bg-slate-600",
     dot: "bg-slate-600",
   },
   emerald: {
-    card: "border-emerald-200/80 bg-gradient-to-br from-emerald-50/90 to-white hover:border-emerald-300",
-    icon: "bg-emerald-100 text-emerald-700",
+    card: "portal-tone-emerald border shadow-pt hover:shadow-pt-md",
+    icon: "portal-tone-icon portal-tone-icon-emerald",
     bar: "bg-emerald-600",
     dot: "bg-emerald-500",
   },
   amber: {
-    card: "border-amber-200/80 bg-gradient-to-br from-amber-50/90 to-white hover:border-amber-300",
-    icon: "bg-amber-100 text-amber-800",
+    card: "portal-tone-amber border shadow-pt hover:shadow-pt-md",
+    icon: "portal-tone-icon portal-tone-icon-amber",
     bar: "bg-amber-500",
     dot: "bg-amber-500",
   },
   indigo: {
-    card: "border-indigo-200/80 bg-gradient-to-br from-indigo-50/90 to-white hover:border-indigo-300",
-    icon: "bg-indigo-100 text-indigo-700",
+    card: "portal-tone-indigo border shadow-pt hover:shadow-pt-md",
+    icon: "portal-tone-icon portal-tone-icon-indigo",
     bar: "bg-indigo-600",
     dot: "bg-indigo-500",
   },
   violet: {
-    card: "border-violet-200/80 bg-gradient-to-br from-violet-50/90 to-white hover:border-violet-300",
-    icon: "bg-violet-100 text-violet-700",
+    card: "portal-tone-violet border shadow-pt hover:shadow-pt-md",
+    icon: "portal-tone-icon portal-tone-icon-violet",
     bar: "bg-violet-600",
     dot: "bg-violet-500",
   },
   sky: {
-    card: "border-sky-200/80 bg-gradient-to-br from-sky-50/90 to-white hover:border-sky-300",
-    icon: "bg-sky-100 text-sky-700",
+    card: "portal-tone-sky border shadow-pt hover:shadow-pt-md",
+    icon: "portal-tone-icon portal-tone-icon-sky",
     bar: "bg-sky-600",
     dot: "bg-sky-500",
   },
   rose: {
-    card: "border-rose-200/80 bg-gradient-to-br from-rose-50/90 to-white hover:border-rose-300",
-    icon: "bg-rose-100 text-rose-700",
+    card: "portal-tone-rose border shadow-pt hover:shadow-pt-md",
+    icon: "portal-tone-icon portal-tone-icon-rose",
     bar: "bg-rose-500",
     dot: "bg-rose-500",
   },
   teal: {
-    card: "border-teal-200/80 bg-gradient-to-br from-teal-50/90 to-white hover:border-teal-300",
-    icon: "bg-teal-100 text-teal-700",
+    card: "portal-tone-teal border shadow-pt hover:shadow-pt-md",
+    icon: "portal-tone-icon portal-tone-icon-teal",
     bar: "bg-teal-600",
     dot: "bg-teal-500",
   },
@@ -110,12 +110,12 @@ export function AdminDashboardLoader() {
   }
   if (error || !data) {
     return (
-      <div className="rounded-xl border border-red-200 bg-red-50/80 p-8 text-center">
-        <p className="text-sm font-medium text-red-800">{error ?? "Something went wrong"}</p>
+      <div className="portal-error-panel rounded-xl border p-8 text-center">
+        <p className="text-sm font-medium">{error ?? "Something went wrong"}</p>
         <button
           type="button"
           onClick={() => void load()}
-          className={cn(pressable, "mt-4 text-sm font-medium text-red-700 underline-offset-2 hover:underline")}
+          className={cn(pressable, "mt-4 text-sm font-medium underline-offset-2 hover:underline opacity-90")}
         >
           Try again
         </button>
@@ -137,15 +137,15 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
   return (
     <div className={DASHBOARD_SHELL}>
       {/* Header */}
-      <div className="shrink-0 flex flex-wrap items-end justify-between gap-3 border-b border-zinc-200/80 pb-3">
+      <div className="shrink-0 flex flex-wrap items-end justify-between gap-3 border-b border-pt pb-3">
         <div className="min-w-0">
-          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-zinc-400">
+          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-pt-faint">
             Overview
           </p>
-          <h1 className="mt-1 text-xl font-semibold tracking-tight text-zinc-900 sm:text-2xl">
+          <h1 className="mt-1 text-xl font-semibold tracking-tight text-pt sm:text-2xl">
             Dashboard
           </h1>
-          <p className="mt-1 text-sm text-zinc-500">
+          <p className="mt-1 text-sm text-pt-muted">
             {data.students.toLocaleString()} students · {data.trainers} trainers · {approvalRate}%
             approval rate
           </p>
@@ -168,7 +168,7 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
             href="/admin/live-classes"
             className={cn(
               pressable,
-              "inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3.5 py-2 text-xs font-medium text-zinc-700 hover:border-zinc-300 hover:bg-zinc-50"
+              "inline-flex items-center gap-2 rounded-lg border border-pt bg-pt-surface px-3.5 py-2 text-xs font-medium text-pt-secondary hover:bg-pt-muted"
             )}
           >
             <Broadcast size={15} weight="duotone" />
@@ -226,19 +226,19 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
           tone="violet"
         >
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
+            <span className="text-3xl font-semibold tabular-nums tracking-tight text-pt">
               <CountUp end={data.loggedInStudents} duration={1.2} separator="," />
             </span>
-            <span className="text-sm text-zinc-400">/ {data.students.toLocaleString()}</span>
-            <span className="ml-auto text-xs font-medium text-zinc-500">{loginRate}% logged in</span>
+            <span className="text-sm text-pt-faint">/ {data.students.toLocaleString()}</span>
+            <span className="ml-auto text-xs font-medium text-pt-muted">{loginRate}% logged in</span>
           </div>
-          <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-violet-100">
+          <div className="mt-3 h-1.5 overflow-hidden rounded-full portal-progress-track">
             <div
               className="h-full rounded-full bg-violet-600 transition-all duration-700"
               style={{ width: `${loginRate}%` }}
             />
           </div>
-          <p className="mt-2 text-xs text-zinc-500">
+          <p className="mt-2 text-xs text-pt-muted">
             {data.neverLoggedInStudents} students have not logged in yet
           </p>
         </InsightCard>
@@ -251,16 +251,16 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
         >
           <div className="grid grid-cols-2 gap-6">
             <div>
-              <p className="text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
+              <p className="text-3xl font-semibold tabular-nums tracking-tight text-pt">
                 <CountUp end={data.upcomingSessions} duration={1.2} />
               </p>
-              <p className="mt-1 text-xs text-zinc-500">Upcoming classes</p>
+              <p className="mt-1 text-xs text-pt-muted">Upcoming classes</p>
             </div>
             <div>
-              <p className="text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
+              <p className="text-3xl font-semibold tabular-nums tracking-tight text-pt">
                 <CountUp end={data.assignments} duration={1.2} />
               </p>
-              <p className="mt-1 text-xs text-zinc-500">Assignments</p>
+              <p className="mt-1 text-xs text-pt-muted">Assignments</p>
             </div>
           </div>
         </InsightCard>
@@ -270,10 +270,10 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
         <StudentMixPanel data={data} />
 
-        <div className="lg:col-span-2 rounded-xl border border-slate-200/80 bg-gradient-to-br from-slate-50/50 to-white p-4 sm:p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+        <div className="lg:col-span-2 portal-panel portal-panel-slate p-4 sm:p-5">
           <div className="mb-3">
-            <h2 className="text-sm font-semibold tracking-tight text-zinc-900">Quick access</h2>
-            <p className="text-xs text-zinc-500 mt-0.5">Jump to admin tools</p>
+            <h2 className="text-sm font-semibold tracking-tight text-pt">Quick access</h2>
+            <p className="text-xs text-pt-muted mt-0.5">Jump to admin tools</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-0.5">
             {QUICK_LINKS.map((link) => (
@@ -290,16 +290,16 @@ function StudentMixPanel({ data }: { data: AdminDashboardData }) {
   const mixTotal = data.firstTimeRegistrations + data.returningRegistrations;
 
   return (
-    <div className="lg:col-span-3 rounded-xl border border-sky-200/70 bg-gradient-to-br from-sky-50/40 to-white p-5 sm:p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+    <div className="lg:col-span-3 portal-panel portal-panel-sky p-5 sm:p-6">
       <div className="mb-6">
-        <h2 className="text-base font-semibold tracking-tight text-zinc-900">Student mix</h2>
-        <p className="text-sm text-zinc-500 mt-1">First-time vs returning registrations</p>
+        <h2 className="text-base font-semibold tracking-tight text-pt">Student mix</h2>
+        <p className="text-sm text-pt-muted mt-1">First-time vs returning registrations</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-[7.5rem_1fr] lg:grid-cols-[8.5rem_1fr] gap-6 md:gap-8 items-start">
         <div className="mx-auto md:mx-0 w-full max-w-[8.5rem]">
           <DonutChart first={data.firstTimeRegistrations} returning={data.returningRegistrations} />
-          <div className="mt-3 flex flex-col gap-1.5 text-[11px] text-zinc-600">
+          <div className="mt-3 flex flex-col gap-1.5 text-[11px] text-pt-secondary">
             <span className="inline-flex items-center gap-2">
               <span className="h-2 w-2 shrink-0 rounded-full bg-indigo-600" aria-hidden="true" />
               First-time
@@ -330,7 +330,7 @@ function StudentMixPanel({ data }: { data: AdminDashboardData }) {
       </div>
 
       <div className="mt-8 pt-6 border-t border-sky-100/80">
-        <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-zinc-500 mb-3">
+        <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-pt-muted mb-3">
           By program
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -451,10 +451,10 @@ function MetricCard({
         {icon}
       </div>
       <div className="mt-3">
-        <p className="text-2xl font-semibold tabular-nums tracking-tight text-zinc-900">
+        <p className="text-2xl font-semibold tabular-nums tracking-tight text-pt">
           <CountUp end={value} duration={1.2} separator="," />
         </p>
-        <p className="mt-1 text-xs font-medium text-zinc-600">{label}</p>
+        <p className="mt-1 text-xs font-medium text-pt-secondary">{label}</p>
       </div>
       <TrendLine text={trend ?? hint} />
       {highlight && (
@@ -468,9 +468,8 @@ function MetricCard({
 
   const className = cn(
     pressable,
-    "group relative rounded-xl border p-4 shadow-[0_1px_2px_rgba(0,0,0,0.03)]",
-    palette.card,
-    "hover:shadow-[0_4px_14px_rgba(0,0,0,0.06)]"
+    "group relative rounded-xl border p-4",
+    palette.card
   );
 
   if (href) {
@@ -503,13 +502,12 @@ function InsightCard({
       href={href}
       className={cn(
         pressable,
-        "block rounded-xl border p-4 sm:p-5 shadow-[0_1px_2px_rgba(0,0,0,0.03)]",
-        palette.card,
-        "hover:shadow-[0_4px_14px_rgba(0,0,0,0.06)]"
+        "block rounded-xl border p-4 sm:p-5",
+        palette.card
       )}
     >
       <div className="flex items-center justify-between gap-2 mb-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">{title}</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-pt-muted">{title}</p>
         <div
           className={cn(
             "flex h-8 w-8 items-center justify-center rounded-lg",
@@ -540,20 +538,20 @@ function BreakdownRow({
   const pct = total > 0 ? Math.round((value / total) * 100) : 0;
 
   return (
-    <div className="rounded-lg border border-zinc-100/80 bg-white/60 px-4 py-3.5">
+    <div className="portal-card-muted rounded-lg px-4 py-3.5">
       <div className="flex items-start justify-between gap-4 mb-3">
         <div className="min-w-0">
-          <p className="text-sm font-semibold tracking-tight text-zinc-900">{label}</p>
-          <p className="text-xs text-zinc-500 mt-0.5">{meta}</p>
+          <p className="text-sm font-semibold tracking-tight text-pt">{label}</p>
+          <p className="text-xs text-pt-muted mt-0.5">{meta}</p>
         </div>
         <div className="text-right shrink-0">
-          <p className="text-lg font-semibold tabular-nums tracking-tight text-zinc-900">
+          <p className="text-lg font-semibold tabular-nums tracking-tight text-pt">
             <CountUp end={value} duration={1} separator="," />
           </p>
-          <p className="text-xs font-medium text-zinc-500">{pct}%</p>
+          <p className="text-xs font-medium text-pt-muted">{pct}%</p>
         </div>
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-zinc-100">
+      <div className="h-2 overflow-hidden rounded-full portal-progress-track">
         <div
           className={cn("h-2 max-h-2 rounded-full transition-all duration-1000", barClass)}
           style={{ width: `${pct}%` }}
@@ -587,7 +585,7 @@ function ProgramPill({
         palette.card
       )}
     >
-      <p className="text-[11px] font-medium text-zinc-600">{label}</p>
+      <p className="text-[11px] font-medium text-pt-secondary">{label}</p>
       <div className="mt-2 flex items-center gap-1.5">
         {icon && (
           <div
@@ -599,7 +597,7 @@ function ProgramPill({
             {icon}
           </div>
         )}
-        <p className="text-lg font-semibold tabular-nums text-zinc-900">
+        <p className="text-lg font-semibold tabular-nums text-pt">
           <CountUp end={value} duration={1} />
         </p>
       </div>
@@ -628,24 +626,24 @@ function QuickLink({
       className={cn(
         pressable,
         "group flex items-center gap-3 rounded-lg px-2 py-2.5 -mx-2",
-        "hover:bg-white/80"
+        "hover:bg-pt-muted"
       )}
     >
       <div
         className={cn(
-          "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/80",
+          "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-pt-subtle",
           palette.icon
         )}
       >
         {icon}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium text-zinc-900 truncate">{title}</p>
-        <p className="text-xs text-zinc-500 truncate">{subtitle}</p>
+        <p className="text-sm font-medium text-pt truncate">{title}</p>
+        <p className="text-xs text-pt-muted truncate">{subtitle}</p>
       </div>
       <ArrowRight
         size={14}
-        className="shrink-0 text-zinc-300 group-hover:text-zinc-500 group-hover:translate-x-0.5 transition-all"
+        className="shrink-0 text-pt-faint group-hover:text-pt-muted group-hover:translate-x-0.5 transition-all"
       />
     </Link>
   );
@@ -659,7 +657,7 @@ function TrendLine({ text }: { text: string }) {
     <p
       className={cn(
         "flex items-center gap-1 mt-2 text-[11px] font-medium",
-        isNegative ? "text-red-600/80" : isPositive ? "text-emerald-700/80" : "text-zinc-400"
+        isNegative ? "text-red-600/80" : isPositive ? "text-emerald-700/80" : "text-pt-faint"
       )}
     >
       {isPositive && <TrendUp size={11} weight="bold" />}
@@ -704,8 +702,8 @@ function DonutChart({ first, returning }: { first: number; returning: number }) 
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-        <span className="text-xl font-semibold tabular-nums tracking-tight text-zinc-900">{total}</span>
-        <span className="text-[10px] font-medium uppercase tracking-wider text-zinc-400">Total</span>
+        <span className="text-xl font-semibold tabular-nums tracking-tight text-pt">{total}</span>
+        <span className="text-[10px] font-medium uppercase tracking-wider text-pt-faint">Total</span>
       </div>
     </div>
   );
