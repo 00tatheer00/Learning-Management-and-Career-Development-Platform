@@ -11,8 +11,6 @@ import {
   DeviceMobile,
   GraduationCap,
   Key,
-  Lightning,
-  Sparkle,
   TrendDown,
   TrendUp,
   UsersThree,
@@ -22,11 +20,10 @@ import { AdminDashboardSkeleton } from "@/components/admin/admin-dashboard-skele
 import type { AdminDashboardData } from "@/lib/api/admin-dashboard";
 import { cn } from "@/lib/utils";
 
-/** Fills portal main area — no clip; bottom section scrolls if viewport is short. */
 const DASHBOARD_SHELL =
-  "flex h-[calc(100dvh-3.5rem-2.5rem)] max-h-[calc(100dvh-3.5rem-2.5rem)] flex-col gap-2 min-h-0 overflow-hidden";
+  "flex h-[calc(100dvh-3.5rem-2.5rem)] max-h-[calc(100dvh-3.5rem-2.5rem)] flex-col gap-3 min-h-0 overflow-hidden";
 
-const pressable = "cursor-pointer select-none transition-all duration-300";
+const pressable = "cursor-pointer select-none transition-all duration-200";
 
 export function AdminDashboardLoader() {
   const [data, setData] = useState<AdminDashboardData | null>(null);
@@ -64,12 +61,12 @@ export function AdminDashboardLoader() {
   }
   if (error || !data) {
     return (
-      <div className="rounded-2xl border border-red-200/80 bg-red-50 p-8 text-center">
-        <p className="text-sm font-semibold text-red-800">{error ?? "Something went wrong"}</p>
+      <div className="rounded-xl border border-red-200 bg-red-50/80 p-8 text-center">
+        <p className="text-sm font-medium text-red-800">{error ?? "Something went wrong"}</p>
         <button
           type="button"
           onClick={() => void load()}
-          className={cn(pressable, "mt-4 text-sm font-semibold text-red-700 underline")}
+          className={cn(pressable, "mt-4 text-sm font-medium text-red-700 underline-offset-2 hover:underline")}
         >
           Try again
         </button>
@@ -94,187 +91,143 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
 
   return (
     <div className={DASHBOARD_SHELL}>
-      {/* Hero — compact */}
-      <div className="relative shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-zinc-900 via-zinc-900 to-orange-950 px-4 py-3 shadow-lg shadow-zinc-900/15">
-        <div
-          className="pointer-events-none absolute inset-0 opacity-30"
-          aria-hidden="true"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 20% 20%, rgba(251,146,60,0.35) 0%, transparent 45%), radial-gradient(circle at 80% 80%, rgba(249,115,22,0.2) 0%, transparent 40%)",
-          }}
-        />
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.07]"
-          aria-hidden="true"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.8) 1px, transparent 1px)",
-            backgroundSize: "32px 32px",
-          }}
-        />
+      {/* Header */}
+      <div className="shrink-0 flex flex-wrap items-end justify-between gap-3 border-b border-zinc-200/80 pb-3">
+        <div className="min-w-0">
+          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-zinc-400">
+            Overview
+          </p>
+          <h1 className="mt-1 text-xl font-semibold tracking-tight text-zinc-900 sm:text-2xl">
+            Dashboard
+          </h1>
+          <p className="mt-1 text-sm text-zinc-500">
+            {data.students.toLocaleString()} students · {data.trainers} trainers · {approvalRate}%
+            approval rate
+          </p>
+        </div>
 
-        <div className="relative flex flex-wrap items-center justify-between gap-2">
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-orange-200/90">
-                <span className="relative flex h-1.5 w-1.5">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
-                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                </span>
-                Live
-              </div>
-              <h1 className="text-lg sm:text-xl font-bold tracking-tight text-white">
-                Command Center
-              </h1>
-            </div>
-            <p className="mt-0.5 text-xs text-zinc-400 truncate">
-              {data.students} students · {data.trainers} trainers · {approvalRate}% approved
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-1.5 shrink-0">
-            {data.pendingEnrollments > 0 && (
-              <Link
-                href="/admin/enrollments"
-                className={cn(
-                  pressable,
-                  "inline-flex items-center gap-1.5 rounded-lg bg-orange-500 px-3 py-1.5 text-xs font-bold text-white shadow-md shadow-orange-500/25 hover:bg-orange-400"
-                )}
-              >
-                <Lightning size={14} weight="fill" />
-                {data.pendingEnrollments} pending
-                <ArrowRight size={12} weight="bold" />
-              </Link>
-            )}
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
+          {data.pendingEnrollments > 0 && (
             <Link
-              href="/admin/live-classes"
+              href="/admin/enrollments"
               className={cn(
                 pressable,
-                "inline-flex items-center gap-1.5 rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-semibold text-white hover:bg-white/10"
+                "inline-flex items-center gap-2 rounded-lg bg-zinc-900 px-3.5 py-2 text-xs font-medium text-white hover:bg-zinc-800"
               )}
             >
-              <Broadcast size={14} weight="duotone" />
-              Classes
+              {data.pendingEnrollments} pending review
+              <ArrowRight size={14} weight="bold" />
             </Link>
-          </div>
+          )}
+          <Link
+            href="/admin/live-classes"
+            className={cn(
+              pressable,
+              "inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3.5 py-2 text-xs font-medium text-zinc-700 hover:border-zinc-300 hover:bg-zinc-50"
+            )}
+          >
+            <Broadcast size={15} weight="duotone" />
+            Portal classes
+          </Link>
         </div>
       </div>
 
-      {/* Metrics — compact row */}
-      <div className="shrink-0 grid grid-cols-2 xl:grid-cols-4 gap-2">
+      {/* KPI row */}
+      <div className="shrink-0 grid grid-cols-2 xl:grid-cols-4 gap-3">
         <MetricCard
           href="/admin/enrollments"
-          label="Total Registrations"
+          label="Total registrations"
           value={data.totalEnrollments}
           hint="All-time submissions"
           icon={<ClipboardText size={18} weight="duotone" />}
-          accent="from-rose-500 to-pink-600"
-          glow="shadow-rose-500/20"
         />
         <MetricCard
           href="/admin/enrollments"
-          label="Paid / Approved"
+          label="Paid / approved"
           value={data.approvedEnrollments}
           hint={data.trends.approved}
-          icon={<Sparkle size={18} weight="duotone" />}
-          accent="from-emerald-500 to-teal-600"
-          glow="shadow-emerald-500/20"
+          icon={<ChartBar size={18} weight="duotone" />}
           trend={data.trends.approved}
         />
         <MetricCard
           href="/admin/enrollments"
-          label="Pending Review"
+          label="Pending review"
           value={data.pendingEnrollments}
           hint={data.trends.pending}
-          icon={<ChartBar size={18} weight="duotone" />}
-          accent="from-sky-500 to-blue-600"
-          glow="shadow-sky-500/20"
-          pulse={data.pendingEnrollments > 0}
+          icon={<ClipboardText size={18} weight="duotone" />}
+          highlight={data.pendingEnrollments > 0}
           trend={data.trends.pending}
         />
         <MetricCard
           href="/admin/students"
-          label="Active Students"
+          label="Active students"
           value={data.students}
           hint={data.trends.students}
           icon={<GraduationCap size={18} weight="duotone" />}
-          accent="from-amber-500 to-orange-600"
-          glow="shadow-orange-500/20"
           trend={data.trends.students}
         />
       </div>
 
-      {/* Spotlight — compact */}
-      <div className="shrink-0 grid grid-cols-1 md:grid-cols-2 gap-2">
-        <SpotlightCard
-          href="/admin/credentials"
-          title="Portal Logins"
-          icon={<Key size={18} weight="duotone" />}
-          accent="from-violet-500 to-purple-700"
-        >
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-2xl sm:text-3xl font-bold tabular-nums text-white">
+      {/* Insight cards */}
+      <div className="shrink-0 grid grid-cols-1 md:grid-cols-2 gap-3">
+        <InsightCard href="/admin/credentials" title="Portal logins" icon={<Key size={18} weight="duotone" />}>
+          <div className="flex items-baseline gap-2">
+            <span className="text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
               <CountUp end={data.loggedInStudents} duration={1.2} separator="," />
             </span>
-            <span className="text-sm font-medium text-white/50">/ {data.students}</span>
-            <span className="ml-auto text-xs font-semibold text-white/70">{loginRate}% logged in</span>
+            <span className="text-sm text-zinc-400">/ {data.students.toLocaleString()}</span>
+            <span className="ml-auto text-xs font-medium text-zinc-500">{loginRate}% logged in</span>
           </div>
-          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10">
+          <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-zinc-100">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-violet-400 to-fuchsia-400"
+              className="h-full rounded-full bg-zinc-800 transition-all duration-700"
               style={{ width: `${loginRate}%` }}
             />
           </div>
-          <p className="mt-1.5 text-[11px] text-white/50">
-            {data.neverLoggedInStudents} never logged in
+          <p className="mt-2 text-xs text-zinc-500">
+            {data.neverLoggedInStudents} students have not logged in yet
           </p>
-        </SpotlightCard>
+        </InsightCard>
 
-        <SpotlightCard
+        <InsightCard
           href="/admin/courses"
-          title="Live Content"
+          title="Live content"
           icon={<VideoCamera size={18} weight="duotone" />}
-          accent="from-cyan-500 to-blue-700"
         >
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-6">
             <div>
-              <p className="text-2xl sm:text-3xl font-bold tabular-nums text-white">
+              <p className="text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
                 <CountUp end={data.upcomingSessions} duration={1.2} />
               </p>
-              <p className="text-[11px] text-white/60">Upcoming classes</p>
+              <p className="mt-1 text-xs text-zinc-500">Upcoming classes</p>
             </div>
             <div>
-              <p className="text-2xl sm:text-3xl font-bold tabular-nums text-white">
+              <p className="text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
                 <CountUp end={data.assignments} duration={1.2} />
               </p>
-              <p className="text-[11px] text-white/60">Assignments</p>
+              <p className="mt-1 text-xs text-zinc-500">Assignments</p>
             </div>
           </div>
-        </SpotlightCard>
+        </InsightCard>
       </div>
 
-      {/* Bottom — fills remaining height, scrolls if needed */}
-      <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-5 gap-2 overflow-y-auto scrollbar-none">
-        <div className="lg:col-span-3 rounded-xl border border-zinc-200/80 bg-white p-3 sm:p-4 shadow-sm flex flex-col min-h-0">
-          <div className="flex items-center justify-between gap-2 mb-2 shrink-0">
+      {/* Bottom panel */}
+      <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-5 gap-3 overflow-y-auto scrollbar-none pb-0.5">
+        <div className="lg:col-span-3 rounded-xl border border-zinc-200/80 bg-white p-4 sm:p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)] flex flex-col min-h-0">
+          <div className="flex items-center justify-between gap-2 mb-4 shrink-0">
             <div>
-              <h2 className="text-sm font-bold text-zinc-900">Student Mix</h2>
-              <p className="text-[10px] text-zinc-500">First-time vs returning</p>
+              <h2 className="text-sm font-semibold text-zinc-900">Student mix</h2>
+              <p className="text-xs text-zinc-500 mt-0.5">First-time vs returning registrations</p>
             </div>
-            <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[9px] font-bold uppercase text-zinc-500">
-              Analytics
-            </span>
           </div>
 
-          <div className="flex items-center gap-4 flex-1 min-h-0">
+          <div className="flex items-center gap-5 flex-1 min-h-0">
             <DonutChart first={data.firstTimeRegistrations} returning={data.returningRegistrations} />
-            <div className="flex-1 min-w-0 space-y-2">
+            <div className="flex-1 min-w-0 space-y-4">
               <BreakdownRow
                 label="First-time students"
                 value={data.firstTimeRegistrations}
                 total={data.firstTimeRegistrations + data.returningRegistrations}
-                color="bg-gradient-to-r from-orange-400 to-amber-500"
                 badge={data.trends.approved}
                 positive
               />
@@ -282,13 +235,12 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
                 label="Returning students"
                 value={data.returningRegistrations}
                 total={data.firstTimeRegistrations + data.returningRegistrations}
-                color="bg-gradient-to-r from-emerald-400 to-teal-500"
                 badge={`${data.returningRegistrations} re-enrolled`}
               />
             </div>
           </div>
 
-          <div className="mt-2 grid grid-cols-3 gap-1.5 pt-2 border-t border-zinc-100 shrink-0">
+          <div className="mt-4 grid grid-cols-3 gap-2 pt-4 border-t border-zinc-100 shrink-0">
             <ProgramPill label="Trainers" value={data.trainers} href="/admin/trainers" />
             <ProgramPill
               label="Web Dev"
@@ -309,24 +261,21 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
               href="/admin/settings"
               className={cn(
                 pressable,
-                "mt-2 flex items-center gap-2 rounded-lg bg-amber-50 border border-amber-200/80 px-3 py-2 text-[10px] font-semibold text-amber-900 hover:bg-amber-100"
+                "mt-3 flex items-center gap-2 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-xs font-medium text-zinc-700 hover:bg-zinc-100"
               )}
             >
-              <Lightning size={14} weight="fill" className="text-amber-600 shrink-0" />
-              {data.missingTrainerAssignments} students need trainer sync
-              <ArrowRight size={12} className="ml-auto" />
+              {data.missingTrainerAssignments} students need trainer assignment sync
+              <ArrowRight size={12} className="ml-auto text-zinc-400" />
             </Link>
           )}
         </div>
 
-        <div className="lg:col-span-2 rounded-xl border border-zinc-200/80 bg-zinc-950 p-3 sm:p-4 shadow-sm flex flex-col min-h-0">
-          <div className="mb-2 shrink-0">
-            <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-orange-400/90">
-              Quick Access
-            </p>
-            <h2 className="text-sm font-bold text-white">Jump in</h2>
+        <div className="lg:col-span-2 rounded-xl border border-zinc-200/80 bg-white p-4 sm:p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)] flex flex-col min-h-0">
+          <div className="mb-3 shrink-0">
+            <h2 className="text-sm font-semibold text-zinc-900">Quick access</h2>
+            <p className="text-xs text-zinc-500 mt-0.5">Jump to admin tools</p>
           </div>
-          <div className="grid grid-cols-2 gap-1.5 flex-1 content-start auto-rows-min">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-1 flex-1 content-start auto-rows-min">
             {QUICK_LINKS.map((link) => (
               <QuickLink key={link.href} {...link} />
             ))}
@@ -340,51 +289,39 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
 const QUICK_LINKS = [
   {
     href: "/admin/live-classes",
-    title: "Portal Classes",
+    title: "Portal classes",
     subtitle: "Live video rooms",
-    icon: <Broadcast size={18} weight="duotone" />,
-    accent: "group-hover:shadow-orange-500/25",
-    iconBg: "bg-orange-500/20 text-orange-400",
+    icon: <Broadcast size={17} weight="duotone" />,
   },
   {
     href: "/admin/enrollments",
     title: "Registrations",
-    subtitle: "Approve & reject",
-    icon: <ClipboardText size={18} weight="duotone" />,
-    accent: "group-hover:shadow-amber-500/25",
-    iconBg: "bg-amber-500/20 text-amber-400",
+    subtitle: "Approve and reject",
+    icon: <ClipboardText size={17} weight="duotone" />,
   },
   {
     href: "/admin/students",
     title: "Students",
     subtitle: "All accounts",
-    icon: <GraduationCap size={18} weight="duotone" />,
-    accent: "group-hover:shadow-blue-500/25",
-    iconBg: "bg-blue-500/20 text-blue-400",
+    icon: <GraduationCap size={17} weight="duotone" />,
   },
   {
     href: "/admin/credentials",
-    title: "Portal Logins",
-    subtitle: "IDs & passwords",
-    icon: <Key size={18} weight="duotone" />,
-    accent: "group-hover:shadow-violet-500/25",
-    iconBg: "bg-violet-500/20 text-violet-400",
+    title: "Portal logins",
+    subtitle: "IDs and passwords",
+    icon: <Key size={17} weight="duotone" />,
   },
   {
     href: "/admin/trainers",
     title: "Trainers",
     subtitle: "Manage team",
-    icon: <ChartBar size={18} weight="duotone" />,
-    accent: "group-hover:shadow-fuchsia-500/25",
-    iconBg: "bg-fuchsia-500/20 text-fuchsia-400",
+    icon: <UsersThree size={17} weight="duotone" />,
   },
   {
     href: "/admin/courses",
     title: "Courses",
-    subtitle: "Syllabus & content",
-    icon: <VideoCamera size={18} weight="duotone" />,
-    accent: "group-hover:shadow-emerald-500/25",
-    iconBg: "bg-emerald-500/20 text-emerald-400",
+    subtitle: "Syllabus and content",
+    icon: <VideoCamera size={17} weight="duotone" />,
   },
 ] as const;
 
@@ -393,63 +330,48 @@ function MetricCard({
   value,
   hint,
   icon,
-  accent,
-  glow,
   href,
-  pulse,
+  highlight,
   trend,
 }: {
   label: string;
   value: number;
   hint: string;
   icon: React.ReactNode;
-  accent: string;
-  glow: string;
   href?: string;
-  pulse?: boolean;
+  highlight?: boolean;
   trend?: string;
 }) {
   const inner = (
     <>
-      <div className="flex items-center gap-2.5">
-        <div
-          className={cn(
-            "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-white shadow-md",
-            accent,
-            glow
-          )}
-        >
-          {icon}
-        </div>
-        <div className="min-w-0 flex-1">
-          <p className="text-xl font-bold tabular-nums leading-none text-zinc-900">
-            <CountUp end={value} duration={1.2} separator="," />
-          </p>
-          <p className="mt-0.5 text-[11px] font-semibold text-zinc-600 truncate">{label}</p>
-        </div>
-        {pulse && (
-          <span className="flex h-2 w-2 rounded-full bg-sky-400 animate-pulse shrink-0" />
-        )}
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-100 text-zinc-600">
+        {icon}
+      </div>
+      <div className="mt-3">
+        <p className="text-2xl font-semibold tabular-nums tracking-tight text-zinc-900">
+          <CountUp end={value} duration={1.2} separator="," />
+        </p>
+        <p className="mt-1 text-xs font-medium text-zinc-500">{label}</p>
       </div>
       <TrendLine text={trend ?? hint} />
+      {highlight && (
+        <span className="absolute top-3 right-3 h-2 w-2 rounded-full bg-zinc-900" aria-hidden="true" />
+      )}
     </>
   );
 
   const className = cn(
     pressable,
-    "group relative overflow-hidden rounded-xl border border-zinc-200/80 bg-white p-2.5 shadow-sm",
-    "hover:border-zinc-300 hover:shadow-md"
+    "group relative rounded-xl border bg-white p-4",
+    highlight
+      ? "border-zinc-300 shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
+      : "border-zinc-200/80 shadow-[0_1px_2px_rgba(0,0,0,0.03)]",
+    "hover:border-zinc-300 hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)]"
   );
 
   if (href) {
     return (
       <Link href={href} className={className}>
-        <div
-          className={cn(
-            "absolute inset-x-0 top-0 h-1 bg-gradient-to-r opacity-80 group-hover:opacity-100 transition-opacity",
-            accent
-          )}
-        />
         {inner}
       </Link>
     );
@@ -457,17 +379,15 @@ function MetricCard({
   return <div className={className}>{inner}</div>;
 }
 
-function SpotlightCard({
+function InsightCard({
   href,
   title,
   icon,
-  accent,
   children,
 }: {
   href: string;
   title: string;
   icon: React.ReactNode;
-  accent: string;
   children: React.ReactNode;
 }) {
   return (
@@ -475,22 +395,17 @@ function SpotlightCard({
       href={href}
       className={cn(
         pressable,
-        "group relative block overflow-hidden rounded-xl p-3 shadow-md hover:shadow-lg",
-        "bg-gradient-to-br text-white",
-        accent
+        "block rounded-xl border border-zinc-200/80 bg-white p-4 sm:p-5",
+        "shadow-[0_1px_2px_rgba(0,0,0,0.03)] hover:border-zinc-300 hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)]"
       )}
     >
-      <div
-        className="pointer-events-none absolute -right-6 -top-6 h-20 w-20 rounded-full bg-white/10 blur-xl"
-        aria-hidden="true"
-      />
-      <div className="relative flex items-center justify-between gap-2 mb-2">
-        <p className="text-xs font-semibold text-white/85">{title}</p>
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/15">
+      <div className="flex items-center justify-between gap-2 mb-4">
+        <p className="text-xs font-medium uppercase tracking-[0.14em] text-zinc-400">{title}</p>
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-100 text-zinc-600">
           {icon}
         </div>
       </div>
-      <div className="relative">{children}</div>
+      {children}
     </Link>
   );
 }
@@ -499,14 +414,12 @@ function BreakdownRow({
   label,
   value,
   total,
-  color,
   badge,
   positive,
 }: {
   label: string;
   value: number;
   total: number;
-  color: string;
   badge: string;
   positive?: boolean;
 }) {
@@ -514,23 +427,22 @@ function BreakdownRow({
 
   return (
     <div>
-      <div className="flex items-center justify-between gap-2 mb-1">
-        <p className="text-xs font-semibold text-zinc-800 truncate">{label}</p>
-        <p className="text-sm font-bold tabular-nums text-zinc-900 shrink-0">
+      <div className="flex items-center justify-between gap-2 mb-1.5">
+        <p className="text-xs font-medium text-zinc-700 truncate">{label}</p>
+        <p className="text-sm font-semibold tabular-nums text-zinc-900 shrink-0">
           <CountUp end={value} duration={1} separator="," />
         </p>
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-zinc-100">
-        <div className={cn("h-full rounded-full transition-all duration-1000", color)} style={{ width: `${pct}%` }} />
+      <div className="h-1.5 overflow-hidden rounded-full bg-zinc-100">
+        <div
+          className={cn(
+            "h-full rounded-full transition-all duration-1000",
+            positive ? "bg-zinc-800" : "bg-zinc-400"
+          )}
+          style={{ width: `${pct}%` }}
+        />
       </div>
-      <span
-        className={cn(
-          "inline-block mt-1.5 rounded-md px-2 py-0.5 text-[10px] font-bold",
-          positive ? "bg-emerald-50 text-emerald-700" : "bg-orange-50 text-orange-700"
-        )}
-      >
-        {badge}
-      </span>
+      <span className="inline-block mt-1.5 text-[10px] font-medium text-zinc-400">{badge}</span>
     </div>
   );
 }
@@ -551,16 +463,16 @@ function ProgramPill({
       href={href}
       className={cn(
         pressable,
-        "rounded-lg border border-zinc-100 bg-zinc-50/80 px-2 py-2 text-center hover:bg-white hover:border-zinc-200"
+        "rounded-lg border border-zinc-100 bg-zinc-50/50 px-2 py-2.5 text-center hover:border-zinc-200 hover:bg-white"
       )}
     >
-      <div className="flex items-center justify-center gap-1">
+      <div className="flex items-center justify-center gap-1 text-zinc-600">
         {icon}
-        <p className="text-base font-bold tabular-nums text-zinc-900">
+        <p className="text-base font-semibold tabular-nums text-zinc-900">
           <CountUp end={value} duration={1} />
         </p>
       </div>
-      <p className="text-[10px] font-semibold text-zinc-500 mt-0.5 uppercase tracking-wide">{label}</p>
+      <p className="text-[10px] font-medium text-zinc-500 mt-1 uppercase tracking-wide">{label}</p>
     </Link>
   );
 }
@@ -570,34 +482,32 @@ function QuickLink({
   title,
   subtitle,
   icon,
-  accent,
-  iconBg,
 }: {
   href: string;
   title: string;
   subtitle: string;
   icon: React.ReactNode;
-  accent: string;
-  iconBg: string;
 }) {
   return (
     <Link
       href={href}
       className={cn(
         pressable,
-        "group flex items-center gap-2 rounded-lg border border-white/8 bg-white/4 p-2",
-        "hover:bg-white/8 hover:border-white/15",
-        accent
+        "group flex items-center gap-3 rounded-lg px-2 py-2.5 -mx-2",
+        "hover:bg-zinc-50"
       )}
     >
-      <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-lg", iconBg)}>
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-zinc-100 bg-zinc-50 text-zinc-600 group-hover:border-zinc-200 group-hover:bg-white">
         {icon}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="text-xs font-semibold text-white truncate">{title}</p>
-        <p className="text-[10px] text-zinc-500 truncate hidden sm:block">{subtitle}</p>
+        <p className="text-sm font-medium text-zinc-900 truncate">{title}</p>
+        <p className="text-xs text-zinc-500 truncate">{subtitle}</p>
       </div>
-      <ArrowRight size={12} className="shrink-0 text-zinc-600 group-hover:text-orange-400" />
+      <ArrowRight
+        size={14}
+        className="shrink-0 text-zinc-300 group-hover:text-zinc-500 group-hover:translate-x-0.5 transition-all"
+      />
     </Link>
   );
 }
@@ -609,12 +519,12 @@ function TrendLine({ text }: { text: string }) {
   return (
     <p
       className={cn(
-        "flex items-center gap-1 mt-1 text-[10px] font-medium",
-        isNegative ? "text-red-500" : isPositive ? "text-emerald-600" : "text-zinc-400"
+        "flex items-center gap-1 mt-2 text-[11px] font-medium",
+        isNegative ? "text-red-600/80" : isPositive ? "text-emerald-700/80" : "text-zinc-400"
       )}
     >
-      {isPositive && <TrendUp size={12} weight="bold" />}
-      {isNegative && <TrendDown size={12} weight="bold" />}
+      {isPositive && <TrendUp size={11} weight="bold" />}
+      {isNegative && <TrendDown size={11} weight="bold" />}
       {text}
     </p>
   );
@@ -631,14 +541,14 @@ function DonutChart({ first, returning }: { first: number; returning: number }) 
   return (
     <div className="relative h-24 w-24 shrink-0">
       <svg viewBox="0 0 80 80" className="h-full w-full -rotate-90">
-        <circle cx="40" cy="40" r={radius} fill="none" stroke="#f4f4f5" strokeWidth="9" />
+        <circle cx="40" cy="40" r={radius} fill="none" stroke="#f4f4f5" strokeWidth="8" />
         <circle
           cx="40"
           cy="40"
           r={radius}
           fill="none"
-          stroke="url(#donutOrange)"
-          strokeWidth="9"
+          stroke="#27272a"
+          strokeWidth="8"
           strokeDasharray={`${firstLen} ${returnLen}`}
           strokeLinecap="round"
         />
@@ -647,26 +557,16 @@ function DonutChart({ first, returning }: { first: number; returning: number }) 
           cy="40"
           r={radius}
           fill="none"
-          stroke="url(#donutGreen)"
-          strokeWidth="9"
+          stroke="#a1a1aa"
+          strokeWidth="8"
           strokeDasharray={`${returnLen} ${firstLen}`}
           strokeDashoffset={-firstLen}
           strokeLinecap="round"
         />
-        <defs>
-          <linearGradient id="donutOrange" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#fb923c" />
-            <stop offset="100%" stopColor="#f97316" />
-          </linearGradient>
-          <linearGradient id="donutGreen" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#34d399" />
-            <stop offset="100%" stopColor="#14b8a6" />
-          </linearGradient>
-        </defs>
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-lg font-bold tabular-nums text-zinc-900">{total}</span>
-        <span className="text-[9px] font-semibold uppercase tracking-wider text-zinc-400">Total</span>
+        <span className="text-lg font-semibold tabular-nums text-zinc-900">{total}</span>
+        <span className="text-[9px] font-medium uppercase tracking-wider text-zinc-400">Total</span>
       </div>
     </div>
   );
