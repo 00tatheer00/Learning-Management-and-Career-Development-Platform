@@ -35,6 +35,7 @@
   --color-surface: var(--surface);
   --font-sans: var(--font-inter);
   --font-mono: var(--font-geist-mono);
+  --font-portal: var(--font-portal), var(--font-inter), system-ui, sans-serif;
   --radius-sm: calc(var(--radius) - 2px);
   --radius-md: var(--radius);
   --radius-lg: calc(var(--radius) + 4px);
@@ -55,6 +56,12 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.portal-font {
+  font-family: var(--font-portal), var(--font-inter), system-ui, sans-serif;
+  font-feature-settings: "ss01" on, "cv11" on;
+  letter-spacing: -0.011em;
 }
 
 ::selection {

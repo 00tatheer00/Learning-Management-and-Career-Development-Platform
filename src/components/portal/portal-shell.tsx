@@ -91,7 +91,7 @@ export function PortalShell({ user, children }: PortalShellProps) {
   };
 
   return (
-    <div className="min-h-screen lg:h-dvh lg:overflow-hidden bg-zinc-50 flex">
+    <div className="portal-font min-h-screen lg:h-dvh lg:overflow-hidden bg-zinc-50 flex">
       {user.role === "student" && <StudentSingleSessionGuard />}
       {/* Sidebar desktop */}
       <aside
@@ -174,7 +174,7 @@ export function PortalShell({ user, children }: PortalShellProps) {
           </div>
         </header>
 
-        <main className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-5 [&>*]:min-h-0">
+        <main className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-5">
           {user.role === "student" && (
             <div className="mb-4">
               <StudentModuleStartBanner />

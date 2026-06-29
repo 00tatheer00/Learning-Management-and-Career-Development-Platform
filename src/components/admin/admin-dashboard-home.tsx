@@ -20,8 +20,7 @@ import { AdminDashboardSkeleton } from "@/components/admin/admin-dashboard-skele
 import type { AdminDashboardData } from "@/lib/api/admin-dashboard";
 import { cn } from "@/lib/utils";
 
-const DASHBOARD_SHELL =
-  "flex h-[calc(100dvh-3.5rem-2.5rem)] max-h-[calc(100dvh-3.5rem-2.5rem)] flex-col gap-3 min-h-0 overflow-hidden";
+const DASHBOARD_SHELL = "flex flex-col gap-4 pb-4";
 
 const pressable = "cursor-pointer select-none transition-all duration-200";
 
@@ -107,11 +106,7 @@ export function AdminDashboardLoader() {
   }, [load]);
 
   if (loading) {
-    return (
-      <div className="h-full min-h-0 flex flex-col">
-        <AdminDashboardSkeleton />
-      </div>
-    );
+    return <AdminDashboardSkeleton />;
   }
   if (error || !data) {
     return (
@@ -128,11 +123,7 @@ export function AdminDashboardLoader() {
     );
   }
 
-  return (
-    <div className="h-full min-h-0 flex flex-col">
-      <AdminDashboardHome data={data} />
-    </div>
-  );
+  return <AdminDashboardHome data={data} />;
 }
 
 function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
@@ -275,92 +266,104 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
         </InsightCard>
       </div>
 
-      {/* Bottom panel */}
-      <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-5 gap-3 overflow-y-auto scrollbar-none pb-0.5">
-        <div className="lg:col-span-3 rounded-xl border border-sky-200/70 bg-gradient-to-br from-sky-50/40 to-white p-4 sm:p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)] flex flex-col min-h-0">
-          <div className="flex items-center justify-between gap-2 mb-4 shrink-0">
-            <div>
-              <h2 className="text-sm font-semibold text-zinc-900">Student mix</h2>
-              <p className="text-xs text-zinc-500 mt-0.5">First-time vs returning registrations</p>
-            </div>
-          </div>
+      {/* Bottom panel — stacks naturally; page scrolls if needed */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+        <StudentMixPanel data={data} />
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-5 flex-1 min-h-0">
-            <div className="shrink-0">
-              <DonutChart first={data.firstTimeRegistrations} returning={data.returningRegistrations} />
-              <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 justify-center text-[10px] text-zinc-500">
-                <span className="inline-flex items-center gap-1">
-                  <span className="h-2 w-2 rounded-full bg-indigo-600" aria-hidden="true" />
-                  First-time
-                </span>
-                <span className="inline-flex items-center gap-1">
-                  <span className="h-2 w-2 rounded-full bg-teal-500" aria-hidden="true" />
-                  Returning
-                </span>
-              </div>
-            </div>
-            <div className="flex-1 min-w-0 w-full space-y-4">
-              <BreakdownRow
-                label="First-time students"
-                value={data.firstTimeRegistrations}
-                total={data.firstTimeRegistrations + data.returningRegistrations}
-                meta="share of approved mix"
-                barClass="bg-indigo-600"
-              />
-              <BreakdownRow
-                label="Returning students"
-                value={data.returningRegistrations}
-                total={data.firstTimeRegistrations + data.returningRegistrations}
-                meta="re-enrolled applicants"
-                barClass="bg-teal-500"
-              />
-            </div>
-          </div>
-
-          <div className="mt-4 grid grid-cols-3 gap-2 pt-4 border-t border-zinc-100 shrink-0">
-            <ProgramPill label="Trainers" value={data.trainers} href="/admin/trainers" tone="rose" />
-            <ProgramPill
-              label="Web Dev"
-              value={data.webStudents}
-              href="/admin/students"
-              icon={<UsersThree size={14} weight="duotone" />}
-              tone="indigo"
-            />
-            <ProgramPill
-              label="Flutter"
-              value={data.appStudents}
-              href="/admin/students"
-              icon={<DeviceMobile size={14} weight="duotone" />}
-              tone="teal"
-            />
-          </div>
-
-          {data.missingTrainerAssignments > 0 && (
-            <Link
-              href="/admin/settings"
-              className={cn(
-                pressable,
-                "mt-3 flex items-center gap-2 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-xs font-medium text-zinc-700 hover:bg-zinc-100"
-              )}
-            >
-              {data.missingTrainerAssignments} students need trainer assignment sync
-              <ArrowRight size={12} className="ml-auto text-zinc-400" />
-            </Link>
-          )}
-        </div>
-
-        <div className="lg:col-span-2 rounded-xl border border-slate-200/80 bg-gradient-to-br from-slate-50/50 to-white p-4 sm:p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)] flex flex-col min-h-0">
-          <div className="mb-3 shrink-0">
-            <h2 className="text-sm font-semibold text-zinc-900">Quick access</h2>
+        <div className="lg:col-span-2 rounded-xl border border-slate-200/80 bg-gradient-to-br from-slate-50/50 to-white p-4 sm:p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+          <div className="mb-3">
+            <h2 className="text-sm font-semibold tracking-tight text-zinc-900">Quick access</h2>
             <p className="text-xs text-zinc-500 mt-0.5">Jump to admin tools</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-1 flex-1 content-start auto-rows-min">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-0.5">
             {QUICK_LINKS.map((link) => (
               <QuickLink key={link.href} {...link} />
             ))}
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function StudentMixPanel({ data }: { data: AdminDashboardData }) {
+  const mixTotal = data.firstTimeRegistrations + data.returningRegistrations;
+
+  return (
+    <div className="lg:col-span-3 rounded-xl border border-sky-200/70 bg-gradient-to-br from-sky-50/40 to-white p-5 sm:p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+      <div className="mb-6">
+        <h2 className="text-base font-semibold tracking-tight text-zinc-900">Student mix</h2>
+        <p className="text-sm text-zinc-500 mt-1">First-time vs returning registrations</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-[7.5rem_1fr] lg:grid-cols-[8.5rem_1fr] gap-6 md:gap-8 items-start">
+        <div className="mx-auto md:mx-0 w-full max-w-[8.5rem]">
+          <DonutChart first={data.firstTimeRegistrations} returning={data.returningRegistrations} />
+          <div className="mt-3 flex flex-col gap-1.5 text-[11px] text-zinc-600">
+            <span className="inline-flex items-center gap-2">
+              <span className="h-2 w-2 shrink-0 rounded-full bg-indigo-600" aria-hidden="true" />
+              First-time
+            </span>
+            <span className="inline-flex items-center gap-2">
+              <span className="h-2 w-2 shrink-0 rounded-full bg-teal-500" aria-hidden="true" />
+              Returning
+            </span>
+          </div>
+        </div>
+
+        <div className="space-y-6 min-w-0">
+          <BreakdownRow
+            label="First-time students"
+            value={data.firstTimeRegistrations}
+            total={mixTotal}
+            meta="Share of approved mix"
+            barClass="bg-indigo-600"
+          />
+          <BreakdownRow
+            label="Returning students"
+            value={data.returningRegistrations}
+            total={mixTotal}
+            meta="Re-enrolled applicants"
+            barClass="bg-teal-500"
+          />
+        </div>
+      </div>
+
+      <div className="mt-8 pt-6 border-t border-sky-100/80">
+        <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-zinc-500 mb-3">
+          By program
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <ProgramPill label="Trainers" value={data.trainers} href="/admin/trainers" tone="rose" />
+          <ProgramPill
+            label="Web Dev"
+            value={data.webStudents}
+            href="/admin/students"
+            icon={<UsersThree size={14} weight="duotone" />}
+            tone="indigo"
+          />
+          <ProgramPill
+            label="Flutter"
+            value={data.appStudents}
+            href="/admin/students"
+            icon={<DeviceMobile size={14} weight="duotone" />}
+            tone="teal"
+          />
+        </div>
+      </div>
+
+      {data.missingTrainerAssignments > 0 && (
+        <Link
+          href="/admin/settings"
+          className={cn(
+            pressable,
+            "mt-4 flex items-center gap-2 rounded-lg border border-amber-200/80 bg-amber-50/80 px-3 py-2.5 text-xs font-medium text-amber-950 hover:bg-amber-50"
+          )}
+        >
+          {data.missingTrainerAssignments} students need trainer assignment sync
+          <ArrowRight size={12} className="ml-auto text-amber-700/70" />
+        </Link>
+      )}
     </div>
   );
 }
@@ -537,22 +540,22 @@ function BreakdownRow({
   const pct = total > 0 ? Math.round((value / total) * 100) : 0;
 
   return (
-    <div>
-      <div className="flex items-baseline justify-between gap-3 mb-2">
+    <div className="rounded-lg border border-zinc-100/80 bg-white/60 px-4 py-3.5">
+      <div className="flex items-start justify-between gap-4 mb-3">
         <div className="min-w-0">
-          <p className="text-sm font-medium text-zinc-800">{label}</p>
-          <p className="text-[11px] text-zinc-500 mt-0.5">{meta}</p>
+          <p className="text-sm font-semibold tracking-tight text-zinc-900">{label}</p>
+          <p className="text-xs text-zinc-500 mt-0.5">{meta}</p>
         </div>
         <div className="text-right shrink-0">
-          <p className="text-base font-semibold tabular-nums text-zinc-900">
+          <p className="text-lg font-semibold tabular-nums tracking-tight text-zinc-900">
             <CountUp end={value} duration={1} separator="," />
           </p>
-          <p className="text-[11px] font-medium text-zinc-500">{pct}%</p>
+          <p className="text-xs font-medium text-zinc-500">{pct}%</p>
         </div>
       </div>
-      <div className="h-1.5 overflow-hidden rounded-full bg-white/80">
+      <div className="h-2 overflow-hidden rounded-full bg-zinc-100">
         <div
-          className={cn("h-full rounded-full transition-all duration-1000", barClass)}
+          className={cn("h-2 max-h-2 rounded-full transition-all duration-1000", barClass)}
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -669,40 +672,40 @@ function TrendLine({ text }: { text: string }) {
 function DonutChart({ first, returning }: { first: number; returning: number }) {
   const total = Math.max(first + returning, 1);
   const firstPct = (first / total) * 100;
-  const radius = 32;
+  const radius = 36;
   const circumference = 2 * Math.PI * radius;
   const firstLen = (firstPct / 100) * circumference;
   const returnLen = circumference - firstLen;
 
   return (
-    <div className="relative h-24 w-24 shrink-0">
-      <svg viewBox="0 0 80 80" className="h-full w-full -rotate-90">
-        <circle cx="40" cy="40" r={radius} fill="none" stroke="#f4f4f5" strokeWidth="8" />
+    <div className="relative mx-auto aspect-square w-full max-w-[8.5rem]">
+      <svg viewBox="0 0 88 88" className="h-full w-full -rotate-90" aria-hidden="true">
+        <circle cx="44" cy="44" r={radius} fill="none" stroke="#e4e4e7" strokeWidth="10" />
         <circle
-          cx="40"
-          cy="40"
+          cx="44"
+          cy="44"
           r={radius}
           fill="none"
           stroke="#4f46e5"
-          strokeWidth="8"
+          strokeWidth="10"
           strokeDasharray={`${firstLen} ${returnLen}`}
           strokeLinecap="round"
         />
         <circle
-          cx="40"
-          cy="40"
+          cx="44"
+          cy="44"
           r={radius}
           fill="none"
           stroke="#14b8a6"
-          strokeWidth="8"
+          strokeWidth="10"
           strokeDasharray={`${returnLen} ${firstLen}`}
           strokeDashoffset={-firstLen}
           strokeLinecap="round"
         />
       </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-lg font-semibold tabular-nums text-zinc-900">{total}</span>
-        <span className="text-[9px] font-medium uppercase tracking-wider text-zinc-400">Total</span>
+      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+        <span className="text-xl font-semibold tabular-nums tracking-tight text-zinc-900">{total}</span>
+        <span className="text-[10px] font-medium uppercase tracking-wider text-zinc-400">Total</span>
       </div>
     </div>
   );

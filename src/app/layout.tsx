@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Geist_Mono } from "next/font/google";
+import { Inter, Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import { LayoutSwitcher } from "@/components/layout/layout-switcher";
 import { AuthSessionProvider } from "@/components/providers/session-provider";
 import { ToastProvider } from "@/components/providers/toast-provider";
@@ -21,6 +21,12 @@ const geistMono = Geist_Mono({
   display: "swap",
 });
 
+const plusJakarta = Plus_Jakarta_Sans({
+  variable: "--font-portal",
+  subsets: ["latin"],
+  display: "swap",
+});
+
 export const metadata: Metadata = createMetadata({
   title: SITE_CONFIG.name,
   description: SITE_CONFIG.description,
@@ -38,7 +44,7 @@ export default function RootLayout({
         <OrganizationSchema />
       </head>
       <body
-        className={`${inter.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
+        className={`${inter.variable} ${geistMono.variable} ${plusJakarta.variable} antialiased bg-background text-foreground`}
       >
         <AuthSessionProvider>
           <LayoutSwitcher>{children}</LayoutSwitcher>
