@@ -21,6 +21,7 @@ import { DEFAULT_BATCH_NAME } from "@/lib/constants/batch";
 import { getProgramBySlug } from "@/lib/data/programs";
 import { formatAppliedDate } from "@/lib/utils";
 import { toast } from "@/lib/ui/toast";
+import { useAdminPermissions } from "@/components/admin/admin-permissions";
 import type { AdminStudentRow } from "@/lib/api/admin-students";
 
 interface AdminStudentsTableProps {
@@ -32,6 +33,7 @@ const BATCH_OPTIONS = [DEFAULT_BATCH_NAME, "Batch 2", "Batch 3"];
 type BrowseView = "courses" | "modules" | "list";
 
 export function AdminStudentsTable({ students: initialStudents }: AdminStudentsTableProps) {
+  const { canWrite } = useAdminPermissions();
   const [students, setStudents] = useState(initialStudents);
   const [browseView, setBrowseView] = useState<BrowseView>("courses");
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
@@ -409,40 +411,44 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
             </div>
             <p className="mt-2 text-xs text-muted font-mono break-all">{student.cnic}</p>
             <div className="mt-3 flex flex-wrap gap-2 border-t border-border pt-3">
-              <button
-                type="button"
-                title="Edit"
-                disabled={loadingId === student.id}
-                onClick={() => openEdit(student)}
-                className="rounded-lg border border-border px-3 py-2 text-xs font-semibold hover:bg-surface"
-              >
-                Edit
-              </button>
-              <button
-                type="button"
-                title="Reset password"
-                disabled={loadingId === student.id}
-                onClick={() => handleResetPassword(student)}
-                className="rounded-lg border border-border px-3 py-2 text-xs font-semibold hover:bg-surface"
-              >
-                Reset pwd
-              </button>
-              <button
-                type="button"
-                disabled={loadingId === student.id}
-                onClick={() => handleToggleActive(student)}
-                className="rounded-lg border border-border px-3 py-2 text-xs font-semibold hover:bg-surface"
-              >
-                {student.isActive ? "Deactivate" : "Activate"}
-              </button>
-              <button
-                type="button"
-                disabled={loadingId === student.id}
-                onClick={() => setDeleteTarget(student)}
-                className="rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50"
-              >
-                Delete
-              </button>
+              {canWrite && (
+                <>
+                  <button
+                    type="button"
+                    title="Edit"
+                    disabled={loadingId === student.id}
+                    onClick={() => openEdit(student)}
+                    className="rounded-lg border border-border px-3 py-2 text-xs font-semibold hover:bg-surface"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    title="Reset password"
+                    disabled={loadingId === student.id}
+                    onClick={() => handleResetPassword(student)}
+                    className="rounded-lg border border-border px-3 py-2 text-xs font-semibold hover:bg-surface"
+                  >
+                    Reset pwd
+                  </button>
+                  <button
+                    type="button"
+                    disabled={loadingId === student.id}
+                    onClick={() => handleToggleActive(student)}
+                    className="rounded-lg border border-border px-3 py-2 text-xs font-semibold hover:bg-surface"
+                  >
+                    {student.isActive ? "Deactivate" : "Activate"}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={loadingId === student.id}
+                    onClick={() => setDeleteTarget(student)}
+                    className="rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50"
+                  >
+                    Delete
+                  </button>
+                </>
+              )}
             </div>
           </div>
         ))}
@@ -520,44 +526,48 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
                     </p>
                   </td>
                   <td className="px-4 py-4">
-                    <div className="flex flex-wrap gap-2">
-                      <button
-                        type="button"
-                        title="Edit module/batch"
-                        disabled={loadingId === student.id}
-                        onClick={() => openEdit(student)}
-                        className="rounded-lg border border-border p-2 hover:bg-surface"
-                      >
-                        <PencilSimple size={16} />
-                      </button>
-                      <button
-                        type="button"
-                        title="Reset password"
-                        disabled={loadingId === student.id}
-                        onClick={() => handleResetPassword(student)}
-                        className="rounded-lg border border-border p-2 hover:bg-surface"
-                      >
-                        <Key size={16} />
-                      </button>
-                      <button
-                        type="button"
-                        title={student.isActive ? "Deactivate" : "Activate"}
-                        disabled={loadingId === student.id}
-                        onClick={() => handleToggleActive(student)}
-                        className="rounded-lg border border-border p-2 hover:bg-surface"
-                      >
-                        {student.isActive ? <Prohibit size={16} /> : <CheckCircle size={16} />}
-                      </button>
-                      <button
-                        type="button"
-                        title="Delete student"
-                        disabled={loadingId === student.id}
-                        onClick={() => setDeleteTarget(student)}
-                        className="rounded-lg border border-red-200 p-2 text-red-600 hover:bg-red-50"
-                      >
-                        <Trash size={16} weight="duotone" />
-                      </button>
-                    </div>
+                    {canWrite ? (
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          title="Edit module/batch"
+                          disabled={loadingId === student.id}
+                          onClick={() => openEdit(student)}
+                          className="rounded-lg border border-border p-2 hover:bg-surface"
+                        >
+                          <PencilSimple size={16} />
+                        </button>
+                        <button
+                          type="button"
+                          title="Reset password"
+                          disabled={loadingId === student.id}
+                          onClick={() => handleResetPassword(student)}
+                          className="rounded-lg border border-border p-2 hover:bg-surface"
+                        >
+                          <Key size={16} />
+                        </button>
+                        <button
+                          type="button"
+                          title={student.isActive ? "Deactivate" : "Activate"}
+                          disabled={loadingId === student.id}
+                          onClick={() => handleToggleActive(student)}
+                          className="rounded-lg border border-border p-2 hover:bg-surface"
+                        >
+                          {student.isActive ? <Prohibit size={16} /> : <CheckCircle size={16} />}
+                        </button>
+                        <button
+                          type="button"
+                          title="Delete student"
+                          disabled={loadingId === student.id}
+                          onClick={() => setDeleteTarget(student)}
+                          className="rounded-lg border border-red-200 p-2 text-red-600 hover:bg-red-50"
+                        >
+                          <Trash size={16} weight="duotone" />
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="text-xs text-muted">View only</span>
+                    )}
                   </td>
                 </tr>
               ))}

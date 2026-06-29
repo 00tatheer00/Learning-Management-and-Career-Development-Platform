@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth/session";
+import { getAdminUser } from "@/lib/auth/admin-access";
 import {
   buildEnrollmentsCsv,
   buildEnrollmentsExportFilename,
@@ -7,8 +7,8 @@ import {
 } from "@/lib/api/admin-enrollments";
 
 export async function GET(request: Request) {
-  const user = await getCurrentUser();
-  if (!user || user.role !== "admin") {
+  const user = await getAdminUser();
+  if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
 

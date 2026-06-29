@@ -1,6 +1,7 @@
 import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
 import { getPortalHome } from "@/lib/auth/portal-routes";
+import { isAdminRole } from "@/lib/auth/admin-roles";
 import type { UserRole } from "@/types/portal";
 
 export default withAuth(
@@ -16,7 +17,7 @@ export default withAuth(
 
     const role = token.role as UserRole;
 
-    if (pathname.startsWith("/admin") && role !== "admin") {
+    if (pathname.startsWith("/admin") && !isAdminRole(role)) {
       return NextResponse.redirect(new URL(getPortalHome(role), req.url));
     }
     if (pathname.startsWith("/trainer") && role !== "trainer") {

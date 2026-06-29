@@ -1,17 +1,13 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth/session";
+import { getAdminUser, unauthorizedAdminResponse } from "@/lib/auth/admin-access";
 import { createApiResponse } from "@/lib/api/enrollment";
 import { prisma } from "@/lib/prisma";
 import { getProgramBySlug } from "@/lib/data/programs";
 import { getJitsiDomain } from "@/lib/portal-video/config";
 
 export async function GET() {
-  const user = await getCurrentUser();
-  if (!user || user.role !== "admin") {
-    return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), {
-      status: 403,
-    });
-  }
+  const user = await getAdminUser();
+  if (!user) return unauthorizedAdminResponse();
 
   const sessions = await prisma.liveSession.findMany({
     orderBy: [{ date: "desc" }, { time: "desc" }],

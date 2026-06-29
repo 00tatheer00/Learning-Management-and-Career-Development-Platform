@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth/session";
+import {
+  getAdminUser,
+  requireAdminWrite,
+  unauthorizedAdminResponse,
+  isNextResponse,
+} from "@/lib/auth/admin-access";
 import { createApiResponse } from "@/lib/api/enrollment";
 import {
   approveEnrollmentAndCreateAccount,
@@ -12,12 +17,8 @@ import { z } from "zod";
 export const maxDuration = 60;
 
 export async function GET() {
-  const user = await getCurrentUser();
-  if (!user || user.role !== "admin") {
-    return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), {
-      status: 403,
-    });
-  }
+  const user = await getAdminUser();
+  if (!user) return unauthorizedAdminResponse();
 
   const enrollments = await getAdminEnrollmentRows();
   return NextResponse.json(createApiResponse(true, { data: enrollments }));
@@ -31,12 +32,8 @@ const patchSchema = z.object({
 });
 
 export async function PATCH(request: Request) {
-  const user = await getCurrentUser();
-  if (!user || user.role !== "admin") {
-    return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), {
-      status: 403,
-    });
-  }
+  const user = await requireAdminWrite();
+  if (isNextResponse(user)) return user;
 
   const body = await request.json();
   const parsed = patchSchema.safeParse(body);
@@ -110,12 +107,8 @@ const bulkSchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const user = await getCurrentUser();
-  if (!user || user.role !== "admin") {
-    return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), {
-      status: 403,
-    });
-  }
+  const user = await requireAdminWrite();
+  if (isNextResponse(user)) return user;
 
   const body = await request.json();
   const parsed = bulkSchema.safeParse(body);
@@ -154,12 +147,8 @@ const deleteSchema = z.object({
 });
 
 export async function DELETE(request: Request) {
-  const user = await getCurrentUser();
-  if (!user || user.role !== "admin") {
-    return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), {
-      status: 403,
-    });
-  }
+  const admin = await requireAdminWrite();
+  if (isNextResponse(admin)) return admin;
 
   const body = await request.json();
   const parsed = deleteSchema.safeParse(body);

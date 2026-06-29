@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth/session";
+import { canAdminWrite } from "@/lib/auth/admin-access";
 import { getLiveSessionById } from "@/lib/api/portal-data";
 import { PortalLiveRoom } from "@/components/portal/portal-live-room";
 import { isPortalRoomSession } from "@/lib/portal-video/config";
@@ -10,8 +11,8 @@ export default async function AdminLiveClassJoinPage({
   params: Promise<{ sessionId: string }>;
 }) {
   const user = await getCurrentUser();
-  if (!user || user.role !== "admin") {
-    redirect("/login");
+  if (!user || !canAdminWrite(user.role)) {
+    redirect("/admin/live-classes");
   }
 
   const { sessionId } = await params;

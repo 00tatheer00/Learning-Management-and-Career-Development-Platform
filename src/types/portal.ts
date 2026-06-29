@@ -1,6 +1,6 @@
 import type { EnrollmentPayload } from "@/types";
 
-export type UserRole = "student" | "trainer" | "admin";
+export type UserRole = "student" | "trainer" | "admin" | "admin_readonly";
 export type EnrollmentStatus = "pending" | "approved" | "rejected";
 
 export interface User {

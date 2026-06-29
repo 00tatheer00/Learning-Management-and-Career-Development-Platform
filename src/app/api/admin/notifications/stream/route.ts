@@ -1,4 +1,4 @@
-import { getCurrentUser } from "@/lib/auth/session";
+import { getAdminUser } from "@/lib/auth/admin-access";
 import { getAdminRegistrationNotifications } from "@/lib/api/admin-notifications";
 
 export const dynamic = "force-dynamic";
@@ -8,8 +8,8 @@ const POLL_MS = 3_000;
 const MAX_MS = 55_000;
 
 export async function GET(request: Request) {
-  const user = await getCurrentUser();
-  if (!user || user.role !== "admin") {
+  const user = await getAdminUser();
+  if (!user) {
     return new Response("Unauthorized", { status: 403 });
   }
 

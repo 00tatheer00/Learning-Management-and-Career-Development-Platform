@@ -17,6 +17,14 @@ const DEFAULT_USERS = [
     avatarInitials: "AU",
   },
   {
+    id: "admin-komal",
+    email: "komal@eest.com",
+    password: "komal@003",
+    role: "admin_readonly" as const,
+    name: "Komal",
+    avatarInitials: "KO",
+  },
+  {
     id: "trainer-tatheer",
     email: "tatheer@eest.com",
     password: "tatheer@321",

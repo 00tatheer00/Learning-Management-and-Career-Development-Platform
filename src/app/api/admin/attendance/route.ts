@@ -1,15 +1,11 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth/session";
+import { getAdminUser, unauthorizedAdminResponse } from "@/lib/auth/admin-access";
 import { createApiResponse } from "@/lib/api/enrollment";
 import { getAttendanceReport } from "@/lib/api/class-attendance";
 
 export async function GET(request: Request) {
-  const user = await getCurrentUser();
-  if (!user || user.role !== "admin") {
-    return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), {
-      status: 403,
-    });
-  }
+  const user = await getAdminUser();
+  if (!user) return unauthorizedAdminResponse();
 
   const { searchParams } = new URL(request.url);
   const programSlug = searchParams.get("programSlug") ?? undefined;

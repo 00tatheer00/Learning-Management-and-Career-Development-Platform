@@ -21,6 +21,7 @@ import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
 import { getProgramCategory } from "@/lib/constants/program-categories";
 import type { AdminProgramStats } from "@/lib/api/admin-program-stats";
 import { toast } from "@/lib/ui/toast";
+import { useAdminPermissions } from "@/components/admin/admin-permissions";
 import type { AdminTrainerRow } from "@/lib/api/admin-trainers";
 
 interface AdminTrainersPanelProps {
@@ -48,6 +49,7 @@ export function AdminTrainersPanel({
   trainers: initialTrainers,
   programStats: initialProgramStats,
 }: AdminTrainersPanelProps) {
+  const { canWrite } = useAdminPermissions();
   const [trainers, setTrainers] = useState(initialTrainers);
   const [programStats, setProgramStats] = useState(initialProgramStats);
   const [programFilter, setProgramFilter] = useState("all");
@@ -239,7 +241,7 @@ export function AdminTrainersPanel({
         description="Add, edit, or remove trainers. Student counts match active portal accounts assigned to each trainer."
       >
         <div className="flex flex-wrap gap-2">
-          {programStats.missingTrainerAssignments > 0 && (
+          {canWrite && programStats.missingTrainerAssignments > 0 && (
             <Button
               variant="outline"
               size="lg"
@@ -251,10 +253,12 @@ export function AdminTrainersPanel({
               Sync assignments ({programStats.missingTrainerAssignments})
             </Button>
           )}
-          <Button size="lg" className="gap-2" onClick={openCreate}>
-            <Plus size={18} weight="bold" />
-            Add Trainer
-          </Button>
+          {canWrite && (
+            <Button size="lg" className="gap-2" onClick={openCreate}>
+              <Plus size={18} weight="bold" />
+              Add Trainer
+            </Button>
+          )}
         </div>
       </PortalPageHeader>
 
@@ -393,29 +397,31 @@ export function AdminTrainersPanel({
                       )}
                     </div>
 
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        size="sm"
-                        className="gap-2"
-                        onClick={() => openEdit(trainer)}
-                      >
-                        <PencilSimple size={16} />
-                        Edit
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
-                        disabled={loadingId === trainer.id}
-                        onClick={() => void deleteTrainer(trainer)}
-                      >
-                        <Trash size={16} />
-                        Delete
-                      </Button>
-                    </div>
+                    {canWrite && (
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          size="sm"
+                          className="gap-2"
+                          onClick={() => openEdit(trainer)}
+                        >
+                          <PencilSimple size={16} />
+                          Edit
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+                          disabled={loadingId === trainer.id}
+                          onClick={() => void deleteTrainer(trainer)}
+                        >
+                          <Trash size={16} />
+                          Delete
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

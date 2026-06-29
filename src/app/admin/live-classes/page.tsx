@@ -5,6 +5,7 @@ import Link from "next/link";
 import { VideoCamera, CheckCircle } from "@phosphor-icons/react";
 import { PortalPageHeader } from "@/components/portal/portal-ui";
 import { Button } from "@/components/ui/button";
+import { useAdminPermissions } from "@/components/admin/admin-permissions";
 import { cn } from "@/lib/utils";
 
 interface LiveClassRow {
@@ -20,6 +21,7 @@ interface LiveClassRow {
 }
 
 export default function AdminLiveClassesPage() {
+  const { canWrite } = useAdminPermissions();
   const [rows, setRows] = useState<LiveClassRow[]>([]);
   const [jitsiDomain, setJitsiDomain] = useState("meet.jit.si");
   const [portalCount, setPortalCount] = useState(0);
@@ -117,11 +119,15 @@ export default function AdminLiveClassesPage() {
                     </td>
                     <td className="px-4 py-3">
                       {row.roomType === "portal" ? (
-                        <Button size="sm" asChild>
-                          <Link href={`/admin/live-classes/${row.id}/live`}>
-                            <VideoCamera size={16} /> Join
-                          </Link>
-                        </Button>
+                        canWrite ? (
+                          <Button size="sm" asChild>
+                            <Link href={`/admin/live-classes/${row.id}/live`}>
+                              <VideoCamera size={16} /> Join
+                            </Link>
+                          </Button>
+                        ) : (
+                          <span className="text-xs text-muted">View only</span>
+                        )
                       ) : row.meetLink ? (
                         <a
                           href={row.meetLink}

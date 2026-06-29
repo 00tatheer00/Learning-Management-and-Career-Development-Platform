@@ -55,6 +55,17 @@ export const PORTAL_NAV: Record<UserRole, PortalNavItem[]> = {
     { href: "/admin/courses", label: "Courses", icon: BookOpen, description: "Materials & content" },
     { href: "/admin/settings", label: "Settings", icon: Gear, description: "Portal settings" },
   ],
+  admin_readonly: [
+    { href: "/admin/dashboard", label: "Home", icon: ChartBar, description: "Overview & stats" },
+    { href: "/admin/live-classes", label: "Portal Classes", icon: Broadcast, description: "In-portal video rooms" },
+    { href: "/admin/enrollments", label: "Registrations", icon: ClipboardText, description: "View applications" },
+    { href: "/admin/students", label: "Students", icon: GraduationCap, description: "All students" },
+    { href: "/admin/credentials", label: "Portal Logins", icon: Key, description: "Student login IDs" },
+    { href: "/admin/attendance", label: "Attendance", icon: ListChecks, description: "Class join records" },
+    { href: "/admin/trainers", label: "Trainers", icon: Users, description: "All trainers" },
+    { href: "/admin/courses", label: "Courses", icon: BookOpen, description: "Materials & content" },
+    { href: "/admin/settings", label: "Settings", icon: Gear, description: "Portal settings" },
+  ],
 };
 
 export interface PortalNavGroup {
@@ -75,16 +86,19 @@ export const PORTAL_NAV_GROUPS: Record<UserRole, PortalNavGroup[]> = {
   student: groupNavItems(PORTAL_NAV.student, ["/student/profile"]),
   trainer: groupNavItems(PORTAL_NAV.trainer, ["/trainer/settings", "/trainer/profile"]),
   admin: groupNavItems(PORTAL_NAV.admin, ["/admin/settings"]),
+  admin_readonly: groupNavItems(PORTAL_NAV.admin_readonly, ["/admin/settings"]),
 };
 
 export const PORTAL_LABELS: Record<UserRole, string> = {
   student: "Student Portal",
   trainer: "Trainer Portal",
   admin: "Super Admin",
+  admin_readonly: "Viewer Admin",
 };
 
 export const PORTAL_COLORS: Record<UserRole, string> = {
   student: "from-orange-500 to-amber-500",
   trainer: "from-blue-500 to-indigo-500",
   admin: "from-slate-700 to-slate-900",
+  admin_readonly: "from-violet-600 to-indigo-900",
 };

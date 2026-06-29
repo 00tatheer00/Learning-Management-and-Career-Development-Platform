@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { getCurrentUser } from "@/lib/auth/session";
+import {
+  getAdminUser,
+  requireAdminWrite,
+  unauthorizedAdminResponse,
+  isNextResponse,
+} from "@/lib/auth/admin-access";
 import { createApiResponse } from "@/lib/api/enrollment";
 import { getAdminTrainerRows } from "@/lib/api/admin-trainers";
 import { createUser, deleteUser, getUserByEmail, updateUser } from "@/lib/auth/users";
@@ -9,12 +14,8 @@ import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
-  const user = await getCurrentUser();
-  if (!user || user.role !== "admin") {
-    return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), {
-      status: 403,
-    });
-  }
+  const user = await getAdminUser();
+  if (!user) return unauthorizedAdminResponse();
 
   const rows = await getAdminTrainerRows();
   return NextResponse.json(createApiResponse(true, { data: rows }));
@@ -58,12 +59,8 @@ const deleteSchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const admin = await getCurrentUser();
-  if (!admin || admin.role !== "admin") {
-    return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), {
-      status: 403,
-    });
-  }
+  const admin = await requireAdminWrite();
+  if (isNextResponse(admin)) return admin;
 
   const body = await request.json();
   const parsed = postSchema.safeParse(body);
@@ -119,12 +116,8 @@ export async function POST(request: Request) {
 }
 
 export async function PATCH(request: Request) {
-  const admin = await getCurrentUser();
-  if (!admin || admin.role !== "admin") {
-    return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), {
-      status: 403,
-    });
-  }
+  const admin = await requireAdminWrite();
+  if (isNextResponse(admin)) return admin;
 
   const body = await request.json();
   const parsed = patchSchema.safeParse(body);
@@ -161,12 +154,8 @@ export async function PATCH(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  const admin = await getCurrentUser();
-  if (!admin || admin.role !== "admin") {
-    return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), {
-      status: 403,
-    });
-  }
+  const admin = await requireAdminWrite();
+  if (isNextResponse(admin)) return admin;
 
   const body = await request.json();
   const parsed = deleteSchema.safeParse(body);

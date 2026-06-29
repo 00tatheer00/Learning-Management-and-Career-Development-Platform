@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { getCurrentUser } from "@/lib/auth/session";
+import {
+  getAdminUser,
+  requireAdminWrite,
+  unauthorizedAdminResponse,
+  isNextResponse,
+} from "@/lib/auth/admin-access";
 import { createApiResponse } from "@/lib/api/enrollment";
 import { getUltraMsgInstanceStatus, sendWhatsAppMessage } from "@/lib/notifications/whatsapp";
 import { resendStudentLoginWhatsApp } from "@/lib/notifications/student-login-whatsapp";
@@ -12,12 +17,8 @@ function getAdminAlertWhatsApp() {
 }
 
 export async function GET() {
-  const user = await getCurrentUser();
-  if (!user || user.role !== "admin") {
-    return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), {
-      status: 403,
-    });
-  }
+  const user = await getAdminUser();
+  if (!user) return unauthorizedAdminResponse();
 
   const status = await getUltraMsgInstanceStatus();
   return NextResponse.json(createApiResponse(true, { data: status }));
@@ -34,12 +35,8 @@ const postSchema = z.discriminatedUnion("action", [
 ]);
 
 export async function POST(request: Request) {
-  const user = await getCurrentUser();
-  if (!user || user.role !== "admin") {
-    return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), {
-      status: 403,
-    });
-  }
+  const user = await requireAdminWrite();
+  if (isNextResponse(user)) return user;
 
   const body = await request.json();
   const parsed = postSchema.safeParse(body);

@@ -20,6 +20,7 @@ import { buildApprovalWhatsAppMessage } from "@/lib/notifications/approval-templ
 import { cn, formatAppliedDateTime } from "@/lib/utils";
 import { PORTAL_VIEWPORT_PANEL } from "@/lib/constants/portal-layout";
 import { toast } from "@/lib/ui/toast";
+import { useAdminPermissions } from "@/components/admin/admin-permissions";
 import type { AdminCredentialRow } from "@/lib/api/admin-credentials";
 
 interface CredentialsMeta {
@@ -40,6 +41,7 @@ async function copyText(label: string, value: string) {
 }
 
 export function AdminCredentialsPanel() {
+  const { canWrite } = useAdminPermissions();
   const [rows, setRows] = useState<AdminCredentialRow[]>([]);
   const [meta, setMeta] = useState<CredentialsMeta>({
     total: 0,
@@ -315,7 +317,7 @@ export function AdminCredentialsPanel() {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            {filtered.some((row) => row.hasStoredPassword) && (
+            {canWrite && filtered.some((row) => row.hasStoredPassword) && (
               <Button
                 size="sm"
                 variant="secondary"
@@ -329,7 +331,7 @@ export function AdminCredentialsPanel() {
                   : `WhatsApp ${filtered.filter((r) => r.hasStoredPassword).length}`}
               </Button>
             )}
-            {meta.missing > 0 && (
+            {canWrite && meta.missing > 0 && (
               <Button
                 size="sm"
                 variant="secondary"
@@ -491,14 +493,16 @@ export function AdminCredentialsPanel() {
                       <td className="px-3 py-2.5">
                         <div className="flex items-center gap-1">
                           <span className="font-mono text-[11px] max-w-[140px] truncate">{row.email}</span>
-                          <button
-                            type="button"
-                            title="Edit login ID"
-                            onClick={() => openEditLogin(row)}
-                            className="rounded p-1 hover:bg-surface text-muted"
-                          >
-                            <PencilSimple size={12} />
-                          </button>
+                          {canWrite && (
+                            <button
+                              type="button"
+                              title="Edit login ID"
+                              onClick={() => openEditLogin(row)}
+                              className="rounded p-1 hover:bg-surface text-muted"
+                            >
+                              <PencilSimple size={12} />
+                            </button>
+                          )}
                           <button
                             type="button"
                             title="Copy login ID"
@@ -532,7 +536,7 @@ export function AdminCredentialsPanel() {
                               <Copy size={12} />
                             </button>
                           </div>
-                        ) : (
+                        ) : canWrite ? (
                           <Button
                             size="sm"
                             variant="secondary"
@@ -543,6 +547,8 @@ export function AdminCredentialsPanel() {
                             <Key size={12} />
                             Generate
                           </Button>
+                        ) : (
+                          <span className="text-[11px] text-muted">—</span>
                         )}
                       </td>
                       <td className="px-3 py-2.5 whitespace-nowrap text-[11px] text-muted">
@@ -564,15 +570,28 @@ export function AdminCredentialsPanel() {
                           >
                             <Copy size={14} />
                           </button>
-                          <button
-                            type="button"
-                            title="Send login on WhatsApp"
-                            disabled={!row.password || loadingId === row.id}
-                            onClick={() => void handleResendWhatsApp(row)}
-                            className="rounded border border-[#25D366]/40 bg-[#25D366]/10 p-1.5 text-[#128C7E] hover:bg-[#25D366]/20 disabled:opacity-40"
-                          >
-                            <ChatsCircle size={14} weight="fill" />
-                          </button>
+                          {canWrite && (
+                            <>
+                              <button
+                                type="button"
+                                title="Send login on WhatsApp"
+                                disabled={!row.password || loadingId === row.id}
+                                onClick={() => void handleResendWhatsApp(row)}
+                                className="rounded border border-[#25D366]/40 bg-[#25D366]/10 p-1.5 text-[#128C7E] hover:bg-[#25D366]/20 disabled:opacity-40"
+                              >
+                                <ChatsCircle size={14} weight="fill" />
+                              </button>
+                              <button
+                                type="button"
+                                title="Reset password"
+                                disabled={loadingId === row.id}
+                                onClick={() => void handleResetPassword(row)}
+                                className="rounded border border-border p-1.5 hover:bg-surface"
+                              >
+                                <ArrowClockwise size={14} />
+                              </button>
+                            </>
+                          )}
                           <button
                             type="button"
                             title="Copy WhatsApp message"
@@ -581,15 +600,6 @@ export function AdminCredentialsPanel() {
                             className="rounded border border-border p-1.5 hover:bg-surface disabled:opacity-40"
                           >
                             <ChatsCircle size={14} weight="duotone" />
-                          </button>
-                          <button
-                            type="button"
-                            title="Reset password"
-                            disabled={loadingId === row.id}
-                            onClick={() => void handleResetPassword(row)}
-                            className="rounded border border-border p-1.5 hover:bg-surface"
-                          >
-                            <ArrowClockwise size={14} />
                           </button>
                         </div>
                       </td>

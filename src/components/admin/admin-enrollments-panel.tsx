@@ -27,6 +27,7 @@ import { formatAppliedDate, formatAppliedDateTime, formatAppliedTime, cn } from 
 import { toast } from "@/lib/ui/toast";
 import { playPortalSound, primePortalSounds } from "@/lib/ui/portal-sounds";
 import { Alert } from "@/components/ui/alert";
+import { useAdminPermissions } from "@/components/admin/admin-permissions";
 import type { AdminEnrollmentRow } from "@/lib/api/admin-enrollments";
 
 type StatusFilter = "all" | "pending" | "approved" | "rejected";
@@ -48,6 +49,7 @@ function hasPaymentScreenshot(url?: string | null): boolean {
 }
 
 export function AdminEnrollmentsPanel() {
+  const { canWrite } = useAdminPermissions();
   const [enrollments, setEnrollments] = useState<AdminEnrollmentRow[]>([]);
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [bulkLoading, setBulkLoading] = useState(false);
@@ -433,7 +435,7 @@ export function AdminEnrollmentsPanel() {
           ))}
         </div>
 
-        {statusFilter === "pending" && pendingFilteredIds.length > 0 && (
+        {canWrite && statusFilter === "pending" && pendingFilteredIds.length > 0 && (
           <div className="flex flex-wrap items-center gap-3 border-t border-border pt-4">
             <button
               type="button"
@@ -484,7 +486,7 @@ export function AdminEnrollmentsPanel() {
                   <div className="flex flex-col gap-6 lg:flex-row">
                     <div className="flex-1">
                       <div className="mb-3 flex flex-wrap items-center gap-2">
-                        {isPending && (
+                        {canWrite && isPending && (
                           <input
                             type="checkbox"
                             checked={selectedIds.includes(enrollment.id)}
@@ -531,22 +533,24 @@ export function AdminEnrollmentsPanel() {
                           <CalendarBlank size={14} weight="duotone" className="text-primary" />
                           Applied: {formatAppliedDateTime(enrollment.createdAt)}
                         </span>
-                        <button
-                          type="button"
-                          title="Delete registration"
-                          disabled={loadingId === enrollment.id || bulkLoading}
-                          onClick={() =>
-                            setDeleteTarget({
-                              id: enrollment.id,
-                              name: enrollment.fullName,
-                              status: enrollment.status,
-                            })
-                          }
-                          className="ml-auto inline-flex items-center gap-1.5 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 transition-colors hover:bg-red-50"
-                        >
-                          <Trash size={16} weight="duotone" />
-                          Delete
-                        </button>
+                        {canWrite && (
+                          <button
+                            type="button"
+                            title="Delete registration"
+                            disabled={loadingId === enrollment.id || bulkLoading}
+                            onClick={() =>
+                              setDeleteTarget({
+                                id: enrollment.id,
+                                name: enrollment.fullName,
+                                status: enrollment.status,
+                              })
+                            }
+                            className="ml-auto inline-flex items-center gap-1.5 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 transition-colors hover:bg-red-50"
+                          >
+                            <Trash size={16} weight="duotone" />
+                            Delete
+                          </button>
+                        )}
                       </div>
 
                       <h2 className="text-xl font-bold">{enrollment.fullName}</h2>
@@ -657,7 +661,7 @@ export function AdminEnrollmentsPanel() {
                     )}
                   </div>
 
-                  {isPending && (
+                  {canWrite && isPending && (
                     <div className="mt-5 flex flex-wrap gap-3 border-t border-border pt-5">
                       <Button
                         size="lg"
@@ -693,7 +697,7 @@ export function AdminEnrollmentsPanel() {
                     </div>
                   )}
 
-                  {!isPending && (
+                  {canWrite && !isPending && (
                     <div className="mt-5 flex flex-wrap gap-3 border-t border-border pt-5">
                       <Button
                         size="lg"

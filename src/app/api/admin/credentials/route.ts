@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { getCurrentUser } from "@/lib/auth/session";
+import {
+  getAdminUser,
+  requireAdminWrite,
+  unauthorizedAdminResponse,
+  isNextResponse,
+} from "@/lib/auth/admin-access";
 import { createApiResponse } from "@/lib/api/enrollment";
 import {
   getAdminCredentialRows,
@@ -10,12 +15,8 @@ import { generateMissingPortalPasswords } from "@/lib/api/admin-credentials-bulk
 import { bulkResendLoginWhatsApp } from "@/lib/api/admin-credentials-bulk-whatsapp";
 
 export async function GET() {
-  const user = await getCurrentUser();
-  if (!user || user.role !== "admin") {
-    return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), {
-      status: 403,
-    });
-  }
+  const user = await getAdminUser();
+  if (!user) return unauthorizedAdminResponse();
 
   const rows = await getAdminCredentialRows();
   const missingCount = rows.filter((row) => !row.hasStoredPassword).length;
@@ -44,12 +45,8 @@ const patchSchema = z.object({
 });
 
 export async function PATCH(request: Request) {
-  const user = await getCurrentUser();
-  if (!user || user.role !== "admin") {
-    return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), {
-      status: 403,
-    });
-  }
+  const user = await requireAdminWrite();
+  if (isNextResponse(user)) return user;
 
   const body = await request.json();
   const parsed = patchSchema.safeParse(body);
@@ -98,12 +95,8 @@ const postSchema = z.discriminatedUnion("action", [
 ]);
 
 export async function POST(request: Request) {
-  const user = await getCurrentUser();
-  if (!user || user.role !== "admin") {
-    return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), {
-      status: 403,
-    });
-  }
+  const user = await requireAdminWrite();
+  if (isNextResponse(user)) return user;
 
   const body = await request.json();
   const parsed = postSchema.safeParse(body);

@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth/session";
+import {
+  getAdminUser,
+  requireAdminWrite,
+  unauthorizedAdminResponse,
+  isNextResponse,
+} from "@/lib/auth/admin-access";
 import { createApiResponse } from "@/lib/api/enrollment";
 import {
   getAdminProgramStats,
@@ -7,24 +12,16 @@ import {
 } from "@/lib/api/admin-program-stats";
 
 export async function GET() {
-  const user = await getCurrentUser();
-  if (!user || user.role !== "admin") {
-    return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), {
-      status: 403,
-    });
-  }
+  const user = await getAdminUser();
+  if (!user) return unauthorizedAdminResponse();
 
   const stats = await getAdminProgramStats();
   return NextResponse.json(createApiResponse(true, { data: stats }));
 }
 
 export async function POST() {
-  const user = await getCurrentUser();
-  if (!user || user.role !== "admin") {
-    return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), {
-      status: 403,
-    });
-  }
+  const user = await requireAdminWrite();
+  if (isNextResponse(user)) return user;
 
   const result = await repairMissingTrainerAssignments();
   const stats = await getAdminProgramStats();

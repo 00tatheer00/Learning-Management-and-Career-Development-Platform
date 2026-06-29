@@ -11,6 +11,7 @@ enum UserRole {
   student
   trainer
   admin
+  admin_readonly
 }
 
 enum EnrollmentStatus {

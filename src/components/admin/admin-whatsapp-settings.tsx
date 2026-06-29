@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ChatsCircle, ArrowSquareOut } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/lib/ui/toast";
+import { useAdminPermissions } from "@/components/admin/admin-permissions";
 
 interface WhatsAppStatus {
   configured: boolean;
@@ -13,6 +14,7 @@ interface WhatsAppStatus {
 }
 
 export function AdminWhatsAppSettings() {
+  const { canWrite } = useAdminPermissions();
   const [status, setStatus] = useState<WhatsAppStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [testing, setTesting] = useState(false);
@@ -103,10 +105,12 @@ export function AdminWhatsAppSettings() {
             Open UltraMsg Dashboard
           </a>
         </Button>
-        <Button type="button" className="gap-2" disabled={testing} onClick={() => void sendTest()}>
-          <ChatsCircle size={18} weight="duotone" />
-          {testing ? "Sending..." : "Send Test Message"}
-        </Button>
+        {canWrite && (
+          <Button type="button" className="gap-2" disabled={testing} onClick={() => void sendTest()}>
+            <ChatsCircle size={18} weight="duotone" />
+            {testing ? "Sending..." : "Send Test Message"}
+          </Button>
+        )}
         <Button type="button" variant="secondary" onClick={() => void loadStatus()}>
           Refresh Status
         </Button>

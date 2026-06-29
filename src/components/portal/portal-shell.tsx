@@ -29,20 +29,25 @@ import {
   AdminRevenueSidebarCard,
 } from "@/components/admin/admin-revenue-side-panel";
 import { useAdminAlertsOptional } from "@/components/admin/admin-alerts-provider";
-import type { PortalUser } from "@/types/portal";
+import { isAdminRole } from "@/lib/auth/admin-access";
+import type { PortalUser, UserRole } from "@/types/portal";
 import { cn } from "@/lib/utils";
 
 const SIDEBAR_COLLAPSED_KEY = "portal-sidebar-collapsed";
 
 const pressable = "cursor-pointer select-none";
 
-function getAdminDisplayName(name: string) {
+function getAdminDisplayName(name: string, role: UserRole) {
   const parts = name.trim().split(/\s+/).filter(Boolean);
+  const firstName = parts[0] ?? name;
+  if (role === "admin_readonly") {
+    return `Viewer Admin · ${firstName}`;
+  }
   const tatheer = parts.find((part) => part.toLowerCase() === "tatheer");
-  const firstName =
+  const displayFirst =
     tatheer ??
-    (name.trim().toLowerCase() === "admin user" ? "Tatheer" : parts[0] ?? name);
-  return `Super Admin - ${firstName}`;
+    (name.trim().toLowerCase() === "admin user" ? "Tatheer" : firstName);
+  return `Super Admin - ${displayFirst}`;
 }
 
 interface PortalShellProps {
@@ -54,8 +59,10 @@ export function PortalShell({ user, children }: PortalShellProps) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const isAdmin = user.role === "admin";
-  const headerTitle = isAdmin ? getAdminDisplayName(user.name) : `Hello, ${user.name.split(" ")[0]} 👋`;
+  const isAdmin = isAdminRole(user.role);
+  const headerTitle = isAdmin
+    ? getAdminDisplayName(user.name, user.role)
+    : `Hello, ${user.name.split(" ")[0]} 👋`;
 
   useEffect(() => {
     const stored = localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
@@ -148,12 +155,12 @@ export function PortalShell({ user, children }: PortalShellProps) {
             </div>
           </div>
           <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-            {user.role === "admin" && (
+            {isAdmin && (
               <span className="hidden md:inline-flex">
                 <AdminRevenueHeaderButton />
               </span>
             )}
-            {user.role === "admin" && <AdminNotificationsBell />}
+            {isAdmin && <AdminNotificationsBell />}
             <Button variant="outline" size="sm" asChild className="hidden sm:flex h-8 text-xs">
               <Link href="/">
                 <House size={15} weight="duotone" />
@@ -200,20 +207,21 @@ function SidebarContent({
 }) {
   const adminAlerts = useAdminAlertsOptional();
   const enrollmentBadgeCount =
-    adminAlerts && user.role === "admin"
+    adminAlerts && isAdminRole(user.role)
       ? adminAlerts.unreadCount > 0
         ? adminAlerts.unreadCount
         : adminAlerts.pendingCount
       : 0;
 
-  const isAdmin = user.role === "admin";
-  const displayName = isAdmin ? getAdminDisplayName(user.name) : user.name;
-  const portalSubtitle =
-    user.role === "admin"
-      ? "Admin Portal"
-      : user.role === "trainer"
-        ? "Trainer Portal"
-        : "Student Portal";
+  const isAdmin = isAdminRole(user.role);
+  const displayName = isAdmin ? getAdminDisplayName(user.name, user.role) : user.name;
+  const portalSubtitle = isAdmin
+    ? user.role === "admin_readonly"
+      ? "Viewer Admin"
+      : "Admin Portal"
+    : user.role === "trainer"
+      ? "Trainer Portal"
+      : "Student Portal";
 
   return (
     <div className="relative flex flex-col h-full overflow-hidden bg-white">
@@ -366,7 +374,7 @@ function SidebarContent({
           collapsed ? "px-2 space-y-1.5" : "px-3 space-y-1.5"
         )}
       >
-        {user.role === "admin" && <AdminRevenueSidebarCard compact={collapsed} />}
+        {isAdmin && <AdminRevenueSidebarCard compact={collapsed} />}
         <button
           type="button"
           onClick={onLogout}

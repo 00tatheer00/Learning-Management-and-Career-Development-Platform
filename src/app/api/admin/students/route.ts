@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth/session";
+import { requireAdminWrite, isNextResponse } from "@/lib/auth/admin-access";
 import { createApiResponse } from "@/lib/api/enrollment";
 import { getUserById, updateUser, updateUserPasswordHash } from "@/lib/auth/users";
 import { hashPassword } from "@/lib/auth/password";
@@ -33,12 +33,8 @@ const patchSchema = z.discriminatedUnion("action", [
 ]);
 
 export async function PATCH(request: Request) {
-  const admin = await getCurrentUser();
-  if (!admin || admin.role !== "admin") {
-    return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), {
-      status: 403,
-    });
-  }
+  const admin = await requireAdminWrite();
+  if (isNextResponse(admin)) return admin;
 
   const body = await request.json();
   const parsed = patchSchema.safeParse(body);
@@ -136,12 +132,8 @@ const deleteSchema = z.object({
 });
 
 export async function DELETE(request: Request) {
-  const admin = await getCurrentUser();
-  if (!admin || admin.role !== "admin") {
-    return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), {
-      status: 403,
-    });
-  }
+  const admin = await requireAdminWrite();
+  if (isNextResponse(admin)) return admin;
 
   const body = await request.json();
   const parsed = deleteSchema.safeParse(body);
