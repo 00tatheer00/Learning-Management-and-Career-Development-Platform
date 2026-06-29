@@ -221,21 +221,33 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
             </div>
           </div>
 
-          <div className="flex items-center gap-5 flex-1 min-h-0">
-            <DonutChart first={data.firstTimeRegistrations} returning={data.returningRegistrations} />
-            <div className="flex-1 min-w-0 space-y-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-5 flex-1 min-h-0">
+            <div className="shrink-0">
+              <DonutChart first={data.firstTimeRegistrations} returning={data.returningRegistrations} />
+              <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 justify-center text-[10px] text-zinc-500">
+                <span className="inline-flex items-center gap-1">
+                  <span className="h-2 w-2 rounded-full bg-zinc-800" aria-hidden="true" />
+                  First-time
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <span className="h-2 w-2 rounded-full bg-zinc-400" aria-hidden="true" />
+                  Returning
+                </span>
+              </div>
+            </div>
+            <div className="flex-1 min-w-0 w-full space-y-4">
               <BreakdownRow
                 label="First-time students"
                 value={data.firstTimeRegistrations}
                 total={data.firstTimeRegistrations + data.returningRegistrations}
-                badge={data.trends.approved}
+                meta="share of approved mix"
                 positive
               />
               <BreakdownRow
                 label="Returning students"
                 value={data.returningRegistrations}
                 total={data.firstTimeRegistrations + data.returningRegistrations}
-                badge={`${data.returningRegistrations} re-enrolled`}
+                meta="re-enrolled applicants"
               />
             </div>
           </div>
@@ -414,24 +426,30 @@ function BreakdownRow({
   label,
   value,
   total,
-  badge,
+  meta,
   positive,
 }: {
   label: string;
   value: number;
   total: number;
-  badge: string;
+  meta: string;
   positive?: boolean;
 }) {
   const pct = total > 0 ? Math.round((value / total) * 100) : 0;
 
   return (
     <div>
-      <div className="flex items-center justify-between gap-2 mb-1.5">
-        <p className="text-xs font-medium text-zinc-700 truncate">{label}</p>
-        <p className="text-sm font-semibold tabular-nums text-zinc-900 shrink-0">
-          <CountUp end={value} duration={1} separator="," />
-        </p>
+      <div className="flex items-baseline justify-between gap-3 mb-2">
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-zinc-800">{label}</p>
+          <p className="text-[11px] text-zinc-400 mt-0.5">{meta}</p>
+        </div>
+        <div className="text-right shrink-0">
+          <p className="text-base font-semibold tabular-nums text-zinc-900">
+            <CountUp end={value} duration={1} separator="," />
+          </p>
+          <p className="text-[11px] font-medium text-zinc-500">{pct}%</p>
+        </div>
       </div>
       <div className="h-1.5 overflow-hidden rounded-full bg-zinc-100">
         <div
@@ -442,7 +460,6 @@ function BreakdownRow({
           style={{ width: `${pct}%` }}
         />
       </div>
-      <span className="inline-block mt-1.5 text-[10px] font-medium text-zinc-400">{badge}</span>
     </div>
   );
 }
@@ -463,16 +480,16 @@ function ProgramPill({
       href={href}
       className={cn(
         pressable,
-        "rounded-lg border border-zinc-100 bg-zinc-50/50 px-2 py-2.5 text-center hover:border-zinc-200 hover:bg-white"
+        "rounded-lg border border-zinc-100 bg-zinc-50/50 px-3 py-3 hover:border-zinc-200 hover:bg-white"
       )}
     >
-      <div className="flex items-center justify-center gap-1 text-zinc-600">
+      <p className="text-[11px] font-medium text-zinc-500">{label}</p>
+      <div className="mt-1 flex items-center gap-1.5 text-zinc-700">
         {icon}
-        <p className="text-base font-semibold tabular-nums text-zinc-900">
+        <p className="text-lg font-semibold tabular-nums text-zinc-900">
           <CountUp end={value} duration={1} />
         </p>
       </div>
-      <p className="text-[10px] font-medium text-zinc-500 mt-1 uppercase tracking-wide">{label}</p>
     </Link>
   );
 }
