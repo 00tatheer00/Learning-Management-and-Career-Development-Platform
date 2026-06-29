@@ -22,6 +22,7 @@ import { getProgramBySlug } from "@/lib/data/programs";
 import { formatAppliedDate } from "@/lib/utils";
 import { toast } from "@/lib/ui/toast";
 import { useAdminPermissions } from "@/components/admin/admin-permissions";
+import { OpenStudentProfileButton } from "@/components/admin/admin-student-profile-drawer";
 import type { AdminStudentRow } from "@/lib/api/admin-students";
 
 interface AdminStudentsTableProps {
@@ -387,7 +388,12 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
                   .toUpperCase()}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="font-semibold">{student.name}</p>
+                <OpenStudentProfileButton
+                  target={{ studentId: student.id }}
+                  className="font-semibold hover:underline"
+                >
+                  {student.name}
+                </OpenStudentProfileButton>
                 <p className="text-xs text-muted mt-0.5">{student.fatherName}</p>
                 <p className="text-sm text-muted mt-2 break-all">{student.email}</p>
                 <p className="text-sm text-muted">{student.whatsapp}</p>
@@ -485,7 +491,12 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
                           .toUpperCase()}
                       </div>
                       <div>
-                        <p className="font-semibold text-foreground">{student.name}</p>
+                        <OpenStudentProfileButton
+                          target={{ studentId: student.id }}
+                          className="font-semibold text-foreground hover:underline"
+                        >
+                          {student.name}
+                        </OpenStudentProfileButton>
                         <p className="mt-0.5 text-xs text-muted">{student.fatherName}</p>
                       </div>
                     </div>

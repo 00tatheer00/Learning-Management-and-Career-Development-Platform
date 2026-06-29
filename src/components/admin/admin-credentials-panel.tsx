@@ -21,6 +21,7 @@ import { cn, formatAppliedDateTime } from "@/lib/utils";
 import { PORTAL_VIEWPORT_PANEL } from "@/lib/constants/portal-layout";
 import { toast } from "@/lib/ui/toast";
 import { useAdminPermissions } from "@/components/admin/admin-permissions";
+import { OpenStudentProfileButton } from "@/components/admin/admin-student-profile-drawer";
 import type { AdminCredentialRow } from "@/lib/api/admin-credentials";
 
 interface CredentialsMeta {
@@ -451,7 +452,12 @@ export function AdminCredentialsPanel() {
                       )}
                     >
                       <td className="px-3 py-2.5">
-                        <p className="font-medium text-sm">{row.name}</p>
+                        <OpenStudentProfileButton
+                          target={{ studentId: row.id }}
+                          className="font-medium text-sm hover:underline"
+                        >
+                          {row.name}
+                        </OpenStudentProfileButton>
                       </td>
                       <td className="px-3 py-2.5">
                         <div className="flex items-center gap-1">
