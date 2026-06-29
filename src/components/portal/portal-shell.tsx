@@ -29,7 +29,7 @@ import {
   AdminRevenueSidebarCard,
 } from "@/components/admin/admin-revenue-side-panel";
 import { useAdminAlertsOptional } from "@/components/admin/admin-alerts-provider";
-import { isAdminRole } from "@/lib/auth/admin-access";
+import { isAdminRole } from "@/lib/auth/admin-roles";
 import type { PortalUser, UserRole } from "@/types/portal";
 import { cn } from "@/lib/utils";
 

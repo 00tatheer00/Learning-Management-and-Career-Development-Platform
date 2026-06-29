@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth/session";
-import { canAdminWrite } from "@/lib/auth/admin-access";
+import { canAdminWrite } from "@/lib/auth/admin-roles";
 import { getLiveSessionById } from "@/lib/api/portal-data";
 import { PortalLiveRoom } from "@/components/portal/portal-live-room";
 import { isPortalRoomSession } from "@/lib/portal-video/config";

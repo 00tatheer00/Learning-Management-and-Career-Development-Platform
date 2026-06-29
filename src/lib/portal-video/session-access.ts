@@ -2,7 +2,7 @@ import type { LiveSession } from "@/types/portal";
 import type { PortalUser } from "@/types/portal";
 import type { LiveRoomRole } from "@/lib/portal-video/config";
 import { isPortalRoomSession } from "@/lib/portal-video/config";
-import { canAdminWrite } from "@/lib/auth/admin-access";
+import { canAdminWrite } from "@/lib/auth/admin-roles";
 
 export function resolveLiveSessionAccess(
   session: LiveSession,

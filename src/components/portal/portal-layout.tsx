@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/auth-options";
 import { getCurrentUser, getPortalHome } from "@/lib/auth/session";
-import { isAdminRole } from "@/lib/auth/admin-access";
+import { isAdminRole } from "@/lib/auth/admin-roles";
 import { AdminPortalShell } from "@/components/admin/admin-portal-shell";
 import { PortalShell } from "@/components/portal/portal-shell";
 import type { UserRole } from "@/types/portal";

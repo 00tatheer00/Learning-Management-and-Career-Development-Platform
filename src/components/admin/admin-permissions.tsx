@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import { canAdminWrite, isAdminRole } from "@/lib/auth/admin-access";
+import { canAdminWrite, isAdminRole } from "@/lib/auth/admin-roles";
 import type { UserRole } from "@/types/portal";
 
 interface AdminPermissions {
