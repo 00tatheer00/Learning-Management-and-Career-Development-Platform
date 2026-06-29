@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { CaretLeft, CaretRight, BookOpen, ListBullets } from "@phosphor-icons/react";
+import { CaretLeft, CaretRight, BookOpen, ListBullets, Certificate } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { formatModuleSchedule } from "@/lib/data/programs";
+import { MODULE_CERTIFICATE_SHORT } from "@/lib/constants/program-marketing";
 import type { Program, ProgramModule } from "@/types";
 
 type SyllabusView = "modules" | "topics";
@@ -72,6 +73,10 @@ export function CourseModulesSyllabus({
           )}
           <p className="mt-3 text-sm font-medium text-muted">
             {topics.length} topics · {selectedModule.duration}
+          </p>
+          <p className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700">
+            <Certificate size={14} weight="duotone" aria-hidden="true" />
+            {MODULE_CERTIFICATE_SHORT} on completion
           </p>
         </div>
 
@@ -145,6 +150,10 @@ export function CourseModulesSyllabus({
                   </p>
                   <p className="mt-1 text-xs font-medium text-muted sm:hidden">
                     {formatModuleSchedule(mod)}
+                  </p>
+                  <p className="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700">
+                    <Certificate size={12} weight="duotone" aria-hidden="true" />
+                    {MODULE_CERTIFICATE_SHORT}
                   </p>
                 </div>
                 <CaretRight

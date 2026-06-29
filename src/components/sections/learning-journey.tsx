@@ -43,7 +43,7 @@ const steps: { icon: Icon; title: string; description: string }[] = [
   {
     icon: Medal,
     title: "Certification",
-    description: "Earn verified certificates for each completed level",
+    description: "Earn a verified certificate for every module you complete",
   },
   {
     icon: ChartLineUp,

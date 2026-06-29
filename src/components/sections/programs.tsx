@@ -12,7 +12,7 @@ export function ProgramsSection() {
         <SectionHeader
           label="Our Programs"
           title="Industry-Focused Training Programs"
-          description="Modular courses with live classes — progress step by step from beginner to job-ready skills."
+          description="Modular courses with live classes — progress step by step, and earn a certificate for every module you complete."
         />
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">

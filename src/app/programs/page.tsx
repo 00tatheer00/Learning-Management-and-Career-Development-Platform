@@ -25,7 +25,7 @@ export default function ProgramsPage() {
       <PageHero
         label="Programs"
         title="Transform Your Career with Industry-Ready Skills"
-        description="Every program is broken into clear modules — each with live classes, defined duration, and expert trainers."
+        description="Every program is broken into clear modules — each with live classes, defined duration, expert trainers, and a certificate when you complete the module."
       />
 
       <section className="section-padding pt-0">

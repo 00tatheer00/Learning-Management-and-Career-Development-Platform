@@ -14,11 +14,13 @@ import {
   CalendarDots,
   ListBullets,
   Stack,
+  Certificate,
 } from "@phosphor-icons/react";
 import type { Icon } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { getProgramAccent } from "@/lib/constants/program-accents";
 import { getProgramTopicCount, programHasSyllabus } from "@/lib/data/programs";
+import { MODULE_CERTIFICATE_SHORT } from "@/lib/constants/program-marketing";
 import type { Program } from "@/types";
 
 const PROGRAM_ICONS: Record<string, Icon> = {
@@ -111,6 +113,12 @@ export function ProgramCard({ program, className }: ProgramCardProps) {
               <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-semibold text-primary">
                 <ListBullets size={14} weight="duotone" aria-hidden="true" />
                 {topicCount} topics
+              </span>
+            )}
+            {program.modules.length > 0 && (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800">
+                <Certificate size={14} weight="duotone" aria-hidden="true" />
+                {MODULE_CERTIFICATE_SHORT}
               </span>
             )}
           </div>

@@ -4,6 +4,8 @@ import { ArrowRight, CheckCircle2, Clock, Layers } from "lucide-react";
 import { PageHero } from "@/components/shared/page-hero";
 import { ProgramSyllabusSection } from "@/components/shared/program-syllabus-section";
 import { ProgramModuleTimeline } from "@/components/shared/program-module-timeline";
+import { ModuleCertificateBadge } from "@/components/shared/module-certificate-badge";
+import { ModuleCertificateCallout } from "@/components/shared/module-certificate-callout";
 import { TrainerCard } from "@/components/shared/trainer-card";
 import { BreadcrumbSchema, CourseSchema } from "@/components/seo/json-ld";
 import { Badge } from "@/components/ui/badge";
@@ -86,7 +88,10 @@ export default async function ProgramDetailPage({ params }: ProgramPageProps) {
                 {getProgramTopicCount(program)} topics
               </span>
             )}
+            {program.modules.length > 0 && <ModuleCertificateBadge />}
           </div>
+
+          {program.modules.length > 0 && <ModuleCertificateCallout />}
 
           {programHasSyllabus(program) ? (
             <ProgramSyllabusSection program={program} />

@@ -45,8 +45,8 @@ export const faqs: FAQ[] = [
   },
   {
     id: "8",
-    question: "What certification do I receive?",
+    question: "Do I get a certificate for every module?",
     answer:
-      "Upon completing each level, you receive a verified digital certificate. Full program completion earns a comprehensive program certificate recognized by our industry partners. All certificates are blockchain-verified for authenticity.",
+      "Every module you complete earns a verified digital certificate. After finishing each level, your certificate is issued so you can show progress step by step. Full program completion also earns a comprehensive program certificate recognized by our industry partners.",
   },
 ];

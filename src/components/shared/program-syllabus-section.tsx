@@ -3,10 +3,12 @@
 import Link from "next/link";
 import { BookOpen, Sparkle } from "@phosphor-icons/react";
 import { CourseModulesSyllabus } from "@/components/portal/course-modules-syllabus";
+import { ModuleCertificateBadge } from "@/components/shared/module-certificate-badge";
 import {
   getProgramTopicCount,
   programHasSyllabus,
 } from "@/lib/data/programs";
+import { MODULE_CERTIFICATE_TAGLINE } from "@/lib/constants/program-marketing";
 import type { Program } from "@/types";
 
 interface ProgramSyllabusSectionProps {
@@ -47,8 +49,8 @@ export function ProgramSyllabusSection({
             </h2>
             <p className={`max-w-2xl text-muted ${compact ? "mt-1 text-sm" : "mt-2"}`}>
               {compact
-                ? "Har module par click karein — poori topic list dekhein aur samjhein ke aap kya seekhenge."
-                : `${moduleCount} modules, ${topicCount}+ hands-on topics — zero se job-ready tak. Har module par click karke poori list dekhein.`}
+                ? "Har module par click karein — poori topic list dekhein. Har module complete par certificate milega."
+                : `${moduleCount} modules, ${topicCount}+ hands-on topics — zero se job-ready tak. Har module par click karke poori list dekhein. ${MODULE_CERTIFICATE_TAGLINE}`}
             </p>
           </div>
           {!compact && (
@@ -61,6 +63,7 @@ export function ProgramSyllabusSection({
                 <Sparkle size={14} weight="duotone" />
                 {topicCount} topics
               </span>
+              <ModuleCertificateBadge />
             </div>
           )}
         </div>
