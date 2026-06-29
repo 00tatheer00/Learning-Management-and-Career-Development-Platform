@@ -7,10 +7,26 @@ import { List, X } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { SiteLogo } from "@/components/shared/site-logo";
 import { NAV_LINKS } from "@/lib/constants";
+import { isNavLinkActive } from "@/lib/nav-active";
 import { cn } from "@/lib/utils";
+
+function useLocationHash(pathname: string) {
+  const [hash, setHash] = useState("");
+
+  useEffect(() => {
+    const sync = () => setHash(window.location.hash);
+    sync();
+    window.addEventListener("hashchange", sync);
+    return () => window.removeEventListener("hashchange", sync);
+  }, [pathname]);
+
+  return hash;
+}
 
 export function Navbar() {
   const pathname = usePathname();
+  const hash = useLocationHash(pathname);
+  const navHrefs = NAV_LINKS.map((link) => link.href);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
@@ -46,22 +62,24 @@ export function Navbar() {
         <SiteLogo variant="navbar" priority className="relative z-10" />
 
         <div className="hidden lg:flex items-center gap-1 relative z-10">
-          {NAV_LINKS.map((link) => (
+          {NAV_LINKS.map((link) => {
+            const active = isNavLinkActive(pathname, hash, link.href, navHrefs);
+            return (
             <Link
               key={link.href}
               href={link.href}
               prefetch
               className={cn(
                 "px-3 py-2 text-sm rounded-md transition-colors",
-                pathname === link.href.split("#")[0] ||
-                  (link.href !== "/" && pathname.startsWith(link.href.split("#")[0]))
+                active
                   ? "text-primary font-semibold bg-primary/5"
                   : "text-muted hover:text-foreground hover:bg-secondary"
               )}
             >
               {link.label}
             </Link>
-          ))}
+            );
+          })}
         </div>
 
         <div className="hidden lg:flex items-center gap-3 relative z-10">
@@ -98,17 +116,25 @@ export function Navbar() {
           />
           <div className="lg:hidden glass-strong border-t border-border relative z-50">
             <div className="container-custom px-4 py-6 flex flex-col gap-1">
-              {NAV_LINKS.map((link) => (
+              {NAV_LINKS.map((link) => {
+                const active = isNavLinkActive(pathname, hash, link.href, navHrefs);
+                return (
                 <Link
                   key={link.href}
                   href={link.href}
                   prefetch
-                  className="px-4 py-3 text-base rounded-lg hover:bg-secondary transition-colors"
+                  className={cn(
+                    "px-4 py-3 text-base rounded-lg transition-colors",
+                    active
+                      ? "text-primary font-semibold bg-primary/5"
+                      : "hover:bg-secondary"
+                  )}
                   onClick={() => setIsMobileOpen(false)}
                 >
                   {link.label}
                 </Link>
-              ))}
+                );
+              })}
               <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-border">
                 <Button variant="outline" asChild>
                   <Link href="/student-portal" prefetch onClick={() => setIsMobileOpen(false)}>
