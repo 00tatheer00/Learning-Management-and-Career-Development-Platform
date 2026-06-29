@@ -22,6 +22,7 @@ const DEFAULT_USERS = [
     password: "komal@003",
     role: "admin_readonly" as const,
     name: "Komal",
+    phone: "03115969527",
     avatarInitials: "KO",
   },
   {
