@@ -28,7 +28,7 @@ import { toast } from "@/lib/ui/toast";
 import { playPortalSound, primePortalSounds } from "@/lib/ui/portal-sounds";
 import { Alert } from "@/components/ui/alert";
 import { useAdminPermissions } from "@/components/admin/admin-permissions";
-import { OpenStudentProfileButton } from "@/components/admin/admin-student-profile-drawer";
+import { OpenStudentProfileButton, AdminStudentProfileButton } from "@/components/admin/admin-student-profile-drawer";
 import type { AdminEnrollmentRow } from "@/lib/api/admin-enrollments";
 
 type StatusFilter = "all" | "pending" | "approved" | "rejected";
@@ -554,12 +554,18 @@ export function AdminEnrollmentsPanel() {
                         )}
                       </div>
 
-                      <OpenStudentProfileButton
-                        target={{ enrollmentId: enrollment.id }}
-                        className="text-xl font-bold hover:underline"
-                      >
-                        {enrollment.fullName}
-                      </OpenStudentProfileButton>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <OpenStudentProfileButton
+                          target={{ enrollmentId: enrollment.id }}
+                          className="text-xl font-bold hover:underline"
+                        >
+                          {enrollment.fullName}
+                        </OpenStudentProfileButton>
+                        <AdminStudentProfileButton
+                          target={{ enrollmentId: enrollment.id }}
+                          compact
+                        />
+                      </div>
                       <p className="mt-1 text-sm text-muted">Father: {enrollment.fatherName}</p>
 
                       <div className="mt-4 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">

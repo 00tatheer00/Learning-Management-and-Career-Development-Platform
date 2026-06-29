@@ -21,7 +21,7 @@ import { cn, formatAppliedDateTime } from "@/lib/utils";
 import { PORTAL_VIEWPORT_PANEL } from "@/lib/constants/portal-layout";
 import { toast } from "@/lib/ui/toast";
 import { useAdminPermissions } from "@/components/admin/admin-permissions";
-import { OpenStudentProfileButton } from "@/components/admin/admin-student-profile-drawer";
+import { OpenStudentProfileButton, AdminStudentProfileButton } from "@/components/admin/admin-student-profile-drawer";
 import type { AdminCredentialRow } from "@/lib/api/admin-credentials";
 
 interface CredentialsMeta {
@@ -562,6 +562,7 @@ export function AdminCredentialsPanel() {
                       </td>
                       <td className="px-3 py-2.5">
                         <div className="flex gap-1">
+                          <AdminStudentProfileButton target={{ studentId: row.id }} compact />
                           <button
                             type="button"
                             title="Copy full login details"

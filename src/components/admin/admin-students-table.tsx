@@ -22,7 +22,7 @@ import { getProgramBySlug } from "@/lib/data/programs";
 import { formatAppliedDate } from "@/lib/utils";
 import { toast } from "@/lib/ui/toast";
 import { useAdminPermissions } from "@/components/admin/admin-permissions";
-import { OpenStudentProfileButton } from "@/components/admin/admin-student-profile-drawer";
+import { OpenStudentProfileButton, AdminStudentProfileButton } from "@/components/admin/admin-student-profile-drawer";
 import type { AdminStudentRow } from "@/lib/api/admin-students";
 
 interface AdminStudentsTableProps {
@@ -36,7 +36,7 @@ type BrowseView = "courses" | "modules" | "list";
 export function AdminStudentsTable({ students: initialStudents }: AdminStudentsTableProps) {
   const { canWrite } = useAdminPermissions();
   const [students, setStudents] = useState(initialStudents);
-  const [browseView, setBrowseView] = useState<BrowseView>("courses");
+  const [browseView, setBrowseView] = useState<BrowseView>("list");
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [selectedModule, setSelectedModule] = useState<string>("all");
   const [search, setSearch] = useState("");
@@ -417,6 +417,7 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
             </div>
             <p className="mt-2 text-xs text-muted font-mono break-all">{student.cnic}</p>
             <div className="mt-3 flex flex-wrap gap-2 border-t border-border pt-3">
+              <AdminStudentProfileButton target={{ studentId: student.id }} compact />
               {canWrite && (
                 <>
                   <button
@@ -537,48 +538,49 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
                     </p>
                   </td>
                   <td className="px-4 py-4">
-                    {canWrite ? (
-                      <div className="flex flex-wrap gap-2">
-                        <button
-                          type="button"
-                          title="Edit module/batch"
-                          disabled={loadingId === student.id}
-                          onClick={() => openEdit(student)}
-                          className="rounded-lg border border-border p-2 hover:bg-surface"
-                        >
-                          <PencilSimple size={16} />
-                        </button>
-                        <button
-                          type="button"
-                          title="Reset password"
-                          disabled={loadingId === student.id}
-                          onClick={() => handleResetPassword(student)}
-                          className="rounded-lg border border-border p-2 hover:bg-surface"
-                        >
-                          <Key size={16} />
-                        </button>
-                        <button
-                          type="button"
-                          title={student.isActive ? "Deactivate" : "Activate"}
-                          disabled={loadingId === student.id}
-                          onClick={() => handleToggleActive(student)}
-                          className="rounded-lg border border-border p-2 hover:bg-surface"
-                        >
-                          {student.isActive ? <Prohibit size={16} /> : <CheckCircle size={16} />}
-                        </button>
-                        <button
-                          type="button"
-                          title="Delete student"
-                          disabled={loadingId === student.id}
-                          onClick={() => setDeleteTarget(student)}
-                          className="rounded-lg border border-red-200 p-2 text-red-600 hover:bg-red-50"
-                        >
-                          <Trash size={16} weight="duotone" />
-                        </button>
-                      </div>
-                    ) : (
-                      <span className="text-xs text-muted">View only</span>
-                    )}
+                    <div className="flex flex-wrap gap-2">
+                      <AdminStudentProfileButton target={{ studentId: student.id }} compact />
+                      {canWrite && (
+                        <>
+                          <button
+                            type="button"
+                            title="Edit module/batch"
+                            disabled={loadingId === student.id}
+                            onClick={() => openEdit(student)}
+                            className="rounded-lg border border-border p-2 hover:bg-surface"
+                          >
+                            <PencilSimple size={16} />
+                          </button>
+                          <button
+                            type="button"
+                            title="Reset password"
+                            disabled={loadingId === student.id}
+                            onClick={() => handleResetPassword(student)}
+                            className="rounded-lg border border-border p-2 hover:bg-surface"
+                          >
+                            <Key size={16} />
+                          </button>
+                          <button
+                            type="button"
+                            title={student.isActive ? "Deactivate" : "Activate"}
+                            disabled={loadingId === student.id}
+                            onClick={() => handleToggleActive(student)}
+                            className="rounded-lg border border-border p-2 hover:bg-surface"
+                          >
+                            {student.isActive ? <Prohibit size={16} /> : <CheckCircle size={16} />}
+                          </button>
+                          <button
+                            type="button"
+                            title="Delete student"
+                            disabled={loadingId === student.id}
+                            onClick={() => setDeleteTarget(student)}
+                            className="rounded-lg border border-red-200 p-2 text-red-600 hover:bg-red-50"
+                          >
+                            <Trash size={16} weight="duotone" />
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}

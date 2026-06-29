@@ -160,12 +160,42 @@ export function OpenStudentProfileButton({
     <button
       type="button"
       onClick={() => ctx.openProfile(target)}
+      title="View student profile"
       className={cn(
         "cursor-pointer text-left transition-colors hover:text-primary",
         className
       )}
     >
       {children}
+    </button>
+  );
+}
+
+export function AdminStudentProfileButton({
+  target,
+  compact = false,
+  className,
+}: {
+  target: StudentProfileTarget;
+  compact?: boolean;
+  className?: string;
+}) {
+  const ctx = useAdminStudentProfileOptional();
+  if (!ctx) return null;
+
+  return (
+    <button
+      type="button"
+      onClick={() => ctx.openProfile(target)}
+      title="View student profile"
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-lg border border-pt font-semibold text-pt-secondary transition-colors hover:border-primary/40 hover:bg-pt-muted hover:text-primary",
+        compact ? "p-2 text-xs" : "px-3 py-2 text-xs",
+        className
+      )}
+    >
+      <UserCircle size={compact ? 16 : 17} weight="duotone" />
+      {!compact && "Profile"}
     </button>
   );
 }

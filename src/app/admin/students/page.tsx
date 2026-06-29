@@ -14,7 +14,7 @@ export default async function AdminStudentsPage() {
     <div>
       <PortalPageHeader
         title="Students by Program"
-        description="Active portal accounts by course. Paid registration count may be higher when students re-register for a new module."
+        description="Active portal accounts by course. Use the Profile button on any row for full student details, logins, and attendance."
       />
 
       {students.length > 0 && (
