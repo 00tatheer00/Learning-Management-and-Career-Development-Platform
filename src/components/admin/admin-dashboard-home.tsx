@@ -25,6 +25,60 @@ const DASHBOARD_SHELL =
 
 const pressable = "cursor-pointer select-none transition-all duration-200";
 
+/** Muted executive palette — tinted surfaces, not loud gradients */
+const tones = {
+  slate: {
+    card: "border-slate-200/90 bg-gradient-to-br from-slate-50 to-white hover:border-slate-300",
+    icon: "bg-slate-100 text-slate-600",
+    bar: "bg-slate-600",
+    dot: "bg-slate-600",
+  },
+  emerald: {
+    card: "border-emerald-200/80 bg-gradient-to-br from-emerald-50/90 to-white hover:border-emerald-300",
+    icon: "bg-emerald-100 text-emerald-700",
+    bar: "bg-emerald-600",
+    dot: "bg-emerald-500",
+  },
+  amber: {
+    card: "border-amber-200/80 bg-gradient-to-br from-amber-50/90 to-white hover:border-amber-300",
+    icon: "bg-amber-100 text-amber-800",
+    bar: "bg-amber-500",
+    dot: "bg-amber-500",
+  },
+  indigo: {
+    card: "border-indigo-200/80 bg-gradient-to-br from-indigo-50/90 to-white hover:border-indigo-300",
+    icon: "bg-indigo-100 text-indigo-700",
+    bar: "bg-indigo-600",
+    dot: "bg-indigo-500",
+  },
+  violet: {
+    card: "border-violet-200/80 bg-gradient-to-br from-violet-50/90 to-white hover:border-violet-300",
+    icon: "bg-violet-100 text-violet-700",
+    bar: "bg-violet-600",
+    dot: "bg-violet-500",
+  },
+  sky: {
+    card: "border-sky-200/80 bg-gradient-to-br from-sky-50/90 to-white hover:border-sky-300",
+    icon: "bg-sky-100 text-sky-700",
+    bar: "bg-sky-600",
+    dot: "bg-sky-500",
+  },
+  rose: {
+    card: "border-rose-200/80 bg-gradient-to-br from-rose-50/90 to-white hover:border-rose-300",
+    icon: "bg-rose-100 text-rose-700",
+    bar: "bg-rose-500",
+    dot: "bg-rose-500",
+  },
+  teal: {
+    card: "border-teal-200/80 bg-gradient-to-br from-teal-50/90 to-white hover:border-teal-300",
+    icon: "bg-teal-100 text-teal-700",
+    bar: "bg-teal-600",
+    dot: "bg-teal-500",
+  },
+} as const;
+
+type ToneKey = keyof typeof tones;
+
 export function AdminDashboardLoader() {
   const [data, setData] = useState<AdminDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -112,7 +166,7 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
               href="/admin/enrollments"
               className={cn(
                 pressable,
-                "inline-flex items-center gap-2 rounded-lg bg-zinc-900 px-3.5 py-2 text-xs font-medium text-white hover:bg-zinc-800"
+                "inline-flex items-center gap-2 rounded-lg bg-amber-700 px-3.5 py-2 text-xs font-medium text-white hover:bg-amber-800 shadow-sm shadow-amber-900/10"
               )}
             >
               {data.pendingEnrollments} pending review
@@ -140,6 +194,7 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
           value={data.totalEnrollments}
           hint="All-time submissions"
           icon={<ClipboardText size={18} weight="duotone" />}
+          tone="slate"
         />
         <MetricCard
           href="/admin/enrollments"
@@ -148,6 +203,7 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
           hint={data.trends.approved}
           icon={<ChartBar size={18} weight="duotone" />}
           trend={data.trends.approved}
+          tone="emerald"
         />
         <MetricCard
           href="/admin/enrollments"
@@ -157,6 +213,7 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
           icon={<ClipboardText size={18} weight="duotone" />}
           highlight={data.pendingEnrollments > 0}
           trend={data.trends.pending}
+          tone="amber"
         />
         <MetricCard
           href="/admin/students"
@@ -165,12 +222,18 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
           hint={data.trends.students}
           icon={<GraduationCap size={18} weight="duotone" />}
           trend={data.trends.students}
+          tone="indigo"
         />
       </div>
 
       {/* Insight cards */}
       <div className="shrink-0 grid grid-cols-1 md:grid-cols-2 gap-3">
-        <InsightCard href="/admin/credentials" title="Portal logins" icon={<Key size={18} weight="duotone" />}>
+        <InsightCard
+          href="/admin/credentials"
+          title="Portal logins"
+          icon={<Key size={18} weight="duotone" />}
+          tone="violet"
+        >
           <div className="flex items-baseline gap-2">
             <span className="text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
               <CountUp end={data.loggedInStudents} duration={1.2} separator="," />
@@ -178,9 +241,9 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
             <span className="text-sm text-zinc-400">/ {data.students.toLocaleString()}</span>
             <span className="ml-auto text-xs font-medium text-zinc-500">{loginRate}% logged in</span>
           </div>
-          <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-zinc-100">
+          <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-violet-100">
             <div
-              className="h-full rounded-full bg-zinc-800 transition-all duration-700"
+              className="h-full rounded-full bg-violet-600 transition-all duration-700"
               style={{ width: `${loginRate}%` }}
             />
           </div>
@@ -193,6 +256,7 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
           href="/admin/courses"
           title="Live content"
           icon={<VideoCamera size={18} weight="duotone" />}
+          tone="sky"
         >
           <div className="grid grid-cols-2 gap-6">
             <div>
@@ -213,7 +277,7 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
 
       {/* Bottom panel */}
       <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-5 gap-3 overflow-y-auto scrollbar-none pb-0.5">
-        <div className="lg:col-span-3 rounded-xl border border-zinc-200/80 bg-white p-4 sm:p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)] flex flex-col min-h-0">
+        <div className="lg:col-span-3 rounded-xl border border-sky-200/70 bg-gradient-to-br from-sky-50/40 to-white p-4 sm:p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)] flex flex-col min-h-0">
           <div className="flex items-center justify-between gap-2 mb-4 shrink-0">
             <div>
               <h2 className="text-sm font-semibold text-zinc-900">Student mix</h2>
@@ -226,11 +290,11 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
               <DonutChart first={data.firstTimeRegistrations} returning={data.returningRegistrations} />
               <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 justify-center text-[10px] text-zinc-500">
                 <span className="inline-flex items-center gap-1">
-                  <span className="h-2 w-2 rounded-full bg-zinc-800" aria-hidden="true" />
+                  <span className="h-2 w-2 rounded-full bg-indigo-600" aria-hidden="true" />
                   First-time
                 </span>
                 <span className="inline-flex items-center gap-1">
-                  <span className="h-2 w-2 rounded-full bg-zinc-400" aria-hidden="true" />
+                  <span className="h-2 w-2 rounded-full bg-teal-500" aria-hidden="true" />
                   Returning
                 </span>
               </div>
@@ -241,30 +305,33 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
                 value={data.firstTimeRegistrations}
                 total={data.firstTimeRegistrations + data.returningRegistrations}
                 meta="share of approved mix"
-                positive
+                barClass="bg-indigo-600"
               />
               <BreakdownRow
                 label="Returning students"
                 value={data.returningRegistrations}
                 total={data.firstTimeRegistrations + data.returningRegistrations}
                 meta="re-enrolled applicants"
+                barClass="bg-teal-500"
               />
             </div>
           </div>
 
           <div className="mt-4 grid grid-cols-3 gap-2 pt-4 border-t border-zinc-100 shrink-0">
-            <ProgramPill label="Trainers" value={data.trainers} href="/admin/trainers" />
+            <ProgramPill label="Trainers" value={data.trainers} href="/admin/trainers" tone="rose" />
             <ProgramPill
               label="Web Dev"
               value={data.webStudents}
               href="/admin/students"
               icon={<UsersThree size={14} weight="duotone" />}
+              tone="indigo"
             />
             <ProgramPill
               label="Flutter"
               value={data.appStudents}
               href="/admin/students"
               icon={<DeviceMobile size={14} weight="duotone" />}
+              tone="teal"
             />
           </div>
 
@@ -282,7 +349,7 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
           )}
         </div>
 
-        <div className="lg:col-span-2 rounded-xl border border-zinc-200/80 bg-white p-4 sm:p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)] flex flex-col min-h-0">
+        <div className="lg:col-span-2 rounded-xl border border-slate-200/80 bg-gradient-to-br from-slate-50/50 to-white p-4 sm:p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)] flex flex-col min-h-0">
           <div className="mb-3 shrink-0">
             <h2 className="text-sm font-semibold text-zinc-900">Quick access</h2>
             <p className="text-xs text-zinc-500 mt-0.5">Jump to admin tools</p>
@@ -298,44 +365,56 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
   );
 }
 
-const QUICK_LINKS = [
+const QUICK_LINKS: Array<{
+  href: string;
+  title: string;
+  subtitle: string;
+  icon: React.ReactNode;
+  tone: ToneKey;
+}> = [
   {
     href: "/admin/live-classes",
     title: "Portal classes",
     subtitle: "Live video rooms",
     icon: <Broadcast size={17} weight="duotone" />,
+    tone: "sky",
   },
   {
     href: "/admin/enrollments",
     title: "Registrations",
     subtitle: "Approve and reject",
     icon: <ClipboardText size={17} weight="duotone" />,
+    tone: "amber",
   },
   {
     href: "/admin/students",
     title: "Students",
     subtitle: "All accounts",
     icon: <GraduationCap size={17} weight="duotone" />,
+    tone: "indigo",
   },
   {
     href: "/admin/credentials",
     title: "Portal logins",
     subtitle: "IDs and passwords",
     icon: <Key size={17} weight="duotone" />,
+    tone: "violet",
   },
   {
     href: "/admin/trainers",
     title: "Trainers",
     subtitle: "Manage team",
     icon: <UsersThree size={17} weight="duotone" />,
+    tone: "rose",
   },
   {
     href: "/admin/courses",
     title: "Courses",
     subtitle: "Syllabus and content",
     icon: <VideoCamera size={17} weight="duotone" />,
+    tone: "emerald",
   },
-] as const;
+];
 
 function MetricCard({
   label,
@@ -345,6 +424,7 @@ function MetricCard({
   href,
   highlight,
   trend,
+  tone = "slate",
 }: {
   label: string;
   value: number;
@@ -353,32 +433,41 @@ function MetricCard({
   href?: string;
   highlight?: boolean;
   trend?: string;
+  tone?: ToneKey;
 }) {
+  const palette = tones[tone];
+
   const inner = (
     <>
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-100 text-zinc-600">
+      <div
+        className={cn(
+          "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
+          palette.icon
+        )}
+      >
         {icon}
       </div>
       <div className="mt-3">
         <p className="text-2xl font-semibold tabular-nums tracking-tight text-zinc-900">
           <CountUp end={value} duration={1.2} separator="," />
         </p>
-        <p className="mt-1 text-xs font-medium text-zinc-500">{label}</p>
+        <p className="mt-1 text-xs font-medium text-zinc-600">{label}</p>
       </div>
       <TrendLine text={trend ?? hint} />
       {highlight && (
-        <span className="absolute top-3 right-3 h-2 w-2 rounded-full bg-zinc-900" aria-hidden="true" />
+        <span
+          className={cn("absolute top-3 right-3 h-2 w-2 rounded-full animate-pulse", palette.dot)}
+          aria-hidden="true"
+        />
       )}
     </>
   );
 
   const className = cn(
     pressable,
-    "group relative rounded-xl border bg-white p-4",
-    highlight
-      ? "border-zinc-300 shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
-      : "border-zinc-200/80 shadow-[0_1px_2px_rgba(0,0,0,0.03)]",
-    "hover:border-zinc-300 hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)]"
+    "group relative rounded-xl border p-4 shadow-[0_1px_2px_rgba(0,0,0,0.03)]",
+    palette.card,
+    "hover:shadow-[0_4px_14px_rgba(0,0,0,0.06)]"
   );
 
   if (href) {
@@ -396,24 +485,34 @@ function InsightCard({
   title,
   icon,
   children,
+  tone = "slate",
 }: {
   href: string;
   title: string;
   icon: React.ReactNode;
   children: React.ReactNode;
+  tone?: ToneKey;
 }) {
+  const palette = tones[tone];
+
   return (
     <Link
       href={href}
       className={cn(
         pressable,
-        "block rounded-xl border border-zinc-200/80 bg-white p-4 sm:p-5",
-        "shadow-[0_1px_2px_rgba(0,0,0,0.03)] hover:border-zinc-300 hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)]"
+        "block rounded-xl border p-4 sm:p-5 shadow-[0_1px_2px_rgba(0,0,0,0.03)]",
+        palette.card,
+        "hover:shadow-[0_4px_14px_rgba(0,0,0,0.06)]"
       )}
     >
       <div className="flex items-center justify-between gap-2 mb-4">
-        <p className="text-xs font-medium uppercase tracking-[0.14em] text-zinc-400">{title}</p>
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-100 text-zinc-600">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">{title}</p>
+        <div
+          className={cn(
+            "flex h-8 w-8 items-center justify-center rounded-lg",
+            palette.icon
+          )}
+        >
           {icon}
         </div>
       </div>
@@ -427,13 +526,13 @@ function BreakdownRow({
   value,
   total,
   meta,
-  positive,
+  barClass,
 }: {
   label: string;
   value: number;
   total: number;
   meta: string;
-  positive?: boolean;
+  barClass: string;
 }) {
   const pct = total > 0 ? Math.round((value / total) * 100) : 0;
 
@@ -442,7 +541,7 @@ function BreakdownRow({
       <div className="flex items-baseline justify-between gap-3 mb-2">
         <div className="min-w-0">
           <p className="text-sm font-medium text-zinc-800">{label}</p>
-          <p className="text-[11px] text-zinc-400 mt-0.5">{meta}</p>
+          <p className="text-[11px] text-zinc-500 mt-0.5">{meta}</p>
         </div>
         <div className="text-right shrink-0">
           <p className="text-base font-semibold tabular-nums text-zinc-900">
@@ -451,12 +550,9 @@ function BreakdownRow({
           <p className="text-[11px] font-medium text-zinc-500">{pct}%</p>
         </div>
       </div>
-      <div className="h-1.5 overflow-hidden rounded-full bg-zinc-100">
+      <div className="h-1.5 overflow-hidden rounded-full bg-white/80">
         <div
-          className={cn(
-            "h-full rounded-full transition-all duration-1000",
-            positive ? "bg-zinc-800" : "bg-zinc-400"
-          )}
+          className={cn("h-full rounded-full transition-all duration-1000", barClass)}
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -469,23 +565,37 @@ function ProgramPill({
   value,
   href,
   icon,
+  tone = "slate",
 }: {
   label: string;
   value: number;
   href: string;
   icon?: React.ReactNode;
+  tone?: ToneKey;
 }) {
+  const palette = tones[tone];
+
   return (
     <Link
       href={href}
       className={cn(
         pressable,
-        "rounded-lg border border-zinc-100 bg-zinc-50/50 px-3 py-3 hover:border-zinc-200 hover:bg-white"
+        "rounded-lg border px-3 py-3 shadow-sm hover:shadow-md",
+        palette.card
       )}
     >
-      <p className="text-[11px] font-medium text-zinc-500">{label}</p>
-      <div className="mt-1 flex items-center gap-1.5 text-zinc-700">
-        {icon}
+      <p className="text-[11px] font-medium text-zinc-600">{label}</p>
+      <div className="mt-2 flex items-center gap-1.5">
+        {icon && (
+          <div
+            className={cn(
+              "flex h-6 w-6 items-center justify-center rounded-md",
+              palette.icon
+            )}
+          >
+            {icon}
+          </div>
+        )}
         <p className="text-lg font-semibold tabular-nums text-zinc-900">
           <CountUp end={value} duration={1} />
         </p>
@@ -499,22 +609,31 @@ function QuickLink({
   title,
   subtitle,
   icon,
+  tone = "slate",
 }: {
   href: string;
   title: string;
   subtitle: string;
   icon: React.ReactNode;
+  tone?: ToneKey;
 }) {
+  const palette = tones[tone];
+
   return (
     <Link
       href={href}
       className={cn(
         pressable,
         "group flex items-center gap-3 rounded-lg px-2 py-2.5 -mx-2",
-        "hover:bg-zinc-50"
+        "hover:bg-white/80"
       )}
     >
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-zinc-100 bg-zinc-50 text-zinc-600 group-hover:border-zinc-200 group-hover:bg-white">
+      <div
+        className={cn(
+          "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/80",
+          palette.icon
+        )}
+      >
         {icon}
       </div>
       <div className="min-w-0 flex-1">
@@ -564,7 +683,7 @@ function DonutChart({ first, returning }: { first: number; returning: number }) 
           cy="40"
           r={radius}
           fill="none"
-          stroke="#27272a"
+          stroke="#4f46e5"
           strokeWidth="8"
           strokeDasharray={`${firstLen} ${returnLen}`}
           strokeLinecap="round"
@@ -574,7 +693,7 @@ function DonutChart({ first, returning }: { first: number; returning: number }) 
           cy="40"
           r={radius}
           fill="none"
-          stroke="#a1a1aa"
+          stroke="#14b8a6"
           strokeWidth="8"
           strokeDasharray={`${returnLen} ${firstLen}`}
           strokeDashoffset={-firstLen}
