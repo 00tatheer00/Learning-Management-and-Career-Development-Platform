@@ -1,6 +1,7 @@
 import { CalendarBlank } from "@phosphor-icons/react/ssr";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getLiveSessionsPreview } from "@/lib/api/portal-data";
+import { getProgramClassSchedule } from "@/lib/constants/course-schedule";
 import { PortalPageHeader, EmptyState } from "@/components/portal/portal-ui";
 import { JoinClassButton } from "@/components/portal/join-class-button";
 
@@ -8,7 +9,9 @@ export default async function StudentClassesPage() {
   const user = await getCurrentUser();
   if (!user) return null;
 
-  const sessions = await getLiveSessionsPreview(user.programSlug ?? "web-development");
+  const programSlug = user.programSlug ?? "web-development";
+  const sessions = await getLiveSessionsPreview(programSlug);
+  const classSchedule = getProgramClassSchedule(programSlug);
   const today = new Date().toISOString().split("T")[0];
 
   return (
@@ -18,6 +21,12 @@ export default async function StudentClassesPage() {
         description="Join your online class using the button below. Be ready 5 minutes early."
       />
 
+      <p className="mb-4 text-sm rounded-xl border border-primary/20 bg-primary/5 p-4">
+        <span className="font-semibold text-foreground">{classSchedule.headline}</span>
+        <br />
+        <span className="text-muted">{classSchedule.daysLabel} · {classSchedule.subline}</span>
+      </p>
+
       <p className="mb-6 text-sm text-muted rounded-xl border border-border bg-surface p-4">
         Class links are only shown to enrolled students at class time. Do not share your portal
         login or class link with anyone outside your batch. Trainers use waiting room to admit
@@ -26,8 +35,8 @@ export default async function StudentClassesPage() {
 
       {sessions.length === 0 ? (
         <EmptyState
-          title="No classes scheduled"
-          description="Your trainer will post the next class here. Also check WhatsApp."
+          title="Class link coming soon"
+          description={`${classSchedule.startDateLabel}. ${classSchedule.daysLabel}. ${classSchedule.subline}`}
         />
       ) : (
         <div className="space-y-4">

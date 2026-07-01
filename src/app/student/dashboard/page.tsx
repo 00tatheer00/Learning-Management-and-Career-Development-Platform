@@ -24,6 +24,7 @@ import { StudentModuleRoadmap } from "@/components/portal/student-module-roadmap
 import { ProgramCategoryBadge } from "@/components/portal/program-category-badge";
 import { HELP_CONFIG } from "@/lib/constants/help";
 import { getProgramCategory } from "@/lib/constants/program-categories";
+import { getProgramClassSchedule } from "@/lib/constants/course-schedule";
 import { findNextUpcomingSession } from "@/lib/utils/session-datetime";
 
 export default async function StudentDashboardPage() {
@@ -37,6 +38,7 @@ export default async function StudentDashboardPage() {
     getLiveSessionsPreview(programSlug),
   ]);
   const category = getProgramCategory(programSlug);
+  const classSchedule = getProgramClassSchedule(programSlug);
   const nextSession = findNextUpcomingSession(sessions);
 
   return (
@@ -58,11 +60,16 @@ export default async function StudentDashboardPage() {
         <StudentNextClassCard session={nextSession} />
       ) : (
         <PortalSurfaceCard className="p-4 text-sm text-zinc-500 border-dashed">
-          No upcoming live class scheduled yet. Check WhatsApp or{" "}
-          <Link href="/student/classes" className="text-primary font-semibold underline">
-            Live Classes
-          </Link>
-          .
+          <p className="font-semibold text-foreground">{classSchedule.startDateLabel}</p>
+          <p className="mt-1">{classSchedule.daysLabel}</p>
+          <p className="mt-2">{classSchedule.subline}</p>
+          <p className="mt-2">
+            Portal class link will appear on{" "}
+            <Link href="/student/classes" className="text-primary font-semibold underline">
+              Live Classes
+            </Link>{" "}
+            when scheduled.
+          </p>
         </PortalSurfaceCard>
       )}
 
