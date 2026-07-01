@@ -42,7 +42,8 @@ export function AdminReadOnlyBanner() {
   return (
     <div className="portal-readonly-banner mb-4 rounded-xl border px-4 py-3 text-sm">
       <strong>View only.</strong> Aap admin portal dekh sakti hain — approve, edit ya delete nahi kar
-      sakti. Changes ke liye Tatheer se rabta karein.
+      sakti. <strong>Students</strong> page se Web / App alag CSV download kar ke WhatsApp groups bana
+      sakti hain. Changes ke liye Tatheer se rabta karein.
     </div>
   );
 }

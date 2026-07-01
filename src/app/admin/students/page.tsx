@@ -1,7 +1,9 @@
 import { getAdminStudentRows } from "@/lib/api/admin-students";
 import { getAdminProgramStats } from "@/lib/api/admin-program-stats";
 import { AdminStudentsTable } from "@/components/admin/admin-students-table";
+import { AdminStudentsExportBar } from "@/components/admin/admin-students-export-bar";
 import { PortalPageHeader, EmptyState } from "@/components/portal/portal-ui";
+import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
 import { getProgramCategory } from "@/lib/constants/program-categories";
 
 export default async function AdminStudentsPage() {
@@ -10,12 +12,19 @@ export default async function AdminStudentsPage() {
     getAdminProgramStats(),
   ]);
 
+  const exportCounts: Record<string, number> = {};
+  for (const slug of ENROLLABLE_PROGRAM_SLUGS) {
+    exportCounts[slug] = students.filter((s) => s.programSlug === slug).length;
+  }
+
   return (
     <div>
       <PortalPageHeader
         title="Students by Program"
-        description="Active portal accounts by course. Use the Profile button on any row for full student details, logins, and attendance."
+        description="Download Web or App student CSV for WhatsApp groups. Profile button se full details bhi dekh sakte hain."
       />
+
+      {students.length > 0 && <AdminStudentsExportBar counts={exportCounts} />}
 
       {students.length > 0 && (
         <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4">

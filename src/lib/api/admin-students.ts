@@ -136,9 +136,25 @@ export function buildStudentsCsv(rows: AdminStudentRow[]) {
   return `\uFEFF${headers.join(",")}\n${lines.join("\n")}`;
 }
 
-export function buildStudentsExportFilename() {
+export function buildStudentsExportFilename(programSlug?: string) {
   const stamp = new Date().toISOString().slice(0, 10);
-  return `eest-students-${stamp}.csv`;
+  if (programSlug === "web-development") return `eest-web-students-${stamp}.csv`;
+  if (programSlug === "app-development") return `eest-app-students-${stamp}.csv`;
+  return `eest-students-all-${stamp}.csv`;
+}
+
+export function filterAdminStudentRows(
+  rows: AdminStudentRow[],
+  options?: { program?: string; activeOnly?: boolean }
+): AdminStudentRow[] {
+  let result = rows;
+  if (options?.program && options.program !== "all") {
+    result = result.filter((row) => row.programSlug === options.program);
+  }
+  if (options?.activeOnly) {
+    result = result.filter((row) => row.isActive);
+  }
+  return result;
 }
 
 export async function deleteAdminStudent(
