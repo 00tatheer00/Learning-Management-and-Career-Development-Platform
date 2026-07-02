@@ -5,7 +5,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { getProgramCategory } from "@/lib/constants/program-categories";
 import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
-import { getProgramBySlug } from "@/lib/data/programs";
 
 const PROGRAM_MODULES: Record<string, string[]> = {
   "web-development": ["HTML & CSS", "JavaScript", "React", "Backend + Database"],
