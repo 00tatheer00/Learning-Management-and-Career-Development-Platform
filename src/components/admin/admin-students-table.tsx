@@ -11,6 +11,7 @@ import {
   Trash,
   CaretLeft,
   GraduationCap,
+  Stack,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -401,12 +402,23 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
                   .toUpperCase()}
               </div>
               <div className="min-w-0 flex-1">
-                <OpenStudentProfileButton
-                  target={{ studentId: student.id }}
-                  className="font-semibold hover:underline"
-                >
-                  {student.name}
-                </OpenStudentProfileButton>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <OpenStudentProfileButton
+                    target={{ studentId: student.id }}
+                    className="font-semibold hover:underline"
+                  >
+                    {student.name}
+                  </OpenStudentProfileButton>
+                  {student.totalApplications > 1 && (
+                    <span
+                      title={`Applied for: ${student.appliedPrograms.join(", ")}`}
+                      className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700"
+                    >
+                      <Stack size={10} weight="fill" />
+                      {student.totalApplications}x applied
+                    </span>
+                  )}
+                </div>
                 <p className="text-xs text-muted mt-0.5">{student.fatherName}</p>
                 <p className="text-sm text-muted mt-2 break-all">{student.email}</p>
                 <p className="text-sm text-muted">{student.whatsapp}</p>
@@ -511,6 +523,15 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
                         >
                           {student.name}
                         </OpenStudentProfileButton>
+                        {student.totalApplications > 1 && (
+                          <span
+                            title={`Applied for: ${student.appliedPrograms.join(", ")}`}
+                            className="mt-1 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700"
+                          >
+                            <Stack size={10} weight="fill" />
+                            {student.totalApplications}x applied
+                          </span>
+                        )}
                         <p className="mt-0.5 text-xs text-muted">{student.fatherName}</p>
                       </div>
                     </div>

@@ -24,6 +24,8 @@ export interface AdminStudentRow {
   isActive: boolean;
   joinedAt: string;
   appliedAt: string;
+  totalApplications: number;
+  appliedPrograms: string[];
 }
 
 export async function getAdminStudentRows(): Promise<AdminStudentRow[]> {
@@ -79,6 +81,8 @@ export async function getAdminStudentRows(): Promise<AdminStudentRow[]> {
       isActive: student.isActive,
       joinedAt: student.createdAt.toISOString(),
       appliedAt: enrollment?.createdAt.toISOString() ?? student.createdAt.toISOString(),
+      totalApplications: studentEnrollments.length,
+      appliedPrograms: [...new Set(studentEnrollments.map((e) => e.program))],
     };
   });
 }
