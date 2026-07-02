@@ -136,20 +136,24 @@ export function buildStudentsCsv(rows: AdminStudentRow[]) {
   return `\uFEFF${headers.join(",")}\n${lines.join("\n")}`;
 }
 
-export function buildStudentsExportFilename(programSlug?: string) {
+export function buildStudentsExportFilename(programSlug?: string, module?: string) {
   const stamp = new Date().toISOString().slice(0, 10);
-  if (programSlug === "web-development") return `eest-web-students-${stamp}.csv`;
-  if (programSlug === "app-development") return `eest-app-students-${stamp}.csv`;
-  return `eest-students-all-${stamp}.csv`;
+  const moduleSlug = module ? `-${module.toLowerCase().replace(/[^a-z0-9]+/g, "-")}` : "";
+  if (programSlug === "web-development") return `eest-web${moduleSlug}-students-${stamp}.csv`;
+  if (programSlug === "app-development") return `eest-app${moduleSlug}-students-${stamp}.csv`;
+  return `eest-students${moduleSlug}-all-${stamp}.csv`;
 }
 
 export function filterAdminStudentRows(
   rows: AdminStudentRow[],
-  options?: { program?: string; activeOnly?: boolean }
+  options?: { program?: string; module?: string; activeOnly?: boolean }
 ): AdminStudentRow[] {
   let result = rows;
   if (options?.program && options.program !== "all") {
     result = result.filter((row) => row.programSlug === options.program);
+  }
+  if (options?.module && options.module !== "all") {
+    result = result.filter((row) => row.module === options.module);
   }
   if (options?.activeOnly) {
     result = result.filter((row) => row.isActive);
