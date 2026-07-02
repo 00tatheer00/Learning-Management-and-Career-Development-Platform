@@ -411,8 +411,8 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
                   </OpenStudentProfileButton>
                   {student.totalApplications > 1 && (
                     <span
-                      title={`Applied for: ${student.appliedPrograms.join(", ")}`}
-                      className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700"
+                      title={student.appliedEntries.map((e) => `${e.course} › ${e.module} (${e.status})`).join("\n")}
+                      className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700 cursor-help"
                     >
                       <Stack size={10} weight="fill" />
                       {student.totalApplications}x applied
@@ -524,13 +524,22 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
                           {student.name}
                         </OpenStudentProfileButton>
                         {student.totalApplications > 1 && (
-                          <span
-                            title={`Applied for: ${student.appliedPrograms.join(", ")}`}
-                            className="mt-1 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700"
-                          >
-                            <Stack size={10} weight="fill" />
-                            {student.totalApplications}x applied
-                          </span>
+                          <div className="mt-1.5 space-y-0.5">
+                            <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700">
+                              <Stack size={10} weight="fill" />
+                              {student.totalApplications}x applied
+                            </span>
+                            {student.appliedEntries.map((entry, i) => (
+                              <p key={i} className="text-[10px] text-muted leading-tight pl-0.5">
+                                {entry.course} › <span className="font-medium text-foreground">{entry.module}</span>
+                                <span className={`ml-1 rounded-full px-1.5 py-0.5 font-semibold ${
+                                  entry.status === "approved" ? "bg-emerald-100 text-emerald-700" :
+                                  entry.status === "rejected" ? "bg-red-100 text-red-700" :
+                                  "bg-amber-100 text-amber-700"
+                                }`}>{entry.status}</span>
+                              </p>
+                            ))}
+                          </div>
                         )}
                         <p className="mt-0.5 text-xs text-muted">{student.fatherName}</p>
                       </div>
