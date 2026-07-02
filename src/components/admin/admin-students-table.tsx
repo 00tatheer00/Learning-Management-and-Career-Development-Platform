@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import {
   DownloadSimple,
   MagnifyingGlass,
@@ -25,6 +25,53 @@ import { toast } from "@/lib/ui/toast";
 import { useAdminPermissions } from "@/components/admin/admin-permissions";
 import { OpenStudentProfileButton, AdminStudentProfileButton } from "@/components/admin/admin-student-profile-drawer";
 import type { AdminStudentRow } from "@/lib/api/admin-students";
+
+function AppliedChip({ entries }: { entries: { course: string; module: string; status: string }[] }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative inline-flex">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700 hover:bg-amber-200 transition-colors"
+      >
+        <Stack size={10} weight="fill" />
+        {entries.length}x applied
+      </button>
+      {open && (
+        <div className="absolute left-0 top-full mt-1.5 z-50 min-w-[220px] rounded-xl border border-border bg-background shadow-lg p-2 space-y-1">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted px-1 pb-1">All applications</p>
+          {entries.map((entry, i) => (
+            <div key={i} className="flex items-center justify-between gap-2 rounded-lg px-2 py-1.5 bg-surface/60">
+              <div className="min-w-0">
+                <p className="text-[10px] text-muted truncate">{entry.course}</p>
+                <p className="text-xs font-semibold truncate">{entry.module}</p>
+              </div>
+              <span className={`shrink-0 rounded-full px-2 py-0.5 text-[9px] font-bold uppercase ${
+                entry.status === "approved" ? "bg-emerald-100 text-emerald-700" :
+                entry.status === "rejected" ? "bg-red-100 text-red-700" :
+                "bg-amber-100 text-amber-700"
+              }`}>
+                {entry.status}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 interface AdminStudentsTableProps {
   students: AdminStudentRow[];
@@ -410,13 +457,7 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
                     {student.name}
                   </OpenStudentProfileButton>
                   {student.totalApplications > 1 && (
-                    <span
-                      title={student.appliedEntries.map((e) => `${e.course} › ${e.module} (${e.status})`).join("\n")}
-                      className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700 cursor-help"
-                    >
-                      <Stack size={10} weight="fill" />
-                      {student.totalApplications}x applied
-                    </span>
+                    <AppliedChip entries={student.appliedEntries} />
                   )}
                 </div>
                 <p className="text-xs text-muted mt-0.5">{student.fatherName}</p>
@@ -524,22 +565,7 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
                           {student.name}
                         </OpenStudentProfileButton>
                         {student.totalApplications > 1 && (
-                          <div className="mt-1.5 space-y-0.5">
-                            <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700">
-                              <Stack size={10} weight="fill" />
-                              {student.totalApplications}x applied
-                            </span>
-                            {student.appliedEntries.map((entry, i) => (
-                              <p key={i} className="text-[10px] text-muted leading-tight pl-0.5">
-                                {entry.course} › <span className="font-medium text-foreground">{entry.module}</span>
-                                <span className={`ml-1 rounded-full px-1.5 py-0.5 font-semibold ${
-                                  entry.status === "approved" ? "bg-emerald-100 text-emerald-700" :
-                                  entry.status === "rejected" ? "bg-red-100 text-red-700" :
-                                  "bg-amber-100 text-amber-700"
-                                }`}>{entry.status}</span>
-                              </p>
-                            ))}
-                          </div>
+                          <AppliedChip entries={student.appliedEntries} />
                         )}
                         <p className="mt-0.5 text-xs text-muted">{student.fatherName}</p>
                       </div>
