@@ -81,7 +81,7 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
         .toLowerCase()
         .includes(query);
     });
-  }, [students, search, courseFilter, selectedCourse, selectedModule, statusFilter, browseView]);
+  }, [students, search, courseFilter, selectedCourse, selectedModule, statusFilter]);
 
   const runAction = async (
     id: string,
@@ -166,6 +166,19 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
 
   return (
     <div className="space-y-4">
+      {browseView === "list" && !selectedCourse && (
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={() => setBrowseView("courses")}
+            className="inline-flex items-center gap-2 rounded-xl border border-border bg-background px-4 py-2.5 text-sm font-semibold text-primary hover:border-primary hover:bg-primary/5 transition-colors"
+          >
+            <GraduationCap size={18} />
+            Browse by Module
+          </button>
+        </div>
+      )}
+
       {browseView === "courses" && (
         <div className="space-y-4">
           <p className="text-sm text-muted">Choose a course to browse students by module.</p>
