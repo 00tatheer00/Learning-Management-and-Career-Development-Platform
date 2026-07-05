@@ -18,6 +18,7 @@ interface StudentNextClassCardProps {
     time: string;
     trainerName: string;
     notes?: string;
+    hasJoinLink?: boolean;
   };
 }
 
@@ -95,7 +96,14 @@ export function StudentNextClassCard({ session }: StudentNextClassCardProps) {
             </div>
           )}
           <div className="flex flex-wrap gap-2 justify-end">
-            <JoinClassButton sessionId={session.id} label="Join Class" />
+            {session.hasJoinLink !== false ? (
+              <JoinClassButton sessionId={session.id} label="Join Class" />
+            ) : (
+              <div className="rounded-xl border border-dashed border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 text-center min-w-[180px]">
+                <p className="font-semibold">Link coming soon</p>
+                <p className="mt-1 text-xs">Trainer will add Meet link before class.</p>
+              </div>
+            )}
             <Button variant="outline" size="sm" asChild>
               <Link href="/student/classes">All classes</Link>
             </Button>

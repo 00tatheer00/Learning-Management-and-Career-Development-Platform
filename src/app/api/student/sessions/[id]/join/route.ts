@@ -42,6 +42,15 @@ export async function GET(
     );
   }
 
+  if (!isPortalRoomSession(session) && !session.meetLink?.trim()) {
+    return NextResponse.json(
+      createApiResponse(false, {
+        message: "Your trainer has not added the class link yet. Check back soon.",
+      }),
+      { status: 403 }
+    );
+  }
+
   void recordUserActivity(user.id);
 
   const attendance = await recordClassJoin({

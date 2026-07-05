@@ -5,26 +5,21 @@ import { requireTrainerProgram } from "@/lib/auth/trainer-scope";
 import { createLiveSession } from "@/lib/api/portal-data";
 import { createApiResponse } from "@/lib/api/enrollment";
 import { notifyStudentsOfLiveClass } from "@/lib/notifications/live-class-notice";
+import { isValidMeetLink, normalizeMeetLink } from "@/lib/sessions/meet-link";
 
-const schema = z
-  .object({
-    title: z.string().min(2),
-    date: z.string(),
-    time: z.string(),
-    roomType: z.enum(["portal", "meet"]).default("portal"),
-    meetLink: z.string().url().optional().or(z.literal("")),
-    programSlug: z.string().optional(),
-    notes: z.string().optional(),
-  })
-  .superRefine((data, ctx) => {
-    if (data.roomType === "meet" && !data.meetLink) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Meeting link is required for external classes",
-        path: ["meetLink"],
-      });
-    }
-  });
+const schema = z.object({
+  title: z.string().min(2),
+  date: z.string(),
+  time: z.string(),
+  roomType: z.enum(["portal", "meet"]).default("meet"),
+  meetLink: z
+    .string()
+    .min(1, "Google Meet link is required")
+    .transform(normalizeMeetLink)
+    .refine(isValidMeetLink, "Enter a valid Google Meet or Zoom link"),
+  programSlug: z.string().optional(),
+  notes: z.string().optional(),
+});
 
 export async function POST(request: Request) {
   const user = await getCurrentUser();
@@ -59,7 +54,7 @@ export async function POST(request: Request) {
       title: parsed.data.title,
       date: parsed.data.date,
       time: parsed.data.time,
-      meetLink: isPortal ? "" : (parsed.data.meetLink ?? ""),
+      meetLink: isPortal ? "" : parsed.data.meetLink,
       roomType: isPortal ? "portal" : "meet",
       programSlug,
       notes: parsed.data.notes,

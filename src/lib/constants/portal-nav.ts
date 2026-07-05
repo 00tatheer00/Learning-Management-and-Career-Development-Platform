@@ -38,7 +38,7 @@ export const PORTAL_NAV: Record<UserRole, PortalNavItem[]> = {
   trainer: [
     { href: "/trainer/dashboard", label: "Home", icon: House, description: "Trainer dashboard" },
     { href: "/trainer/students", label: "My Students", icon: Users, description: "See enrolled students" },
-    { href: "/trainer/classes", label: "Portal Classes", icon: VideoCamera, description: "Free in-portal live video" },
+    { href: "/trainer/classes", label: "Live Classes", icon: VideoCamera, description: "Schedule Google Meet classes" },
     { href: "/trainer/assignments", label: "Assignments", icon: ClipboardText, description: "Create & review work" },
     { href: "/trainer/materials", label: "Course Videos", icon: BookOpen, description: "Learning materials" },
     { href: "/trainer/settings", label: "Settings", icon: Gear, description: "Edit your profile" },

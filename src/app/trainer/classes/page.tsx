@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { VideoCamera } from "@phosphor-icons/react";
+import { LinkSimple, PencilSimple, VideoCamera } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,6 +17,7 @@ interface LiveSession {
   meetLink: string;
   roomType: "portal" | "meet";
   programSlug: string;
+  notes?: string;
 }
 
 interface TrainerInfo {
@@ -26,20 +26,22 @@ interface TrainerInfo {
   designation: string;
 }
 
+const emptyForm = {
+  title: "",
+  date: "",
+  time: "07:00 PM",
+  meetLink: "",
+  notes: "",
+};
+
 export default function TrainerClassesPage() {
   const [sessions, setSessions] = useState<LiveSession[]>([]);
   const [trainer, setTrainer] = useState<TrainerInfo | null>(null);
-  const [portalEnabled, setPortalEnabled] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({
-    title: "",
-    date: "",
-    time: "07:00 PM",
-    roomType: "portal" as "portal" | "meet",
-    meetLink: "",
-    notes: "",
-  });
+  const [form, setForm] = useState(emptyForm);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editLink, setEditLink] = useState("");
 
   const load = () =>
     fetch("/api/trainer/data")
@@ -48,7 +50,6 @@ export default function TrainerClassesPage() {
         if (d.success) {
           setSessions(d.data.sessions ?? []);
           setTrainer(d.data.trainer ?? null);
-          setPortalEnabled(Boolean(d.data.portalVideoEnabled));
         }
       });
 
@@ -64,25 +65,17 @@ export default function TrainerClassesPage() {
       const res = await fetch("/api/trainer/sessions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, programSlug: trainer.programSlug }),
+        body: JSON.stringify({
+          ...form,
+          roomType: "meet",
+          programSlug: trainer.programSlug,
+        }),
       });
       const data = await res.json();
       if (data.success) {
-        toast.success(
-          form.roomType === "portal"
-            ? "Portal class scheduled!"
-            : "Class scheduled!",
-          "Students notified on WhatsApp."
-        );
+        toast.success("Class scheduled!", "Students can join from their portal at class time.");
         setShowForm(false);
-        setForm({
-          title: "",
-          date: "",
-          time: "07:00 PM",
-          roomType: portalEnabled ? "portal" : "meet",
-          meetLink: "",
-          notes: "",
-        });
+        setForm(emptyForm);
         load();
       } else {
         toast.error(data.message || data.error || "Failed to create class.");
@@ -94,20 +87,55 @@ export default function TrainerClassesPage() {
     }
   };
 
+  const handleSaveLink = async (sessionId: string) => {
+    if (!editLink.trim()) {
+      toast.error("Paste your Google Meet link first.");
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/trainer/sessions/${sessionId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ meetLink: editLink }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success("Meet link saved!", "Students will see Join Class when it's time.");
+        setEditingId(null);
+        setEditLink("");
+        load();
+      } else {
+        toast.error(data.message || data.error || "Could not save link.");
+      }
+    } catch {
+      toast.error("Error. Try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div>
       <PortalPageHeader
-        title="Portal Classes"
+        title="Live Classes"
         description={
           trainer
-            ? `Free in-portal video for ${trainer.courseTitle}. No Google Meet link to share.`
-            : "Schedule portal classes for your students."
+            ? `Schedule classes for ${trainer.courseTitle}. Add a Google Meet link — students join from their portal.`
+            : "Schedule live classes for your students."
         }
       >
         <Button size="lg" onClick={() => setShowForm(!showForm)}>
-          {showForm ? "Cancel" : "+ Add New Class"}
+          {showForm ? "Cancel" : "+ Schedule Class"}
         </Button>
       </PortalPageHeader>
+
+      <p className="mb-6 text-sm rounded-xl border border-primary/20 bg-primary/5 p-4 text-muted">
+        <span className="font-semibold text-foreground">How it works:</span> Create a class with
+        date, time & Google Meet link. At class time, students open their portal and tap{" "}
+        <strong className="text-foreground">Join Class</strong> — they enter your Meet directly.
+        You can update the link anytime before class.
+      </p>
 
       {showForm && trainer && (
         <form
@@ -116,26 +144,6 @@ export default function TrainerClassesPage() {
         >
           <h2 className="font-bold text-lg">Schedule a New Class</h2>
           <p className="text-sm text-muted">Course: {trainer.courseTitle}</p>
-
-          <div className="flex flex-wrap gap-2">
-            <RoomTypePill
-              active={form.roomType === "portal"}
-              disabled={!portalEnabled}
-              label="Portal room (recommended)"
-              onClick={() => setForm({ ...form, roomType: "portal", meetLink: "" })}
-            />
-            <RoomTypePill
-              active={form.roomType === "meet"}
-              label="External Meet / Zoom"
-              onClick={() => setForm({ ...form, roomType: "meet" })}
-            />
-          </div>
-
-          {!portalEnabled && (
-            <p className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-              Portal video loading… refresh if this stays.
-            </p>
-          )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="sm:col-span-2">
@@ -168,18 +176,31 @@ export default function TrainerClassesPage() {
                 required
               />
             </div>
-            {form.roomType === "meet" && (
-              <div className="sm:col-span-2">
-                <Label className="text-base">Meeting Link (Google Meet / Zoom)</Label>
-                <Input
-                  className="mt-2 h-12"
-                  value={form.meetLink}
-                  onChange={(e) => setForm({ ...form, meetLink: e.target.value })}
-                  placeholder="https://meet.google.com/..."
-                  required
-                />
-              </div>
-            )}
+            <div className="sm:col-span-2">
+              <Label className="text-base flex items-center gap-2">
+                <LinkSimple size={18} weight="duotone" />
+                Google Meet Link
+              </Label>
+              <Input
+                className="mt-2 h-12"
+                value={form.meetLink}
+                onChange={(e) => setForm({ ...form, meetLink: e.target.value })}
+                placeholder="https://meet.google.com/abc-defg-hij"
+                required
+              />
+              <p className="text-xs text-muted mt-1.5">
+                Create a meeting in Google Calendar or meet.google.com, then paste the link here.
+              </p>
+            </div>
+            <div className="sm:col-span-2">
+              <Label className="text-base">Notes for students (optional)</Label>
+              <Input
+                className="mt-2 h-12"
+                value={form.notes}
+                onChange={(e) => setForm({ ...form, notes: e.target.value })}
+                placeholder="e.g. Bring your laptop charged"
+              />
+            </div>
           </div>
           <Button type="submit" size="lg" disabled={loading}>
             {loading ? "Saving..." : "Save Class"}
@@ -189,76 +210,105 @@ export default function TrainerClassesPage() {
 
       <div className="space-y-4">
         {sessions.length === 0 ? (
-          <p className="text-muted text-center py-8">No classes scheduled yet.</p>
+          <p className="text-muted text-center py-8">
+            No classes scheduled yet. Tap &quot;Schedule Class&quot; to add your first one.
+          </p>
         ) : (
-          sessions.map((session) => (
-            <div
-              key={session.id}
-              className="rounded-2xl border border-border bg-background p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-            >
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <p className="font-bold text-lg">{session.title}</p>
-                  <span
-                    className={cn(
-                      "text-[10px] font-bold uppercase rounded-full px-2 py-0.5",
-                      session.roomType === "portal"
-                        ? "bg-orange-100 text-orange-800"
-                        : "bg-zinc-100 text-zinc-600"
+          sessions.map((session) => {
+            const hasLink = Boolean(session.meetLink?.trim()) || session.roomType === "portal";
+            const isEditing = editingId === session.id;
+
+            return (
+              <div
+                key={session.id}
+                className="rounded-2xl border border-border bg-background p-5 space-y-4"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="font-bold text-lg">{session.title}</p>
+                      <span
+                        className={cn(
+                          "text-[10px] font-bold uppercase rounded-full px-2 py-0.5",
+                          hasLink
+                            ? "bg-emerald-100 text-emerald-800"
+                            : "bg-amber-100 text-amber-800"
+                        )}
+                      >
+                        {hasLink ? "Link ready" : "Link needed"}
+                      </span>
+                    </div>
+                    <p className="text-muted text-sm">
+                      {session.date} · {session.time}
+                    </p>
+                    {hasLink && session.roomType === "meet" && !isEditing && (
+                      <p className="text-xs text-muted mt-2 truncate max-w-md">
+                        {session.meetLink}
+                      </p>
                     )}
-                  >
-                    {session.roomType === "portal" ? "Portal" : "External"}
-                  </span>
+                  </div>
+
+                  {session.roomType === "meet" && hasLink && !isEditing && (
+                    <Button asChild className="shrink-0">
+                      <a href={session.meetLink} target="_blank" rel="noopener noreferrer">
+                        <VideoCamera size={18} weight="duotone" /> Open Meet
+                      </a>
+                    </Button>
+                  )}
                 </div>
-                <p className="text-muted text-sm">
-                  {session.date} · {session.time}
-                </p>
+
+                {session.roomType === "meet" && (
+                  <div className="rounded-xl border border-border bg-surface p-4">
+                    {isEditing ? (
+                      <div className="space-y-3">
+                        <Label className="text-sm font-semibold">Google Meet Link</Label>
+                        <Input
+                          className="h-11"
+                          value={editLink}
+                          onChange={(e) => setEditLink(e.target.value)}
+                          placeholder="https://meet.google.com/..."
+                          autoFocus
+                        />
+                        <div className="flex flex-wrap gap-2">
+                          <Button
+                            size="sm"
+                            disabled={loading}
+                            onClick={() => handleSaveLink(session.id)}
+                          >
+                            {loading ? "Saving..." : "Save Link"}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setEditingId(null);
+                              setEditLink("");
+                            }}
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setEditingId(session.id);
+                          setEditLink(session.meetLink ?? "");
+                        }}
+                      >
+                        <PencilSimple size={16} weight="duotone" />
+                        {hasLink ? "Update Meet Link" : "Add Meet Link"}
+                      </Button>
+                    )}
+                  </div>
+                )}
               </div>
-              {session.roomType === "portal" ? (
-                <Button asChild>
-                  <Link href={`/trainer/classes/${session.id}/live`}>
-                    <VideoCamera size={18} weight="duotone" /> Start / Join Class
-                  </Link>
-                </Button>
-              ) : (
-                <Button asChild>
-                  <a href={session.meetLink} target="_blank" rel="noopener noreferrer">
-                    <VideoCamera size={18} weight="duotone" /> Open Link
-                  </a>
-                </Button>
-              )}
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>
-  );
-}
-
-function RoomTypePill({
-  active,
-  disabled,
-  label,
-  onClick,
-}: {
-  active: boolean;
-  disabled?: boolean;
-  label: string;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      disabled={disabled}
-      onClick={onClick}
-      className={cn(
-        "rounded-full px-4 py-2 text-sm font-semibold border cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",
-        active
-          ? "border-primary bg-primary text-white"
-          : "border-border bg-background text-muted hover:text-foreground"
-      )}
-    >
-      {label}
-    </button>
   );
 }

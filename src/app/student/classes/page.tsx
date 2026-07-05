@@ -28,9 +28,9 @@ export default async function StudentClassesPage() {
       </p>
 
       <p className="mb-6 text-sm text-muted rounded-xl border border-border bg-surface p-4">
-        Class links are only shown to enrolled students at class time. Do not share your portal
-        login or class link with anyone outside your batch. Trainers use waiting room to admit
-        only registered students.
+        At class time, tap <strong className="text-foreground">Join Class</strong> to enter your
+        trainer&apos;s Google Meet. The link is only available to enrolled students — do not share
+        your portal login with anyone.
       </p>
 
       {sessions.length === 0 ? (
@@ -63,7 +63,15 @@ export default async function StudentClassesPage() {
                       </p>
                     )}
                   </div>
-                  {isUpcoming && <JoinClassButton sessionId={session.id} />}
+                  {isUpcoming &&
+                    (session.hasJoinLink ? (
+                      <JoinClassButton sessionId={session.id} />
+                    ) : (
+                      <div className="rounded-xl border border-dashed border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 shrink-0">
+                        <p className="font-semibold">Link coming soon</p>
+                        <p className="mt-1 text-xs">Your trainer will add the Google Meet link before class.</p>
+                      </div>
+                    ))}
                 </div>
               </div>
             );

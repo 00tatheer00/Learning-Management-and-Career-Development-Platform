@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getSessionRoomName, generateRoomPassword } from "@/lib/portal-video/config";
+import { sessionHasJoinLink } from "@/lib/sessions/meet-link";
 import { getAdminProgramStats } from "@/lib/api/admin-program-stats";
 import { DEFAULT_BATCH_NAME } from "@/lib/constants/batch";
 import type {
@@ -72,7 +73,9 @@ function mapEnrollment(record: {
   };
 }
 
-export type LiveSessionPreview = Omit<LiveSessionPublic, "meetLink">;
+export type LiveSessionPreview = Omit<LiveSessionPublic, "meetLink"> & {
+  hasJoinLink: boolean;
+};
 
 export async function getEnrollmentByEmail(email: string) {
   return prisma.enrollment.findFirst({
@@ -266,7 +269,10 @@ export async function getLiveSessions(programSlug?: string): Promise<LiveSession
 
 export async function getLiveSessionsPreview(programSlug?: string): Promise<LiveSessionPreview[]> {
   const sessions = await getLiveSessions(programSlug);
-  return sessions.map(({ meetLink: _meetLink, ...session }) => session);
+  return sessions.map(({ meetLink: _meetLink, ...session }) => ({
+    ...session,
+    hasJoinLink: sessionHasJoinLink({ roomType: session.roomType, meetLink: _meetLink }),
+  }));
 }
 
 export async function getLiveSessionById(id: string): Promise<LiveSession | null> {
@@ -329,6 +335,27 @@ export async function createLiveSession(
     },
   });
   return mapLiveSession(session);
+}
+
+export async function updateLiveSession(
+  id: string,
+  data: Partial<Pick<LiveSession, "title" | "date" | "time" | "meetLink" | "notes">>
+): Promise<LiveSession | null> {
+  try {
+    const session = await prisma.liveSession.update({
+      where: { id },
+      data: {
+        ...(data.title !== undefined ? { title: data.title } : {}),
+        ...(data.date !== undefined ? { date: data.date } : {}),
+        ...(data.time !== undefined ? { time: data.time } : {}),
+        ...(data.meetLink !== undefined ? { meetLink: data.meetLink } : {}),
+        ...(data.notes !== undefined ? { notes: data.notes } : {}),
+      },
+    });
+    return mapLiveSession(session);
+  } catch {
+    return null;
+  }
 }
 
 export async function getPortalStats() {
