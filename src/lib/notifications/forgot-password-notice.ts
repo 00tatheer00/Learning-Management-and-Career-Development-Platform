@@ -1,4 +1,4 @@
-import { sendWhatsAppMessage } from "@/lib/notifications/whatsapp";
+import { sendForgotPasswordWhatsApp } from "@/lib/notifications/whatsapp";
 import { getPasswordResetUrl } from "@/lib/auth/password-reset";
 
 interface ForgotPasswordNoticeInput {
@@ -36,7 +36,7 @@ export async function sendForgotPasswordNotifications(
     return { whatsappSent: false, warnings };
   }
 
-  const whatsappResult = await sendWhatsAppMessage(
+  const whatsappResult = await sendForgotPasswordWhatsApp(
     input.phone,
     `🔐 *EEST Password Reset*\n\n${text}`
   );

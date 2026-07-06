@@ -8,9 +8,10 @@ import {
 } from "@/lib/auth/admin-access";
 import { createApiResponse } from "@/lib/api/enrollment";
 import { getUltraMsgInstanceStatus } from "@/lib/notifications/whatsapp";
+import { resendStudentLoginWhatsApp } from "@/lib/notifications/student-login-whatsapp";
 
-const WHATSAPP_DISABLED_MESSAGE =
-  "WhatsApp automation is disabled. Only approve/reject registration messages are sent.";
+const WHATSAPP_TEST_DISABLED_MESSAGE =
+  "Test messages are disabled. Use Resend Login or approve a student to verify WhatsApp.";
 
 export async function GET() {
   const user = await getAdminUser();
@@ -47,13 +48,18 @@ export async function POST(request: Request) {
     const status = await getUltraMsgInstanceStatus();
     return NextResponse.json(
       createApiResponse(false, {
-        message: WHATSAPP_DISABLED_MESSAGE,
+        message: WHATSAPP_TEST_DISABLED_MESSAGE,
         data: { status },
       })
     );
   }
 
-  return NextResponse.json(createApiResponse(false, { error: WHATSAPP_DISABLED_MESSAGE }), {
-    status: 400,
-  });
+  const result = await resendStudentLoginWhatsApp(parsed.data.studentId);
+  if (!result.success) {
+    return NextResponse.json(createApiResponse(false, { error: result.error ?? "Send failed" }), {
+      status: 400,
+    });
+  }
+
+  return NextResponse.json(createApiResponse(true, { message: result.message }));
 }

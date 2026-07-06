@@ -1,6 +1,6 @@
 import { getProgramBySlug } from "@/lib/data/programs";
 import { buildApprovalWhatsAppMessage } from "@/lib/notifications/approval-templates";
-import { sendWhatsAppMessage } from "@/lib/notifications/whatsapp";
+import { sendLoginResendWhatsApp } from "@/lib/notifications/whatsapp";
 import { decryptPortalPassword } from "@/lib/auth/portal-password-vault";
 import { getPortalLoginUrl } from "@/lib/site-url";
 import { prisma } from "@/lib/prisma";
@@ -24,7 +24,7 @@ export async function sendStudentLoginWhatsApp(input: {
     loginUrl,
   });
 
-  return sendWhatsAppMessage(input.whatsapp, message);
+  return sendLoginResendWhatsApp(input.whatsapp, message);
 }
 
 export async function resendStudentLoginWhatsApp(studentId: string): Promise<{

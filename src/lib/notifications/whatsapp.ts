@@ -121,10 +121,25 @@ export async function getUltraMsgInstanceStatus(): Promise<{
   }
 }
 
-export type WhatsAppPurpose = "approval" | "rejection";
+export type WhatsAppPurpose =
+  | "approval"
+  | "rejection"
+  | "class_schedule"
+  | "login_resend"
+  | "forgot_password"
+  | "password_reset";
 
-const WHATSAPP_AUTOMATION_DISABLED_MESSAGE =
-  "WhatsApp automation is disabled. Only approve/reject registration messages are sent.";
+const ALLOWED_WHATSAPP_PURPOSES = new Set<WhatsAppPurpose>([
+  "approval",
+  "rejection",
+  "class_schedule",
+  "login_resend",
+  "forgot_password",
+  "password_reset",
+]);
+
+const WHATSAPP_BLOCKED_MESSAGE =
+  "This WhatsApp message type is disabled. Allowed: approve, reject, class schedule, login resend, password reset.";
 
 export async function sendApprovalWhatsApp(
   phone: string,
@@ -140,14 +155,42 @@ export async function sendRejectionWhatsApp(
   return sendWhatsAppMessage(phone, message, "rejection");
 }
 
+export async function sendClassScheduleWhatsApp(
+  phone: string,
+  message: string
+): Promise<{ sent: boolean; error?: string }> {
+  return sendWhatsAppMessage(phone, message, "class_schedule");
+}
+
+export async function sendLoginResendWhatsApp(
+  phone: string,
+  message: string
+): Promise<{ sent: boolean; error?: string }> {
+  return sendWhatsAppMessage(phone, message, "login_resend");
+}
+
+export async function sendForgotPasswordWhatsApp(
+  phone: string,
+  message: string
+): Promise<{ sent: boolean; error?: string }> {
+  return sendWhatsAppMessage(phone, message, "forgot_password");
+}
+
+export async function sendPasswordResetWhatsApp(
+  phone: string,
+  message: string
+): Promise<{ sent: boolean; error?: string }> {
+  return sendWhatsAppMessage(phone, message, "password_reset");
+}
+
 export async function sendWhatsAppMessage(
   phone: string,
   message: string,
   purpose?: WhatsAppPurpose
 ): Promise<{ sent: boolean; error?: string }> {
-  if (purpose !== "approval" && purpose !== "rejection") {
-    console.info("[whatsapp] blocked send (only approval/rejection allowed)");
-    return { sent: false, error: WHATSAPP_AUTOMATION_DISABLED_MESSAGE };
+  if (!purpose || !ALLOWED_WHATSAPP_PURPOSES.has(purpose)) {
+    console.info("[whatsapp] blocked send:", purpose ?? "unspecified");
+    return { sent: false, error: WHATSAPP_BLOCKED_MESSAGE };
   }
 
   const { instanceId, token } = getUltraMsgCredentials();

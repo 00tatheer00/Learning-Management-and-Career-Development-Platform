@@ -1,4 +1,4 @@
-import { sendWhatsAppMessage } from "@/lib/notifications/whatsapp";
+import { sendPasswordResetWhatsApp } from "@/lib/notifications/whatsapp";
 import { getPortalLoginUrl } from "@/lib/site-url";
 
 interface PasswordResetNoticeInput {
@@ -28,7 +28,7 @@ export async function sendPasswordResetNotifications(
     "— Emerging Edge Summer Training",
   ].join("\n");
 
-  const whatsappResult = await sendWhatsAppMessage(
+  const whatsappResult = await sendPasswordResetWhatsApp(
     input.whatsapp,
     `🔑 *EEST Password Reset*\n\n${text}`
   );
