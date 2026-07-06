@@ -25,6 +25,7 @@ import {
   resetStudentWelcomeForLogin,
 } from "@/components/portal/student-portal-welcome";
 import type { UserRole } from "@/types/portal";
+import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
 
 const ROLES: {
   role: UserRole;
@@ -34,9 +35,9 @@ const ROLES: {
 }[] = [
   {
     role: "student",
-    label: "Student",
+    label: STUDENT_UR.login.studentRole,
     icon: GraduationCap,
-    hint: "Access your course, classes & assignments",
+    hint: STUDENT_UR.login.studentDesc,
   },
   {
     role: "trainer",
@@ -80,14 +81,14 @@ export default function LoginForm({
       if (result?.error) {
         const message =
           result.status === 500
-            ? "Server error. Check Vercel env vars (NEXTAUTH_URL, DATABASE_URL)."
-            : "Wrong email or password. Try again.";
+            ? STUDENT_UR.login.serverError
+            : STUDENT_UR.login.wrongCredentials;
         setError(message);
-        toast.error("Login failed", message);
+        toast.error(STUDENT_UR.login.loginFailed, message);
         return;
       }
 
-      toast.success("Welcome back!", "Redirecting to your portal...");
+      toast.success(STUDENT_UR.login.welcomeBack, STUDENT_UR.login.redirecting);
 
       const session = await getSession();
       const role = session?.user?.role ?? selectedRole;
@@ -98,9 +99,9 @@ export default function LoginForm({
       router.push(getPortalHome(role));
       router.refresh();
     } catch {
-      const message = "Something went wrong. Check your internet and try again.";
+      const message = STUDENT_UR.login.networkError;
       setError(message);
-      toast.error("Login failed", message);
+      toast.error(STUDENT_UR.login.loginFailed, message);
     } finally {
       setLoading(false);
     }
@@ -113,8 +114,12 @@ export default function LoginForm({
           <div className="flex justify-center mb-4">
             <SiteLogo variant="login" href="/" />
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold">Portal Login</h1>
-          <p className="text-muted mt-2">Choose who you are, then sign in</p>
+          <h1 className="text-2xl sm:text-3xl font-bold">
+            {selectedRole === "student" ? STUDENT_UR.login.portalLogin : "Portal Login"}
+          </h1>
+          <p className="text-muted mt-2">
+            {selectedRole === "student" ? STUDENT_UR.login.chooseRole : "Choose who you are, then sign in"}
+          </p>
         </div>
 
         <div className="rounded-2xl border border-border bg-background shadow-xl p-6 sm:p-8">
@@ -142,22 +147,20 @@ export default function LoginForm({
           </p>
 
           {sessionNotice === "replaced" && (
-            <Alert variant="warning" title="Logged out from this device" className="mb-6">
-              This account was opened on another phone or computer. For security, only one device
-              can stay logged in at a time. Sign in again if this is your device.
+            <Alert variant="warning" title={STUDENT_UR.login.sessionReplacedTitle} className="mb-6">
+              {STUDENT_UR.login.sessionReplaced}
             </Alert>
           )}
 
           <form onSubmit={handleLogin} className="space-y-5">
             {selectedRole === "student" && (
               <p className="rounded-lg border border-border bg-surface px-3 py-2 text-xs text-muted">
-                Student accounts work on <strong>one device at a time</strong>. Logging in elsewhere
-                will sign out the previous device.
+                {STUDENT_UR.login.oneDevice}
               </p>
             )}
             <div>
               <Label htmlFor="email" className="text-base">
-                Email
+                {selectedRole === "student" ? STUDENT_UR.login.email : "Email"}
               </Label>
               <Input
                 id="email"
@@ -172,7 +175,7 @@ export default function LoginForm({
 
             <div>
               <Label htmlFor="password" className="text-base">
-                Password
+                {selectedRole === "student" ? STUDENT_UR.login.password : "Password"}
               </Label>
               <div className="relative mt-2">
                 <Input
@@ -180,7 +183,7 @@ export default function LoginForm({
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter password"
+                  placeholder={selectedRole === "student" ? STUDENT_UR.login.passwordPlaceholder : "Enter password"}
                   className="h-12 text-base pr-12"
                   required
                 />
@@ -198,7 +201,7 @@ export default function LoginForm({
                   href="/forgot-password"
                   className="text-sm text-primary font-medium hover:underline"
                 >
-                  Forgot password?
+                  {selectedRole === "student" ? STUDENT_UR.login.forgotPassword : "Forgot password?"}
                 </Link>
               </div>
             </div>
@@ -211,19 +214,25 @@ export default function LoginForm({
 
             <Button type="submit" className="w-full h-14 text-base font-bold" disabled={loading}>
               <SignIn size={20} weight="bold" />
-              {loading ? "Signing in..." : "Sign In"}
+              {loading
+                ? selectedRole === "student"
+                  ? STUDENT_UR.login.signingIn
+                  : "Signing in..."
+                : selectedRole === "student"
+                  ? STUDENT_UR.login.signIn
+                  : "Sign In"}
             </Button>
           </form>
 
           <div className="mt-6 pt-6 border-t border-border text-center space-y-3">
             <p className="text-sm text-muted">
-              Not registered yet?{" "}
+              {selectedRole === "student" ? STUDENT_UR.login.notRegistered : "Not registered yet?"}{" "}
               <Link href="/register" className="text-primary font-semibold hover:underline">
-                Register here
+                {selectedRole === "student" ? STUDENT_UR.login.registerHere : "Register here"}
               </Link>
             </p>
             <Link href="/" className="text-sm text-muted hover:text-foreground block">
-              ← Back to website
+              {selectedRole === "student" ? STUDENT_UR.login.backToWebsite : "← Back to website"}
             </Link>
           </div>
         </div>

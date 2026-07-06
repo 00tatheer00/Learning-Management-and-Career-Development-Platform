@@ -3,16 +3,17 @@ import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth/session";
 import { createSubmission } from "@/lib/api/portal-data";
 import { createApiResponse } from "@/lib/api/enrollment";
+import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
 
 const schema = z.object({
   assignmentId: z.string(),
-  content: z.string().min(5, "Please write at least a few words"),
+  content: z.string().min(5, STUDENT_UR.assignments.apiMinWords),
 });
 
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user || user.role !== "student") {
-    return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), { status: 403 });
+    return NextResponse.json(createApiResponse(false, { error: STUDENT_UR.api.unauthorized }), { status: 403 });
   }
 
   const body = await request.json();
@@ -32,6 +33,6 @@ export async function POST(request: Request) {
   });
 
   return NextResponse.json(
-    createApiResponse(true, { data: submission, message: "Submitted successfully" })
+    createApiResponse(true, { data: submission, message: STUDENT_UR.assignments.apiSuccess })
   );
 }

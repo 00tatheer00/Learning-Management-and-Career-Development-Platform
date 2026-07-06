@@ -4,6 +4,7 @@ import { getLiveSessionsPreview } from "@/lib/api/portal-data";
 import { getProgramClassSchedule } from "@/lib/constants/course-schedule";
 import { PortalPageHeader, EmptyState } from "@/components/portal/portal-ui";
 import { JoinClassButton } from "@/components/portal/join-class-button";
+import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
 
 export default async function StudentClassesPage() {
   const user = await getCurrentUser();
@@ -17,8 +18,8 @@ export default async function StudentClassesPage() {
   return (
     <div>
       <PortalPageHeader
-        title="Live Classes"
-        description="Join your online class using the button below. Be ready 5 minutes early."
+        title={STUDENT_UR.classes.title}
+        description={STUDENT_UR.classes.description}
       />
 
       <p className="mb-4 text-sm rounded-xl border border-primary/20 bg-primary/5 p-4">
@@ -28,14 +29,12 @@ export default async function StudentClassesPage() {
       </p>
 
       <p className="mb-6 text-sm text-muted rounded-xl border border-border bg-surface p-4">
-        At class time, tap <strong className="text-foreground">Join Class</strong> to enter your
-        trainer&apos;s Google Meet. The link is only available to enrolled students — do not share
-        your portal login with anyone.
+        {STUDENT_UR.classes.joinHint}
       </p>
 
       {sessions.length === 0 ? (
         <EmptyState
-          title="Class link coming soon"
+          title={STUDENT_UR.classes.emptyTitle}
           description={`${classSchedule.startDateLabel}. ${classSchedule.daysLabel}. ${classSchedule.subline}`}
         />
       ) : (
@@ -56,7 +55,7 @@ export default async function StudentClassesPage() {
                       {session.date} · {session.time}
                     </div>
                     <h2 className="text-xl font-bold">{session.title}</h2>
-                    <p className="text-muted mt-1">Trainer: {session.trainerName}</p>
+                    <p className="text-muted mt-1">{STUDENT_UR.classes.trainerLabel(session.trainerName)}</p>
                     {session.notes && (
                       <p className="text-sm text-muted mt-2 bg-background rounded-lg p-3 border border-border">
                         {session.notes}
@@ -68,8 +67,8 @@ export default async function StudentClassesPage() {
                       <JoinClassButton sessionId={session.id} />
                     ) : (
                       <div className="rounded-xl border border-dashed border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 shrink-0">
-                        <p className="font-semibold">Link coming soon</p>
-                        <p className="mt-1 text-xs">Your trainer will add the Google Meet link before class.</p>
+                        <p className="font-semibold">{STUDENT_UR.classes.linkSoon}</p>
+                        <p className="mt-1 text-xs">{STUDENT_UR.classes.linkSoonHint}</p>
                       </div>
                     ))}
                 </div>

@@ -6,12 +6,19 @@ import { getProgramBySlug } from "@/lib/data/programs";
 import { CourseModulesSyllabus } from "@/components/portal/course-modules-syllabus";
 import { PortalPageHeader, EmptyState } from "@/components/portal/portal-ui";
 import { Button } from "@/components/ui/button";
+import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
 
 const typeIcons = {
   video: PlayCircle,
   link: LinkSimple,
   document: FileText,
 };
+
+const typeLabels = {
+  video: STUDENT_UR.course.videoLesson,
+  link: STUDENT_UR.course.practiceLink,
+  document: STUDENT_UR.course.document,
+} as const;
 
 export default async function StudentCoursePage() {
   const user = await getCurrentUser();
@@ -24,34 +31,33 @@ export default async function StudentCoursePage() {
   return (
     <div>
       <PortalPageHeader
-        title="My Course"
-        description={`${program?.title ?? "Your course"} — your modules and lessons`}
+        title={STUDENT_UR.course.title}
+        description={STUDENT_UR.course.description(program?.title ?? "Aapka course")}
       />
 
       {program && program.modules.length > 0 && (
         <div className="mb-10">
-          <h2 className="text-lg font-bold mb-1">Course Syllabus</h2>
+          <h2 className="text-lg font-bold mb-1">{STUDENT_UR.course.syllabus}</h2>
           <p className="text-sm text-muted mb-5">
-            You are currently on: <strong className="text-foreground">{user.level ?? "—"}</strong>
-            {" · "}
-            Click a module to see all topics you will study
+            {STUDENT_UR.course.currentModule(user.level ?? STUDENT_UR.profile.empty)}
           </p>
           <CourseModulesSyllabus
             program={program}
             activeModuleName={user.level ?? undefined}
+            copyVariant="student"
           />
         </div>
       )}
 
-      <h2 className="text-lg font-bold mb-4">Lessons &amp; Materials</h2>
+      <h2 className="text-lg font-bold mb-4">{STUDENT_UR.course.lessons}</h2>
 
       {materials.length === 0 ? (
         <EmptyState
-          title="No lessons yet"
-          description="Your trainer will add videos soon. Check WhatsApp for updates."
+          title={STUDENT_UR.course.noLessons}
+          description={STUDENT_UR.course.noLessonsDesc}
           action={
             <Button asChild>
-              <Link href="/student/whatsapp">Open WhatsApp Group</Link>
+              <Link href="/student/whatsapp">{STUDENT_UR.course.openWhatsapp}</Link>
             </Button>
           }
         />
@@ -74,7 +80,7 @@ export default async function StudentCoursePage() {
                   <div className="flex items-center gap-2 mb-1">
                     <Icon size={18} weight="duotone" className="text-primary" />
                     <span className="text-xs font-semibold uppercase text-muted">
-                      {material.type === "video" ? "Video Lesson" : material.type === "link" ? "Practice Link" : "Document"}
+                      {typeLabels[material.type]}
                     </span>
                   </div>
                   <p className="font-semibold text-lg group-hover:text-primary transition-colors">
@@ -82,7 +88,7 @@ export default async function StudentCoursePage() {
                   </p>
                   <p className="text-sm text-muted mt-0.5">{material.description}</p>
                 </div>
-                <span className="text-primary font-semibold text-sm shrink-0 sm:ml-auto">Open →</span>
+                <span className="text-primary font-semibold text-sm shrink-0 sm:ml-auto">{STUDENT_UR.course.open}</span>
               </a>
             );
           })}

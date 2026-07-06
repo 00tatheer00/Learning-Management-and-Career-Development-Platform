@@ -1,5 +1,6 @@
 import { CalendarBlank, Sparkle } from "@phosphor-icons/react/ssr";
 import { getProgramClassSchedule } from "@/lib/constants/course-schedule";
+import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
 import { cn } from "@/lib/utils";
 
 export function StudentModuleStartBanner({
@@ -39,7 +40,7 @@ export function StudentModuleStartBanner({
             )}
           >
             <Sparkle size={14} weight="fill" />
-            {schedule.programLabel} — Class Schedule
+            {STUDENT_UR.schedule.bannerTitle(schedule.programLabel)}
           </p>
           <p
             className={cn(

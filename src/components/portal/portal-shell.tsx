@@ -37,6 +37,7 @@ import {
 import { PortalThemeToggle } from "@/components/portal/portal-theme-toggle";
 import type { PortalUser, UserRole } from "@/types/portal";
 import { cn } from "@/lib/utils";
+import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
 
 const SIDEBAR_COLLAPSED_KEY = "portal-sidebar-collapsed";
 
@@ -73,10 +74,15 @@ function PortalShellInner({ user, children }: PortalShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const { theme } = usePortalTheme();
+  const isStudent = user.role === "student";
   const isAdmin = isAdminRole(user.role);
+  const logoutLabel = isStudent ? STUDENT_UR.logout : "Logout";
+  const websiteLabel = isStudent ? STUDENT_UR.website : "Website";
   const headerTitle = isAdmin
     ? getAdminDisplayName(user.name, user.role)
-    : `Hello, ${user.name.split(" ")[0]} 👋`;
+    : isStudent
+      ? STUDENT_UR.hello(user.name.split(" ")[0])
+      : `Hello, ${user.name.split(" ")[0]} 👋`;
 
   useEffect(() => {
     const stored = localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
@@ -183,12 +189,12 @@ function PortalShellInner({ user, children }: PortalShellProps) {
             <Button variant="outline" size="sm" asChild className="hidden sm:flex h-8 text-xs border-pt">
               <Link href="/">
                 <House size={15} weight="duotone" />
-                Website
+                {websiteLabel}
               </Link>
             </Button>
             <Button variant="ghost" size="sm" onClick={handleLogout} className="h-8 text-xs">
               <SignOut size={16} weight="bold" />
-              <span className="hidden sm:inline">Logout</span>
+              <span className="hidden sm:inline">{logoutLabel}</span>
             </Button>
           </div>
         </header>
@@ -233,6 +239,8 @@ function SidebarContent({
       : 0;
 
   const isAdmin = isAdminRole(user.role);
+  const isStudent = user.role === "student";
+  const logoutLabel = isStudent ? STUDENT_UR.logout : "Logout";
   const displayName = isAdmin ? getAdminDisplayName(user.name, user.role) : user.name;
   const portalSubtitle = isAdmin
     ? user.role === "admin_readonly"
@@ -395,7 +403,7 @@ function SidebarContent({
         <button
           type="button"
           onClick={onLogout}
-          title={collapsed ? "Logout" : undefined}
+          title={collapsed ? logoutLabel : undefined}
           className={cn(
             pressable,
             "flex w-full items-center rounded-lg text-sm font-medium text-red-600 hover:bg-red-500/10",
@@ -403,7 +411,7 @@ function SidebarContent({
           )}
         >
           <SignOut size={18} weight="bold" />
-          {!collapsed && "Logout"}
+          {!collapsed && logoutLabel}
         </button>
       </div>
     </div>

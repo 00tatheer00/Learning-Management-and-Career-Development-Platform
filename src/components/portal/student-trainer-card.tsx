@@ -3,6 +3,7 @@ import { ChalkboardTeacher } from "@phosphor-icons/react/ssr";
 import { getDisplayTrainerProfile } from "@/lib/api/admin-trainers";
 import { getProgramCategory } from "@/lib/constants/program-categories";
 import { cn } from "@/lib/utils";
+import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
 import type { Trainer } from "@/types";
 
 interface StudentTrainerCardProps {
@@ -39,7 +40,7 @@ export async function StudentTrainerCard({
         )}
       >
         <ChalkboardTeacher size={20} weight="duotone" />
-        <p className="text-sm font-semibold">Your {category.shortLabel} Trainer</p>
+        <p className="text-sm font-semibold">{STUDENT_UR.trainer.yourTrainer(category.shortLabel)}</p>
       </div>
 
       <div className="flex items-start gap-4 p-5">
@@ -69,7 +70,7 @@ export async function StudentTrainerCard({
           <p className="text-lg font-bold text-foreground">{assignedTrainer.name}</p>
           <p className="text-sm text-primary font-medium">{assignedTrainer.designation}</p>
           {assignedTrainer.experience && (
-            <p className="mt-1 text-xs text-muted">{assignedTrainer.experience} experience</p>
+            <p className="mt-1 text-xs text-muted">{STUDENT_UR.trainer.experience(assignedTrainer.experience)}</p>
           )}
           <p className="mt-2 text-sm text-muted leading-relaxed line-clamp-2">
             {assignedTrainer.bio}

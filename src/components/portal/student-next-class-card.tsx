@@ -9,6 +9,7 @@ import {
   getSessionCountdownParts,
   parseSessionDateTime,
 } from "@/lib/utils/session-datetime";
+import { getStudentCountdownLabel, STUDENT_UR } from "@/lib/constants/student-portal-ur";
 
 interface StudentNextClassCardProps {
   session: {
@@ -22,16 +23,31 @@ interface StudentNextClassCardProps {
   };
 }
 
+function toUrduCountdown(target: Date, now = new Date()) {
+  const parts = getSessionCountdownParts(target, now);
+  if (parts.isPast) {
+    return { ...parts, label: STUDENT_UR.classes.startingNow };
+  }
+  const totalMinutes = Math.floor(parts.diffMs / 60000);
+  const days = Math.floor(totalMinutes / (60 * 24));
+  const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
+  const minutes = totalMinutes % 60;
+  return {
+    ...parts,
+    label: getStudentCountdownLabel(days, hours, minutes, false),
+  };
+}
+
 export function StudentNextClassCard({ session }: StudentNextClassCardProps) {
   const sessionAt = parseSessionDateTime(session.date, session.time);
   const [countdown, setCountdown] = useState(() =>
-    sessionAt ? getSessionCountdownParts(sessionAt) : null
+    sessionAt ? toUrduCountdown(sessionAt) : null
   );
 
   useEffect(() => {
     const at = parseSessionDateTime(session.date, session.time);
     if (!at) return;
-    const tick = () => setCountdown(getSessionCountdownParts(at));
+    const tick = () => setCountdown(toUrduCountdown(at));
     tick();
     const id = window.setInterval(tick, 30_000);
     return () => window.clearInterval(id);
@@ -49,7 +65,7 @@ export function StudentNextClassCard({ session }: StudentNextClassCardProps) {
         <div className="flex-1">
           <p className="text-sm font-semibold text-primary uppercase tracking-wider mb-1 flex items-center gap-2">
             <VideoCamera size={18} weight="duotone" />
-            Next Live Class
+            {STUDENT_UR.classes.nextClass}
           </p>
           <h2 className="text-xl sm:text-2xl font-bold mb-2">{session.title}</h2>
           <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted">
@@ -61,7 +77,7 @@ export function StudentNextClassCard({ session }: StudentNextClassCardProps) {
               <Clock size={16} weight="duotone" className="text-primary" />
               {session.time}
             </span>
-            <span>Trainer: {session.trainerName}</span>
+            <span>{STUDENT_UR.classes.trainerLabel(session.trainerName)}</span>
           </div>
           {session.notes && (
             <p className="mt-3 text-sm text-muted rounded-xl border border-border bg-background/80 p-3">
@@ -84,7 +100,7 @@ export function StudentNextClassCard({ session }: StudentNextClassCardProps) {
                   countdown.isSoon ? "text-emerald-100" : "text-muted"
                 }`}
               >
-                Starts in
+                {STUDENT_UR.classes.startsIn}
               </p>
               <p
                 className={`text-2xl sm:text-3xl font-bold mt-1 tabular-nums ${
@@ -97,15 +113,15 @@ export function StudentNextClassCard({ session }: StudentNextClassCardProps) {
           )}
           <div className="flex flex-wrap gap-2 justify-end">
             {session.hasJoinLink !== false ? (
-              <JoinClassButton sessionId={session.id} label="Join Class" />
+              <JoinClassButton sessionId={session.id} />
             ) : (
               <div className="rounded-xl border border-dashed border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 text-center min-w-[180px]">
-                <p className="font-semibold">Link coming soon</p>
-                <p className="mt-1 text-xs">Trainer will add Meet link before class.</p>
+                <p className="font-semibold">{STUDENT_UR.classes.linkSoon}</p>
+                <p className="mt-1 text-xs">{STUDENT_UR.classes.linkSoonHint}</p>
               </div>
             )}
             <Button variant="outline" size="sm" asChild>
-              <Link href="/student/classes">All classes</Link>
+              <Link href="/student/classes">{STUDENT_UR.classes.allClasses}</Link>
             </Button>
           </div>
         </div>

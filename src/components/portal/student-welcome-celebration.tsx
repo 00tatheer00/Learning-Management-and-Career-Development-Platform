@@ -6,6 +6,7 @@ import confetti from "canvas-confetti";
 import { Sparkle, Trophy } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { playPortalSound } from "@/lib/ui/portal-sounds";
+import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
 
 const CELEBRATION_KEY = "eest-student-celebration-shown";
 
@@ -112,14 +113,13 @@ export function StudentWelcomeCelebration({
             >
               <p className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-orange-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-orange-700">
                 <Sparkle size={14} weight="fill" />
-                Registration Approved
+                {STUDENT_UR.celebration.badge}
               </p>
               <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
-                Congratulations, {firstName}! 🎉
+                {STUDENT_UR.celebration.title(firstName)}
               </h2>
               <p className="mt-3 text-sm sm:text-base text-muted leading-relaxed">
-                Welcome to Emerging Edge School of Technology. Your student portal is ready —
-                explore your course, live classes, and assignments.
+                {STUDENT_UR.celebration.body}
               </p>
             </motion.div>
 
@@ -130,7 +130,7 @@ export function StudentWelcomeCelebration({
               className="mt-8"
             >
               <Button size="lg" className="w-full h-12 text-base font-bold" onClick={finish}>
-                Enter My Portal
+                {STUDENT_UR.celebration.button}
               </Button>
             </motion.div>
           </div>

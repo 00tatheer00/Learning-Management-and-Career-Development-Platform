@@ -6,6 +6,7 @@ import { createApiResponse } from "@/lib/api/enrollment";
 import { recordClassJoin } from "@/lib/api/class-attendance";
 import { recordUserActivity } from "@/lib/auth/user-activity";
 import { isPortalRoomSession } from "@/lib/portal-video/config";
+import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
 
 export async function GET(
   _request: Request,
@@ -13,7 +14,7 @@ export async function GET(
 ) {
   const user = await getCurrentUser();
   if (!user || user.role !== "student") {
-    return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), {
+    return NextResponse.json(createApiResponse(false, { error: STUDENT_UR.api.unauthorized }), {
       status: 403,
     });
   }
@@ -22,13 +23,13 @@ export async function GET(
   const session = await getLiveSessionById(id);
 
   if (!session) {
-    return NextResponse.json(createApiResponse(false, { error: "Class not found" }), {
+    return NextResponse.json(createApiResponse(false, { error: STUDENT_UR.api.classNotFound }), {
       status: 404,
     });
   }
 
   if (session.programSlug !== user.programSlug) {
-    return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), {
+    return NextResponse.json(createApiResponse(false, { error: STUDENT_UR.api.unauthorized }), {
       status: 403,
     });
   }
@@ -36,7 +37,7 @@ export async function GET(
   if (!isWithinJoinWindow(session.date, session.time)) {
     return NextResponse.json(
       createApiResponse(false, {
-        message: "Join button opens 30 minutes before class and closes 3 hours after start.",
+        message: STUDENT_UR.api.joinWindow,
       }),
       { status: 403 }
     );
@@ -45,7 +46,7 @@ export async function GET(
   if (!isPortalRoomSession(session) && !session.meetLink?.trim()) {
     return NextResponse.json(
       createApiResponse(false, {
-        message: "Your trainer has not added the class link yet. Check back soon.",
+        message: STUDENT_UR.api.linkNotAdded,
       }),
       { status: 403 }
     );

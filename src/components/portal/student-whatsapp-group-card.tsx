@@ -5,6 +5,7 @@ import {
   STUDENT_WHATSAPP_GROUP_URL,
 } from "@/lib/constants/contact";
 import { cn } from "@/lib/utils";
+import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
 
 interface StudentWhatsAppGroupCardProps {
   variant?: "banner" | "page";
@@ -37,12 +38,10 @@ export function StudentWhatsAppGroupCard({
           </div>
           <div className={cn(!isBanner && "text-center")}>
             <h2 className={cn("font-bold", isBanner ? "text-lg sm:text-xl" : "text-2xl mb-3")}>
-              Join {STUDENT_WHATSAPP_GROUP_NAME}
+              {STUDENT_UR.whatsappCard.joinTitle(STUDENT_WHATSAPP_GROUP_NAME)}
             </h2>
             <p className={cn("text-muted leading-relaxed", isBanner ? "text-sm sm:text-base mt-1" : "mb-6")}>
-              {isBanner
-                ? "Your registration is approved. Join the class WhatsApp group now for live links, videos, and updates."
-                : "All class updates, live links, recorded lectures, and assignments are shared in our official WhatsApp group."}
+              {isBanner ? STUDENT_UR.whatsappCard.bannerDesc : STUDENT_UR.whatsappCard.pageDesc}
             </p>
           </div>
         </div>
@@ -57,7 +56,7 @@ export function StudentWhatsAppGroupCard({
         >
           <a href={STUDENT_WHATSAPP_GROUP_URL} target="_blank" rel="noopener noreferrer">
             <WhatsappLogo size={22} weight="fill" />
-            Join Now — Open Group
+            {STUDENT_UR.whatsappCard.joinButton}
           </a>
         </Button>
       </div>
@@ -65,12 +64,7 @@ export function StudentWhatsAppGroupCard({
       {!isBanner && (
         <>
           <div className="space-y-3 text-left mb-8 mt-8">
-            {[
-              "Live class links are posted before each session",
-              "Recorded lecture videos are shared in the group",
-              "Ask questions directly to your trainer",
-              "Get assignment reminders and updates",
-            ].map((item) => (
+            {STUDENT_UR.whatsappCard.bullets.map((item) => (
               <div key={item} className="flex items-start gap-3 text-sm">
                 <ChatsCircle size={20} weight="duotone" className="text-[#25D366] shrink-0 mt-0.5" />
                 {item}
@@ -78,9 +72,7 @@ export function StudentWhatsAppGroupCard({
             ))}
           </div>
 
-          <p className="text-xs text-muted">
-            Tap the button above to open WhatsApp and join the group.
-          </p>
+          <p className="text-xs text-muted">{STUDENT_UR.whatsappCard.footer}</p>
         </>
       )}
     </div>

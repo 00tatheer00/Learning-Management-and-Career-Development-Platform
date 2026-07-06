@@ -2,6 +2,7 @@ import { CheckCircle, MapTrifold } from "@phosphor-icons/react/ssr";
 import { getProgramBySlug } from "@/lib/data/programs";
 import { getProgramCategory } from "@/lib/constants/program-categories";
 import { cn } from "@/lib/utils";
+import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
 
 interface StudentModuleRoadmapProps {
   programSlug: string;
@@ -34,10 +35,13 @@ export function StudentModuleRoadmap({
           <MapTrifold size={22} weight="duotone" />
         </div>
         <div>
-          <h2 className="text-lg font-bold">Your Module Roadmap</h2>
+          <h2 className="text-lg font-bold">{STUDENT_UR.roadmap.title}</h2>
           <p className="text-sm text-muted">
-            {program?.title} · {modules.length} modules
-            {currentModule ? ` · You are in ${currentModule}` : ""}
+            {STUDENT_UR.roadmap.subtitle(
+              program?.title ?? "",
+              modules.length,
+              currentModule || undefined
+            )}
           </p>
         </div>
       </div>
@@ -94,12 +98,12 @@ export function StudentModuleRoadmap({
                     <p className="font-semibold">{mod.name}</p>
                     {isCurrent && (
                       <span className="rounded-full bg-primary px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary-foreground">
-                        You are here
+                        {STUDENT_UR.roadmap.youAreHere}
                       </span>
                     )}
                     {isCompleted && (
                       <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-800">
-                        Done
+                        {STUDENT_UR.roadmap.done}
                       </span>
                     )}
                   </div>
@@ -114,8 +118,7 @@ export function StudentModuleRoadmap({
 
       {currentIndex >= 0 && currentIndex < modules.length - 1 && (
         <p className="mt-2 text-sm text-muted rounded-xl bg-surface px-4 py-3 border border-border">
-          Next up: <strong>{modules[currentIndex + 1]?.name}</strong> — register again when you
-          finish this module and pay the next PKR 1,000 fee.
+          {STUDENT_UR.roadmap.nextUp(modules[currentIndex + 1]?.name ?? "")}
         </p>
       )}
     </div>

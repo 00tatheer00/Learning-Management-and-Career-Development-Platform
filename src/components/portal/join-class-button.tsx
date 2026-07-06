@@ -6,6 +6,7 @@ import { VideoCamera } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "@/lib/ui/toast";
+import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
 
 interface JoinClassButtonProps {
   sessionId: string;
@@ -18,7 +19,7 @@ export function JoinClassButton({
   sessionId,
   className,
   size = "lg",
-  label = "Join Class",
+  label = STUDENT_UR.classes.joinClass,
 }: JoinClassButtonProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -32,30 +33,35 @@ export function JoinClassButton({
 
       if (!res.ok || !data.success) {
         toast.error(
-          "Cannot join class",
-          data.message || "Try again at class time."
+          STUDENT_UR.joinClass.cannotJoin,
+          data.message || STUDENT_UR.joinClass.tryAgain
         );
         return;
       }
 
-      const attendanceLabel =
-        data.data?.attendance === "late" ? "marked late" : "marked present";
-
       if (data.data?.roomType === "portal" && data.data?.livePath) {
-        toast.success(`Entering class — ${attendanceLabel}`);
+        const msg =
+          data.data?.attendance === "late"
+            ? STUDENT_UR.joinClass.enteringLate
+            : STUDENT_UR.joinClass.enteringPresent;
+        toast.success(msg);
         router.push(data.data.livePath);
         return;
       }
 
       if (data.data?.meetLink) {
-        toast.success(`Opening class — ${attendanceLabel}`);
+        const msg =
+          data.data?.attendance === "late"
+            ? STUDENT_UR.joinClass.openingLate
+            : STUDENT_UR.joinClass.openingPresent;
+        toast.success(msg);
         window.open(data.data.meetLink, "_blank", "noopener,noreferrer");
         return;
       }
 
-      toast.error("Class link not available");
+      toast.error(STUDENT_UR.joinClass.linkNotAvailable);
     } catch {
-      toast.error("Could not join class. Please try again.");
+      toast.error(STUDENT_UR.joinClass.error);
     } finally {
       setLoading(false);
     }
@@ -71,7 +77,7 @@ export function JoinClassButton({
         disabled={loading}
       >
         <VideoCamera size={22} weight="duotone" />
-        {loading ? "Joining..." : label}
+        {loading ? STUDENT_UR.classes.joining : label}
       </Button>
     </div>
   );
