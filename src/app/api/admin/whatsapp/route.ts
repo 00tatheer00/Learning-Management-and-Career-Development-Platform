@@ -7,14 +7,10 @@ import {
   isNextResponse,
 } from "@/lib/auth/admin-access";
 import { createApiResponse } from "@/lib/api/enrollment";
-import { getUltraMsgInstanceStatus, sendWhatsAppMessage } from "@/lib/notifications/whatsapp";
-import { resendStudentLoginWhatsApp } from "@/lib/notifications/student-login-whatsapp";
+import { getUltraMsgInstanceStatus } from "@/lib/notifications/whatsapp";
 
-const DEFAULT_ADMIN_ALERT_WHATSAPP = "03115969527";
-
-function getAdminAlertWhatsApp() {
-  return process.env.ADMIN_ALERT_WHATSAPP?.trim() || DEFAULT_ADMIN_ALERT_WHATSAPP;
-}
+const WHATSAPP_DISABLED_MESSAGE =
+  "WhatsApp automation is disabled. Only approve/reject registration messages are sent.";
 
 export async function GET() {
   const user = await getAdminUser();
@@ -49,28 +45,15 @@ export async function POST(request: Request) {
 
   if (parsed.data.action === "test") {
     const status = await getUltraMsgInstanceStatus();
-    const adminPhone = getAdminAlertWhatsApp();
-    const result = await sendWhatsAppMessage(
-      adminPhone,
-      "✅ EEST Portal WhatsApp test\n\nIf you received this, UltraMsg is working from the live server."
-    );
-
     return NextResponse.json(
-      createApiResponse(result.sent, {
-        message: result.sent
-          ? `Test message sent to ${adminPhone}.`
-          : result.error ?? "Test message failed",
-        data: { status, adminPhone },
+      createApiResponse(false, {
+        message: WHATSAPP_DISABLED_MESSAGE,
+        data: { status },
       })
     );
   }
 
-  const result = await resendStudentLoginWhatsApp(parsed.data.studentId);
-  if (!result.success) {
-    return NextResponse.json(createApiResponse(false, { error: result.error ?? "Send failed" }), {
-      status: 400,
-    });
-  }
-
-  return NextResponse.json(createApiResponse(true, { message: result.message }));
+  return NextResponse.json(createApiResponse(false, { error: WHATSAPP_DISABLED_MESSAGE }), {
+    status: 400,
+  });
 }

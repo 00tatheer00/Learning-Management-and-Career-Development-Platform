@@ -1,5 +1,5 @@
 import { getProgramBySlug } from "@/lib/data/programs";
-import { sendWhatsAppMessage } from "@/lib/notifications/whatsapp";
+import { sendRejectionWhatsApp } from "@/lib/notifications/whatsapp";
 import { SITE_CONFIG } from "@/lib/constants";
 
 interface RejectionNoticeInput {
@@ -36,7 +36,7 @@ export async function sendRejectionNotifications(
   const warnings: string[] = [];
 
   const whatsappMessage = `❌ *EEST Registration Update*\n\n${buildRejectionText(input)}`;
-  const whatsappResult = await sendWhatsAppMessage(input.whatsapp, whatsappMessage);
+  const whatsappResult = await sendRejectionWhatsApp(input.whatsapp, whatsappMessage);
 
   if (!whatsappResult.sent && whatsappResult.error) {
     warnings.push(`Rejection WhatsApp failed: ${whatsappResult.error}`);

@@ -1,10 +1,3 @@
-import { runClassReminders } from "@/lib/automation/class-reminders";
-import { runNeverLoggedInNudges } from "@/lib/automation/never-logged-in-nudge";
-import { runAssignmentDueReminders } from "@/lib/automation/assignment-due-reminders";
-import { runInactiveStudentAlerts } from "@/lib/automation/inactive-student-alerts";
-import { runWelcomeSequence } from "@/lib/automation/welcome-sequence";
-import { runPendingRegistrationSla } from "@/lib/automation/pending-registration-sla";
-
 export interface AutomationRunSummary {
   ranAt: string;
   classReminders: { oneHour: number; fifteenMin: number };
@@ -15,30 +8,15 @@ export interface AutomationRunSummary {
   pendingRegistrationSla: boolean;
 }
 
+/** WhatsApp automation disabled — only manual approve/reject messages are sent. */
 export async function runAllAutomations(now = new Date()): Promise<AutomationRunSummary> {
-  const [
-    classReminders,
-    neverLoggedIn,
-    assignmentDueReminders,
-    inactiveStudentAlerts,
-    welcomeSequence,
-    pendingRegistrationSla,
-  ] = await Promise.all([
-    runClassReminders(now),
-    runNeverLoggedInNudges(now),
-    runAssignmentDueReminders(now),
-    runInactiveStudentAlerts(now),
-    runWelcomeSequence(now),
-    runPendingRegistrationSla(now),
-  ]);
-
   return {
     ranAt: now.toISOString(),
-    classReminders,
-    neverLoggedIn,
-    assignmentDueReminders,
-    inactiveStudentAlerts,
-    welcomeSequence,
-    pendingRegistrationSla,
+    classReminders: { oneHour: 0, fifteenMin: 0 },
+    neverLoggedIn: { studentNudges: 0, adminDigestSent: false },
+    assignmentDueReminders: 0,
+    inactiveStudentAlerts: 0,
+    welcomeSequence: { day1: 0, day3: 0 },
+    pendingRegistrationSla: false,
   };
 }

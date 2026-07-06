@@ -121,17 +121,35 @@ export async function getUltraMsgInstanceStatus(): Promise<{
   }
 }
 
+export type WhatsAppPurpose = "approval" | "rejection";
+
+const WHATSAPP_AUTOMATION_DISABLED_MESSAGE =
+  "WhatsApp automation is disabled. Only approve/reject registration messages are sent.";
+
 export async function sendApprovalWhatsApp(
   phone: string,
   message: string
 ): Promise<{ sent: boolean; error?: string }> {
-  return sendWhatsAppMessage(phone, message);
+  return sendWhatsAppMessage(phone, message, "approval");
+}
+
+export async function sendRejectionWhatsApp(
+  phone: string,
+  message: string
+): Promise<{ sent: boolean; error?: string }> {
+  return sendWhatsAppMessage(phone, message, "rejection");
 }
 
 export async function sendWhatsAppMessage(
   phone: string,
-  message: string
+  message: string,
+  purpose?: WhatsAppPurpose
 ): Promise<{ sent: boolean; error?: string }> {
+  if (purpose !== "approval" && purpose !== "rejection") {
+    console.info("[whatsapp] blocked send (only approval/rejection allowed)");
+    return { sent: false, error: WHATSAPP_AUTOMATION_DISABLED_MESSAGE };
+  }
+
   const { instanceId, token } = getUltraMsgCredentials();
 
   if (!instanceId || !token) {
