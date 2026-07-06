@@ -1,5 +1,8 @@
 export const OFFICIAL_WHATSAPP_NUMBER = "03374005515";
 
+export const FOUNDER_LINKEDIN_URL = "https://linkedin.com/in/tatheer-hussain";
+export const FOUNDER_LINKEDIN_DISPLAY = "linkedin.com/in/tatheer-hussain";
+
 /** Official class WhatsApp group — shown to approved students in the portal */
 export const STUDENT_WHATSAPP_GROUP_NAME = "EEST General Group";
 export const STUDENT_WHATSAPP_GROUP_URL =

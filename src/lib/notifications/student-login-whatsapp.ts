@@ -15,12 +15,14 @@ export async function sendStudentLoginWhatsApp(input: {
 }): Promise<{ sent: boolean; error?: string }> {
   const loginUrl = getPortalLoginUrl();
   const courseName = getProgramBySlug(input.program)?.title ?? input.program;
+  const programLevel = getProgramBySlug(input.program)?.level ?? "—";
   const message = buildApprovalWhatsAppMessage({
     studentName: input.fullName,
     email: input.email,
     password: input.password,
     courseName,
-    level: input.level,
+    module: input.level,
+    level: programLevel,
     loginUrl,
   });
 

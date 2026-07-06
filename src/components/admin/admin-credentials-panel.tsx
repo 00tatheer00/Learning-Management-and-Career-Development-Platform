@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
 import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
 import { getProgramCategory } from "@/lib/constants/program-categories";
+import { getProgramBySlug } from "@/lib/data/programs";
 import { buildApprovalWhatsAppMessage } from "@/lib/notifications/approval-templates";
 import { cn, formatAppliedDateTime } from "@/lib/utils";
 import { PORTAL_VIEWPORT_PANEL } from "@/lib/constants/portal-layout";
@@ -59,7 +60,6 @@ export function AdminCredentialsPanel() {
   const [visiblePasswords, setVisiblePasswords] = useState<Set<string>>(new Set());
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [bulkGenerating, setBulkGenerating] = useState(false);
-  const [bulkSendingWhatsApp, setBulkSendingWhatsApp] = useState(false);
   const [credentialModal, setCredentialModal] = useState<{
     name: string;
     loginId: string;
@@ -67,6 +67,7 @@ export function AdminCredentialsPanel() {
     loginUrl: string;
     course: string;
     module: string;
+    programSlug: string;
   } | null>(null);
   const [editRow, setEditRow] = useState<AdminCredentialRow | null>(null);
   const [editEmail, setEditEmail] = useState("");
@@ -119,12 +120,14 @@ export function AdminCredentialsPanel() {
 
   const buildWhatsAppMessage = (row: AdminCredentialRow) => {
     if (!row.password) return "";
+    const programLevel = getProgramBySlug(row.programSlug)?.level ?? "—";
     return buildApprovalWhatsAppMessage({
       studentName: row.name,
       email: row.email,
       password: row.password,
       courseName: row.course,
-      level: row.module,
+      module: row.module,
+      level: programLevel,
       loginUrl: row.loginUrl,
     });
   };
@@ -147,37 +150,6 @@ export function AdminCredentialsPanel() {
       toast.error("WhatsApp send failed");
     } finally {
       setLoadingId(null);
-    }
-  };
-
-  const handleBulkWhatsApp = async () => {
-    const eligible = filtered.filter((row) => row.hasStoredPassword);
-    if (eligible.length === 0) {
-      toast.error("No students with saved passwords in this filter.");
-      return;
-    }
-
-    setBulkSendingWhatsApp(true);
-    try {
-      const res = await fetch("/api/admin/credentials", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "bulkResendLogin",
-          studentIds: eligible.map((row) => row.id),
-          neverLoggedInOnly: showNeverLoggedInOnly,
-        }),
-      });
-      const json = await res.json();
-      if (json.success) {
-        toast.success(json.message ?? "Bulk WhatsApp complete.");
-      } else {
-        toast.error(json.error ?? json.message ?? "Bulk send failed");
-      }
-    } catch {
-      toast.error("Bulk send failed");
-    } finally {
-      setBulkSendingWhatsApp(false);
     }
   };
 
@@ -295,6 +267,7 @@ export function AdminCredentialsPanel() {
           loginUrl,
           course: row.course,
           module: row.module,
+          programSlug: row.programSlug,
         });
       }
 
@@ -318,20 +291,6 @@ export function AdminCredentialsPanel() {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            {canWrite && filtered.some((row) => row.hasStoredPassword) && (
-              <Button
-                size="sm"
-                variant="secondary"
-                disabled={bulkSendingWhatsApp}
-                onClick={() => void handleBulkWhatsApp()}
-                className="h-8 gap-1.5 text-xs"
-              >
-                <ChatsCircle size={14} />
-                {bulkSendingWhatsApp
-                  ? "Sending..."
-                  : `WhatsApp ${filtered.filter((r) => r.hasStoredPassword).length}`}
-              </Button>
-            )}
             {canWrite && meta.missing > 0 && (
               <Button
                 size="sm"
@@ -711,7 +670,8 @@ export function AdminCredentialsPanel() {
                       email: credentialModal.loginId,
                       password: credentialModal.password,
                       courseName: credentialModal.course,
-                      level: credentialModal.module,
+                      module: credentialModal.module,
+                      level: getProgramBySlug(credentialModal.programSlug)?.level ?? "—",
                       loginUrl: credentialModal.loginUrl,
                     })
                   )

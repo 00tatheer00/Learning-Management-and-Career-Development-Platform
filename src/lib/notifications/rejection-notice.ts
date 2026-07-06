@@ -1,6 +1,7 @@
 import { getProgramBySlug } from "@/lib/data/programs";
 import { sendRejectionWhatsApp } from "@/lib/notifications/whatsapp";
 import { SITE_CONFIG } from "@/lib/constants";
+import { FOUNDER_LINKEDIN_DISPLAY } from "@/lib/constants/contact";
 
 interface RejectionNoticeInput {
   fullName: string;
@@ -12,13 +13,19 @@ interface RejectionNoticeInput {
 }
 
 function buildRejectionText(input: RejectionNoticeInput): string {
-  const courseName = getProgramBySlug(input.program)?.title ?? input.program;
+  const program = getProgramBySlug(input.program);
+  const courseName = program?.title ?? input.program;
+  const programLevel = program?.level ?? "—";
   const reason = input.reason?.trim() || "Your application could not be approved at this time.";
 
   return [
     `Dear ${input.fullName},`,
     "",
-    `Thank you for applying to EEST for ${courseName} (${input.level}).`,
+    "Thank you for applying to Emerging Edge School of Technology.",
+    "",
+    `Course: ${courseName}`,
+    `Module: ${input.level}`,
+    `Level: ${programLevel}`,
     "",
     "Unfortunately, your registration has not been approved.",
     "",
@@ -26,7 +33,9 @@ function buildRejectionText(input: RejectionNoticeInput): string {
     "",
     `If you have questions, contact us on WhatsApp ${SITE_CONFIG.whatsapp}.`,
     "",
-    "— Emerging Edge Summer Training",
+    `Follow: ${FOUNDER_LINKEDIN_DISPLAY}`,
+    "",
+    "— EEST Team",
   ].join("\n");
 }
 

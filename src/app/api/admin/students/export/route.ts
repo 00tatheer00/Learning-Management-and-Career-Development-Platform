@@ -16,7 +16,6 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url);
   const program = searchParams.get("program") ?? "all";
-  const moduleFilter = searchParams.get("module") ?? "all";
   const activeOnly = searchParams.get("active") === "1";
 
   if (program !== "all" && !ENROLLABLE_PROGRAM_SLUGS.includes(program as (typeof ENROLLABLE_PROGRAM_SLUGS)[number])) {
@@ -26,15 +25,11 @@ export async function GET(request: Request) {
   const allRows = await getAdminStudentRows();
   const rows = filterAdminStudentRows(allRows, {
     program: program === "all" ? undefined : program,
-    module: moduleFilter === "all" ? undefined : moduleFilter,
     activeOnly,
   });
 
   const csv = buildStudentsCsv(rows);
-  const filename = buildStudentsExportFilename(
-    program === "all" ? undefined : program,
-    moduleFilter === "all" ? undefined : moduleFilter
-  );
+  const filename = buildStudentsExportFilename(program === "all" ? undefined : program);
 
   return new NextResponse(csv, {
     status: 200,

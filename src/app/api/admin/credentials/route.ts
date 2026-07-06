@@ -12,7 +12,6 @@ import {
   updateStudentLoginDetails,
 } from "@/lib/api/admin-credentials";
 import { generateMissingPortalPasswords } from "@/lib/api/admin-credentials-bulk";
-import { bulkResendLoginWhatsApp } from "@/lib/api/admin-credentials-bulk-whatsapp";
 
 export async function GET() {
   const user = await getAdminUser();
@@ -107,24 +106,11 @@ export async function POST(request: Request) {
   }
 
   if (parsed.data.action === "bulkResendLogin") {
-    const result = await bulkResendLoginWhatsApp({
-      studentIds: parsed.data.studentIds,
-      neverLoggedInOnly: parsed.data.neverLoggedInOnly,
-    });
-
-    const message =
-      result.sent > 0
-        ? `WhatsApp sent to ${result.sent} student(s).`
-        : "No WhatsApp messages were sent.";
-
     return NextResponse.json(
-      createApiResponse(true, {
-        data: result,
-        message:
-          result.errors.length > 0
-            ? `${message} ${result.errors.length} failed.`
-            : message,
-      })
+      createApiResponse(false, {
+        error: "Bulk WhatsApp is disabled. Approve students one by one or share login manually.",
+      }),
+      { status: 403 }
     );
   }
 

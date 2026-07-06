@@ -18,13 +18,15 @@ export async function sendApprovalWelcomeNotifications(
   const warnings: string[] = [];
   const loginUrl = getPortalLoginUrl();
   const courseName = getProgramBySlug(enrollment.program)?.title ?? enrollment.program;
+  const programLevel = getProgramBySlug(enrollment.program)?.level ?? "—";
 
   const whatsappMessage = buildApprovalWhatsAppMessage({
     studentName: enrollment.fullName,
     email: enrollment.email,
     password: enrollment.password,
     courseName,
-    level: enrollment.level,
+    module: enrollment.level,
+    level: programLevel,
     loginUrl,
   });
 

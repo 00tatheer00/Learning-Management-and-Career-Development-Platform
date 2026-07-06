@@ -124,7 +124,6 @@ export async function getUltraMsgInstanceStatus(): Promise<{
 export type WhatsAppPurpose =
   | "approval"
   | "rejection"
-  | "class_schedule"
   | "login_resend"
   | "forgot_password"
   | "password_reset";
@@ -132,14 +131,13 @@ export type WhatsAppPurpose =
 const ALLOWED_WHATSAPP_PURPOSES = new Set<WhatsAppPurpose>([
   "approval",
   "rejection",
-  "class_schedule",
   "login_resend",
   "forgot_password",
   "password_reset",
 ]);
 
 const WHATSAPP_BLOCKED_MESSAGE =
-  "This WhatsApp message type is disabled. Allowed: approve, reject, class schedule, login resend, password reset.";
+  "This WhatsApp message type is disabled. Allowed: approve, reject, single login resend, password reset.";
 
 export async function sendApprovalWhatsApp(
   phone: string,
@@ -153,13 +151,6 @@ export async function sendRejectionWhatsApp(
   message: string
 ): Promise<{ sent: boolean; error?: string }> {
   return sendWhatsAppMessage(phone, message, "rejection");
-}
-
-export async function sendClassScheduleWhatsApp(
-  phone: string,
-  message: string
-): Promise<{ sent: boolean; error?: string }> {
-  return sendWhatsAppMessage(phone, message, "class_schedule");
 }
 
 export async function sendLoginResendWhatsApp(

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useRef, useEffect } from "react";
+import { useMemo, useState } from "react";
 import {
   DownloadSimple,
   MagnifyingGlass,
@@ -11,7 +11,6 @@ import {
   Trash,
   CaretLeft,
   GraduationCap,
-  Stack,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,53 +24,6 @@ import { toast } from "@/lib/ui/toast";
 import { useAdminPermissions } from "@/components/admin/admin-permissions";
 import { OpenStudentProfileButton, AdminStudentProfileButton } from "@/components/admin/admin-student-profile-drawer";
 import type { AdminStudentRow } from "@/lib/api/admin-students";
-
-function AppliedChip({ entries }: { entries: { course: string; module: string; status: string }[] }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [open]);
-
-  return (
-    <div ref={ref} className="relative inline-flex">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700 hover:bg-amber-200 transition-colors"
-      >
-        <Stack size={10} weight="fill" />
-        {entries.length}x applied
-      </button>
-      {open && (
-        <div className="absolute left-0 top-full mt-1.5 z-50 min-w-[220px] rounded-xl border border-border bg-background shadow-lg p-2 space-y-1">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted px-1 pb-1">All applications</p>
-          {entries.map((entry, i) => (
-            <div key={i} className="flex items-center justify-between gap-2 rounded-lg px-2 py-1.5 bg-surface/60">
-              <div className="min-w-0">
-                <p className="text-[10px] text-muted truncate">{entry.course}</p>
-                <p className="text-xs font-semibold truncate">{entry.module}</p>
-              </div>
-              <span className={`shrink-0 rounded-full px-2 py-0.5 text-[9px] font-bold uppercase ${
-                entry.status === "approved" ? "bg-emerald-100 text-emerald-700" :
-                entry.status === "rejected" ? "bg-red-100 text-red-700" :
-                "bg-amber-100 text-amber-700"
-              }`}>
-                {entry.status}
-              </span>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
 
 interface AdminStudentsTableProps {
   students: AdminStudentRow[];
@@ -129,7 +81,7 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
         .toLowerCase()
         .includes(query);
     });
-  }, [students, search, courseFilter, selectedCourse, selectedModule, statusFilter]);
+  }, [students, search, courseFilter, selectedCourse, selectedModule, statusFilter, browseView]);
 
   const runAction = async (
     id: string,
@@ -214,19 +166,6 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
 
   return (
     <div className="space-y-4">
-      {browseView === "list" && !selectedCourse && (
-        <div className="flex justify-end">
-          <button
-            type="button"
-            onClick={() => setBrowseView("courses")}
-            className="inline-flex items-center gap-2 rounded-xl border border-border bg-background px-4 py-2.5 text-sm font-semibold text-primary hover:border-primary hover:bg-primary/5 transition-colors"
-          >
-            <GraduationCap size={18} />
-            Browse by Module
-          </button>
-        </div>
-      )}
-
       {browseView === "courses" && (
         <div className="space-y-4">
           <p className="text-sm text-muted">Choose a course to browse students by module.</p>
@@ -449,17 +388,12 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
                   .toUpperCase()}
               </div>
               <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <OpenStudentProfileButton
-                    target={{ studentId: student.id }}
-                    className="font-semibold hover:underline"
-                  >
-                    {student.name}
-                  </OpenStudentProfileButton>
-                  {student.totalApplications > 1 && (
-                    <AppliedChip entries={student.appliedEntries} />
-                  )}
-                </div>
+                <OpenStudentProfileButton
+                  target={{ studentId: student.id }}
+                  className="font-semibold hover:underline"
+                >
+                  {student.name}
+                </OpenStudentProfileButton>
                 <p className="text-xs text-muted mt-0.5">{student.fatherName}</p>
                 <p className="text-sm text-muted mt-2 break-all">{student.email}</p>
                 <p className="text-sm text-muted">{student.whatsapp}</p>
@@ -564,9 +498,6 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
                         >
                           {student.name}
                         </OpenStudentProfileButton>
-                        {student.totalApplications > 1 && (
-                          <AppliedChip entries={student.appliedEntries} />
-                        )}
                         <p className="mt-0.5 text-xs text-muted">{student.fatherName}</p>
                       </div>
                     </div>

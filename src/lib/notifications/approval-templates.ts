@@ -2,6 +2,7 @@ import { SITE_CONFIG } from "@/lib/constants";
 import {
   STUDENT_WHATSAPP_GROUP_NAME,
   STUDENT_WHATSAPP_GROUP_URL,
+  FOUNDER_LINKEDIN_DISPLAY,
 } from "@/lib/constants/contact";
 
 interface ApprovalEmailParams {
@@ -115,31 +116,33 @@ export function buildApprovalWhatsAppMessage({
   email,
   password,
   courseName,
+  module,
   level,
   loginUrl,
-  whatsappGroupUrl = STUDENT_WHATSAPP_GROUP_URL,
-  whatsappGroupName = STUDENT_WHATSAPP_GROUP_NAME,
-}: ApprovalEmailParams): string {
+}: ApprovalEmailParams & { module: string; level: string }): string {
   const firstName = studentName.split(" ")[0];
 
-  return `🎉 Congratulations ${firstName}!
-
-Your registration at Emerging Edge School of Technology has been *approved*.
-
-📚 Course: ${courseName}
-📌 Level: ${level}
-
-🔐 *Portal Login*
-Username: ${email}
-Password: ${password}
-Login: ${loginUrl}
-
-📱 *Join WhatsApp Group Now*
-${whatsappGroupName}: ${whatsappGroupUrl}
-
-Log in to the portal, then join the group for live classes and updates.
-
-Welcome to your batch. See you in class!`;
+  return [
+    `Congratulations ${firstName}!`,
+    "",
+    "Your registration at Emerging Edge School of Technology has been approved.",
+    "",
+    `Course: ${courseName}`,
+    `Module: ${module}`,
+    `Level: ${level}`,
+    "",
+    "Portal Login",
+    `Email: ${email}`,
+    `Password: ${password}`,
+    `Link: ${loginUrl}`,
+    "",
+    "Log in to the portal — the WhatsApp group link is inside your student dashboard.",
+    "",
+    `Follow: ${FOUNDER_LINKEDIN_DISPLAY}`,
+    "",
+    "Welcome to your batch!",
+    "— EEST Team",
+  ].join("\n");
 }
 
 export function buildApprovalEmailText({
