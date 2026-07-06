@@ -97,9 +97,9 @@ export const STUDENT_UR = {
 
   classes: {
     title: "Live Classes",
-    description: "Neeche button se online class join karein. Class se 5 minute pehle tayyar ho jayein.",
+    description: "Join Class dabayein — seedha Google Meet khul jayegi.",
     joinHint:
-      "Class ke time Join Class dabayein — trainer ki Google Meet khul jayegi. Sirf enrolled students join kar sakte hain — apna portal login kisi ko na dein.",
+      "Jab trainer link laga de, Join Class dabayein aur seedha class mein chale jayein. Apna portal login kisi ko na dein.",
     emptyTitle: "Class link jald aayegi",
     trainer: "Trainer",
     linkSoon: "Link jald aayegi",
@@ -115,7 +115,7 @@ export const STUDENT_UR = {
 
   joinClass: {
     cannotJoin: "Class join nahi ho sakti",
-    tryAgain: "Class ke time dubara try karein.",
+    tryAgain: "Dubara try karein ya trainer se link check karein.",
     enteringPresent: "Class mein ja rahe hain — hazir",
     enteringLate: "Class mein ja rahe hain — late",
     openingPresent: "Class khul rahi hai — hazir",
@@ -209,8 +209,6 @@ export const STUDENT_UR = {
   api: {
     unauthorized: "Ijazat nahi — dubara login karein",
     classNotFound: "Class nahi mili",
-    joinWindow:
-      "Join button class se 30 minute pehle khulta hai aur shuru hone ke 3 ghante baad band ho jata hai.",
     linkNotAdded: "Trainer ne abhi class link nahi lagayi. Thori der baad dekhein.",
   },
 

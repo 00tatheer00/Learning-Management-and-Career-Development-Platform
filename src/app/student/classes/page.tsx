@@ -62,15 +62,14 @@ export default async function StudentClassesPage() {
                       </p>
                     )}
                   </div>
-                  {isUpcoming &&
-                    (session.hasJoinLink ? (
-                      <JoinClassButton sessionId={session.id} />
-                    ) : (
-                      <div className="rounded-xl border border-dashed border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 shrink-0">
-                        <p className="font-semibold">{STUDENT_UR.classes.linkSoon}</p>
-                        <p className="mt-1 text-xs">{STUDENT_UR.classes.linkSoonHint}</p>
-                      </div>
-                    ))}
+                  {session.hasJoinLink ? (
+                    <JoinClassButton sessionId={session.id} />
+                  ) : (
+                    <div className="rounded-xl border border-dashed border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 shrink-0">
+                      <p className="font-semibold">{STUDENT_UR.classes.linkSoon}</p>
+                      <p className="mt-1 text-xs">{STUDENT_UR.classes.linkSoonHint}</p>
+                    </div>
+                  )}
                 </div>
               </div>
             );

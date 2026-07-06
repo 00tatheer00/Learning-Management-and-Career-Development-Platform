@@ -1,6 +1,3 @@
-const JOIN_EARLY_MS = 30 * 60 * 1000;
-const JOIN_LATE_MS = 3 * 60 * 60 * 1000;
-
 export function parseSessionDateTime(date: string, time: string): Date | null {
   const trimmed = time.trim();
   const ampmMatch = trimmed.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
@@ -28,18 +25,11 @@ export function parseSessionDateTime(date: string, time: string): Date | null {
   return new Date(year, month - 1, day, hours, minutes, 0, 0);
 }
 
+/** Students can join any time the trainer has added a link. */
 export function isWithinJoinWindow(
-  date: string,
-  time: string,
-  now = new Date()
+  _date: string,
+  _time: string,
+  _now = new Date()
 ): boolean {
-  const start = parseSessionDateTime(date, time);
-  if (!start) {
-    const today = now.toISOString().split("T")[0];
-    return date === today;
-  }
-
-  const early = start.getTime() - JOIN_EARLY_MS;
-  const late = start.getTime() + JOIN_LATE_MS;
-  return now.getTime() >= early && now.getTime() <= late;
+  return true;
 }

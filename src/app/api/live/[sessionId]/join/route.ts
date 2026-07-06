@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getLiveSessionById } from "@/lib/api/portal-data";
-import { isWithinJoinWindow } from "@/lib/sessions/join-window";
 import { createApiResponse } from "@/lib/api/enrollment";
 import { getJitsiDomain, getSessionRoomName } from "@/lib/portal-video/config";
 import { resolveLiveSessionAccess } from "@/lib/portal-video/session-access";
@@ -31,15 +30,6 @@ export async function POST(
     return NextResponse.json(createApiResponse(false, { error: access.error }), {
       status: 403,
     });
-  }
-
-  if (access.role === "student" && !isWithinJoinWindow(session.date, session.time)) {
-    return NextResponse.json(
-      createApiResponse(false, {
-        message: "Join opens 30 minutes before class and closes 3 hours after start.",
-      }),
-      { status: 403 }
-    );
   }
 
   return NextResponse.json(

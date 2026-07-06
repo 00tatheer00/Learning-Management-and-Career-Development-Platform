@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getLiveSessionById } from "@/lib/api/portal-data";
-import { isWithinJoinWindow } from "@/lib/sessions/join-window";
 import { createApiResponse } from "@/lib/api/enrollment";
 import { recordClassJoin } from "@/lib/api/class-attendance";
 import { recordUserActivity } from "@/lib/auth/user-activity";
@@ -32,15 +31,6 @@ export async function GET(
     return NextResponse.json(createApiResponse(false, { error: STUDENT_UR.api.unauthorized }), {
       status: 403,
     });
-  }
-
-  if (!isWithinJoinWindow(session.date, session.time)) {
-    return NextResponse.json(
-      createApiResponse(false, {
-        message: STUDENT_UR.api.joinWindow,
-      }),
-      { status: 403 }
-    );
   }
 
   if (!isPortalRoomSession(session) && !session.meetLink?.trim()) {

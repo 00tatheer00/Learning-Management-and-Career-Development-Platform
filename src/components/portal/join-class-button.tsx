@@ -55,7 +55,7 @@ export function JoinClassButton({
             ? STUDENT_UR.joinClass.openingLate
             : STUDENT_UR.joinClass.openingPresent;
         toast.success(msg);
-        window.open(data.data.meetLink, "_blank", "noopener,noreferrer");
+        window.location.assign(data.data.meetLink);
         return;
       }
 
