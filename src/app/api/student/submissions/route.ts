@@ -7,7 +7,7 @@ import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
 
 const schema = z.object({
   assignmentId: z.string(),
-  content: z.string().min(5, STUDENT_UR.assignments.apiMinWords),
+  content: z.string().min(5, STUDENT_UR.api.assignmentMinWords),
 });
 
 export async function POST(request: Request) {
@@ -33,6 +33,6 @@ export async function POST(request: Request) {
   });
 
   return NextResponse.json(
-    createApiResponse(true, { data: submission, message: STUDENT_UR.assignments.apiSuccess })
+    createApiResponse(true, { data: submission, message: STUDENT_UR.api.assignmentSuccess })
   );
 }

@@ -46,7 +46,7 @@ export default function StudentAssignmentsPage() {
 
   const handleSubmit = async (assignmentId: string) => {
     if (!content.trim()) {
-      toast.warning(STUDENT_UR.assignments.writeSomething);
+      toast.warning(STUDENT_UR.toasts.assignmentWriteSomething);
       return;
     }
     setLoading(true);
@@ -58,17 +58,17 @@ export default function StudentAssignmentsPage() {
       });
       const data = await res.json();
       if (data.success) {
-        toast.success(STUDENT_UR.assignments.submittedToast, STUDENT_UR.assignments.submittedDesc);
+        toast.success(STUDENT_UR.toasts.assignmentSubmitted, STUDENT_UR.toasts.assignmentSubmittedDesc);
         setContent("");
         setSelectedId(null);
         const refresh = await fetch("/api/student/data");
         const refreshData = await refresh.json();
         if (refreshData.success) setSubmissions(refreshData.data.submissions ?? []);
       } else {
-        toast.error(data.message || STUDENT_UR.assignments.failed);
+        toast.error(data.message || STUDENT_UR.toasts.assignmentFailed);
       }
     } catch {
-      toast.error(STUDENT_UR.assignments.error);
+      toast.error(STUDENT_UR.toasts.assignmentError);
     } finally {
       setLoading(false);
     }
@@ -77,8 +77,8 @@ export default function StudentAssignmentsPage() {
   return (
     <div>
       <PortalPageHeader
-        title={STUDENT_UR.assignments.title}
-        description={STUDENT_UR.assignments.description}
+        title="Assignments"
+        description="Read the task, write your answer, and click Submit. Your trainer will review it."
       />
 
       <div className="space-y-4">
@@ -93,13 +93,13 @@ export default function StudentAssignmentsPage() {
                   <h2 className="text-lg font-bold">{assignment.title}</h2>
                   <p className="text-sm text-muted flex items-center gap-1.5 mt-1">
                     <Clock size={16} weight="duotone" />
-                    {STUDENT_UR.assignments.due}: {assignment.dueDate}
+                    Due: {assignment.dueDate}
                   </p>
                 </div>
                 {submission && (
                   <span className="inline-flex items-center gap-1 text-sm font-semibold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full">
                     <CheckCircle size={16} weight="duotone" />
-                    {STUDENT_UR.assignments.submitted}
+                    Submitted
                   </span>
                 )}
               </div>
@@ -108,23 +108,23 @@ export default function StudentAssignmentsPage() {
 
               {submission ? (
                 <div className="rounded-xl bg-surface p-4 space-y-2">
-                  <p className="text-sm font-semibold">{STUDENT_UR.assignments.yourSubmission}</p>
+                  <p className="text-sm font-semibold">Your submission:</p>
                   <p className="text-sm">{submission.content}</p>
                   {submission.feedback && (
                     <p className="text-sm text-primary mt-2">
-                      <strong>{STUDENT_UR.assignments.trainerFeedback}</strong> {submission.feedback}
+                      <strong>Trainer feedback:</strong> {submission.feedback}
                     </p>
                   )}
                 </div>
               ) : isOpen ? (
                 <div className="space-y-3">
                   <div>
-                    <Label className="text-base">{STUDENT_UR.assignments.yourAnswer}</Label>
+                    <Label className="text-base">Your Answer</Label>
                     <textarea
                       value={content}
                       onChange={(e) => setContent(e.target.value)}
                       rows={5}
-                      placeholder={STUDENT_UR.assignments.placeholder}
+                      placeholder="Write your assignment answer here..."
                       className="mt-2 w-full rounded-xl border border-border bg-background px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary/30"
                     />
                   </div>
@@ -134,16 +134,16 @@ export default function StudentAssignmentsPage() {
                       onClick={() => handleSubmit(assignment.id)}
                       disabled={loading}
                     >
-                      {loading ? STUDENT_UR.assignments.submitting : STUDENT_UR.assignments.submit}
+                      {loading ? "Submitting..." : "Submit Assignment"}
                     </Button>
                     <Button size="lg" variant="secondary" onClick={() => setSelectedId(null)}>
-                      {STUDENT_UR.assignments.cancel}
+                      Cancel
                     </Button>
                   </div>
                 </div>
               ) : (
                 <Button size="lg" onClick={() => { setSelectedId(assignment.id); setContent(""); }}>
-                  {STUDENT_UR.assignments.start}
+                  Start Assignment
                 </Button>
               )}
             </div>

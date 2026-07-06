@@ -37,7 +37,6 @@ import {
 import { PortalThemeToggle } from "@/components/portal/portal-theme-toggle";
 import type { PortalUser, UserRole } from "@/types/portal";
 import { cn } from "@/lib/utils";
-import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
 
 const SIDEBAR_COLLAPSED_KEY = "portal-sidebar-collapsed";
 
@@ -76,13 +75,11 @@ function PortalShellInner({ user, children }: PortalShellProps) {
   const { theme } = usePortalTheme();
   const isStudent = user.role === "student";
   const isAdmin = isAdminRole(user.role);
-  const logoutLabel = isStudent ? STUDENT_UR.logout : "Logout";
-  const websiteLabel = isStudent ? STUDENT_UR.website : "Website";
+  const logoutLabel = "Logout";
+  const websiteLabel = "Website";
   const headerTitle = isAdmin
     ? getAdminDisplayName(user.name, user.role)
-    : isStudent
-      ? STUDENT_UR.hello(user.name.split(" ")[0])
-      : `Hello, ${user.name.split(" ")[0]} 👋`;
+    : `Hello, ${user.name.split(" ")[0]} 👋`;
 
   useEffect(() => {
     const stored = localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
@@ -240,7 +237,7 @@ function SidebarContent({
 
   const isAdmin = isAdminRole(user.role);
   const isStudent = user.role === "student";
-  const logoutLabel = isStudent ? STUDENT_UR.logout : "Logout";
+  const logoutLabel = "Logout";
   const displayName = isAdmin ? getAdminDisplayName(user.name, user.role) : user.name;
   const portalSubtitle = isAdmin
     ? user.role === "admin_readonly"

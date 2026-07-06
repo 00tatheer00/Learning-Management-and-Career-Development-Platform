@@ -24,9 +24,8 @@ import { StudentModuleRoadmap } from "@/components/portal/student-module-roadmap
 import { ProgramCategoryBadge } from "@/components/portal/program-category-badge";
 import { HELP_CONFIG } from "@/lib/constants/help";
 import { getProgramCategory } from "@/lib/constants/program-categories";
-import { getProgramClassSchedule } from "@/lib/constants/course-schedule";
+import { getStudentClassSchedule } from "@/lib/constants/student-portal-ur";
 import { findNextUpcomingSession } from "@/lib/utils/session-datetime";
-import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
 
 export default async function StudentDashboardPage() {
   const user = await getCurrentUser();
@@ -39,20 +38,20 @@ export default async function StudentDashboardPage() {
     getLiveSessionsPreview(programSlug),
   ]);
   const category = getProgramCategory(programSlug);
-  const classSchedule = getProgramClassSchedule(programSlug);
+  const classSchedule = getStudentClassSchedule(programSlug);
   const nextSession = findNextUpcomingSession(sessions);
-  const courseLabel = category?.sidebarLabel ?? "Aapka course";
+  const courseLabel = category?.sidebarLabel ?? "Your course";
 
   return (
     <div className="space-y-4">
       <PortalPageHeader
-        eyebrow={STUDENT_UR.dashboard.eyebrow}
-        title={STUDENT_UR.welcome(user.name.split(" ")[0])}
-        description={STUDENT_UR.dashboard.description(courseLabel)}
+        eyebrow="Student Portal"
+        title={`Welcome, ${user.name.split(" ")[0]}!`}
+        description={`${courseLabel} · classes, lessons & trainer for your program.`}
       >
         <ProgramCategoryBadge programSlug={programSlug} />
         <Button size="sm" asChild className="h-8 text-xs">
-          <Link href="/student/classes">{STUDENT_UR.dashboard.joinLiveClass}</Link>
+          <Link href="/student/classes">Join Live Class</Link>
         </Button>
       </PortalPageHeader>
 
@@ -66,11 +65,11 @@ export default async function StudentDashboardPage() {
           <p className="mt-1">{classSchedule.daysLabel}</p>
           <p className="mt-2">{classSchedule.subline}</p>
           <p className="mt-2">
-            {STUDENT_UR.dashboard.noClassLink}{" "}
+            Portal class link will appear on{" "}
             <Link href="/student/classes" className="text-primary font-semibold underline">
-              {STUDENT_UR.dashboard.liveClassesLink}
+              Live Classes
             </Link>{" "}
-            par dikhegi.
+            when scheduled.
           </p>
         </PortalSurfaceCard>
       )}
@@ -80,20 +79,20 @@ export default async function StudentDashboardPage() {
       <StudentTrainerCard programSlug={programSlug} trainerId={user.trainerId} />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
-        <StatCard compact label={STUDENT_UR.dashboard.stats.videoLessons} value={materials.length} accent="orange" icon={<BookOpen size={16} weight="duotone" />} href="/student/course" />
-        <StatCard compact label={STUDENT_UR.dashboard.stats.assignments} value={assignments.length} accent="blue" icon={<ClipboardText size={16} weight="duotone" />} href="/student/assignments" />
-        <StatCard compact label={STUDENT_UR.dashboard.stats.liveClasses} value={sessions.length} accent="green" icon={<VideoCamera size={16} weight="duotone" />} href="/student/classes" />
-        <StatCard compact label={STUDENT_UR.dashboard.stats.yourModule} value={user.level ?? STUDENT_UR.profile.empty} accent="slate" icon={<GraduationCap size={16} weight="duotone" />} />
+        <StatCard compact label="Video Lessons" value={materials.length} accent="orange" icon={<BookOpen size={16} weight="duotone" />} href="/student/course" />
+        <StatCard compact label="Assignments" value={assignments.length} accent="blue" icon={<ClipboardText size={16} weight="duotone" />} href="/student/assignments" />
+        <StatCard compact label="Live Classes" value={sessions.length} accent="green" icon={<VideoCamera size={16} weight="duotone" />} href="/student/classes" />
+        <StatCard compact label="Your Module" value={user.level ?? "—"} accent="slate" icon={<GraduationCap size={16} weight="duotone" />} />
       </div>
 
       <div>
-        <PortalSectionTitle title={STUDENT_UR.dashboard.quickAccess} />
+        <PortalSectionTitle title="Quick Access" />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          <QuickActionCard compact href="/student/course" title={STUDENT_UR.dashboard.watchLessons.title} description={STUDENT_UR.dashboard.watchLessons.desc} icon={<BookOpen size={18} weight="duotone" />} gradient="from-orange-500 to-amber-500" />
-          <QuickActionCard compact href="/student/assignments" title={STUDENT_UR.dashboard.submitHomework.title} description={STUDENT_UR.dashboard.submitHomework.desc} icon={<ClipboardText size={18} weight="duotone" />} gradient="from-blue-500 to-indigo-500" />
-          <QuickActionCard compact href="/student/trainer" title={STUDENT_UR.dashboard.myTrainer.title} description={STUDENT_UR.dashboard.myTrainer.desc} icon={<ChalkboardTeacher size={18} weight="duotone" />} gradient="from-violet-500 to-purple-600" />
-          <QuickActionCard compact href="/student/whatsapp" title={STUDENT_UR.dashboard.whatsappGroup.title} description={STUDENT_UR.dashboard.whatsappGroup.desc} icon={<ChatsCircle size={18} weight="duotone" />} gradient="from-emerald-500 to-teal-600" />
-          <QuickActionCard compact href={HELP_CONFIG.whatsappUrl} title={STUDENT_UR.dashboard.needHelp.title} description={STUDENT_UR.dashboard.needHelp.desc} icon={<ChatsCircle size={18} weight="fill" />} gradient="from-[#25D366] to-[#128C7E]" />
+          <QuickActionCard compact href="/student/course" title="Watch Lessons" description="Course videos & materials" icon={<BookOpen size={18} weight="duotone" />} gradient="from-orange-500 to-amber-500" />
+          <QuickActionCard compact href="/student/assignments" title="Submit Homework" description="View & submit assignments" icon={<ClipboardText size={18} weight="duotone" />} gradient="from-blue-500 to-indigo-500" />
+          <QuickActionCard compact href="/student/trainer" title="My Trainer" description="Your program trainer" icon={<ChalkboardTeacher size={18} weight="duotone" />} gradient="from-violet-500 to-purple-600" />
+          <QuickActionCard compact href="/student/whatsapp" title="WhatsApp Group" description="Join the class group" icon={<ChatsCircle size={18} weight="duotone" />} gradient="from-emerald-500 to-teal-600" />
+          <QuickActionCard compact href={HELP_CONFIG.whatsappUrl} title="Need Help?" description="Message us anytime" icon={<ChatsCircle size={18} weight="fill" />} gradient="from-[#25D366] to-[#128C7E]" />
         </div>
       </div>
     </div>

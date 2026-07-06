@@ -17,7 +17,6 @@ import {
 } from "@phosphor-icons/react";
 
 import type { UserRole } from "@/types/portal";
-import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
 
 export interface PortalNavItem {
   href: string;
@@ -28,13 +27,13 @@ export interface PortalNavItem {
 
 export const PORTAL_NAV: Record<UserRole, PortalNavItem[]> = {
   student: [
-    { href: "/student/dashboard", label: STUDENT_UR.nav.home.label, icon: House, description: STUDENT_UR.nav.home.description },
-    { href: "/student/course", label: STUDENT_UR.nav.course.label, icon: BookOpen, description: STUDENT_UR.nav.course.description },
-    { href: "/student/classes", label: STUDENT_UR.nav.classes.label, icon: VideoCamera, description: STUDENT_UR.nav.classes.description },
-    { href: "/student/trainer", label: STUDENT_UR.nav.trainer.label, icon: ChalkboardTeacher, description: STUDENT_UR.nav.trainer.description },
-    { href: "/student/assignments", label: STUDENT_UR.nav.assignments.label, icon: ClipboardText, description: STUDENT_UR.nav.assignments.description },
-    { href: "/student/whatsapp", label: STUDENT_UR.nav.whatsapp.label, icon: ChatsCircle, description: STUDENT_UR.nav.whatsapp.description },
-    { href: "/student/profile", label: STUDENT_UR.nav.profile.label, icon: UserCircle, description: STUDENT_UR.nav.profile.description },
+    { href: "/student/dashboard", label: "Home", icon: House, description: "Your main page" },
+    { href: "/student/course", label: "My Course", icon: BookOpen, description: "Videos & lessons" },
+    { href: "/student/classes", label: "Live Classes", icon: VideoCamera, description: "Join online class" },
+    { href: "/student/trainer", label: "My Trainer", icon: ChalkboardTeacher, description: "Your course trainer" },
+    { href: "/student/assignments", label: "Assignments", icon: ClipboardText, description: "Submit homework" },
+    { href: "/student/whatsapp", label: "WhatsApp Group", icon: ChatsCircle, description: "Chat with class" },
+    { href: "/student/profile", label: "My Profile", icon: UserCircle, description: "Your details" },
   ],
   trainer: [
     { href: "/trainer/dashboard", label: "Home", icon: House, description: "Trainer dashboard" },
@@ -85,8 +84,8 @@ function groupNavItems(items: PortalNavItem[], accountHrefs: string[]): PortalNa
 
 export const PORTAL_NAV_GROUPS: Record<UserRole, PortalNavGroup[]> = {
   student: [
-    { label: STUDENT_UR.nav.mainGroup, items: PORTAL_NAV.student.filter((i) => i.href !== "/student/profile") },
-    { label: STUDENT_UR.nav.accountGroup, items: PORTAL_NAV.student.filter((i) => i.href === "/student/profile") },
+    { label: "Main", items: PORTAL_NAV.student.filter((i) => i.href !== "/student/profile") },
+    { label: "Account", items: PORTAL_NAV.student.filter((i) => i.href === "/student/profile") },
   ],
   trainer: groupNavItems(PORTAL_NAV.trainer, ["/trainer/settings", "/trainer/profile"]),
   admin: groupNavItems(PORTAL_NAV.admin, ["/admin/settings"]),
@@ -94,7 +93,7 @@ export const PORTAL_NAV_GROUPS: Record<UserRole, PortalNavGroup[]> = {
 };
 
 export const PORTAL_LABELS: Record<UserRole, string> = {
-  student: STUDENT_UR.portalLabel,
+  student: "Student Portal",
   trainer: "Trainer Portal",
   admin: "Super Admin",
   admin_readonly: "Viewer Admin",

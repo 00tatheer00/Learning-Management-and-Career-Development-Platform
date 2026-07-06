@@ -1,6 +1,5 @@
 import { CalendarBlank, Sparkle } from "@phosphor-icons/react/ssr";
-import { getProgramClassSchedule } from "@/lib/constants/course-schedule";
-import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
+import { getStudentClassSchedule, STUDENT_UR } from "@/lib/constants/student-portal-ur";
 import { cn } from "@/lib/utils";
 
 export function StudentModuleStartBanner({
@@ -10,7 +9,7 @@ export function StudentModuleStartBanner({
   programSlug?: string | null;
   className?: string;
 }) {
-  const schedule = getProgramClassSchedule(programSlug);
+  const schedule = getStudentClassSchedule(programSlug);
   const isApp = programSlug === "app-development";
 
   return (

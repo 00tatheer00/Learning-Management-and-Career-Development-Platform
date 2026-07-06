@@ -4,7 +4,6 @@ import { getTrainersByProgramSlug } from "@/lib/data/trainers";
 import { PortalPageHeader, EmptyState } from "@/components/portal/portal-ui";
 import { StudentTrainerCard } from "@/components/portal/student-trainer-card";
 import { ProgramCategoryBadge } from "@/components/portal/program-category-badge";
-import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
 
 export default async function StudentTrainerPage() {
   const user = await getCurrentUser();
@@ -14,21 +13,20 @@ export default async function StudentTrainerPage() {
   if (!programSlug) {
     return (
       <EmptyState
-        title={STUDENT_UR.trainer.notAssigned}
-        description={STUDENT_UR.trainer.notAssignedDesc}
+        title="Course not assigned"
+        description="Your course category is not set yet. Contact admin after approval."
       />
     );
   }
 
   const program = getProgramBySlug(programSlug);
   const trainers = getTrainersByProgramSlug(programSlug);
-  const programTitle = program?.title ?? "Aapka program";
 
   return (
     <div>
       <PortalPageHeader
-        title={STUDENT_UR.trainer.title}
-        description={STUDENT_UR.trainer.description(programTitle)}
+        title="My Trainer"
+        description={`Trainers for ${program?.title ?? "your course"}. You only see trainers from your program.`}
       >
         <ProgramCategoryBadge programSlug={programSlug} />
       </PortalPageHeader>
@@ -39,7 +37,7 @@ export default async function StudentTrainerPage() {
 
       {trainers.length > 1 && (
         <>
-          <h2 className="text-lg font-bold mb-4">{STUDENT_UR.trainer.allTrainers(programTitle)}</h2>
+          <h2 className="text-lg font-bold mb-4">All {program?.title ?? "Program"} Trainers</h2>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {trainers
               .filter((trainer) => trainer.id !== user.trainerId)

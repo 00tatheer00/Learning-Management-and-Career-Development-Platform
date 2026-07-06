@@ -5,7 +5,6 @@ import { PortalPageHeader } from "@/components/portal/portal-ui";
 import { ProgramCategoryBadge } from "@/components/portal/program-category-badge";
 import { UserCircle, Envelope, Phone, BookOpen, GraduationCap, ChalkboardTeacher } from "@phosphor-icons/react/ssr";
 import { getTrainersByProgramSlug } from "@/lib/data/trainers";
-import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
 
 export default async function StudentProfilePage() {
   const user = await getCurrentUser();
@@ -19,19 +18,19 @@ export default async function StudentProfilePage() {
     : null;
 
   const fields = [
-    { icon: UserCircle, label: STUDENT_UR.profile.fullName, value: user.name },
-    { icon: Envelope, label: STUDENT_UR.profile.email, value: user.email },
-    { icon: Phone, label: STUDENT_UR.profile.phone, value: user.phone ?? STUDENT_UR.profile.empty },
-    { icon: BookOpen, label: STUDENT_UR.profile.program, value: category?.sidebarLabel ?? program?.title ?? STUDENT_UR.profile.empty },
-    { icon: GraduationCap, label: STUDENT_UR.profile.module, value: user.level ?? STUDENT_UR.profile.empty },
-    { icon: ChalkboardTeacher, label: STUDENT_UR.profile.trainer, value: trainer?.name ?? STUDENT_UR.profile.empty },
+    { icon: UserCircle, label: "Full Name", value: user.name },
+    { icon: Envelope, label: "Email", value: user.email },
+    { icon: Phone, label: "Phone / WhatsApp", value: user.phone ?? "—" },
+    { icon: BookOpen, label: "Program Category", value: category?.sidebarLabel ?? program?.title ?? "—" },
+    { icon: GraduationCap, label: "Current Module", value: user.level ?? "—" },
+    { icon: ChalkboardTeacher, label: "Assigned Trainer", value: trainer?.name ?? "—" },
   ];
 
   return (
     <div>
       <PortalPageHeader
-        title={STUDENT_UR.profile.title}
-        description={STUDENT_UR.profile.description}
+        title="My Profile"
+        description="Your account details. Contact admin if anything is wrong."
       >
         {user.programSlug && <ProgramCategoryBadge programSlug={user.programSlug} />}
       </PortalPageHeader>
@@ -44,7 +43,7 @@ export default async function StudentProfilePage() {
             </div>
             <div>
               <p className="text-xl font-bold">{user.name}</p>
-              <p className="text-sm opacity-80">{STUDENT_UR.profile.studentAccount}</p>
+              <p className="text-sm opacity-80">Student Account</p>
             </div>
           </div>
         </div>

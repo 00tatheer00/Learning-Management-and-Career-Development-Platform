@@ -19,7 +19,7 @@ export function JoinClassButton({
   sessionId,
   className,
   size = "lg",
-  label = STUDENT_UR.classes.joinClass,
+  label = "Join Class",
 }: JoinClassButtonProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -77,7 +77,7 @@ export function JoinClassButton({
         disabled={loading}
       >
         <VideoCamera size={22} weight="duotone" />
-        {loading ? STUDENT_UR.classes.joining : label}
+        {loading ? "Joining..." : label}
       </Button>
     </div>
   );

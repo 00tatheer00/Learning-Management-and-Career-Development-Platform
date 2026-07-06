@@ -5,7 +5,6 @@ import { CaretLeft, CaretRight, BookOpen, ListBullets, Certificate } from "@phos
 import { cn } from "@/lib/utils";
 import { formatModuleSchedule } from "@/lib/data/programs";
 import { MODULE_CERTIFICATE_SHORT } from "@/lib/constants/program-marketing";
-import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
 import type { Program, ProgramModule } from "@/types";
 
 type SyllabusView = "modules" | "topics";
@@ -57,7 +56,7 @@ export function CourseModulesSyllabus({
           className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
         >
           <CaretLeft size={16} />
-          {isStudentCopy ? STUDENT_UR.course.backToModules : "Back to modules"}
+          {isStudentCopy ? "Back to modules" : "Back to modules"}
         </button>
 
         <div
@@ -80,14 +79,14 @@ export function CourseModulesSyllabus({
           </p>
           <p className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700">
             <Certificate size={14} weight="duotone" aria-hidden="true" />
-            {isStudentCopy ? STUDENT_UR.course.certificateOnComplete : `${MODULE_CERTIFICATE_SHORT} on completion`}
+            {isStudentCopy ? `${MODULE_CERTIFICATE_SHORT} on completion` : `${MODULE_CERTIFICATE_SHORT} on completion`}
           </p>
         </div>
 
         <div className="rounded-2xl border border-border bg-background overflow-hidden">
           <div className="flex items-center gap-2 border-b border-border bg-surface/50 px-5 py-3">
             <ListBullets size={18} weight="duotone" className="text-primary" />
-            <p className="text-sm font-semibold">{isStudentCopy ? STUDENT_UR.course.whatYouLearn : "What you will learn"}</p>
+            <p className="text-sm font-semibold">{isStudentCopy ? "What you will learn" : "What you will learn"}</p>
           </div>
           <ol className="divide-y divide-border">
             {topics.map((topic, index) => (
@@ -167,7 +166,7 @@ export function CourseModulesSyllabus({
               </div>
               {isActive && (
                 <span className="mt-3 inline-block rounded-full bg-primary px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary-foreground">
-                  {isStudentCopy ? STUDENT_UR.course.yourCurrentModule : "Your current module"}
+                  Your current module
                 </span>
               )}
             </button>
