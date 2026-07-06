@@ -84,11 +84,11 @@ export const trainers: Trainer[] = [
   },
   {
     id: "trainer-zunira",
-    name: "Zunira",
-    designation: "Digital Marketing Intern",
+    name: "Zunira Rahman",
+    designation: "Digital Marketing Expert",
     programSlug: "digital-marketing",
-    expertise: ["Social Media", "Content Strategy", "Campaign Support", "Analytics"],
-    bio: "Supports EEST digital campaigns, content planning, and student-facing marketing initiatives.",
+    expertise: ["Social Media", "Content Strategy", "Campaigns", "Analytics"],
+    bio: "Guides students in digital campaigns, content planning, social media growth, and practical marketing skills for brands and freelancers.",
     social: {},
   },
   {
