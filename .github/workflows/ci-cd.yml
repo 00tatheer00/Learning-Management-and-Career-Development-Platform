@@ -54,7 +54,7 @@ jobs:
   deploy:
     name: Deploy to Vercel (Production)
     needs: quality
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.VERCEL_TOKEN != ''
     runs-on: ubuntu-latest
     environment:
       name: production
