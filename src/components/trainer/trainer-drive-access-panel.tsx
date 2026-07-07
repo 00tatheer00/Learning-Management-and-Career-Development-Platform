@@ -1,10 +1,16 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Check, Copy, EnvelopeSimple, Prohibit, ShareNetwork, Users } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { PortalPageHeader } from "@/components/portal/portal-ui";
-import { formatEmailsForDriveShare } from "@/lib/utils/drive-share";
+import {
+  chunkEmailsForDriveShare,
+  DRIVE_SHARE_LIMITS,
+  DRIVE_SHARE_LIMITS_SUMMARY,
+  formatEmailsForDriveShare,
+  getDriveBatchLabel,
+} from "@/lib/utils/drive-share";
 import {
   DRIVE_DOWNLOAD_LIMITATION,
   DRIVE_DOWNLOAD_NOTE,
@@ -34,8 +40,9 @@ export function TrainerDriveAccessPanel({
   courseTitle,
 }: TrainerDriveAccessPanelProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [copiedModule, setCopiedModule] = useState<string | null>(null);
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [activeModule, setActiveModule] = useState<string | null>(null);
+  const [activeBatchIndex, setActiveBatchIndex] = useState(0);
 
   const firstModuleName = getFirstModuleName(programSlug);
   const moduleGroups = useMemo(
@@ -54,6 +61,11 @@ export function TrainerDriveAccessPanel({
     activeModule ?? firstModuleName ?? moduleGroups[0]?.moduleName ?? null;
 
   const selectedGroup = moduleGroups.find((group) => group.moduleName === selectedModule);
+
+  useEffect(() => {
+    setActiveBatchIndex(0);
+  }, [selectedModule]);
+
   const selectedEmails = useMemo(
     () =>
       (selectedGroup?.students ?? [])
@@ -61,32 +73,52 @@ export function TrainerDriveAccessPanel({
         .filter(Boolean),
     [selectedGroup]
   );
-  const emailBlob = useMemo(() => formatEmailsForDriveShare(selectedEmails), [selectedEmails]);
+  const emailBatches = useMemo(
+    () => chunkEmailsForDriveShare(selectedEmails),
+    [selectedEmails]
+  );
 
-  const copyModuleEmails = useCallback(
-    async (moduleName: string, emails: string[]) => {
-      if (emails.length === 0) {
-        toast.warning("No students", `No emails in ${moduleName}.`);
-        return;
-      }
+  const safeBatchIndex = Math.min(activeBatchIndex, Math.max(0, emailBatches.length - 1));
+  const activeBatchEmails = emailBatches[safeBatchIndex] ?? [];
+  const emailBlob = useMemo(
+    () => formatEmailsForDriveShare(activeBatchEmails),
+    [activeBatchEmails]
+  );
 
-      const blob = formatEmailsForDriveShare(emails);
-      try {
-        await navigator.clipboard.writeText(blob);
-        setCopiedModule(moduleName);
-        toast.success(
-          `${moduleName} emails copied`,
-          "Paste into Google Drive → Share → Add people."
-        );
-        window.setTimeout(() => setCopiedModule(null), 2500);
-      } catch {
-        setActiveModule(moduleName);
-        textareaRef.current?.focus();
-        textareaRef.current?.select();
-        toast.info("Select & copy", "Emails are selected — press Ctrl+C to copy.");
-      }
+  const copyEmails = useCallback(async (key: string, emails: string[], successDetail?: string) => {
+    if (emails.length === 0) {
+      toast.warning("No students", "No emails in this batch.");
+      return;
+    }
+
+    const blob = formatEmailsForDriveShare(emails);
+    try {
+      await navigator.clipboard.writeText(blob);
+      setCopiedKey(key);
+      toast.success(
+        "Batch copied!",
+        successDetail ?? "Paste into Google Drive → Share → Add people → Send."
+      );
+      window.setTimeout(() => setCopiedKey(null), 2500);
+    } catch {
+      setActiveBatchIndex(emailBatches.findIndex((batch) => batch === emails));
+      textareaRef.current?.focus();
+      textareaRef.current?.select();
+      toast.info("Select & copy", "Emails are selected — press Ctrl+C to copy.");
+    }
+  }, [emailBatches]);
+
+  const copyModuleFirstBatch = useCallback(
+    (moduleName: string, emails: string[]) => {
+      const batches = chunkEmailsForDriveShare(emails);
+      const first = batches[0] ?? [];
+      const detail =
+        batches.length > 1
+          ? `${getDriveBatchLabel(0, batches.length, first.length)} copied. Paste in Drive, then copy Batch 2.`
+          : "Paste into Google Drive → Share → Add people.";
+      void copyEmails(`module-${moduleName}-0`, first, detail);
     },
-    []
+    [copyEmails]
   );
 
   const selectAllInBox = () => {
@@ -137,6 +169,26 @@ export function TrainerDriveAccessPanel({
         </div>
       </div>
 
+      <div className="mb-6 rounded-2xl border border-sky-500/30 bg-sky-500/5 p-4 sm:p-5">
+        <p className="font-bold text-pt text-sm">Google Drive limits</p>
+        <p className="mt-1.5 text-sm text-pt-muted">{DRIVE_SHARE_LIMITS_SUMMARY}</p>
+        <ul className="mt-3 text-xs text-pt-muted space-y-1">
+          <li>
+            • Max <strong className="text-pt">{DRIVE_SHARE_LIMITS.maxEmailsPerFile}</strong> people per
+            file (total)
+          </li>
+          <li>
+            • Portal batches:{" "}
+            <strong className="text-pt">{DRIVE_SHARE_LIMITS.recommendedPasteBatch}</strong> emails per
+            paste (recommended)
+          </li>
+          <li>
+            • Max <strong className="text-pt">{DRIVE_SHARE_LIMITS.maxInvitesPerDay}</strong> share
+            invitations per day
+          </li>
+        </ul>
+      </div>
+
       <div className="flex flex-wrap gap-2 mb-4">
         {moduleGroups.map((group) => {
           const isFirst = group.moduleName === firstModuleName;
@@ -149,7 +201,10 @@ export function TrainerDriveAccessPanel({
             <button
               key={group.moduleName}
               type="button"
-              onClick={() => setActiveModule(group.moduleName)}
+              onClick={() => {
+                setActiveModule(group.moduleName);
+                setActiveBatchIndex(0);
+              }}
               className={cn(
                 "rounded-xl border px-3 py-2 text-left transition-all",
                 isActive
@@ -169,15 +224,15 @@ export function TrainerDriveAccessPanel({
                 className="mt-2 h-7 text-[10px] gap-1"
                 onClick={(e) => {
                   e.stopPropagation();
-                  void copyModuleEmails(group.moduleName, emails);
+                  copyModuleFirstBatch(group.moduleName, emails);
                 }}
               >
-                {copiedModule === group.moduleName ? (
+                {copiedKey === `module-${group.moduleName}-0` ? (
                   <Check size={12} weight="bold" />
                 ) : (
                   <Copy size={12} />
                 )}
-                Copy emails
+                Copy batch 1
               </Button>
             </button>
           );
@@ -218,8 +273,40 @@ export function TrainerDriveAccessPanel({
             </h2>
           </div>
           <p className="text-xs text-pt-muted mb-3">
-            Comma-separated for Drive share. Only share Module 1 recordings with Module 1 emails.
+            {selectedEmails.length > DRIVE_SHARE_LIMITS.recommendedPasteBatch
+              ? `${emailBatches.length} batches for this module — copy and paste one batch at a time in Drive.`
+              : "Comma-separated for one Drive Share paste."}
           </p>
+
+          {emailBatches.length > 1 && (
+            <div className="flex flex-wrap gap-2 mb-3">
+              {emailBatches.map((batch, index) => {
+                const key = `batch-${selectedModule}-${index}`;
+                const isActive = index === safeBatchIndex;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setActiveBatchIndex(index)}
+                    className={cn(
+                      "rounded-lg border px-2.5 py-1.5 text-left text-xs transition-all",
+                      isActive
+                        ? "border-primary bg-primary/10 text-primary font-semibold"
+                        : "border-pt text-pt-muted hover:border-primary/30"
+                    )}
+                  >
+                    {getDriveBatchLabel(index, emailBatches.length, batch.length)}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {emailBatches.length > 1 && (
+            <p className="text-xs font-medium text-pt mb-2">
+              {getDriveBatchLabel(safeBatchIndex, emailBatches.length, activeBatchEmails.length)}
+            </p>
+          )}
           <textarea
             ref={textareaRef}
             readOnly
@@ -233,12 +320,21 @@ export function TrainerDriveAccessPanel({
             </Button>
             <Button
               size="sm"
-              onClick={() => selectedModule && copyModuleEmails(selectedModule, selectedEmails)}
+              onClick={() =>
+                selectedModule &&
+                copyEmails(
+                  `batch-${selectedModule}-${safeBatchIndex}`,
+                  activeBatchEmails,
+                  emailBatches.length > 1
+                    ? `Paste Batch ${safeBatchIndex + 1} in Drive, click Send, then copy the next batch.`
+                    : undefined
+                )
+              }
               disabled={!emailBlob || !selectedModule}
               className="gap-1.5"
             >
               <Copy size={14} />
-              Copy for Drive
+              {emailBatches.length > 1 ? `Copy batch ${safeBatchIndex + 1}` : "Copy for Drive"}
             </Button>
           </div>
         </div>

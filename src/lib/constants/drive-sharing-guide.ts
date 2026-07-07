@@ -2,7 +2,8 @@
 
 export const DRIVE_SHARE_STEPS = [
   "Upload the class video to your school Google Drive (Workspace account).",
-  "Share → paste portal student emails → role: Viewer only.",
+  "Share → Add people → paste one batch of emails (about 40) → Viewer.",
+  "Click Send, then paste the next batch until all module emails are added.",
   "Turn ON: “Disable download, print, and copy” (Workspace share settings).",
   "Do NOT use “Anyone with the link” for lecture videos.",
   "Add the same Drive link in Class Recordings on the portal.",
