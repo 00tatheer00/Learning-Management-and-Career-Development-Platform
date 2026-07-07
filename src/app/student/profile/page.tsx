@@ -29,6 +29,7 @@ export default async function StudentProfilePage() {
   return (
     <div>
       <PortalPageHeader
+        eyebrow="Student Portal"
         title="My Profile"
         description="Your account details. Contact admin if anything is wrong."
       >

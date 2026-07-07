@@ -4,8 +4,16 @@ import { usePathname } from "next/navigation";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { NavigationProgress } from "@/components/providers/navigation-progress";
+import { SkipToMain } from "@/components/shared/skip-to-main";
 
-const PORTAL_PREFIXES = ["/student", "/trainer", "/admin", "/login"];
+const PORTAL_PREFIXES = [
+  "/student",
+  "/trainer",
+  "/admin",
+  "/login",
+  "/forgot-password",
+  "/reset-password",
+];
 
 export function LayoutSwitcher({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -15,6 +23,7 @@ export function LayoutSwitcher({ children }: { children: React.ReactNode }) {
 
   return (
     <>
+      <SkipToMain />
       <NavigationProgress />
       {isPortal ? (
         children

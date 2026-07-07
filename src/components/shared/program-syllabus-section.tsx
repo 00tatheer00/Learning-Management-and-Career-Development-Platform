@@ -49,8 +49,8 @@ export function ProgramSyllabusSection({
             </h2>
             <p className={`max-w-2xl text-muted ${compact ? "mt-1 text-sm" : "mt-2"}`}>
               {compact
-                ? "Har module par click karein — poori topic list dekhein. Har module complete par certificate milega."
-                : `${moduleCount} modules, ${topicCount}+ hands-on topics — zero se job-ready tak. Har module par click karke poori list dekhein. ${MODULE_CERTIFICATE_TAGLINE}`}
+                ? "Tap each module to see the full topic list. Earn a certificate after every completed module."
+                : `${moduleCount} modules, ${topicCount}+ hands-on topics — from zero to job-ready. Tap each module for the full list. ${MODULE_CERTIFICATE_TAGLINE}`}
             </p>
           </div>
           {!compact && (

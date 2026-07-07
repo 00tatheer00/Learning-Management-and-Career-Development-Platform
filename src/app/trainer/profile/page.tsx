@@ -19,7 +19,9 @@ export default async function TrainerProfilePage() {
 
   return (
     <div>
-      <PortalPageHeader title="My Profile" description="Your trainer account details.">
+      <PortalPageHeader
+        eyebrow="Trainer Portal"
+        title="My Profile" description="Your trainer account details.">
         <Button size="lg" asChild className="gap-2">
           <Link href="/trainer/settings">
             <PencilSimple size={18} />

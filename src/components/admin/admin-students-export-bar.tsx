@@ -26,9 +26,9 @@ export function AdminStudentsExportBar({
         <div>
           <p className="text-sm font-semibold text-pt">Download student lists (CSV)</p>
           <p className="text-xs text-pt-muted mt-1 max-w-xl">
-            WhatsApp groups ke liye — Web aur App alag files download karein. CSV mein{" "}
-            <strong>Name</strong>, <strong>WhatsApp</strong>, email aur course details hain.
-            Viewer admin bhi download kar sakti hain.
+            Download separate Web and App student CSV files for WhatsApp groups. Each file includes{" "}
+            <strong>Name</strong>, <strong>WhatsApp</strong>, email, and course details. Viewers can
+            download exports too.
           </p>
         </div>
         <Button asChild variant="secondary" size="sm" className="shrink-0 gap-2">

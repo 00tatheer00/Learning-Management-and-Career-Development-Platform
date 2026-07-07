@@ -5,6 +5,7 @@ export default function StudentWhatsAppPage() {
   return (
     <div>
       <PortalPageHeader
+        eyebrow="Student Portal"
         title="WhatsApp Group"
         description="Join the official class group for live links, videos, and announcements."
       />

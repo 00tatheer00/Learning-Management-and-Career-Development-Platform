@@ -73,7 +73,7 @@ export function StudentNextClassCard({ session }: StudentNextClassCardProps) {
         <div className="flex flex-col items-stretch sm:items-end gap-3 shrink-0">
           {countdown && (
             <div
-              className={`rounded-2xl px-5 py-4 text-center min-w-[180px] ${
+              className={`rounded-2xl px-4 py-3 sm:px-5 sm:py-4 text-center w-full sm:min-w-[160px] sm:w-auto ${
                 countdown.isSoon
                   ? "bg-emerald-600 text-white"
                   : "bg-background border border-border"

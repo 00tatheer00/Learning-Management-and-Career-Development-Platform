@@ -408,8 +408,56 @@ export function AdminCredentialsPanel() {
         </p>
       </div>
 
-      {/* Table fills remaining height */}
-      <div className="flex-1 min-h-0 overflow-hidden rounded-xl border border-border bg-background shadow-sm">
+      {/* Mobile cards */}
+      <div className="md:hidden flex-1 min-h-0 overflow-auto space-y-3 pb-2">
+        {loading ? (
+          <>
+            <div className="h-28 rounded-xl border border-border bg-surface/60 animate-pulse" />
+            <div className="h-28 rounded-xl border border-border bg-surface/60 animate-pulse" />
+          </>
+        ) : filtered.length === 0 ? (
+          <p className="py-8 text-center text-sm text-muted rounded-xl border border-border bg-background">
+            No students match your filters.
+          </p>
+        ) : (
+          filtered.map((row) => (
+            <div
+              key={row.id}
+              className={cn(
+                "rounded-xl border border-border bg-background p-4 space-y-2",
+                !row.hasLoggedIn && "bg-red-50/40"
+              )}
+            >
+              <OpenStudentProfileButton target={{ studentId: row.id }} className="font-semibold text-sm">
+                {row.name}
+              </OpenStudentProfileButton>
+              <p className="text-xs text-muted">{row.course} · {row.module}</p>
+              <p className="text-xs font-mono truncate">{row.email}</p>
+              <p className="text-xs text-muted">
+                Login: {row.hasLoggedIn ? "Done" : "Pending"}
+                {row.hasStoredPassword ? " · Password saved" : " · No password"}
+              </p>
+              <div className="flex flex-wrap gap-2 pt-1">
+                <AdminStudentProfileButton target={{ studentId: row.id }} compact />
+                {canWrite && row.hasStoredPassword && (
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className="h-8 text-xs"
+                    disabled={loadingId === row.id}
+                    onClick={() => void handleResendWhatsApp(row)}
+                  >
+                    WhatsApp
+                  </Button>
+                )}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden md:flex flex-1 min-h-0 overflow-hidden rounded-xl border border-border bg-background shadow-sm">
         <div className="h-full overflow-auto scrollbar-none">
           <table className="min-w-[960px] w-full text-sm">
             <thead className="sticky top-0 z-10 border-b border-border bg-surface/95 backdrop-blur-sm">
@@ -425,7 +473,13 @@ export function AdminCredentialsPanel() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {!loading &&
+              {loading ? (
+                <tr>
+                  <td colSpan={8} className="px-3 py-10 text-center text-muted">
+                    Loading portal logins...
+                  </td>
+                </tr>
+              ) : (
                 filtered.map((row) => {
                   const visible = visiblePasswords.has(row.id);
                   const password = getRowPassword(row);
@@ -600,7 +654,8 @@ export function AdminCredentialsPanel() {
                       </td>
                     </tr>
                   );
-                })}
+                })
+              )}
             </tbody>
           </table>
         </div>

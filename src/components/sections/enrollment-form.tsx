@@ -136,12 +136,21 @@ function EnrollmentModulePicker({
 function FormSection({
   title,
   children,
+  step,
+  mobileStep,
 }: {
   title: string;
   children: React.ReactNode;
+  step: number;
+  mobileStep: number;
 }) {
   return (
-    <div className="space-y-4 pt-2 border-t border-border first:border-t-0 first:pt-0">
+    <div
+      className={cn(
+        "space-y-4 pt-2 border-t border-border first:border-t-0 first:pt-0",
+        step !== mobileStep && "hidden lg:block"
+      )}
+    >
       <h3 className="text-sm font-semibold uppercase tracking-wider text-primary">
         {title}
       </h3>
@@ -150,13 +159,42 @@ function FormSection({
   );
 }
 
-function FieldError({ message }: { message?: string }) {
+const MOBILE_FORM_STEPS = [
+  "Personal",
+  "Education",
+  "Program",
+  "Resources",
+  "Payment",
+] as const;
+
+const STEP_FIELDS: (keyof EnrollmentFormData)[][] = [
+  ["fullName", "fatherName", "cnic", "whatsapp", "email"],
+  ["institution", "classSemester", "fieldOfStudy"],
+  ["program", "level"],
+  ["hasLaptop", "internetAvailable"],
+  ["confirmInfoCorrect", "agreeToPolicies"],
+];
+
+function FieldError({ message, id }: { message?: string; id?: string }) {
   if (!message) return null;
   return (
-    <p className="text-sm text-red-600 mt-1" role="alert">
+    <p id={id} className="text-sm text-red-600 mt-1" role="alert">
       {message}
     </p>
   );
+}
+
+function fieldA11y(
+  field: keyof EnrollmentFormData | "paymentScreenshot",
+  errors: FieldErrors<EnrollmentFormData>,
+  extraError?: string
+) {
+  const message =
+    field === "paymentScreenshot" ? extraError : (errors[field]?.message as string | undefined);
+  return {
+    "aria-invalid": !!message,
+    ...(message ? { "aria-describedby": `${field}-error` } : {}),
+  };
 }
 
 function YesNoField({
@@ -180,7 +218,13 @@ function YesNoField({
           *
         </span>
       </Label>
-      <div className="mt-2 flex gap-3">
+      <div
+        className="mt-2 flex gap-3"
+        role="radiogroup"
+        aria-label={label}
+        aria-invalid={!!error}
+        aria-describedby={error ? `${name}-error` : undefined}
+      >
         {(["yes", "no"] as const).map((option) => (
           <label
             key={option}
@@ -203,7 +247,7 @@ function YesNoField({
           </label>
         ))}
       </div>
-      <FieldError message={error} />
+      <FieldError id={`${name}-error`} message={error} />
     </div>
   );
 }
@@ -232,20 +276,14 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
   const [historyLoading, setHistoryLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
+  const [mobileStep, setMobileStep] = useState(0);
 
   useEffect(() => {
     if (!isSuccess) return;
-
-    const scrollToForm = () => {
-      const target = document.getElementById("register-form");
-      if (!target) return;
-      const top = target.getBoundingClientRect().top + window.scrollY - 96;
-      window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
-    };
-
-    scrollToForm();
-    const timer = window.setTimeout(scrollToForm, 150);
-    return () => window.clearTimeout(timer);
+    document.getElementById("register-form-panel")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
   }, [isSuccess]);
 
   const {
@@ -255,6 +293,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
     setValue,
     watch,
     reset,
+    trigger,
     formState: { errors },
   } = useForm<EnrollmentFormData>({
     resolver: zodResolver(enrollmentSchema),
@@ -387,7 +426,17 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
       setScreenshotError("Please upload your Easypaisa payment screenshot");
     }
     scrollToFirstError(formErrors);
-    toast.error("Please complete all required fields", "Scroll up to see highlighted errors.");
+    toast.error("Please complete all required fields", "Scroll to see highlighted errors.");
+  };
+
+  const handleMobileNext = async () => {
+    const fields = STEP_FIELDS[mobileStep];
+    const valid = await trigger(fields);
+    if (!valid) {
+      scrollToFirstError(errors);
+      return;
+    }
+    setMobileStep((step) => Math.min(step + 1, MOBILE_FORM_STEPS.length - 1));
   };
 
   const onSubmit = async (data: EnrollmentFormData) => {
@@ -513,7 +562,27 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
         className="rounded-2xl border border-border bg-background p-6 lg:p-8 space-y-8 shadow-sm"
         noValidate
       >
-          <FormSection title="Personal Information">
+          <div className="lg:hidden space-y-3">
+            <div className="flex items-center justify-between gap-2 text-xs font-semibold text-muted">
+              <span>
+                Step {mobileStep + 1} of {MOBILE_FORM_STEPS.length}
+              </span>
+              <span className="text-primary">{MOBILE_FORM_STEPS[mobileStep]}</span>
+            </div>
+            <div className="flex gap-1">
+              {MOBILE_FORM_STEPS.map((label, index) => (
+                <div
+                  key={label}
+                  className={cn(
+                    "h-1.5 flex-1 rounded-full",
+                    index <= mobileStep ? "bg-primary" : "bg-border"
+                  )}
+                />
+              ))}
+            </div>
+          </div>
+
+          <FormSection title="Personal Information" step={0} mobileStep={mobileStep}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="sm:col-span-2">
                 <RequiredLabel htmlFor="fullName">Full Name</RequiredLabel>
@@ -523,9 +592,10 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                   className="mt-2"
                   required
                   aria-required="true"
+                  {...fieldA11y("fullName", errors)}
                   {...register("fullName")}
                 />
-                <FieldError message={errors.fullName?.message} />
+                <FieldError id="fullName-error" message={errors.fullName?.message} />
               </div>
 
               <div className="sm:col-span-2">
@@ -536,9 +606,10 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                   className="mt-2"
                   required
                   aria-required="true"
+                  {...fieldA11y("fatherName", errors)}
                   {...register("fatherName")}
                 />
-                <FieldError message={errors.fatherName?.message} />
+                <FieldError id="fatherName-error" message={errors.fatherName?.message} />
               </div>
 
               <div>
@@ -551,9 +622,10 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                   className="mt-2"
                   required
                   aria-required="true"
+                  {...fieldA11y("cnic", errors)}
                   {...register("cnic")}
                 />
-                <FieldError message={errors.cnic?.message} />
+                <FieldError id="cnic-error" message={errors.cnic?.message} />
               </div>
 
               <div>
@@ -565,9 +637,10 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                   className="mt-2"
                   required
                   aria-required="true"
+                  {...fieldA11y("whatsapp", errors)}
                   {...register("whatsapp")}
                 />
-                <FieldError message={errors.whatsapp?.message} />
+                <FieldError id="whatsapp-error" message={errors.whatsapp?.message} />
               </div>
 
               <div className="sm:col-span-2">
@@ -579,9 +652,10 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                   className="mt-2"
                   required
                   aria-required="true"
+                  {...fieldA11y("email", errors)}
                   {...register("email")}
                 />
-                <FieldError message={errors.email?.message} />
+                <FieldError id="email-error" message={errors.email?.message} />
               </div>
             </div>
 
@@ -614,7 +688,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
             )}
           </FormSection>
 
-          <FormSection title="Education Details">
+          <FormSection title="Education Details" step={1} mobileStep={mobileStep}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="sm:col-span-2">
                 <RequiredLabel htmlFor="institution">School / College / University</RequiredLabel>
@@ -624,9 +698,10 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                   className="mt-2"
                   required
                   aria-required="true"
+                  {...fieldA11y("institution", errors)}
                   {...register("institution")}
                 />
-                <FieldError message={errors.institution?.message} />
+                <FieldError id="institution-error" message={errors.institution?.message} />
               </div>
 
               <div>
@@ -637,9 +712,10 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                   className="mt-2"
                   required
                   aria-required="true"
+                  {...fieldA11y("classSemester", errors)}
                   {...register("classSemester")}
                 />
-                <FieldError message={errors.classSemester?.message} />
+                <FieldError id="classSemester-error" message={errors.classSemester?.message} />
               </div>
 
               <div>
@@ -650,14 +726,15 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                   className="mt-2"
                   required
                   aria-required="true"
+                  {...fieldA11y("fieldOfStudy", errors)}
                   {...register("fieldOfStudy")}
                 />
-                <FieldError message={errors.fieldOfStudy?.message} />
+                <FieldError id="fieldOfStudy-error" message={errors.fieldOfStudy?.message} />
               </div>
             </div>
           </FormSection>
 
-          <FormSection title="Program Selection">
+          <FormSection title="Program Selection" step={2} mobileStep={mobileStep}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="sm:col-span-2">
                 <RequiredLabel htmlFor="program">Program Applying For</RequiredLabel>
@@ -674,7 +751,13 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                         }
                       }}
                     >
-                      <SelectTrigger id="program" className="mt-2" aria-required="true">
+                      <SelectTrigger
+                        id="program"
+                        className="mt-2"
+                        aria-required="true"
+                        aria-invalid={!!errors.program}
+                        aria-describedby={errors.program ? "program-error" : undefined}
+                      >
                         <SelectValue placeholder="Select a program" />
                       </SelectTrigger>
                       <SelectContent>
@@ -696,7 +779,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                     </Select>
                   )}
                 />
-                <FieldError message={errors.program?.message} />
+                <FieldError id="program-error" message={errors.program?.message} />
                 <p className="text-xs text-muted mt-1.5">
                   Currently open: Web Development &amp; Mobile App (Flutter) Development
                 </p>
@@ -705,8 +788,8 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
               <div className="sm:col-span-2">
                 <RequiredLabel htmlFor="level">Starting Module</RequiredLabel>
                 <p className="mt-1 text-xs text-muted">
-                  Har module kya cover karta hai aur kitni duration hai — neeche se apna starting
-                  module choose karein.
+                  See what each module covers and how long it runs — choose your starting module
+                  below.
                 </p>
                 <Controller
                   name="level"
@@ -720,7 +803,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                     />
                   )}
                 />
-                <FieldError message={errors.level?.message} />
+                <FieldError id="level-error" message={errors.level?.message} />
                 {activeProgram && programHasSyllabus(activeProgram) && (
                   <div className="rounded-2xl border border-primary/15 bg-primary/[0.03] p-4 sm:p-5">
                     <ProgramSyllabusSection program={activeProgram} compact />
@@ -742,7 +825,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
             </div>
           </FormSection>
 
-          <FormSection title="Resources &amp; Requirements">
+          <FormSection title="Resources &amp; Requirements" step={3} mobileStep={mobileStep}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <Controller
                 name="hasLaptop"
@@ -783,7 +866,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
             </div>
           </FormSection>
 
-          <FormSection title="Payment Verification">
+          <FormSection title="Payment Verification" step={4} mobileStep={mobileStep}>
             <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 mb-4">
               <p className="text-sm font-semibold text-emerald-800">
                 Remember: Course is FREE — upload proof of your PKR 1,000 registration
@@ -809,11 +892,12 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                 type="file"
                 accept="image/*,.heic,.heif"
                 aria-required="true"
+                {...fieldA11y("paymentScreenshot", errors, screenshotError ?? undefined)}
                 className="mt-1 w-full max-w-full cursor-pointer file:mr-2 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-2 file:text-xs sm:file:text-sm file:font-medium file:text-primary-foreground hover:file:bg-accent"
                 onChange={handleScreenshotChange}
               />
               </div>
-              <FieldError message={screenshotError ?? undefined} />
+              <FieldError id="paymentScreenshot-error" message={screenshotError ?? undefined} />
 
               {screenshotPreview && (
                 <div className="mt-4 relative w-full max-w-xs aspect-[3/4] rounded-lg overflow-hidden border border-border">
@@ -829,7 +913,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
             </div>
           </FormSection>
 
-          <FormSection title="Agreement">
+          <FormSection title="Agreement" step={4} mobileStep={mobileStep}>
             <div className="space-y-4">
               <Controller
                 name="confirmInfoCorrect"
@@ -848,6 +932,8 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                       checked={field.value}
                       onChange={(e) => field.onChange(e.target.checked)}
                       className="mt-0.5 h-4 w-4 shrink-0 rounded border-border text-primary focus:ring-primary"
+                      aria-invalid={!!errors.confirmInfoCorrect}
+                      aria-describedby={errors.confirmInfoCorrect ? "confirmInfoCorrect-error" : undefined}
                     />
                     <span className="text-sm leading-relaxed text-foreground">
                       I confirm that all information provided is correct.{" "}
@@ -856,7 +942,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                   </label>
                 )}
               />
-              <FieldError message={errors.confirmInfoCorrect?.message} />
+              <FieldError id="confirmInfoCorrect-error" message={errors.confirmInfoCorrect?.message} />
 
               <Controller
                 name="agreeToPolicies"
@@ -875,6 +961,8 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                       checked={field.value}
                       onChange={(e) => field.onChange(e.target.checked)}
                       className="mt-0.5 h-4 w-4 shrink-0 rounded border-border text-primary focus:ring-primary"
+                      aria-invalid={!!errors.agreeToPolicies}
+                      aria-describedby={errors.agreeToPolicies ? "agreeToPolicies-error" : undefined}
                     />
                     <span className="text-sm leading-relaxed text-foreground">
                       I agree to follow the rules, attendance policy, and code of conduct
@@ -884,7 +972,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                   </label>
                 )}
               />
-              <FieldError message={errors.agreeToPolicies?.message} />
+              <FieldError id="agreeToPolicies-error" message={errors.agreeToPolicies?.message} />
             </div>
           </FormSection>
 
@@ -892,7 +980,37 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
             <Alert variant="error">{error}</Alert>
           )}
 
-          <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
+          <div className="lg:hidden flex flex-col sm:flex-row gap-3">
+            {mobileStep > 0 && (
+              <Button
+                type="button"
+                variant="secondary"
+                className="flex-1"
+                size="lg"
+                onClick={() => setMobileStep((step) => Math.max(step - 1, 0))}
+              >
+                Back
+              </Button>
+            )}
+            {mobileStep < MOBILE_FORM_STEPS.length - 1 ? (
+              <Button type="button" className="flex-1" size="lg" onClick={() => void handleMobileNext()}>
+                Continue
+              </Button>
+            ) : (
+              <Button type="submit" className="flex-1" size="lg" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" />
+                    Submitting...
+                  </>
+                ) : (
+                  "Submit Registration"
+                )}
+              </Button>
+            )}
+          </div>
+
+          <Button type="submit" className="hidden lg:flex w-full" size="lg" disabled={isSubmitting}>
             {isSubmitting ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" />

@@ -4,4 +4,4 @@ export const MODULE_CERTIFICATE_TAGLINE =
   "Every module you complete earns a verified digital certificate — proof of skills, step by step.";
 
 export const MODULE_CERTIFICATE_DETAIL =
-  "Har module complete karne par verified digital certificate milega — apni progress level-by-level prove karein.";
+  "Earn a verified digital certificate after each completed module — show your progress level by level.";

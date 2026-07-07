@@ -122,7 +122,7 @@ export function StatCard({
         )}
         <div className="min-w-0">
           <p className={cn("font-medium text-pt-muted", compact ? "text-[10px]" : "text-xs")}>{label}</p>
-          <p className={cn("font-bold tabular-nums", compact ? "text-xl mt-0.5" : "text-2xl mt-0.5", style.text)}>
+          <p className={cn("font-bold tabular-nums truncate", compact ? "text-xl mt-0.5" : "text-2xl mt-0.5", style.text)}>
             {value}
           </p>
         </div>

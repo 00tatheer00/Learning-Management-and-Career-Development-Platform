@@ -27,7 +27,7 @@ export default async function TrainerDashboardPage() {
   const programSlug = user.programSlug;
   if (!programSlug) {
     return (
-      <PortalSurfaceCard className="p-6 text-sm text-zinc-500">
+      <PortalSurfaceCard className="p-6 text-sm text-pt-muted">
         Your trainer account is not linked to a course yet. Contact admin.
       </PortalSurfaceCard>
     );
@@ -91,11 +91,11 @@ export default async function TrainerDashboardPage() {
                 href={`/trainer/students?module=${encodeURIComponent(group.moduleName)}`}
                 className={cn(
                   portalPressable,
-                  "rounded-xl border border-zinc-200/80 bg-white p-3 shadow-sm hover:border-orange-200/60 hover:shadow-md block"
+                  "rounded-xl border border-pt-subtle bg-pt-surface p-3 shadow-sm hover:border-primary/30 hover:shadow-md block"
                 )}
               >
-                <p className="text-[10px] font-semibold text-zinc-500 truncate">{group.moduleName}</p>
-                <p className="text-xl font-bold tabular-nums text-zinc-900 mt-0.5">{group.students.length}</p>
+                <p className="text-[10px] font-semibold text-pt-muted truncate">{group.moduleName}</p>
+                <p className="text-xl font-bold tabular-nums text-pt mt-0.5">{group.students.length}</p>
               </Link>
             ))}
           </div>

@@ -25,6 +25,7 @@ export default async function StudentTrainerPage() {
   return (
     <div>
       <PortalPageHeader
+        eyebrow="Student Portal"
         title="My Trainer"
         description={`Trainers for ${program?.title ?? "your course"}. You only see trainers from your program.`}
       >

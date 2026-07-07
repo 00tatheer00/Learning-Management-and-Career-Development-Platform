@@ -7,6 +7,7 @@ import { PortalPageHeader } from "@/components/portal/portal-ui";
 import { Button } from "@/components/ui/button";
 import { useAdminPermissions } from "@/components/admin/admin-permissions";
 import { cn } from "@/lib/utils";
+import { toast } from "@/lib/ui/toast";
 
 interface LiveClassRow {
   id: string;
@@ -36,7 +37,11 @@ export default function AdminLiveClassesPage() {
         setRows(json.data?.rows ?? []);
         setJitsiDomain(json.data?.jitsiDomain ?? "meet.jit.si");
         setPortalCount(json.data?.portalCount ?? 0);
+      } else {
+        toast.error(json.error ?? "Could not load live classes");
       }
+    } catch {
+      toast.error("Could not load live classes");
     } finally {
       setLoading(false);
     }
@@ -50,26 +55,60 @@ export default function AdminLiveClassesPage() {
     <div className="space-y-4">
       <PortalPageHeader
         title="Portal Live Classes"
-        description="100% free in-portal video (Jitsi). No API keys. Vercel sirf page serve karta hai — video alag server par."
+        description="Free in-portal video (Jitsi). No API keys required — Vercel serves the page; video runs on Jitsi servers."
       />
 
       <div className="rounded-2xl portal-callout-emerald p-4 flex items-start gap-3">
         <CheckCircle size={24} className="text-emerald-600 shrink-0" weight="fill" />
         <div className="text-sm space-y-2">
-          <p className="font-bold text-foreground">Free — koi LiveKit / paid plan nahi</p>
+          <p className="font-bold text-foreground">Free — no LiveKit or paid plan required</p>
           <p className="text-muted">
             Server: <strong>{jitsiDomain}</strong> · {portalCount} portal class(es). Mic, camera,
-            screen share, chat, raise hand — sab built-in.
+            screen share, chat, and raise hand are built in.
           </p>
           <p className="text-xs portal-callout-amber rounded-lg px-3 py-2">
-            <strong>150 students:</strong> public meet.jit.si par limit ho sakti hai. Bari batch ke
-            liye baad mein Oracle free VPS par apna Jitsi (still $0) — env{" "}
-            <code className="text-[11px]">JITSI_DOMAIN</code> set karo.
+            <strong>Large batches (150+ students):</strong> public meet.jit.si may hit limits. For
+            bigger classes, host your own Jitsi on a free VPS later — set{" "}
+            <code className="text-[11px]">JITSI_DOMAIN</code> in env.
           </p>
         </div>
       </div>
 
-      <div className="rounded-2xl border border-border overflow-hidden">
+      <div className="md:hidden space-y-3">
+        {loading ? (
+          <div className="h-24 rounded-2xl border border-border bg-surface/60 animate-pulse" />
+        ) : rows.length === 0 ? (
+          <p className="py-8 text-center text-muted rounded-2xl border border-border bg-background">
+            No classes scheduled yet.
+          </p>
+        ) : (
+          rows.map((row) => (
+            <div key={row.id} className="rounded-2xl border border-border bg-background p-4 space-y-2">
+              <p className="font-semibold">{row.title}</p>
+              <p className="text-xs text-muted">{row.trainerName} · {row.courseTitle}</p>
+              <p className="text-sm text-muted">{row.date} · {row.time}</p>
+              {row.roomType === "portal" && canWrite ? (
+                <Button size="sm" asChild className="w-full">
+                  <Link href={`/admin/live-classes/${row.id}/live`}>
+                    <VideoCamera size={16} /> Join class
+                  </Link>
+                </Button>
+              ) : row.meetLink ? (
+                <a
+                  href={row.meetLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block text-sm font-semibold text-primary underline"
+                >
+                  Open external link
+                </a>
+              ) : null}
+            </div>
+          ))
+        )}
+      </div>
+
+      <div className="hidden md:block rounded-2xl border border-border overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-[800px] w-full text-sm">
             <thead className="bg-surface border-b border-border">

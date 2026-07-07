@@ -17,6 +17,7 @@ export default async function StudentClassesPage() {
   return (
     <div>
       <PortalPageHeader
+        eyebrow="Student Portal"
         title="Live Classes"
         description="Tap Join Class to open Google Meet directly when your trainer has added the link."
       />

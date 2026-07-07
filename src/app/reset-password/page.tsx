@@ -103,7 +103,7 @@ function ResetPasswordFormInner() {
 
 export default function ResetPasswordPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-surface via-background to-orange-50">
+    <div id="main-content" className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-surface via-background to-orange-50">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">

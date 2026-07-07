@@ -119,7 +119,7 @@ export function AdminWhatsAppSettings() {
       <p className="mt-3 text-xs text-muted">
         Vercel env: <code className="bg-surface px-1 rounded">ULTRAMSG_INSTANCE_ID</code> +{" "}
         <code className="bg-surface px-1 rounded">ULTRAMSG_TOKEN</code>. If test fails here, QR
-        scan karein ya env vars check karein.
+        scan the QR code on UltraMsg or verify env vars on Vercel.
       </p>
     </div>
   );

@@ -21,7 +21,7 @@ export default async function AdminStudentsPage() {
     <div>
       <PortalPageHeader
         title="Students by Program"
-        description="Download Web or App student CSV for WhatsApp groups. Profile button se full details bhi dekh sakte hain."
+        description="Download Web or App student CSV for WhatsApp groups. Open Profile for full student details."
       />
 
       {students.length > 0 && <AdminStudentsExportBar counts={exportCounts} />}

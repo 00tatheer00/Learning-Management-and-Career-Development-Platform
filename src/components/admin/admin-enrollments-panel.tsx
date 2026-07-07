@@ -49,6 +49,7 @@ function isCreatedToday(iso: string): boolean {
 export function AdminEnrollmentsPanel() {
   const { canWrite, canApproveReject } = useAdminPermissions();
   const [enrollments, setEnrollments] = useState<AdminEnrollmentRow[]>([]);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [bulkLoading, setBulkLoading] = useState(false);
   const [fetchError, setFetchError] = useState("");
@@ -94,6 +95,8 @@ export function AdminEnrollmentsPanel() {
     } catch {
       setFetchError("Failed to load registrations");
       toast.error("Could not load registrations");
+    } finally {
+      setInitialLoading(false);
     }
   };
 
@@ -459,8 +462,28 @@ export function AdminEnrollmentsPanel() {
       </div>
 
       <div className="space-y-6">
-        {filtered.length === 0 ? (
-          <p className="py-10 text-center text-muted">No registrations match your filters.</p>
+        {initialLoading ? (
+          <div className="space-y-4 py-4">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="h-40 rounded-2xl border border-border bg-surface/60 animate-pulse"
+              />
+            ))}
+          </div>
+        ) : fetchError ? (
+          <div className="py-10 text-center space-y-3">
+            <p className="text-muted">{fetchError}</p>
+            <Button variant="secondary" size="sm" onClick={() => void load()}>
+              Try again
+            </Button>
+          </div>
+        ) : filtered.length === 0 ? (
+          <p className="py-10 text-center text-muted">
+            {enrollments.length === 0
+              ? "No registrations yet."
+              : "No registrations match your filters."}
+          </p>
         ) : (
           filtered.map((enrollment) => {
             const screenshotUrl = enrollment.hasPaymentScreenshot

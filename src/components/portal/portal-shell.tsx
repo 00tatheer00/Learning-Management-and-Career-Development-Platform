@@ -183,10 +183,10 @@ function PortalShellInner({ user, children }: PortalShellProps) {
             )}
             {isAdmin && <AdminNotificationsBell />}
             <PortalThemeToggle />
-            <Button variant="outline" size="sm" asChild className="hidden sm:flex h-8 text-xs border-pt">
-              <Link href="/">
+            <Button variant="outline" size="sm" asChild className="h-8 text-xs border-pt px-2 sm:px-3">
+              <Link href="/" title="Back to website">
                 <House size={15} weight="duotone" />
-                {websiteLabel}
+                <span className="sr-only sm:not-sr-only sm:ml-1">{websiteLabel}</span>
               </Link>
             </Button>
             <Button variant="ghost" size="sm" onClick={handleLogout} className="h-8 text-xs">
@@ -196,7 +196,7 @@ function PortalShellInner({ user, children }: PortalShellProps) {
           </div>
         </header>
 
-        <main className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-5">
+        <main id="main-content" className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-5">
           {user.role === "student" && (
             <div className="mb-4">
               <StudentModuleStartBanner programSlug={user.programSlug} />

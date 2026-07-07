@@ -89,7 +89,6 @@ export default function LoginForm({
               ? STUDENT_UR.toasts.wrongCredentials
               : "Wrong email or password. Try again.";
         setError(message);
-        toast.error(isStudent ? STUDENT_UR.toasts.loginFailed : "Login failed", message);
         return;
       }
 
@@ -112,14 +111,16 @@ export default function LoginForm({
         ? STUDENT_UR.toasts.networkError
         : "Something went wrong. Check your internet and try again.";
       setError(message);
-      toast.error(isStudent ? STUDENT_UR.toasts.loginFailed : "Login failed", message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-surface via-background to-orange-50">
+    <div
+      id="main-content"
+      className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-surface via-background to-orange-50"
+    >
       <div className="w-full max-w-lg">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
@@ -130,11 +131,17 @@ export default function LoginForm({
         </div>
 
         <div className="rounded-2xl border border-border bg-background shadow-xl p-6 sm:p-8">
-          <div className="grid grid-cols-3 gap-2 mb-6">
+          <div
+            className="grid grid-cols-3 gap-2 mb-6"
+            role="tablist"
+            aria-label="Portal role"
+          >
             {ROLES.map(({ role, label, icon: Icon }) => (
               <button
                 key={role}
                 type="button"
+                role="tab"
+                aria-selected={selectedRole === role}
                 onClick={() => setSelectedRole(role)}
                 className={cn(
                   "flex flex-col items-center gap-1.5 rounded-xl border-2 p-3 sm:p-4 transition-all text-center",

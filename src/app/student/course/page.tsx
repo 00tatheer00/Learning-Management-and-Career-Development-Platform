@@ -24,6 +24,7 @@ export default async function StudentCoursePage() {
   return (
     <div>
       <PortalPageHeader
+        eyebrow="Student Portal"
         title="My Course"
         description={`${program?.title ?? "Your course"} — your modules and lessons`}
       />

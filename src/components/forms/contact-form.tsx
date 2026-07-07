@@ -104,7 +104,7 @@ export function ContactContent() {
                 <div className="rounded-2xl border border-border bg-background p-8 text-center shadow-sm">
                   <h2 className="text-xl font-bold mb-2">Message Sent!</h2>
                   <p className="text-muted mb-4">
-                    We&apos;ll get back to you within 1-2 business days.
+                    We&apos;ll get back to you within 1–2 business days.
                   </p>
                   <Button onClick={() => setIsSuccess(false)}>Send Another</Button>
                 </div>
@@ -117,9 +117,17 @@ export function ContactContent() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
                       <Label htmlFor="name">Name</Label>
-                      <Input id="name" className="mt-2" {...register("name")} />
+                      <Input
+                        id="name"
+                        className="mt-2"
+                        aria-invalid={!!errors.name}
+                        aria-describedby={errors.name ? "name-error" : undefined}
+                        {...register("name")}
+                      />
                       {errors.name && (
-                        <p className="text-sm text-red-600 mt-1">{errors.name.message}</p>
+                        <p id="name-error" className="text-sm text-red-600 mt-1" role="alert">
+                          {errors.name.message}
+                        </p>
                       )}
                     </div>
                     <div>
@@ -128,18 +136,30 @@ export function ContactContent() {
                         id="email"
                         type="email"
                         className="mt-2"
+                        aria-invalid={!!errors.email}
+                        aria-describedby={errors.email ? "email-error" : undefined}
                         {...register("email")}
                       />
                       {errors.email && (
-                        <p className="text-sm text-red-600 mt-1">{errors.email.message}</p>
+                        <p id="email-error" className="text-sm text-red-600 mt-1" role="alert">
+                          {errors.email.message}
+                        </p>
                       )}
                     </div>
                   </div>
                   <div>
                     <Label htmlFor="subject">Subject</Label>
-                    <Input id="subject" className="mt-2" {...register("subject")} />
+                    <Input
+                      id="subject"
+                      className="mt-2"
+                      aria-invalid={!!errors.subject}
+                      aria-describedby={errors.subject ? "subject-error" : undefined}
+                      {...register("subject")}
+                    />
                     {errors.subject && (
-                      <p className="text-sm text-red-600 mt-1">{errors.subject.message}</p>
+                      <p id="subject-error" className="text-sm text-red-600 mt-1" role="alert">
+                        {errors.subject.message}
+                      </p>
                     )}
                   </div>
                   <div>
@@ -148,10 +168,14 @@ export function ContactContent() {
                       id="message"
                       rows={5}
                       className="flex w-full rounded-lg border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring mt-2"
+                      aria-invalid={!!errors.message}
+                      aria-describedby={errors.message ? "message-error" : undefined}
                       {...register("message")}
                     />
                     {errors.message && (
-                      <p className="text-sm text-red-600 mt-1">{errors.message.message}</p>
+                      <p id="message-error" className="text-sm text-red-600 mt-1" role="alert">
+                        {errors.message.message}
+                      </p>
                     )}
                   </div>
                   <Button type="submit" className="w-full" disabled={isSubmitting}>

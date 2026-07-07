@@ -5,7 +5,7 @@ import { LinkSimple, PencilSimple, VideoCamera } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { PortalPageHeader } from "@/components/portal/portal-ui";
+import { PortalPageHeader, EmptyState } from "@/components/portal/portal-ui";
 import { toast } from "@/lib/ui/toast";
 import { cn } from "@/lib/utils";
 
@@ -39,6 +39,7 @@ export default function TrainerClassesPage() {
   const [trainer, setTrainer] = useState<TrainerInfo | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editLink, setEditLink] = useState("");
@@ -50,8 +51,12 @@ export default function TrainerClassesPage() {
         if (d.success) {
           setSessions(d.data.sessions ?? []);
           setTrainer(d.data.trainer ?? null);
+        } else {
+          toast.error("Could not load classes");
         }
-      });
+      })
+      .catch(() => toast.error("Could not load classes"))
+      .finally(() => setPageLoading(false));
 
   useEffect(() => {
     void load();
@@ -118,6 +123,7 @@ export default function TrainerClassesPage() {
   return (
     <div>
       <PortalPageHeader
+        eyebrow="Trainer Portal"
         title="Live Classes"
         description={
           trainer
@@ -209,10 +215,13 @@ export default function TrainerClassesPage() {
       )}
 
       <div className="space-y-4">
-        {sessions.length === 0 ? (
-          <p className="text-muted text-center py-8">
-            No classes scheduled yet. Tap &quot;Schedule Class&quot; to add your first one.
-          </p>
+        {pageLoading ? (
+          <div className="h-32 rounded-2xl border border-border bg-surface/60 animate-pulse" />
+        ) : sessions.length === 0 ? (
+          <EmptyState
+            title="No classes scheduled"
+            description='Tap "Schedule Class" to add your first live session.'
+          />
         ) : (
           sessions.map((session) => {
             const hasLink = Boolean(session.meetLink?.trim()) || session.roomType === "portal";

@@ -302,7 +302,21 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
         </div>
       )}
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 items-center">
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          onClick={() => {
+            setBrowseView("courses");
+            setSelectedCourse(null);
+            setSelectedModule("all");
+          }}
+          className="gap-1.5"
+        >
+          <GraduationCap size={16} />
+          Browse by course
+        </Button>
         <button
           type="button"
           onClick={() => setCourseFilter("all")}
@@ -372,6 +386,16 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
         {filtered.length} of {students.length} students shown
       </p>
 
+      {filtered.length === 0 && (
+        <p className="py-10 text-center text-muted rounded-2xl border border-border bg-background">
+          {students.length === 0
+            ? "No students yet. Approve registrations to create accounts."
+            : "No students match your search or filters."}
+        </p>
+      )}
+
+      {filtered.length > 0 && (
+      <>
       <div className="md:hidden space-y-3">
         {filtered.map((student) => (
           <div
@@ -588,6 +612,10 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
           </table>
         </div>
       </div>
+      </>
+      )}
+        </>
+      )}
 
       <Modal
         open={Boolean(editStudent)}
@@ -676,8 +704,6 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
           </>
         )}
       </Modal>
-        </>
-      )}
     </div>
   );
 }

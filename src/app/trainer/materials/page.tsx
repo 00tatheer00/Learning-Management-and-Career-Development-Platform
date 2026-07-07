@@ -16,6 +16,7 @@ export default async function TrainerMaterialsPage() {
   return (
     <div>
       <PortalPageHeader
+        eyebrow="Trainer Portal"
         title="Course Videos & Materials"
         description={`Learning content for ${courseTitle}. Contact admin to add new materials.`}
       />
