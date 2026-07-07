@@ -1,6 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import { getSessionRoomName, generateRoomPassword } from "@/lib/portal-video/config";
 import { sessionHasJoinLink } from "@/lib/sessions/meet-link";
+import {
+  buildLiveSessionTimestamps,
+  resolveLiveSessionTimestamps,
+} from "@/lib/sessions/live-session-datetime";
 import { getAdminProgramStats } from "@/lib/api/admin-program-stats";
 import { DEFAULT_BATCH_NAME } from "@/lib/constants/batch";
 import { getTodayYmdInPakistan } from "@/lib/utils/pakistan-time";
@@ -278,7 +282,7 @@ export async function updateSubmission(
 export async function getLiveSessions(programSlug?: string): Promise<LiveSessionPublic[]> {
   const sessions = await prisma.liveSession.findMany({
     where: programSlug ? { programSlug } : undefined,
-    orderBy: { date: "asc" },
+    orderBy: [{ startsAt: "asc" }, { date: "asc" }],
   });
   return sessions.map(mapLiveSession).map(stripSessionPassword);
 }
@@ -302,6 +306,8 @@ function mapLiveSession(s: {
   title: string;
   date: string;
   time: string;
+  startsAt?: Date | null;
+  timezone?: string | null;
   meetLink: string;
   roomType?: string | null;
   roomName?: string | null;
@@ -310,12 +316,21 @@ function mapLiveSession(s: {
   trainerName: string;
   notes: string | null;
 }): LiveSession {
+  const resolved = resolveLiveSessionTimestamps({
+    date: s.date,
+    time: s.time,
+    startsAt: s.startsAt,
+    timezone: s.timezone,
+  });
+
   return {
     id: s.id,
     programSlug: s.programSlug,
     title: s.title,
-    date: s.date,
-    time: s.time,
+    date: resolved.date,
+    time: resolved.time,
+    startsAt: resolved.startsAt.toISOString(),
+    timezone: resolved.timezone,
     meetLink: s.meetLink,
     roomType: s.roomType === "portal" ? "portal" : "meet",
     roomName: s.roomName ?? undefined,
@@ -333,14 +348,20 @@ export async function createLiveSession(
   const roomType = data.roomType ?? "meet";
   const roomName = roomType === "portal" ? getSessionRoomName(id) : data.roomName;
   const roomPassword = roomType === "portal" ? generateRoomPassword() : undefined;
+  const timezone = data.timezone ?? "Asia/Karachi";
+  const timestamps =
+    buildLiveSessionTimestamps(data.date, data.time, timezone) ??
+    resolveLiveSessionTimestamps({ date: data.date, time: data.time, timezone });
 
   const session = await prisma.liveSession.create({
     data: {
       id,
       programSlug: data.programSlug,
       title: data.title,
-      date: data.date,
-      time: data.time,
+      startsAt: timestamps.startsAt,
+      timezone: timestamps.timezone,
+      date: timestamps.date,
+      time: timestamps.time,
       meetLink: data.meetLink ?? "",
       roomType,
       roomName,
@@ -358,12 +379,30 @@ export async function updateLiveSession(
   data: Partial<Pick<LiveSession, "title" | "date" | "time" | "meetLink" | "notes">>
 ): Promise<LiveSession | null> {
   try {
+    const existing = await prisma.liveSession.findUnique({ where: { id } });
+    if (!existing) return null;
+
+    const nextDate = data.date ?? existing.date;
+    const nextTime = data.time ?? existing.time;
+    const timezone = existing.timezone ?? "Asia/Karachi";
+    const timestamps =
+      data.date !== undefined || data.time !== undefined
+        ? buildLiveSessionTimestamps(nextDate, nextTime, timezone) ??
+          resolveLiveSessionTimestamps({ date: nextDate, time: nextTime, timezone })
+        : null;
+
     const session = await prisma.liveSession.update({
       where: { id },
       data: {
         ...(data.title !== undefined ? { title: data.title } : {}),
-        ...(data.date !== undefined ? { date: data.date } : {}),
-        ...(data.time !== undefined ? { time: data.time } : {}),
+        ...(timestamps
+          ? {
+              startsAt: timestamps.startsAt,
+              date: timestamps.date,
+              time: timestamps.time,
+              timezone: timestamps.timezone,
+            }
+          : {}),
         ...(data.meetLink !== undefined ? { meetLink: data.meetLink } : {}),
         ...(data.notes !== undefined ? { notes: data.notes } : {}),
       },
@@ -392,7 +431,15 @@ export async function getPortalStats() {
     missingTrainerAssignments: programStats.missingTrainerAssignments,
     returningRegistrations: programStats.returningRegistrations,
     assignments: assignments.length,
-    upcomingSessions: sessions.filter((s) => s.date >= today).length,
+    upcomingSessions: sessions.filter((s) => {
+      const resolved = resolveLiveSessionTimestamps({
+        date: s.date,
+        time: s.time,
+        startsAt: s.startsAt,
+        timezone: s.timezone,
+      });
+      return resolved.date >= today;
+    }).length,
   };
 }
 

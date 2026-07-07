@@ -166,9 +166,10 @@ export function StudentRecordingsContent({
         {recordings.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-pt p-8 text-center">
             <p className="font-semibold text-pt">No recordings yet</p>
-            <p className="text-sm text-pt-muted mt-2 max-w-md mx-auto">
-              After each class, your trainer will upload the recording link here. Check back soon.
-            </p>
+        <p className="text-sm text-pt-muted mt-2 max-w-md mx-auto">
+          After each class, your trainer will upload the recording link here. Access is limited to
+          portal students on Google Drive.
+        </p>
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2">

@@ -1,25 +1,4 @@
-export function parseSessionDateTime(date: string, time: string): Date | null {
-  const dateMatch = date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if (!dateMatch) return null;
-
-  const timeMatch = time.trim().match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?$/i);
-  if (!timeMatch) return null;
-
-  let hours = Number(timeMatch[1]);
-  const minutes = Number(timeMatch[2]);
-  const seconds = timeMatch[3] ? Number(timeMatch[3]) : 0;
-  const meridiem = timeMatch[4]?.toUpperCase();
-
-  if (meridiem === "PM" && hours < 12) hours += 12;
-  if (meridiem === "AM" && hours === 12) hours = 0;
-
-  const year = Number(dateMatch[1]);
-  const month = Number(dateMatch[2]) - 1;
-  const day = Number(dateMatch[3]);
-
-  const parsed = new Date(year, month, day, hours, minutes, seconds, 0);
-  return Number.isNaN(parsed.getTime()) ? null : parsed;
-}
+export { parseSessionDateTime } from "@/lib/sessions/live-session-datetime";
 
 export function getSessionCountdownParts(target: Date, now = new Date()) {
   const diffMs = target.getTime() - now.getTime();

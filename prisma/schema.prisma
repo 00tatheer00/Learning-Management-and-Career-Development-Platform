@@ -41,29 +41,32 @@ model PasswordResetToken {
 }
 
 model User {
-  id             String   @id @map("_id")
-  email          String   @unique
-  passwordHash   String
-  role           UserRole
-  name           String
-  phone          String?
-  programSlug    String?
-  level          String?
-  batch          String?  @default("Batch 1")
-  trainerId      String?
-  avatarInitials String?
-  avatarUrl      String?
-  designation    String?
-  bio            String?
-  experience     String?
-  expertise      String[] @default([])
-  imagePosition  String?
-  isActive       Boolean  @default(true)
+  id              String   @id @map("_id")
+  email           String   @unique
+  passwordHash    String
+  role            UserRole
+  name            String
+  phone           String?
+  programSlug     String?
+  level           String?
+  batch           String?  @default("Batch 1")
+  trainerId       String?
+  avatarInitials  String?
+  avatarUrl       String?
+  designation     String?
+  bio             String?
+  experience      String?
+  expertise       String[] @default([])
+  imagePosition   String?
+  isActive        Boolean  @default(true)
   activeSessionId String?
-  firstLoginAt   DateTime?
-  lastLoginAt    DateTime?
-  lastActiveAt   DateTime?
-  createdAt      DateTime @default(now())
+  firstLoginAt    DateTime?
+  lastLoginAt     DateTime?
+  lastActiveAt    DateTime?
+  createdAt       DateTime @default(now())
+
+  submissions AssignmentSubmission[] @relation("StudentSubmissions")
+  attendance  ClassAttendance[]        @relation("StudentAttendance")
 }
 
 model Enrollment {
@@ -88,7 +91,7 @@ model Enrollment {
   paymentScreenshotPublicId String?
   profilePhotoUrl           String?
   profilePhotoPublicId      String?
-  passwordHash              String?
+  /// Encrypted portal password for admin reveal / WhatsApp — login uses User.passwordHash
   portalPasswordEnc         String?
   status                    EnrollmentStatus @default(pending)
   reviewedAt                DateTime?
@@ -117,6 +120,8 @@ model Assignment {
   dueDate     String
   trainerId   String
   createdAt   DateTime @default(now())
+
+  submissions AssignmentSubmission[]
 }
 
 model AssignmentSubmission {
@@ -129,21 +134,28 @@ model AssignmentSubmission {
   submittedAt  DateTime         @default(now())
   feedback     String?
   reviewedAt   DateTime?
+
+  assignment Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  student    User       @relation("StudentSubmissions", fields: [studentId], references: [id], onDelete: Cascade)
 }
 
 model LiveSession {
-  id          String  @id @map("_id")
-  programSlug String
-  title       String
-  date        String
-  time        String
-  meetLink    String  @default("")
-  roomType    String  @default("meet")
-  roomName    String?
+  id           String    @id @map("_id")
+  programSlug  String
+  title        String
+  startsAt     DateTime?
+  timezone     String    @default("Asia/Karachi")
+  date         String
+  time         String
+  meetLink     String    @default("")
+  roomType     String    @default("meet")
+  roomName     String?
   roomPassword String?
-  trainerId   String
-  trainerName String
-  notes       String?
+  trainerId    String
+  trainerName  String
+  notes        String?
+
+  attendances ClassAttendance[]
 }
 
 model AutomationSendLog {
@@ -163,6 +175,9 @@ model ClassAttendance {
   sessionTime String
   joinedAt    DateTime @default(now())
   status      String
+
+  session LiveSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  student User        @relation("StudentAttendance", fields: [studentId], references: [id], onDelete: Cascade)
 
   @@unique([sessionId, studentId])
 }

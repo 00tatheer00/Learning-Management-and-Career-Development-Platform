@@ -78,6 +78,8 @@ export interface LiveSession {
   title: string;
   date: string;
   time: string;
+  startsAt?: string;
+  timezone?: string;
   meetLink: string;
   roomType: "meet" | "portal";
   roomName?: string;

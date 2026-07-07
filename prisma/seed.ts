@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { buildLiveSessionTimestamps } from "../src/lib/sessions/live-session-datetime";
 import { hashPassword } from "../src/lib/auth/password";
 import { getDatabaseUrl } from "../src/lib/database-url";
 
@@ -167,14 +168,23 @@ async function main() {
   }
 
   for (const session of DEFAULT_SESSIONS) {
+    const timestamps = buildLiveSessionTimestamps(session.date, session.time);
     await prisma.liveSession.upsert({
       where: { id: session.id },
-      create: session,
+      create: {
+        ...session,
+        startsAt: timestamps?.startsAt,
+        timezone: timestamps?.timezone ?? "Asia/Karachi",
+        date: timestamps?.date ?? session.date,
+        time: timestamps?.time ?? session.time,
+      },
       update: {
         programSlug: session.programSlug,
         title: session.title,
-        date: session.date,
-        time: session.time,
+        startsAt: timestamps?.startsAt,
+        timezone: timestamps?.timezone ?? "Asia/Karachi",
+        date: timestamps?.date ?? session.date,
+        time: timestamps?.time ?? session.time,
         meetLink: session.meetLink,
         trainerId: session.trainerId,
         trainerName: session.trainerName,

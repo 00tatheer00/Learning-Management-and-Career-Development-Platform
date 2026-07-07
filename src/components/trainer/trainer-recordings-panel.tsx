@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { LinkSimple, PlayCircle, Trash, Plus } from "@phosphor-icons/react";
+import Link from "next/link";
+import { LinkSimple, PlayCircle, Trash, Plus, ShareNetwork } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -135,9 +136,21 @@ export function TrainerRecordingsPanel({ programSlug, courseTitle }: TrainerReco
         <p className="font-semibold text-pt">How to upload</p>
         <ol className="mt-2 list-decimal list-inside space-y-1">
           <li>Upload the class video to Google Drive (or YouTube).</li>
-          <li>Set sharing to &quot;Anyone with the link can view&quot;.</li>
+          <li>
+            Share with{" "}
+            <Link href="/trainer/drive-access" className="text-primary font-semibold underline">
+              portal student emails only
+            </Link>{" "}
+            — not public link.
+          </li>
           <li>Paste the link here with the correct class number.</li>
         </ol>
+        <Button variant="secondary" size="sm" asChild className="mt-3 gap-1.5">
+          <Link href="/trainer/drive-access">
+            <ShareNetwork size={16} />
+            Copy all student emails for Drive
+          </Link>
+        </Button>
         {progress.config && (
           <p className="mt-3 text-xs">
             Schedule: {progress.config.daysLabel} · {progress.config.timeLabel} PKT
