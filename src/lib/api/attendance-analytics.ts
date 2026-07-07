@@ -1,10 +1,11 @@
-import { generateClassSlots, getClassProgress } from "@/lib/class-schedule";
+import { generateClassSlots } from "@/lib/class-schedule";
 import { canAccessModuleOneClasses } from "@/lib/modules/student-module-access";
 import { groupStudentsByModule } from "@/lib/trainer/group-students-by-module";
 import { parseSessionDateTime } from "@/lib/sessions/live-session-datetime";
 import { formatYmdInPakistan, getTodayYmdInPakistan } from "@/lib/utils/pakistan-time";
+import { isAttendanceTrackedDate } from "@/lib/constants/attendance";
 
-export type AttendanceCellStatus = "present" | "late" | "absent" | "upcoming";
+export type AttendanceCellStatus = "present" | "late" | "absent" | "upcoming" | "untracked";
 
 export interface AttendanceSessionRef {
   id: string;
@@ -157,6 +158,21 @@ export function filterPastSessions<T extends Pick<AttendanceSessionRef, "date" |
   return sessions.filter((session) => isSessionPast(session.date, session.time, now));
 }
 
+export function filterTrackedPastSessions<T extends Pick<AttendanceSessionRef, "date" | "time">>(
+  sessions: T[],
+  now: Date = new Date()
+): T[] {
+  return filterPastSessions(sessions, now).filter((session) =>
+    isAttendanceTrackedDate(session.date)
+  );
+}
+
+function getTrackedScheduleCompletedCount(programSlug: string, now: Date): number {
+  return generateClassSlots(programSlug, { now, maxClasses: 36 }).filter(
+    (slot) => slot.status === "done" && isAttendanceTrackedDate(slot.date)
+  ).length;
+}
+
 export function getEligibleStudents(
   students: AttendanceStudentRef[],
   programSlug: string
@@ -194,20 +210,23 @@ export function computeStudentAttendanceStats(input: {
 }): StudentAttendanceStats {
   const now = input.now ?? new Date();
   const eligible = canAccessModuleOneClasses(input.programSlug, input.studentLevel);
-  const pastSessions = filterPastSessions(
+  const pastSessions = filterTrackedPastSessions(
     input.sessions.filter((session) => session.programSlug === input.programSlug),
     now
   );
 
   const studentRecords = input.records
-    .filter((record) => record.studentId === input.studentId)
+    .filter(
+      (record) =>
+        record.studentId === input.studentId && isAttendanceTrackedDate(record.sessionDate)
+    )
     .sort((a, b) => b.joinedAt.localeCompare(a.joinedAt));
 
   const present = studentRecords.filter((record) => record.status === "present").length;
   const late = studentRecords.filter((record) => record.status === "late").length;
   const attended = studentRecords.length;
 
-  const scheduleFallback = getClassProgress(input.programSlug, now).completedCount;
+  const scheduleFallback = getTrackedScheduleCompletedCount(input.programSlug, now);
   const totalExpected = eligible
     ? Math.max(pastSessions.length, scheduleFallback > 0 ? scheduleFallback : pastSessions.length)
     : 0;
@@ -276,7 +295,15 @@ export function computeStudentDayRows(input: {
           title: session.title,
           time: session.time,
           classNumber: slot.classNumber,
-          status: record ? record.status : past ? "absent" : "upcoming",
+          status: record
+            ? isAttendanceTrackedDate(session.date)
+              ? record.status
+              : "untracked"
+            : past
+              ? isAttendanceTrackedDate(session.date)
+                ? "absent"
+                : "untracked"
+              : "upcoming",
           joinedAt: record?.joinedAt,
         });
       }
@@ -285,7 +312,7 @@ export function computeStudentDayRows(input: {
         title: `Class ${slot.classNumber}`,
         time: slot.timeLabel,
         classNumber: slot.classNumber,
-        status: "absent",
+        status: isAttendanceTrackedDate(slot.date) ? "absent" : "untracked",
       });
     } else {
       items.push({
@@ -314,7 +341,15 @@ export function computeStudentDayRows(input: {
         sessionId: session.id,
         title: session.title,
         time: session.time,
-        status: record ? record.status : past ? "absent" : "upcoming",
+        status: record
+          ? isAttendanceTrackedDate(session.date)
+            ? record.status
+            : "untracked"
+          : past
+            ? isAttendanceTrackedDate(session.date)
+              ? "absent"
+              : "untracked"
+            : "upcoming",
         joinedAt: record?.joinedAt,
       };
     });
@@ -332,7 +367,8 @@ export function computeStudentDayRows(input: {
 function rollupDayStatus(items: StudentDaySessionItem[]): AttendanceCellStatus {
   if (items.some((item) => item.status === "present")) return "present";
   if (items.some((item) => item.status === "late")) return "late";
-  if (items.every((item) => item.status === "absent")) return "absent";
+  if (items.some((item) => item.status === "absent")) return "absent";
+  if (items.every((item) => item.status === "untracked")) return "untracked";
   return "upcoming";
 }
 
@@ -357,6 +393,7 @@ export function computeSessionRows(input: {
 
   return programSessions.map((session) => {
     const isPast = isSessionPast(session.date, session.time, now);
+    const isCounted = isPast && isAttendanceTrackedDate(session.date);
     let present = 0;
     let late = 0;
 
@@ -368,8 +405,8 @@ export function computeSessionRows(input: {
     }
 
     const attended = present + late;
-    const expected = isPast ? eligible.length : 0;
-    const absent = isPast ? Math.max(0, expected - attended) : 0;
+    const expected = isCounted ? eligible.length : 0;
+    const absent = isCounted ? Math.max(0, expected - attended) : 0;
     const rate = expected > 0 ? Math.round((attended / expected) * 100) : 0;
 
     return {
@@ -390,7 +427,7 @@ export function computeSessionRows(input: {
 export function computeDayRows(sessionRows: SessionAttendanceRow[]): DayAttendanceRow[] {
   const byDate = new Map<string, SessionAttendanceRow[]>();
 
-  for (const row of sessionRows.filter((session) => session.isPast)) {
+  for (const row of sessionRows.filter((session) => session.isPast && session.expected > 0)) {
     const list = byDate.get(row.date) ?? [];
     list.push(row);
     byDate.set(row.date, list);
@@ -427,11 +464,11 @@ export function computeModuleRows(input: {
   now?: Date;
 }): ModuleAttendanceRow[] {
   const now = input.now ?? new Date();
-  const pastCount = filterPastSessions(
+  const pastCount = filterTrackedPastSessions(
     input.sessions.filter((session) => session.programSlug === input.programSlug),
     now
   ).length;
-  const scheduleFallback = getClassProgress(input.programSlug, now).completedCount;
+  const scheduleFallback = getTrackedScheduleCompletedCount(input.programSlug, now);
   const totalExpectedPerStudent = Math.max(pastCount, scheduleFallback > 0 ? scheduleFallback : pastCount);
   const programStudents = input.students.filter((student) => student.programSlug === input.programSlug);
   const groups = groupStudentsByModule(
@@ -445,7 +482,9 @@ export function computeModuleRows(input: {
   return groups.map((group) => {
     const studentRows: ModuleStudentAttendance[] = group.students.map((student) => {
       const eligible = canAccessModuleOneClasses(input.programSlug, student.level);
-      const studentRecords = input.records.filter((record) => record.studentId === student.id);
+      const studentRecords = input.records.filter(
+        (record) => record.studentId === student.id && isAttendanceTrackedDate(record.sessionDate)
+      );
       const present = studentRecords.filter((record) => record.status === "present").length;
       const late = studentRecords.filter((record) => record.status === "late").length;
       const attended = studentRecords.length;
@@ -492,7 +531,9 @@ export function computeAttendanceOverview(input: {
   programSlug: string;
   now?: Date;
 }): AttendanceOverview {
-  const sessionRows = computeSessionRows(input).filter((row) => row.isPast);
+  const sessionRows = computeSessionRows(input).filter(
+    (row) => row.isPast && row.expected > 0
+  );
   const eligible = getEligibleStudents(input.students, input.programSlug);
 
   const present = sessionRows.reduce((sum, row) => sum + row.present, 0);
@@ -545,10 +586,12 @@ export function computeAttendanceMatrix(input: {
       const past = isSessionPast(session.date, session.time, now);
 
       if (record) {
-        cells[session.id] = record.status;
-        attended += 1;
+        cells[session.id] = isAttendanceTrackedDate(session.date) ? record.status : "untracked";
+        if (isAttendanceTrackedDate(session.date)) attended += 1;
       } else if (!past) {
         cells[session.id] = "upcoming";
+      } else if (!isAttendanceTrackedDate(session.date)) {
+        cells[session.id] = "untracked";
       } else if (eligible) {
         cells[session.id] = "absent";
       } else {
@@ -556,8 +599,8 @@ export function computeAttendanceMatrix(input: {
       }
     }
 
-    const pastSessions = filterPastSessions(programSessions, now).length;
-    const scheduleFallback = getClassProgress(input.programSlug, now).completedCount;
+    const pastSessions = filterTrackedPastSessions(programSessions, now).length;
+    const scheduleFallback = getTrackedScheduleCompletedCount(input.programSlug, now);
     const expected = eligible
       ? Math.max(pastSessions, scheduleFallback > 0 ? scheduleFallback : pastSessions)
       : 0;

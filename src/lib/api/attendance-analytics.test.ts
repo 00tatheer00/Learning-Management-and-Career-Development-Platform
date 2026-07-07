@@ -7,6 +7,7 @@ import {
   computeSessionRows,
   computeStudentAttendanceStats,
   filterPastSessions,
+  filterTrackedPastSessions,
   isSessionPast,
 } from "@/lib/api/attendance-analytics";
 
@@ -86,103 +87,119 @@ const records = [
 ];
 
 describe("attendance analytics", () => {
-  const now = new Date("2026-07-07T16:00:00.000Z"); // class 1 done, class 2 today
+  const nowBeforeClass2 = new Date("2026-07-07T16:00:00.000Z");
+  const nowAfterClass2 = new Date("2026-07-08T16:00:00.000Z");
 
   it("detects past sessions", () => {
-    expect(isSessionPast("2026-07-06", "10:00 PM", now)).toBe(true);
-    expect(isSessionPast("2026-07-08", "10:00 PM", now)).toBe(false);
-    expect(filterPastSessions(sessions, now).map((session) => session.id)).toEqual(["s1"]);
+    expect(isSessionPast("2026-07-06", "10:00 PM", nowBeforeClass2)).toBe(true);
+    expect(isSessionPast("2026-07-08", "10:00 PM", nowBeforeClass2)).toBe(false);
+    expect(filterPastSessions(sessions, nowBeforeClass2).map((session) => session.id)).toEqual([
+      "s1",
+    ]);
+    expect(filterTrackedPastSessions(sessions, nowBeforeClass2).map((session) => session.id)).toEqual(
+      []
+    );
+    expect(filterTrackedPastSessions(sessions, nowAfterClass2).map((session) => session.id)).toEqual(
+      ["s2"]
+    );
   });
 
-  it("computes student attendance percentage", () => {
+  it("excludes pre-tracking classes from student attendance marks", () => {
     const stats = computeStudentAttendanceStats({
       studentId: "stu1",
       programSlug: "web-development",
       studentLevel: "HTML & CSS",
       sessions,
       records,
-      now,
+      now: nowAfterClass2,
     });
 
-    expect(stats.attended).toBe(2);
-    expect(stats.present).toBe(2);
+    expect(stats.attended).toBe(1);
+    expect(stats.present).toBe(1);
     expect(stats.late).toBe(0);
-    expect(stats.percentage).toBeGreaterThan(0);
+    expect(stats.totalExpected).toBe(1);
+    expect(stats.percentage).toBe(100);
   });
 
-  it("builds session rows with absent counts for eligible students", () => {
+  it("does not mark students absent for classes before tracking started", () => {
     const rows = computeSessionRows({
       sessions,
       students,
       records,
       programSlug: "web-development",
-      now,
+      now: nowAfterClass2,
     });
 
     const class1 = rows.find((row) => row.sessionId === "s1");
     expect(class1?.present).toBe(1);
     expect(class1?.late).toBe(1);
     expect(class1?.absent).toBe(0);
-    expect(class1?.expected).toBe(2);
+    expect(class1?.expected).toBe(0);
+
+    const class2 = rows.find((row) => row.sessionId === "s2");
+    expect(class2?.present).toBe(1);
+    expect(class2?.absent).toBe(1);
+    expect(class2?.expected).toBe(2);
   });
 
-  it("groups sessions by day", () => {
+  it("groups tracked sessions by day", () => {
     const dayRows = computeDayRows(
       computeSessionRows({
         sessions,
         students,
         records,
         programSlug: "web-development",
-        now,
+        now: nowAfterClass2,
       })
     );
 
-    expect(dayRows[0]?.date).toBe("2026-07-06");
+    expect(dayRows.map((day) => day.date)).toEqual(["2026-07-07"]);
     expect(dayRows[0]?.present).toBe(1);
-    expect(dayRows[0]?.late).toBe(1);
+    expect(dayRows[0]?.absent).toBe(1);
   });
 
-  it("computes module-wise attendance", () => {
+  it("computes module-wise attendance from tracked classes only", () => {
     const moduleRows = computeModuleRows({
       sessions,
       students,
       records,
       programSlug: "web-development",
-      now,
+      now: nowAfterClass2,
     });
 
     const module1 = moduleRows.find((row) => row.moduleName === "HTML & CSS");
     expect(module1?.studentCount).toBe(2);
-    expect(module1?.present).toBeGreaterThan(0);
+    expect(module1?.present).toBe(1);
+    expect(module1?.absent).toBe(1);
   });
 
-  it("computes overview totals", () => {
+  it("computes overview totals from tracked classes only", () => {
     const overview = computeAttendanceOverview({
       sessions,
       students,
       records,
       programSlug: "web-development",
-      now,
+      now: nowAfterClass2,
     });
 
     expect(overview.eligibleStudents).toBe(2);
     expect(overview.pastSessions).toBe(1);
-    expect(overview.present + overview.late).toBe(2);
+    expect(overview.present).toBe(1);
+    expect(overview.absent).toBe(1);
   });
 
-  it("computes student day-by-day attendance", () => {
+  it("shows pre-tracking days as not tracked in student day view", () => {
     const stats = computeStudentAttendanceStats({
       studentId: "stu1",
       programSlug: "web-development",
       studentLevel: "HTML & CSS",
       sessions,
       records,
-      now,
+      now: nowAfterClass2,
     });
 
-    expect(stats.days.length).toBeGreaterThan(0);
     const class1Day = stats.days.find((day) => day.date === "2026-07-06");
-    expect(class1Day?.status).toBe("present");
+    expect(class1Day?.status).toBe("untracked");
     const class2Day = stats.days.find((day) => day.date === "2026-07-07");
     expect(class2Day?.status).toBe("present");
   });

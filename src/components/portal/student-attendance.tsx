@@ -8,6 +8,7 @@ import { ModuleStartsSoonNotice } from "@/components/portal/module-starts-soon-n
 import { PortalPageHeader, PortalSurfaceCard } from "@/components/portal/portal-ui";
 import { formatAppliedDateTime } from "@/lib/utils";
 import { cn } from "@/lib/utils";
+import { lateThresholdDescription, ATTENDANCE_TRACKING_START_DATE } from "@/lib/constants/attendance";
 
 interface StudentAttendanceProgressCardProps {
   programSlug: string;
@@ -126,7 +127,7 @@ export async function StudentAttendancePageContent() {
     <div className="space-y-4">
       <PortalPageHeader
         title="My Attendance"
-        description="Recorded when you join class from the portal. Present on time, Late after 10 minutes."
+        description={`Recorded when you join class from the portal (from ${ATTENDANCE_TRACKING_START_DATE}). Present on time, ${lateThresholdDescription()}.`}
       />
 
       <PortalSurfaceCard className="p-5 sm:p-6">
@@ -272,6 +273,11 @@ function DayStatusBadge({
     },
     upcoming: {
       label: "Upcoming",
+      icon: <CalendarBlank size={compact ? 12 : 14} weight="duotone" />,
+      className: "bg-surface text-pt-muted border border-pt",
+    },
+    untracked: {
+      label: "Not tracked",
       icon: <CalendarBlank size={compact ? 12 : 14} weight="duotone" />,
       className: "bg-surface text-pt-muted border border-pt",
     },

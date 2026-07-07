@@ -18,6 +18,7 @@ import { getProgramCategory } from "@/lib/constants/program-categories";
 import { formatAppliedDateTime } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { PORTAL_VIEWPORT_PANEL } from "@/lib/constants/portal-layout";
+import { lateThresholdDescription, ATTENDANCE_TRACKING_START_DATE } from "@/lib/constants/attendance";
 import type {
   AttendanceOverview,
   DayAttendanceRow,
@@ -42,7 +43,7 @@ interface AttendanceAnalytics {
       rate: number;
       attended: number;
       missed: number;
-      cells: Record<string, "present" | "late" | "absent" | "upcoming">;
+      cells: Record<string, "present" | "late" | "absent" | "upcoming" | "untracked">;
     }>;
   };
   rows: AttendanceReportRow[];
@@ -65,7 +66,7 @@ const TABS: Array<{ id: AttendanceTab; label: string; icon: typeof ChartPie }> =
 export function AttendanceDashboard({
   mode,
   title = "Attendance Management",
-  description = "Auto-recorded when students join class from the portal. Present if on time, Late after 10 minutes.",
+  description = `Auto-recorded when students join class from the portal (from ${ATTENDANCE_TRACKING_START_DATE}). Present if on time, ${lateThresholdDescription()}.`,
 }: AttendanceDashboardProps) {
   const [tab, setTab] = useState<AttendanceTab>("overview");
   const [programFilter, setProgramFilter] = useState("web-development");
@@ -605,7 +606,11 @@ function RatePill({
   );
 }
 
-function CellBadge({ status }: { status: "present" | "late" | "absent" | "upcoming" }) {
+function CellBadge({
+  status,
+}: {
+  status: "present" | "late" | "absent" | "upcoming" | "untracked";
+}) {
   if (status === "present") {
     return <CheckCircle size={18} weight="fill" className="mx-auto text-emerald-600" />;
   }
@@ -614,6 +619,9 @@ function CellBadge({ status }: { status: "present" | "late" | "absent" | "upcomi
   }
   if (status === "absent") {
     return <XCircle size={18} weight="fill" className="mx-auto text-rose-500" />;
+  }
+  if (status === "untracked") {
+    return <span className="text-[10px] font-semibold text-muted">N/A</span>;
   }
   return <span className="text-muted">—</span>;
 }

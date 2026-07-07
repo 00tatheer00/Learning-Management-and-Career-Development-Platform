@@ -11,8 +11,7 @@ import {
   type AttendanceStudentRef,
 } from "@/lib/api/attendance-analytics";
 import { parseSessionDateTime } from "@/lib/sessions/join-window";
-
-const LATE_THRESHOLD_MS = 10 * 60 * 1000;
+import { LATE_THRESHOLD_MS } from "@/lib/constants/attendance";
 
 export function getAttendanceStatus(
   sessionDate: string,
