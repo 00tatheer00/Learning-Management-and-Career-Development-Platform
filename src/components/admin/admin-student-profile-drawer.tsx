@@ -258,13 +258,13 @@ function AdminStudentProfileDrawer() {
 
     if (!revealedPassword) {
       setActionLoading("password");
-      const password = await revealStudentPassword(profile.studentId);
+      const result = await revealStudentPassword(profile.studentId);
       setActionLoading(null);
-      if (!password) {
-        toast.error("Could not load password");
+      if (!result.password) {
+        toast.error(result.error ?? "Could not load password");
         return;
       }
-      setRevealedPassword(password);
+      setRevealedPassword(result.password);
     }
 
     setShowPassword(true);

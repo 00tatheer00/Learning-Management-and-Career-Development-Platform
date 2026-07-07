@@ -19,6 +19,7 @@ import { getProgramCategory } from "@/lib/constants/program-categories";
 import { getProgramBySlug } from "@/lib/data/programs";
 import { buildApprovalWhatsAppMessage } from "@/lib/notifications/approval-templates";
 import { cn, formatAppliedDateTime } from "@/lib/utils";
+import { copyToClipboard } from "@/lib/utils/clipboard";
 import { PORTAL_VIEWPORT_PANEL } from "@/lib/constants/portal-layout";
 import { toast } from "@/lib/ui/toast";
 import { useAdminPermissions } from "@/components/admin/admin-permissions";
@@ -35,10 +36,10 @@ interface CredentialsMeta {
 }
 
 async function copyText(label: string, value: string) {
-  try {
-    await navigator.clipboard.writeText(value);
+  const copied = await copyToClipboard(value);
+  if (copied) {
     toast.success(`${label} copied`);
-  } catch {
+  } else {
     toast.error("Could not copy");
   }
 }
@@ -120,33 +121,49 @@ export function AdminCredentialsPanel() {
     });
   };
 
+  const fetchPasswordForRow = async (row: AdminCredentialRow): Promise<string | null> => {
+    const cached = revealedPasswords[row.id];
+    if (cached) return cached;
+
+    setLoadingId(row.id);
+    const result = await revealStudentPassword(row.id);
+    setLoadingId(null);
+
+    if (!result.password) {
+      toast.error(result.error ?? "Could not load password");
+      return null;
+    }
+
+    setRevealedPasswords((current) => ({ ...current, [row.id]: result.password! }));
+    return result.password;
+  };
+
   const revealPassword = async (row: AdminCredentialRow) => {
     if (visiblePasswords.has(row.id)) {
       togglePassword(row.id);
       return;
     }
 
-    if (!revealedPasswords[row.id]) {
-      setLoadingId(row.id);
-      const password = await revealStudentPassword(row.id);
-      setLoadingId(null);
-      if (!password) {
-        toast.error("Could not load password");
-        return;
-      }
-      setRevealedPasswords((current) => ({ ...current, [row.id]: password }));
-    }
+    const password = await fetchPasswordForRow(row);
+    if (!password) return;
 
     togglePassword(row.id);
   };
 
   const getRowPassword = (row: AdminCredentialRow) => revealedPasswords[row.id] ?? null;
 
-  const buildWhatsAppMessage = (row: AdminCredentialRow) => {
-    const password = getRowPassword(row);
-    if (!password) return "";
+  const copyPasswordForRow = async (row: AdminCredentialRow) => {
+    const password = await fetchPasswordForRow(row);
+    if (!password) return;
+    await copyText("Password", password);
+  };
+
+  const copyWhatsAppMessageForRow = async (row: AdminCredentialRow) => {
+    const password = await fetchPasswordForRow(row);
+    if (!password) return;
+
     const programLevel = getProgramBySlug(row.programSlug)?.level ?? "—";
-    return buildApprovalWhatsAppMessage({
+    const message = buildApprovalWhatsAppMessage({
       studentName: row.name,
       email: row.email,
       password,
@@ -155,6 +172,16 @@ export function AdminCredentialsPanel() {
       level: programLevel,
       loginUrl: row.loginUrl,
     });
+    await copyText("WhatsApp message", message);
+  };
+
+  const copyLoginDetailsForRow = async (row: AdminCredentialRow) => {
+    const password = await fetchPasswordForRow(row);
+    if (!password) return;
+    await copyText(
+      "Login details",
+      `Login ID: ${row.email}\nPassword: ${password}\nPortal: ${row.loginUrl}`
+    );
   };
 
   const handleResendWhatsApp = async (row: AdminCredentialRow) => {
@@ -577,8 +604,8 @@ export function AdminCredentialsPanel() {
                             <button
                               type="button"
                               title="Copy password"
-                              disabled={!password}
-                              onClick={() => void copyText("Password", password!)}
+                              disabled={loadingId === row.id}
+                              onClick={() => void copyPasswordForRow(row)}
                               className="rounded p-1 hover:bg-surface text-muted disabled:opacity-40"
                             >
                               <Copy size={12} />
@@ -608,13 +635,8 @@ export function AdminCredentialsPanel() {
                           <button
                             type="button"
                             title="Copy full login details"
-                            disabled={!password}
-                            onClick={() =>
-                              void copyText(
-                                "Login details",
-                                `Login ID: ${row.email}\nPassword: ${password}\nPortal: ${row.loginUrl}`
-                              )
-                            }
+                            disabled={loadingId === row.id}
+                            onClick={() => void copyLoginDetailsForRow(row)}
                             className="rounded border border-border p-1.5 hover:bg-surface disabled:opacity-40"
                           >
                             <Copy size={14} />
@@ -644,8 +666,8 @@ export function AdminCredentialsPanel() {
                           <button
                             type="button"
                             title="Copy WhatsApp message"
-                            disabled={!password}
-                            onClick={() => void copyText("WhatsApp message", buildWhatsAppMessage(row))}
+                            disabled={loadingId === row.id}
+                            onClick={() => void copyWhatsAppMessageForRow(row)}
                             className="rounded border border-border p-1.5 hover:bg-surface disabled:opacity-40"
                           >
                             <ChatsCircle size={14} weight="duotone" />

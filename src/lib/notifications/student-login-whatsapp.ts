@@ -1,9 +1,8 @@
 import { getProgramBySlug } from "@/lib/data/programs";
 import { buildApprovalWhatsAppMessage } from "@/lib/notifications/approval-templates";
 import { sendLoginResendWhatsApp } from "@/lib/notifications/whatsapp";
-import { decryptPortalPassword } from "@/lib/auth/portal-password-vault";
+import { getStudentPortalPasswordForWhatsApp } from "@/lib/api/admin-portal-password";
 import { getPortalLoginUrl } from "@/lib/site-url";
-import { prisma } from "@/lib/prisma";
 
 export async function sendStudentLoginWhatsApp(input: {
   fullName: string;
@@ -34,28 +33,16 @@ export async function resendStudentLoginWhatsApp(studentId: string): Promise<{
   message: string;
   error?: string;
 }> {
-  const student = await prisma.user.findUnique({ where: { id: studentId } });
-  if (!student || student.role !== "student") {
-    return { success: false, message: "", error: "Student not found" };
-  }
-
-  const enrollment = await prisma.enrollment.findFirst({
-    where: { email: student.email.toLowerCase(), status: "approved" },
-    orderBy: { reviewedAt: "desc" },
-  });
-
-  if (!enrollment) {
-    return { success: false, message: "", error: "No approved registration found for this student" };
-  }
-
-  const password = decryptPortalPassword(enrollment.portalPasswordEnc);
-  if (!password) {
+  const lookup = await getStudentPortalPasswordForWhatsApp(studentId);
+  if (!lookup.password || !lookup.enrollment) {
     return {
       success: false,
       message: "",
-      error: "Login password not saved. Use Portal Logins → Generate & Save, then resend.",
+      error: lookup.error ?? "Login password not available",
     };
   }
+
+  const { student, enrollment, password } = lookup;
 
   const result = await sendStudentLoginWhatsApp({
     fullName: student.name,
