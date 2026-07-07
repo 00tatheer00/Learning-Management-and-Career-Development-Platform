@@ -6,11 +6,13 @@ import { cn } from "@/lib/utils";
 interface StudentModuleRoadmapProps {
   programSlug: string;
   currentModule?: string;
+  enrolledModules?: string[];
 }
 
 export function StudentModuleRoadmap({
   programSlug,
   currentModule,
+  enrolledModules = [],
 }: StudentModuleRoadmapProps) {
   const program = getProgramBySlug(programSlug);
   const category = getProgramCategory(programSlug);
@@ -18,6 +20,7 @@ export function StudentModuleRoadmap({
 
   if (modules.length === 0) return null;
 
+  const enrolledSet = new Set(enrolledModules);
   const currentIndex = currentModule
     ? modules.findIndex((mod) => mod.name === currentModule)
     : -1;
@@ -47,6 +50,7 @@ export function StudentModuleRoadmap({
           const isCurrent = currentIndex >= 0 ? index === currentIndex : mod.name === currentModule;
           const isCompleted = currentIndex >= 0 && index < currentIndex;
           const isUpcoming = currentIndex >= 0 && index > currentIndex;
+          const isEnrolled = enrolledSet.has(mod.name);
 
           return (
             <div key={mod.name} className="flex gap-4">
@@ -100,6 +104,11 @@ export function StudentModuleRoadmap({
                     {isCompleted && (
                       <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-800">
                         Done
+                      </span>
+                    )}
+                    {isEnrolled && !isCurrent && !isCompleted && (
+                      <span className="rounded-full bg-sky-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-sky-800">
+                        Enrolled
                       </span>
                     )}
                   </div>

@@ -8,6 +8,29 @@ export function getProgramModuleNames(programSlug: string): string[] {
   return getProgramBySlug(programSlug)?.modules.map((mod) => mod.name) ?? [];
 }
 
+export function resolveActiveStudentModule(
+  programSlug: string,
+  userLevel: string | null | undefined,
+  approvedLevels: string[]
+): string | null {
+  const order = getProgramModuleNames(programSlug);
+  if (order.length === 0) {
+    return userLevel?.trim() || approvedLevels[0] || null;
+  }
+
+  const enrolled = new Set(
+    [...approvedLevels, userLevel ?? ""].map((level) => level.trim()).filter(Boolean)
+  );
+
+  for (const moduleName of order) {
+    if (enrolled.has(moduleName)) {
+      return moduleName;
+    }
+  }
+
+  return userLevel?.trim() || approvedLevels[0] || null;
+}
+
 export function isFirstModuleStudent(programSlug: string, level?: string | null): boolean {
   const firstModule = getFirstModuleName(programSlug);
   if (!firstModule) return true;
@@ -15,8 +38,15 @@ export function isFirstModuleStudent(programSlug: string, level?: string | null)
   return level.trim() === firstModule;
 }
 
-export function canAccessModuleOneClasses(programSlug: string, level?: string | null): boolean {
-  return isFirstModuleStudent(programSlug, level);
+export function canAccessModuleOneClasses(
+  programSlug: string,
+  level?: string | null,
+  approvedLevels?: string[]
+): boolean {
+  const activeLevel = approvedLevels?.length
+    ? resolveActiveStudentModule(programSlug, level, approvedLevels)
+    : level;
+  return isFirstModuleStudent(programSlug, activeLevel);
 }
 
 export const MODULE_ONE_ACTIVE_NOTE =

@@ -31,6 +31,7 @@ import { getStudentClassSchedule } from "@/lib/constants/student-portal-ur";
 import { canAccessModuleOneClasses } from "@/lib/modules/student-module-access";
 import { ModuleStartsSoonNotice } from "@/components/portal/module-starts-soon-notice";
 import { findNextUpcomingSession } from "@/lib/utils/session-datetime";
+import { getApprovedEnrollmentLevels } from "@/lib/auth/student-module-sync";
 
 export default async function StudentDashboardPage() {
   const user = await getCurrentUser();
@@ -44,6 +45,9 @@ export default async function StudentDashboardPage() {
   ]);
   const category = getProgramCategory(programSlug);
   const classSchedule = getStudentClassSchedule(programSlug);
+  const enrolledModules = user.email
+    ? await getApprovedEnrollmentLevels(user.email, programSlug)
+    : [];
   const nextSession = findNextUpcomingSession(sessions, programSlug);
   const courseLabel = category?.sidebarLabel ?? "Your course";
   const canJoinLive = canAccessModuleOneClasses(programSlug, user.level);
@@ -103,7 +107,11 @@ export default async function StudentDashboardPage() {
 
       {canJoinLive && <StudentClassProgressCard programSlug={programSlug} />}
 
-      <StudentModuleRoadmap programSlug={programSlug} currentModule={user.level} />
+      <StudentModuleRoadmap
+        programSlug={programSlug}
+        currentModule={user.level}
+        enrolledModules={enrolledModules}
+      />
 
       <StudentTrainerCard programSlug={programSlug} trainerId={user.trainerId} />
 

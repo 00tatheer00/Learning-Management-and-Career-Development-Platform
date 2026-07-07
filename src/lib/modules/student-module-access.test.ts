@@ -3,6 +3,7 @@ import {
   canAccessModuleOneClasses,
   getFirstModuleName,
   isFirstModuleStudent,
+  resolveActiveStudentModule,
 } from "@/lib/modules/student-module-access";
 
 describe("student module access", () => {
@@ -15,6 +16,26 @@ describe("student module access", () => {
     expect(isFirstModuleStudent("web-development", "JavaScript")).toBe(false);
     expect(canAccessModuleOneClasses("web-development", "React")).toBe(false);
     expect(canAccessModuleOneClasses("web-development", null)).toBe(false);
+  });
+
+  it("uses the earliest approved module when a student enrolled in multiple modules", () => {
+    const approved = ["HTML & CSS", "JavaScript", "React", "Backend + Database"];
+
+    expect(
+      resolveActiveStudentModule("web-development", "Backend + Database", approved)
+    ).toBe("HTML & CSS");
+
+    expect(
+      canAccessModuleOneClasses("web-development", "Backend + Database", approved)
+    ).toBe(true);
+  });
+
+  it("does not grant module 1 access when only later modules are approved", () => {
+    expect(
+      canAccessModuleOneClasses("web-development", "Backend + Database", [
+        "Backend + Database",
+      ])
+    ).toBe(false);
   });
 
   it("identifies app module 1", () => {

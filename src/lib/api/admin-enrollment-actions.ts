@@ -9,6 +9,8 @@ import {
   updateUserPasswordHash,
 } from "@/lib/auth/users";
 import { buildStudentProgramAssignment } from "@/lib/auth/program-assignment";
+import { resolveActiveStudentModule } from "@/lib/modules/student-module-access";
+import { getApprovedEnrollmentLevels } from "@/lib/auth/student-module-sync";
 import { hashPassword } from "@/lib/auth/password";
 import { generateStudentPassword } from "@/lib/auth/generate-password";
 import { sendApprovalWelcomeNotifications } from "@/lib/notifications/approval-welcome";
@@ -72,6 +74,14 @@ export async function approveEnrollmentAndCreateAccount(
     enrollment.batch
   );
 
+  const approvedLevels = await getApprovedEnrollmentLevels(
+    enrollment.email,
+    enrollment.program
+  );
+  const activeLevel =
+    resolveActiveStudentModule(enrollment.program, enrollment.level, approvedLevels) ??
+    assignment.level;
+
   const user = await getUserByEmail(enrollment.email);
   if (!user) {
     await createUserWithPasswordHash({
@@ -81,7 +91,7 @@ export async function approveEnrollmentAndCreateAccount(
       name: enrollment.fullName,
       phone: enrollment.whatsapp,
       programSlug: assignment.programSlug,
-      level: assignment.level,
+      level: activeLevel,
       batch: assignment.batch,
       trainerId: assignment.trainerId,
       isActive: true,
@@ -92,7 +102,7 @@ export async function approveEnrollmentAndCreateAccount(
       name: enrollment.fullName,
       phone: enrollment.whatsapp,
       programSlug: assignment.programSlug,
-      level: assignment.level,
+      level: activeLevel,
       batch: assignment.batch,
       trainerId: assignment.trainerId,
       isActive: true,

@@ -4,6 +4,7 @@ import { isActiveSession } from "@/lib/auth/session-control";
 import { getPortalHome } from "@/lib/auth/portal-routes";
 import { prisma } from "@/lib/prisma";
 import type { PortalUser, UserRole } from "@/types/portal";
+import { syncStudentActiveModuleFromEnrollments } from "@/lib/auth/student-module-sync";
 
 export { getPortalHome };
 
@@ -22,6 +23,11 @@ export async function getCurrentUser(): Promise<PortalUser | null> {
     if (!sessionValid) return null;
   }
 
+  const level =
+    user.role === "student" && user.programSlug
+      ? (await syncStudentActiveModuleFromEnrollments(user.id)) ?? user.level
+      : user.level;
+
   return {
     id: user.id,
     email: user.email,
@@ -29,7 +35,7 @@ export async function getCurrentUser(): Promise<PortalUser | null> {
     name: user.name,
     phone: user.phone ?? undefined,
     programSlug: user.programSlug ?? undefined,
-    level: user.level ?? undefined,
+    level: level ?? undefined,
     trainerId: user.trainerId ?? undefined,
     avatarInitials: user.avatarInitials ?? undefined,
     avatarUrl: user.avatarUrl ?? undefined,
