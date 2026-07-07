@@ -18,14 +18,15 @@ const JOINED_KEY = "eest-whatsapp-group-joined";
 const DEFERRED_KEY = "eest-whatsapp-group-deferred";
 
 interface StudentPortalWelcomeProps {
+  studentId: string;
   studentName: string;
 }
 
-export function StudentPortalWelcome({ studentName }: StudentPortalWelcomeProps) {
+export function StudentPortalWelcome({ studentId, studentName }: StudentPortalWelcomeProps) {
   const [phase, setPhase] = useState<"celebration" | "whatsapp" | "done">("done");
 
   useEffect(() => {
-    if (shouldShowStudentCelebration()) {
+    if (shouldShowStudentCelebration(studentId)) {
       setPhase("celebration");
       return;
     }
@@ -43,11 +44,12 @@ export function StudentPortalWelcome({ studentName }: StudentPortalWelcomeProps)
     } catch {
       setPhase("whatsapp");
     }
-  }, []);
+  }, [studentId]);
 
   if (phase === "celebration") {
     return (
       <StudentWelcomeCelebration
+        studentId={studentId}
         studentName={studentName}
         onComplete={() => {
           try {
@@ -147,5 +149,3 @@ export function resetWhatsAppGroupPromptForLogin() {
     // ignore storage errors
   }
 }
-
-export { resetStudentWelcomeForLogin } from "@/components/portal/student-welcome-celebration";

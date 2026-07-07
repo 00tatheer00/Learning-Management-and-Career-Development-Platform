@@ -22,7 +22,6 @@ import { Alert } from "@/components/ui/alert";
 import { toast } from "@/lib/ui/toast";
 import {
   resetWhatsAppGroupPromptForLogin,
-  resetStudentWelcomeForLogin,
 } from "@/components/portal/student-portal-welcome";
 import type { UserRole } from "@/types/portal";
 import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
@@ -102,7 +101,6 @@ export default function LoginForm({
       const role = session?.user?.role ?? selectedRole;
       if (role === "student") {
         resetWhatsAppGroupPromptForLogin();
-        resetStudentWelcomeForLogin();
       }
       router.push(getPortalHome(role));
       router.refresh();

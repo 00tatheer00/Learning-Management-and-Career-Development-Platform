@@ -204,7 +204,9 @@ function PortalShellInner({ user, children }: PortalShellProps) {
           )}
           {children}
         </main>
-        {user.role === "student" && <StudentPortalWelcome studentName={user.name} />}
+        {user.role === "student" && (
+          <StudentPortalWelcome studentId={user.id} studentName={user.name} />
+        )}
       </div>
     </div>
   );

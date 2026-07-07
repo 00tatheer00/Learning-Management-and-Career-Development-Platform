@@ -8,9 +8,14 @@ import { Button } from "@/components/ui/button";
 import { playPortalSound } from "@/lib/ui/portal-sounds";
 import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
 
-const CELEBRATION_KEY = "eest-student-celebration-shown";
+const CELEBRATION_KEY_PREFIX = "eest-student-celebration-shown";
+
+function celebrationStorageKey(studentId: string) {
+  return `${CELEBRATION_KEY_PREFIX}-${studentId}`;
+}
 
 interface StudentWelcomeCelebrationProps {
+  studentId: string;
   studentName: string;
   onComplete: () => void;
 }
@@ -48,6 +53,7 @@ function fireCelebrationBurst() {
 }
 
 export function StudentWelcomeCelebration({
+  studentId,
   studentName,
   onComplete,
 }: StudentWelcomeCelebrationProps) {
@@ -56,12 +62,12 @@ export function StudentWelcomeCelebration({
 
   const finish = useCallback(() => {
     try {
-      sessionStorage.setItem(CELEBRATION_KEY, "true");
+      localStorage.setItem(celebrationStorageKey(studentId), "true");
     } catch {
       // ignore storage errors
     }
     onComplete();
-  }, [onComplete]);
+  }, [onComplete, studentId]);
 
   useEffect(() => {
     playPortalSound("studentWelcome");
@@ -140,19 +146,10 @@ export function StudentWelcomeCelebration({
   );
 }
 
-export function shouldShowStudentCelebration() {
+export function shouldShowStudentCelebration(studentId: string) {
   try {
-    return sessionStorage.getItem(CELEBRATION_KEY) !== "true";
+    return localStorage.getItem(celebrationStorageKey(studentId)) !== "true";
   } catch {
     return true;
-  }
-}
-
-/** Call after a successful student login so celebration shows again this session. */
-export function resetStudentWelcomeForLogin() {
-  try {
-    sessionStorage.removeItem(CELEBRATION_KEY);
-  } catch {
-    // ignore storage errors
   }
 }

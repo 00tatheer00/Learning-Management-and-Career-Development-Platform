@@ -23,4 +23,4 @@ export const MODULE_ONE_ACTIVE_NOTE =
   "Live classes and recordings are currently for Module 1 students only.";
 
 export const MODULE_STARTS_SOON_MESSAGE =
-  "Your module will start soon — next month, InshAllah. We will notify you on WhatsApp when your batch begins.";
+  "Your module will start soon — next month. We will notify you on WhatsApp when your batch begins.";
