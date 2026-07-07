@@ -8,15 +8,10 @@ import { Button } from "@/components/ui/button";
 import { playPortalSound } from "@/lib/ui/portal-sounds";
 import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
 
-const CELEBRATION_KEY_PREFIX = "eest-student-celebration-shown";
-
-function celebrationStorageKey(studentId: string) {
-  return `${CELEBRATION_KEY_PREFIX}-${studentId}`;
-}
-
 interface StudentWelcomeCelebrationProps {
-  studentId: string;
   studentName: string;
+  moduleName?: string;
+  courseTitle?: string;
   onComplete: () => void;
 }
 
@@ -53,21 +48,17 @@ function fireCelebrationBurst() {
 }
 
 export function StudentWelcomeCelebration({
-  studentId,
   studentName,
+  moduleName,
+  courseTitle,
   onComplete,
 }: StudentWelcomeCelebrationProps) {
   const firstName = studentName.split(" ")[0] || studentName;
   const burstTimerRef = useRef<number | null>(null);
 
   const finish = useCallback(() => {
-    try {
-      localStorage.setItem(celebrationStorageKey(studentId), "true");
-    } catch {
-      // ignore storage errors
-    }
     onComplete();
-  }, [onComplete, studentId]);
+  }, [onComplete]);
 
   useEffect(() => {
     playPortalSound("studentWelcome");
@@ -124,8 +115,11 @@ export function StudentWelcomeCelebration({
               <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
                 {STUDENT_UR.celebration.title(firstName)}
               </h2>
+              {moduleName && (
+                <p className="mt-2 text-sm font-semibold text-primary">{moduleName}</p>
+              )}
               <p className="mt-3 text-sm sm:text-base text-muted leading-relaxed">
-                {STUDENT_UR.celebration.body}
+                {STUDENT_UR.celebration.body(moduleName, courseTitle)}
               </p>
             </motion.div>
 
@@ -144,12 +138,4 @@ export function StudentWelcomeCelebration({
       </motion.div>
     </AnimatePresence>
   );
-}
-
-export function shouldShowStudentCelebration(studentId: string) {
-  try {
-    return localStorage.getItem(celebrationStorageKey(studentId)) !== "true";
-  } catch {
-    return true;
-  }
 }

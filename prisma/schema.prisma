@@ -99,6 +99,7 @@ model Enrollment {
   adminNotes                String?
   approvalWhatsAppSent      Boolean?
   approvalWhatsAppError     String?
+  portalWelcomeShownAt      DateTime?
   createdAt                 DateTime         @default(now())
 }
 

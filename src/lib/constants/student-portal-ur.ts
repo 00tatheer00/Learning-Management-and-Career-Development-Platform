@@ -3,8 +3,11 @@
 export const STUDENT_UR = {
   celebration: {
     badge: "Enrollment Approved",
-    title: (name: string) => `Welcome, ${name}!`,
-    body: "Welcome to Emerging Edge School. Your student portal is ready — explore your course, live classes, and assignments.",
+    title: (name: string) => `Congratulations, ${name}!`,
+    body: (moduleName?: string, courseTitle?: string) =>
+      moduleName && courseTitle
+        ? `Your registration for ${moduleName} (${courseTitle}) is approved. Your student portal is ready — explore live classes, assignments, and your course roadmap.`
+        : "Welcome to Emerging Edge School. Your student portal is ready — explore your course, live classes, and assignments.",
     button: "Enter Portal",
   },
 
@@ -79,6 +82,7 @@ export const STUDENT_UR = {
     loginFailed: "Login failed",
     wrongCredentials: "Wrong email or password. Please try again.",
     welcomeBack: "Welcome back!",
+    firstLogin: "Congratulations! Your portal is ready.",
     redirecting: "Taking you to your portal...",
     serverError: "Server error. Please try again in a moment.",
     networkError: "Something went wrong. Check your internet and try again.",

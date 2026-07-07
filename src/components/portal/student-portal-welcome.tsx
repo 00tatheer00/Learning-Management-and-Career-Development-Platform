@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { WhatsappLogo, ChatsCircle, CheckCircle } from "@phosphor-icons/react";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
@@ -8,11 +8,9 @@ import {
   STUDENT_WHATSAPP_GROUP_NAME,
   STUDENT_WHATSAPP_GROUP_URL,
 } from "@/lib/constants/contact";
-import {
-  StudentWelcomeCelebration,
-  shouldShowStudentCelebration,
-} from "@/components/portal/student-welcome-celebration";
+import { StudentWelcomeCelebration } from "@/components/portal/student-welcome-celebration";
 import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
+import type { PendingPortalWelcome } from "@/lib/api/student-portal-welcome";
 
 const JOINED_KEY = "eest-whatsapp-group-joined";
 const DEFERRED_KEY = "eest-whatsapp-group-deferred";
@@ -23,12 +21,50 @@ interface StudentPortalWelcomeProps {
 }
 
 export function StudentPortalWelcome({ studentId, studentName }: StudentPortalWelcomeProps) {
-  const [phase, setPhase] = useState<"celebration" | "whatsapp" | "done">("done");
+  const [phase, setPhase] = useState<"loading" | "celebration" | "whatsapp" | "done">("loading");
+  const [pendingWelcome, setPendingWelcome] = useState<PendingPortalWelcome | null>(null);
+
+  const loadWelcomeState = useCallback(async () => {
+    try {
+      const res = await fetch("/api/student/welcome", { cache: "no-store" });
+      const json = await res.json();
+      const pending = (json.data?.pending as PendingPortalWelcome | null | undefined) ?? null;
+
+      if (pending) {
+        setPendingWelcome(pending);
+        setPhase("celebration");
+        return;
+      }
+
+      if (localStorage.getItem(JOINED_KEY) === "true") {
+        setPhase("done");
+        return;
+      }
+      if (sessionStorage.getItem(DEFERRED_KEY) === "true") {
+        setPhase("done");
+        return;
+      }
+      setPhase("whatsapp");
+    } catch {
+      setPhase("done");
+    }
+  }, []);
 
   useEffect(() => {
-    if (shouldShowStudentCelebration(studentId)) {
-      setPhase("celebration");
-      return;
+    void loadWelcomeState();
+  }, [loadWelcomeState, studentId]);
+
+  const handleCelebrationComplete = async () => {
+    if (pendingWelcome) {
+      try {
+        await fetch("/api/student/welcome", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ enrollmentId: pendingWelcome.enrollmentId }),
+        });
+      } catch {
+        // ignore network errors — student can still continue
+      }
     }
 
     try {
@@ -40,32 +76,22 @@ export function StudentPortalWelcome({ studentId, studentName }: StudentPortalWe
         setPhase("done");
         return;
       }
-      setPhase("whatsapp");
     } catch {
-      setPhase("whatsapp");
+      // ignore storage errors
     }
-  }, [studentId]);
+
+    setPhase("whatsapp");
+  };
+
+  if (phase === "loading") return null;
 
   if (phase === "celebration") {
     return (
       <StudentWelcomeCelebration
-        studentId={studentId}
         studentName={studentName}
-        onComplete={() => {
-          try {
-            if (localStorage.getItem(JOINED_KEY) === "true") {
-              setPhase("done");
-              return;
-            }
-            if (sessionStorage.getItem(DEFERRED_KEY) === "true") {
-              setPhase("done");
-              return;
-            }
-          } catch {
-            // ignore storage errors
-          }
-          setPhase("whatsapp");
-        }}
+        moduleName={pendingWelcome?.moduleName}
+        courseTitle={pendingWelcome?.courseTitle}
+        onComplete={() => void handleCelebrationComplete()}
       />
     );
   }

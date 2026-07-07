@@ -9,6 +9,7 @@ declare module "next-auth" {
     } & DefaultSession["user"];
     sessionId?: string;
     sessionInvalid?: boolean;
+    isFirstLogin?: boolean;
   }
 
   interface User {
@@ -22,5 +23,6 @@ declare module "next-auth/jwt" {
     role: UserRole;
     sessionId?: string;
     sessionInvalid?: boolean;
+    isFirstLogin?: boolean;
   }
 }

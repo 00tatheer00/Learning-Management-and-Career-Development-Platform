@@ -91,6 +91,12 @@ export const authOptions: NextAuthOptions = {
         token.role = (user as { role: UserRole }).role;
         token.sessionInvalid = false;
 
+        const existing = await prisma.user.findUnique({
+          where: { id: user.id },
+          select: { firstLoginAt: true },
+        });
+        token.isFirstLogin = !existing?.firstLoginAt;
+
         await recordUserLogin(user.id);
 
         if (token.role === "student") {
@@ -114,6 +120,7 @@ export const authOptions: NextAuthOptions = {
 
       session.sessionId = token.sessionId as string | undefined;
       session.sessionInvalid = Boolean(token.sessionInvalid);
+      session.isFirstLogin = Boolean(token.isFirstLogin);
 
       if (token.sessionInvalid) {
         session.expires = new Date(0).toISOString();

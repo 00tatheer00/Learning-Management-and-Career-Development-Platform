@@ -91,17 +91,20 @@ export default function LoginForm({
         return;
       }
 
+      const session = await getSession();
+      const role = session?.user?.role ?? selectedRole;
+
       if (isStudent) {
-        toast.success(STUDENT_UR.toasts.welcomeBack, STUDENT_UR.toasts.redirecting);
+        const isFirstLogin = Boolean(session?.isFirstLogin);
+        toast.success(
+          isFirstLogin ? STUDENT_UR.toasts.firstLogin : STUDENT_UR.toasts.welcomeBack,
+          STUDENT_UR.toasts.redirecting
+        );
+        resetWhatsAppGroupPromptForLogin();
       } else {
         toast.success("Welcome back!", "Redirecting to your portal...");
       }
 
-      const session = await getSession();
-      const role = session?.user?.role ?? selectedRole;
-      if (role === "student") {
-        resetWhatsAppGroupPromptForLogin();
-      }
       router.push(getPortalHome(role));
       router.refresh();
     } catch {

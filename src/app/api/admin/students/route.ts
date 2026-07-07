@@ -11,6 +11,7 @@ import {
   savePortalPasswordForStudentEmail,
 } from "@/lib/auth/portal-password-vault";
 import { getPortalLoginUrl } from "@/lib/site-url";
+import { resetPortalWelcomeForEnrollment } from "@/lib/api/student-portal-welcome";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
@@ -94,6 +95,7 @@ export async function PATCH(request: Request) {
 
         const passwordHash = await hashPassword(plainPassword);
         await updateUserPasswordHash(student.id, passwordHash);
+        await resetPortalWelcomeForEnrollment(enrollmentId);
 
         const vaultResult = await savePortalPasswordForEnrollment(enrollmentId, plainPassword);
         const vaultWarning = vaultResult.saved
