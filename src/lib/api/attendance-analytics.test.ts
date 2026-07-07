@@ -170,6 +170,23 @@ describe("attendance analytics", () => {
     expect(overview.present + overview.late).toBe(2);
   });
 
+  it("computes student day-by-day attendance", () => {
+    const stats = computeStudentAttendanceStats({
+      studentId: "stu1",
+      programSlug: "web-development",
+      studentLevel: "HTML & CSS",
+      sessions,
+      records,
+      now,
+    });
+
+    expect(stats.days.length).toBeGreaterThan(0);
+    const class1Day = stats.days.find((day) => day.date === "2026-07-06");
+    expect(class1Day?.status).toBe("present");
+    const class2Day = stats.days.find((day) => day.date === "2026-07-07");
+    expect(class2Day?.status).toBe("present");
+  });
+
   it("builds attendance lookup map", () => {
     const lookup = buildAttendanceLookup(records);
     expect(lookup.get("s1:stu1")?.status).toBe("present");

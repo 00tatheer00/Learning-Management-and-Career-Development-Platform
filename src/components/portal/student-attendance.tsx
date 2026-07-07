@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { CheckCircle, Clock, ListChecks, XCircle } from "@phosphor-icons/react/ssr";
+import { CalendarBlank, CheckCircle, Clock, ListChecks, XCircle } from "@phosphor-icons/react/ssr";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getStudentAttendanceSummary } from "@/lib/api/class-attendance";
+import type { AttendanceCellStatus } from "@/lib/api/attendance-analytics";
 import { canAccessModuleOneClasses } from "@/lib/modules/student-module-access";
 import { ModuleStartsSoonNotice } from "@/components/portal/module-starts-soon-notice";
 import { PortalPageHeader, PortalSurfaceCard } from "@/components/portal/portal-ui";
@@ -149,6 +150,59 @@ export async function StudentAttendancePageContent() {
       </PortalSurfaceCard>
 
       <PortalSurfaceCard className="overflow-hidden">
+        <div className="px-4 py-3 border-b border-pt bg-gradient-to-r from-slate-800 to-slate-700 text-white flex items-center gap-2">
+          <CalendarBlank size={18} weight="duotone" />
+          <p className="text-sm font-bold">Day by Day</p>
+        </div>
+        {stats.days.length === 0 ? (
+          <p className="p-6 text-sm text-pt-muted text-center">
+            Class days will appear here once your batch starts.
+          </p>
+        ) : (
+          <ul className="divide-y divide-pt">
+            {stats.days.map((day) => (
+              <li key={day.date} className="px-4 py-3">
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                  <div>
+                    <p className="font-semibold text-sm text-pt">{day.dateLabel}</p>
+                    {day.classNumber != null && (
+                      <p className="text-xs text-pt-muted mt-0.5">Class {day.classNumber}</p>
+                    )}
+                  </div>
+                  <DayStatusBadge status={day.status} />
+                </div>
+                <div className="space-y-1.5">
+                  {day.sessions.map((session, index) => (
+                    <div
+                      key={session.sessionId ?? `${day.date}-${index}`}
+                      className={cn(
+                        "flex flex-wrap items-center justify-between gap-2 rounded-xl border px-3 py-2 text-sm",
+                        session.status === "present" && "border-emerald-500/25 bg-emerald-500/5",
+                        session.status === "late" && "border-amber-500/25 bg-amber-500/5",
+                        session.status === "absent" && "border-rose-500/25 bg-rose-500/5",
+                        session.status === "upcoming" && "border-pt bg-surface/40"
+                      )}
+                    >
+                      <div>
+                        <p className="font-medium text-pt">{session.title}</p>
+                        <p className="text-xs text-pt-muted">{session.time}</p>
+                        {session.joinedAt && (
+                          <p className="text-xs text-pt-muted mt-0.5">
+                            Joined {formatAppliedDateTime(session.joinedAt)}
+                          </p>
+                        )}
+                      </div>
+                      <DayStatusBadge status={session.status} compact />
+                    </div>
+                  ))}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </PortalSurfaceCard>
+
+      <PortalSurfaceCard className="overflow-hidden">
         <div className="px-4 py-3 border-b border-pt bg-surface/50">
           <p className="text-sm font-bold text-pt">Class History</p>
         </div>
@@ -190,5 +244,49 @@ export async function StudentAttendancePageContent() {
         )}
       </PortalSurfaceCard>
     </div>
+  );
+}
+
+function DayStatusBadge({
+  status,
+  compact = false,
+}: {
+  status: AttendanceCellStatus;
+  compact?: boolean;
+}) {
+  const config = {
+    present: {
+      label: "Present",
+      icon: <CheckCircle size={compact ? 12 : 14} weight="fill" />,
+      className: "bg-emerald-100 text-emerald-800",
+    },
+    late: {
+      label: "Late",
+      icon: <Clock size={compact ? 12 : 14} weight="fill" />,
+      className: "bg-amber-100 text-amber-800",
+    },
+    absent: {
+      label: "Absent",
+      icon: <XCircle size={compact ? 12 : 14} weight="fill" />,
+      className: "bg-rose-100 text-rose-800",
+    },
+    upcoming: {
+      label: "Upcoming",
+      icon: <CalendarBlank size={compact ? 12 : 14} weight="duotone" />,
+      className: "bg-surface text-pt-muted border border-pt",
+    },
+  }[status];
+
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1 rounded-full font-semibold",
+        compact ? "px-2 py-0.5 text-[10px]" : "px-2.5 py-1 text-xs",
+        config.className
+      )}
+    >
+      {config.icon}
+      {config.label}
+    </span>
   );
 }

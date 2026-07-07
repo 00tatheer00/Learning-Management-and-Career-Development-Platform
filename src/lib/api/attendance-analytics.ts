@@ -1,4 +1,4 @@
-import { getClassProgress } from "@/lib/class-schedule";
+import { generateClassSlots, getClassProgress } from "@/lib/class-schedule";
 import { canAccessModuleOneClasses } from "@/lib/modules/student-module-access";
 import { groupStudentsByModule } from "@/lib/trainer/group-students-by-module";
 import { parseSessionDateTime } from "@/lib/sessions/live-session-datetime";
@@ -46,6 +46,24 @@ export interface StudentAttendanceStats {
     status: "present" | "late";
     joinedAt: string;
   }>;
+  days: StudentDayAttendanceRow[];
+}
+
+export interface StudentDaySessionItem {
+  sessionId?: string;
+  title: string;
+  time: string;
+  classNumber?: number;
+  status: AttendanceCellStatus;
+  joinedAt?: string;
+}
+
+export interface StudentDayAttendanceRow {
+  date: string;
+  dateLabel: string;
+  classNumber?: number;
+  sessions: StudentDaySessionItem[];
+  status: AttendanceCellStatus;
 }
 
 export interface SessionAttendanceRow {
@@ -213,7 +231,109 @@ export function computeStudentAttendanceStats(input: {
       status: record.status,
       joinedAt: record.joinedAt,
     })),
+    days: computeStudentDayRows(input),
   };
+}
+
+export function computeStudentDayRows(input: {
+  programSlug: string;
+  studentId: string;
+  studentLevel?: string | null;
+  sessions: AttendanceSessionRef[];
+  records: AttendanceRecordRef[];
+  now?: Date;
+}): StudentDayAttendanceRow[] {
+  if (!canAccessModuleOneClasses(input.programSlug, input.studentLevel)) return [];
+
+  const now = input.now ?? new Date();
+  const lookup = buildAttendanceLookup(input.records);
+  const programSessions = input.sessions.filter(
+    (session) => session.programSlug === input.programSlug
+  );
+
+  const sessionsByDate = new Map<string, AttendanceSessionRef[]>();
+  for (const session of programSessions) {
+    const list = sessionsByDate.get(session.date) ?? [];
+    list.push(session);
+    sessionsByDate.set(session.date, list);
+  }
+
+  const slots = generateClassSlots(input.programSlug, { now, maxClasses: 36 });
+  const dayMap = new Map<string, StudentDayAttendanceRow>();
+
+  for (const slot of slots) {
+    if (slot.status === "upcoming") continue;
+
+    const dateSessions = sessionsByDate.get(slot.date) ?? [];
+    const items: StudentDaySessionItem[] = [];
+
+    if (dateSessions.length > 0) {
+      for (const session of dateSessions) {
+        const record = lookup.get(attendanceKey(session.id, input.studentId));
+        const past = isSessionPast(session.date, session.time, now);
+        items.push({
+          sessionId: session.id,
+          title: session.title,
+          time: session.time,
+          classNumber: slot.classNumber,
+          status: record ? record.status : past ? "absent" : "upcoming",
+          joinedAt: record?.joinedAt,
+        });
+      }
+    } else if (slot.status === "done") {
+      items.push({
+        title: `Class ${slot.classNumber}`,
+        time: slot.timeLabel,
+        classNumber: slot.classNumber,
+        status: "absent",
+      });
+    } else {
+      items.push({
+        title: `Class ${slot.classNumber}`,
+        time: slot.timeLabel,
+        classNumber: slot.classNumber,
+        status: "upcoming",
+      });
+    }
+
+    dayMap.set(slot.date, {
+      date: slot.date,
+      dateLabel: formatYmdInPakistan(slot.date, { weekday: true, month: "short" }),
+      classNumber: slot.classNumber,
+      sessions: items,
+      status: rollupDayStatus(items),
+    });
+  }
+
+  for (const [date, dateSessions] of sessionsByDate) {
+    if (dayMap.has(date)) continue;
+    const items: StudentDaySessionItem[] = dateSessions.map((session) => {
+      const record = lookup.get(attendanceKey(session.id, input.studentId));
+      const past = isSessionPast(session.date, session.time, now);
+      return {
+        sessionId: session.id,
+        title: session.title,
+        time: session.time,
+        status: record ? record.status : past ? "absent" : "upcoming",
+        joinedAt: record?.joinedAt,
+      };
+    });
+    dayMap.set(date, {
+      date,
+      dateLabel: formatYmdInPakistan(date, { weekday: true, month: "short" }),
+      sessions: items,
+      status: rollupDayStatus(items),
+    });
+  }
+
+  return [...dayMap.values()].sort((a, b) => b.date.localeCompare(a.date));
+}
+
+function rollupDayStatus(items: StudentDaySessionItem[]): AttendanceCellStatus {
+  if (items.some((item) => item.status === "present")) return "present";
+  if (items.some((item) => item.status === "late")) return "late";
+  if (items.every((item) => item.status === "absent")) return "absent";
+  return "upcoming";
 }
 
 export function computeSessionRows(input: {
