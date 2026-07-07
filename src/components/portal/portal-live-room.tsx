@@ -27,7 +27,10 @@ declare global {
     JitsiMeetExternalAPI?: new (
       domain: string,
       options: Record<string, unknown>
-    ) => { dispose: () => void };
+    ) => {
+      dispose: () => void;
+      addListener: (event: string, listener: () => void) => void;
+    };
   }
 }
 
@@ -110,11 +113,17 @@ export function PortalLiveRoom(props: PortalLiveRoomProps) {
 
     jitsiRef.current = api;
 
+    if (!isHost) {
+      api.addListener("videoConferenceJoined", () => {
+        void fetch(`/api/student/sessions/${props.sessionId}/attend`, { method: "POST" });
+      });
+    }
+
     return () => {
       api.dispose();
       jitsiRef.current = null;
     };
-  }, [scriptReady, joinData]);
+  }, [scriptReady, joinData, props.sessionId]);
 
   return (
     <>

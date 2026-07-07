@@ -1,0 +1,194 @@
+import Link from "next/link";
+import { CheckCircle, Clock, ListChecks, XCircle } from "@phosphor-icons/react/ssr";
+import { getCurrentUser } from "@/lib/auth/session";
+import { getStudentAttendanceSummary } from "@/lib/api/class-attendance";
+import { canAccessModuleOneClasses } from "@/lib/modules/student-module-access";
+import { ModuleStartsSoonNotice } from "@/components/portal/module-starts-soon-notice";
+import { PortalPageHeader, PortalSurfaceCard } from "@/components/portal/portal-ui";
+import { formatAppliedDateTime } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+
+interface StudentAttendanceProgressCardProps {
+  programSlug: string;
+  studentId: string;
+  studentLevel?: string | null;
+}
+
+export async function StudentAttendanceProgressCard({
+  programSlug,
+  studentId,
+  studentLevel,
+}: StudentAttendanceProgressCardProps) {
+  const canTrack = canAccessModuleOneClasses(programSlug, studentLevel);
+  if (!canTrack) return null;
+
+  const stats = await getStudentAttendanceSummary(studentId, programSlug);
+  const percentage = stats.percentage;
+
+  const barTone =
+    percentage >= 80 ? "from-emerald-500 to-teal-500" : percentage >= 50 ? "from-amber-500 to-orange-500" : "from-rose-500 to-red-500";
+
+  return (
+    <div className="rounded-2xl border border-pt overflow-hidden shadow-sm bg-gradient-to-br from-background to-surface/50">
+      <div className="px-5 py-4 border-b border-pt bg-gradient-to-r from-slate-800 to-slate-700 text-white">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-white/75">
+              My Attendance
+            </p>
+            <p className="text-2xl font-bold mt-0.5">{percentage}%</p>
+          </div>
+          <Link
+            href="/student/attendance"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-white/15 backdrop-blur px-3 py-2 text-xs font-bold hover:bg-white/25 transition-colors"
+          >
+            <ListChecks size={14} weight="duotone" />
+            Full report
+          </Link>
+        </div>
+      </div>
+
+      <div className="p-4 sm:p-5">
+        <div className="h-3 rounded-full bg-surface overflow-hidden">
+          <div
+            className={cn("h-full rounded-full bg-gradient-to-r transition-all", barTone)}
+            style={{ width: `${percentage}%` }}
+          />
+        </div>
+        <p className="mt-2 text-xs text-pt-muted">
+          {stats.attended} of {stats.totalExpected} classes attended
+        </p>
+
+        <div className="mt-4 grid grid-cols-3 gap-2">
+          <StatPill label="Present" value={stats.present} icon={<CheckCircle size={14} weight="fill" />} tone="emerald" />
+          <StatPill label="Late" value={stats.late} icon={<Clock size={14} weight="fill" />} tone="amber" />
+          <StatPill label="Missed" value={stats.missed} icon={<XCircle size={14} weight="fill" />} tone="rose" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StatPill({
+  label,
+  value,
+  icon,
+  tone,
+}: {
+  label: string;
+  value: number;
+  icon: React.ReactNode;
+  tone: "emerald" | "amber" | "rose";
+}) {
+  const tones = {
+    emerald: "text-emerald-700 bg-emerald-500/10 border-emerald-500/20",
+    amber: "text-amber-700 bg-amber-500/10 border-amber-500/20",
+    rose: "text-rose-700 bg-rose-500/10 border-rose-500/20",
+  };
+
+  return (
+    <div className={cn("rounded-xl border px-3 py-2 text-center", tones[tone])}>
+      <div className="flex items-center justify-center gap-1 text-[10px] font-bold uppercase tracking-wide">
+        {icon}
+        {label}
+      </div>
+      <p className="text-lg font-bold mt-0.5">{value}</p>
+    </div>
+  );
+}
+
+export async function StudentAttendancePageContent() {
+  const user = await getCurrentUser();
+  if (!user) return null;
+
+  const programSlug = user.programSlug ?? "web-development";
+  const canTrack = canAccessModuleOneClasses(programSlug, user.level);
+
+  if (!canTrack) {
+    return (
+      <div className="space-y-4">
+        <PortalPageHeader
+          title="My Attendance"
+          description="Attendance tracking starts when your module goes live."
+        />
+        <ModuleStartsSoonNotice programSlug={programSlug} studentModule={user.level} />
+      </div>
+    );
+  }
+
+  const stats = await getStudentAttendanceSummary(user.id, programSlug);
+  const percentage = stats.percentage;
+  const barTone =
+    percentage >= 80 ? "from-emerald-500 to-teal-500" : percentage >= 50 ? "from-amber-500 to-orange-500" : "from-rose-500 to-red-500";
+
+  return (
+    <div className="space-y-4">
+      <PortalPageHeader
+        title="My Attendance"
+        description="Recorded when you join class from the portal. Present on time, Late after 10 minutes."
+      />
+
+      <PortalSurfaceCard className="p-5 sm:p-6">
+        <p className="text-xs font-bold uppercase tracking-widest text-pt-faint">Overall</p>
+        <p className="text-4xl font-bold text-pt mt-1">{percentage}%</p>
+        <div className="mt-4 h-4 rounded-full bg-surface overflow-hidden">
+          <div
+            className={cn("h-full rounded-full bg-gradient-to-r", barTone)}
+            style={{ width: `${percentage}%` }}
+          />
+        </div>
+        <p className="mt-2 text-sm text-pt-muted">
+          {stats.attended} attended · {stats.missed} missed · {stats.totalExpected} total classes
+        </p>
+
+        <div className="mt-5 grid grid-cols-3 gap-2">
+          <StatPill label="Present" value={stats.present} icon={<CheckCircle size={14} weight="fill" />} tone="emerald" />
+          <StatPill label="Late" value={stats.late} icon={<Clock size={14} weight="fill" />} tone="amber" />
+          <StatPill label="Missed" value={stats.missed} icon={<XCircle size={14} weight="fill" />} tone="rose" />
+        </div>
+      </PortalSurfaceCard>
+
+      <PortalSurfaceCard className="overflow-hidden">
+        <div className="px-4 py-3 border-b border-pt bg-surface/50">
+          <p className="text-sm font-bold text-pt">Class History</p>
+        </div>
+        {stats.records.length === 0 ? (
+          <p className="p-6 text-sm text-pt-muted text-center">
+            No classes joined yet. Tap Join Class on Live Classes when your class starts.
+          </p>
+        ) : (
+          <ul className="divide-y divide-pt">
+            {stats.records.map((record) => (
+              <li key={`${record.sessionId}-${record.joinedAt}`} className="px-4 py-3 flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <p className="font-semibold text-sm text-pt">{record.sessionTitle}</p>
+                  <p className="text-xs text-pt-muted mt-0.5">
+                    {record.sessionDate} · {record.sessionTime}
+                  </p>
+                  <p className="text-xs text-pt-muted mt-0.5">
+                    Joined {formatAppliedDateTime(record.joinedAt)}
+                  </p>
+                </div>
+                <span
+                  className={cn(
+                    "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold",
+                    record.status === "present"
+                      ? "bg-emerald-100 text-emerald-800"
+                      : "bg-amber-100 text-amber-800"
+                  )}
+                >
+                  {record.status === "present" ? (
+                    <CheckCircle size={14} weight="fill" />
+                  ) : (
+                    <Clock size={14} weight="fill" />
+                  )}
+                  {record.status === "present" ? "Present" : "Late"}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </PortalSurfaceCard>
+    </div>
+  );
+}

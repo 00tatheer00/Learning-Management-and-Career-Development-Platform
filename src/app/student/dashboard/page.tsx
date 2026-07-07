@@ -23,6 +23,7 @@ import { StudentWhatsAppGroupCard } from "@/components/portal/student-whatsapp-g
 import { StudentNextClassCard } from "@/components/portal/student-next-class-card";
 import { StudentModuleRoadmap } from "@/components/portal/student-module-roadmap";
 import { StudentClassProgressCard } from "@/components/portal/student-class-progress-card";
+import { StudentAttendanceProgressCard } from "@/components/portal/student-attendance";
 import { ProgramCategoryBadge } from "@/components/portal/program-category-badge";
 import { HELP_CONFIG } from "@/lib/constants/help";
 import { getProgramCategory } from "@/lib/constants/program-categories";
@@ -97,6 +98,8 @@ export default async function StudentDashboardPage() {
           </p>
         </PortalSurfaceCard>
       )}
+
+      {canJoinLive && <StudentAttendanceProgressCard programSlug={programSlug} studentId={user.id} studentLevel={user.level} />}
 
       {canJoinLive && <StudentClassProgressCard programSlug={programSlug} />}
 

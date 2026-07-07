@@ -1,4 +1,15 @@
 import { prisma } from "@/lib/prisma";
+import {
+  computeAttendanceMatrix,
+  computeAttendanceOverview,
+  computeDayRows,
+  computeModuleRows,
+  computeSessionRows,
+  computeStudentAttendanceStats,
+  type AttendanceRecordRef,
+  type AttendanceSessionRef,
+  type AttendanceStudentRef,
+} from "@/lib/api/attendance-analytics";
 import { parseSessionDateTime } from "@/lib/sessions/join-window";
 
 const LATE_THRESHOLD_MS = 10 * 60 * 1000;
@@ -115,5 +126,130 @@ export async function getSessionAttendanceSummary(sessionId: string) {
     present: records.filter((r) => r.status === "present").length,
     late: records.filter((r) => r.status === "late").length,
     records,
+  };
+}
+
+function mapAttendanceRecord(record: {
+  sessionId: string;
+  studentId: string;
+  studentName: string;
+  status: string;
+  joinedAt: Date;
+  sessionDate: string;
+  sessionTime: string;
+}): AttendanceRecordRef {
+  return {
+    sessionId: record.sessionId,
+    studentId: record.studentId,
+    studentName: record.studentName,
+    status: record.status as "present" | "late",
+    joinedAt: record.joinedAt.toISOString(),
+    sessionDate: record.sessionDate,
+    sessionTime: record.sessionTime,
+  };
+}
+
+async function loadAttendanceContext(programSlug: string) {
+  const [sessions, students, records] = await Promise.all([
+    prisma.liveSession.findMany({
+      where: { programSlug },
+      orderBy: [{ startsAt: "asc" }, { date: "asc" }],
+      select: {
+        id: true,
+        title: true,
+        date: true,
+        time: true,
+        programSlug: true,
+      },
+    }),
+    prisma.user.findMany({
+      where: { role: "student", programSlug, isActive: true },
+      select: { id: true, name: true, level: true, programSlug: true },
+    }),
+    prisma.classAttendance.findMany({
+      where: { programSlug },
+      orderBy: { joinedAt: "desc" },
+    }),
+  ]);
+
+  return {
+    sessions: sessions as AttendanceSessionRef[],
+    students: students as AttendanceStudentRef[],
+    records: records.map(mapAttendanceRecord),
+  };
+}
+
+export async function getStudentAttendanceSummary(studentId: string, programSlug: string) {
+  const [sessions, records, student] = await Promise.all([
+    prisma.liveSession.findMany({
+      where: { programSlug },
+      select: { id: true, title: true, date: true, time: true, programSlug: true },
+    }),
+    prisma.classAttendance.findMany({
+      where: { studentId, programSlug },
+      orderBy: { joinedAt: "desc" },
+    }),
+    prisma.user.findUnique({
+      where: { id: studentId },
+      select: { level: true },
+    }),
+  ]);
+
+  return computeStudentAttendanceStats({
+    studentId,
+    programSlug,
+    studentLevel: student?.level,
+    sessions: sessions as AttendanceSessionRef[],
+    records: records.map(mapAttendanceRecord),
+  });
+}
+
+export async function getProgramAttendanceAnalytics(programSlug: string) {
+  const context = await loadAttendanceContext(programSlug);
+  const sessionRows = computeSessionRows({ ...context, programSlug });
+  const reportRows = await getAttendanceReport({ programSlug, limit: 500 });
+
+  return {
+    overview: computeAttendanceOverview({ ...context, programSlug }),
+    sessions: sessionRows,
+    days: computeDayRows(sessionRows),
+    modules: computeModuleRows({ ...context, programSlug }),
+    matrix: computeAttendanceMatrix({ ...context, programSlug }),
+    rows: reportRows,
+  };
+}
+
+export async function getTrainerAttendanceAnalytics(programSlug: string, trainerId: string) {
+  const context = await loadAttendanceContext(programSlug);
+
+  const sessionIds = new Set(
+    (
+      await prisma.liveSession.findMany({
+        where: { programSlug, trainerId },
+        select: { id: true },
+      })
+    ).map((session) => session.id)
+  );
+
+  const filteredSessions = context.sessions.filter((session) => sessionIds.has(session.id));
+  const filteredRecords = context.records.filter((record) => sessionIds.has(record.sessionId));
+  const filteredContext = {
+    sessions: filteredSessions,
+    students: context.students,
+    records: filteredRecords,
+  };
+
+  const sessionRows = computeSessionRows({ ...filteredContext, programSlug });
+  const reportRows = (await getAttendanceReport({ programSlug, limit: 500 })).filter((row) =>
+    sessionIds.has(row.sessionId)
+  );
+
+  return {
+    overview: computeAttendanceOverview({ ...filteredContext, programSlug }),
+    sessions: sessionRows,
+    days: computeDayRows(sessionRows),
+    modules: computeModuleRows({ ...filteredContext, programSlug }),
+    matrix: computeAttendanceMatrix({ ...filteredContext, programSlug }),
+    rows: reportRows,
   };
 }
