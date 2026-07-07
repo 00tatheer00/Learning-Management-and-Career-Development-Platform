@@ -21,7 +21,7 @@ interface StudentNextClassCardProps {
     hasJoinLink?: boolean;
   };
   canJoinLive?: boolean;
-  programSlug?: string;
+  programSlug: string;
   studentModule?: string | null;
 }
 
@@ -105,22 +105,21 @@ export function StudentNextClassCard({
           )}
           <div className="flex flex-wrap gap-2 justify-end">
             {canJoinLive ? (
-              session.hasJoinLink !== false ? (
-                <JoinClassButton sessionId={session.id} />
-              ) : (
-                <div className="rounded-xl border border-dashed border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 text-center min-w-[180px]">
-                  <p className="font-semibold">Link coming soon</p>
-                  <p className="mt-1 text-xs">Your trainer will add the Google Meet link before class.</p>
-                </div>
-              )
-            ) : programSlug ? (
+              <JoinClassButton
+                sessionId={session.id}
+                sessionDate={session.date}
+                sessionTime={session.time}
+                programSlug={programSlug}
+                hasJoinLink={session.hasJoinLink}
+              />
+            ) : (
               <div className="rounded-xl border border-dashed border-indigo-300 bg-indigo-50 px-4 py-3 text-sm text-indigo-900 text-center min-w-[200px]">
                 <p className="font-semibold">Your module starts next month</p>
                 <p className="mt-1 text-xs">
                   {studentModule ? `Registered: ${studentModule}` : "Module 1 is live now"}
                 </p>
               </div>
-            ) : null}
+            )}
             <Button variant="outline" size="sm" asChild>
               <Link href="/student/classes">All classes</Link>
             </Button>

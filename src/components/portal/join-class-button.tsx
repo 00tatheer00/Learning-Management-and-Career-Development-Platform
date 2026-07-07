@@ -1,30 +1,61 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { VideoCamera } from "@phosphor-icons/react";
+import { Info, VideoCamera } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "@/lib/ui/toast";
 import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
+import { getJoinWindowState } from "@/lib/sessions/join-window";
 
 interface JoinClassButtonProps {
   sessionId: string;
+  sessionDate: string;
+  sessionTime: string;
+  programSlug: string;
+  hasJoinLink?: boolean;
   className?: string;
   size?: "default" | "sm" | "lg" | "icon";
-  label?: string;
 }
 
 export function JoinClassButton({
   sessionId,
+  sessionDate,
+  sessionTime,
+  programSlug,
+  hasJoinLink = true,
   className,
   size = "lg",
-  label = "Join Class",
 }: JoinClassButtonProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [showHint, setShowHint] = useState(false);
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(new Date()), 30_000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  const windowState = useMemo(
+    () =>
+      getJoinWindowState({
+        sessionDate,
+        sessionTime,
+        programSlug,
+        hasJoinLink,
+        now,
+      }),
+    [sessionDate, sessionTime, programSlug, hasJoinLink, now]
+  );
 
   const handleJoin = async () => {
+    if (!windowState.canJoin) {
+      setShowHint(true);
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -34,7 +65,7 @@ export function JoinClassButton({
       if (!res.ok || !data.success) {
         toast.error(
           STUDENT_UR.joinClass.cannotJoin,
-          data.message || STUDENT_UR.joinClass.tryAgain
+          data.message || windowState.hint || STUDENT_UR.joinClass.tryAgain
         );
         return;
       }
@@ -67,18 +98,42 @@ export function JoinClassButton({
     }
   };
 
+  const isOpen = windowState.phase === "open";
+  const isDone = windowState.phase === "ended";
+
   return (
-    <div className={cn("shrink-0", className)}>
+    <div
+      className={cn("relative shrink-0", className)}
+      onMouseEnter={() => !isOpen && setShowHint(true)}
+      onMouseLeave={() => setShowHint(false)}
+    >
       <Button
         type="button"
         size={size}
-        className="h-14 text-base gap-2"
+        variant={isDone ? "secondary" : isOpen ? "default" : "outline"}
+        className={cn(
+          "h-14 text-base gap-2",
+          !isOpen && "opacity-90"
+        )}
         onClick={handleJoin}
         disabled={loading}
+        aria-disabled={!isOpen}
       >
         <VideoCamera size={22} weight="duotone" />
-        {loading ? "Joining..." : label}
+        {loading ? "Joining..." : windowState.buttonLabel}
       </Button>
+
+      {!isOpen && showHint && (
+        <div
+          role="tooltip"
+          className="absolute right-0 bottom-full z-20 mb-2 w-[min(100vw-2rem,280px)] rounded-xl border border-border bg-background p-3 text-left shadow-lg"
+        >
+          <p className="flex items-start gap-2 text-xs text-muted leading-relaxed">
+            <Info size={16} weight="fill" className="shrink-0 text-primary mt-0.5" />
+            <span>{windowState.hint}</span>
+          </p>
+        </div>
+      )}
     </div>
   );
 }

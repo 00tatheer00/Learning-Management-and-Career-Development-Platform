@@ -4,6 +4,7 @@ import { getLiveSessionById } from "@/lib/api/portal-data";
 import { createApiResponse } from "@/lib/api/enrollment";
 import { recordClassJoin } from "@/lib/api/class-attendance";
 import { canAccessModuleOneClasses } from "@/lib/modules/student-module-access";
+import { getJoinWindowState } from "@/lib/sessions/join-window";
 import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
 
 /** Idempotent attendance mark when student enters the live room (Meet / portal). */
@@ -36,6 +37,20 @@ export async function POST(
   if (!canAccessModuleOneClasses(session.programSlug, user.level)) {
     return NextResponse.json(
       createApiResponse(false, { message: STUDENT_UR.joinClass.moduleNotStarted }),
+      { status: 403 }
+    );
+  }
+
+  const joinWindow = getJoinWindowState({
+    sessionDate: session.date,
+    sessionTime: session.time,
+    programSlug: session.programSlug,
+    hasJoinLink: true,
+  });
+
+  if (!joinWindow.canJoin) {
+    return NextResponse.json(
+      createApiResponse(false, { message: joinWindow.hint }),
       { status: 403 }
     );
   }

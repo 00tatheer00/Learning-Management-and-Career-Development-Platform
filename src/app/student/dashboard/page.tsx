@@ -44,7 +44,7 @@ export default async function StudentDashboardPage() {
   ]);
   const category = getProgramCategory(programSlug);
   const classSchedule = getStudentClassSchedule(programSlug);
-  const nextSession = findNextUpcomingSession(sessions);
+  const nextSession = findNextUpcomingSession(sessions, programSlug);
   const courseLabel = category?.sidebarLabel ?? "Your course";
   const canJoinLive = canAccessModuleOneClasses(programSlug, user.level);
 

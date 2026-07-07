@@ -6,6 +6,7 @@ import { recordClassJoin } from "@/lib/api/class-attendance";
 import { recordUserActivity } from "@/lib/auth/user-activity";
 import { isPortalRoomSession } from "@/lib/portal-video/config";
 import { canAccessModuleOneClasses } from "@/lib/modules/student-module-access";
+import { getJoinWindowState } from "@/lib/sessions/join-window";
 import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
 
 export async function GET(
@@ -47,6 +48,22 @@ export async function GET(
     return NextResponse.json(
       createApiResponse(false, {
         message: STUDENT_UR.api.linkNotAdded,
+      }),
+      { status: 403 }
+    );
+  }
+
+  const joinWindow = getJoinWindowState({
+    sessionDate: session.date,
+    sessionTime: session.time,
+    programSlug: session.programSlug,
+    hasJoinLink: true,
+  });
+
+  if (!joinWindow.canJoin) {
+    return NextResponse.json(
+      createApiResponse(false, {
+        message: joinWindow.hint,
       }),
       { status: 403 }
     );

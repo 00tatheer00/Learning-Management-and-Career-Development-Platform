@@ -1,4 +1,5 @@
 import { parseSessionDateTime } from "@/lib/sessions/live-session-datetime";
+import { getSessionEndDateTime } from "@/lib/sessions/join-window";
 
 export { parseSessionDateTime };
 
@@ -27,15 +28,23 @@ export function getSessionCountdownParts(target: Date, now = new Date()) {
 }
 
 export function findNextUpcomingSession<
-  T extends { date: string; time: string; id: string }
->(sessions: T[], now = new Date()): T | null {
-  const upcoming = sessions
-    .map((session) => ({
-      session,
-      at: parseSessionDateTime(session.date, session.time),
-    }))
-    .filter((item): item is { session: T; at: Date } => item.at !== null && item.at >= now)
-    .sort((a, b) => a.at.getTime() - b.at.getTime());
+  T extends { date: string; time: string; id: string; programSlug?: string }
+>(sessions: T[], programSlug?: string, now = new Date()): T | null {
+  const slug = programSlug ?? sessions[0]?.programSlug ?? "web-development";
 
-  return upcoming[0]?.session ?? null;
+  const activeOrUpcoming = sessions
+    .map((session) => {
+      const startsAt = parseSessionDateTime(session.date, session.time);
+      const endsAt =
+        getSessionEndDateTime(session.date, session.programSlug ?? slug) ??
+        (startsAt ? new Date(startsAt.getTime() + 60 * 60 * 1000) : null);
+      return { session, startsAt, endsAt };
+    })
+    .filter(
+      (item): item is { session: T; startsAt: Date; endsAt: Date } =>
+        item.startsAt !== null && item.endsAt !== null && now.getTime() <= item.endsAt.getTime()
+    )
+    .sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime());
+
+  return activeOrUpcoming[0]?.session ?? null;
 }

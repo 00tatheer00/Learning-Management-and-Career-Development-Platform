@@ -25,7 +25,7 @@ export default async function StudentClassesPage() {
         title="Live Classes"
         description={
           canJoinLive
-            ? "Tap Join Class to open Google Meet directly when your trainer has added the link."
+            ? "Join opens 10 minutes before class and closes at class end time. Hover the button for details."
             : "Your module batch has not started yet. Module 1 students are in live classes now."
         }
       />
@@ -43,8 +43,9 @@ export default async function StudentClassesPage() {
       </p>
 
       <p className="mb-6 text-sm text-muted rounded-xl border border-border bg-surface p-4">
-        Tap <strong className="text-foreground">Join Class</strong> to enter your trainer&apos;s Google
-        Meet. Only enrolled students can join — do not share your portal login with anyone.
+        <strong className="text-foreground">Join Class</strong> opens 10 minutes before the scheduled
+        time and closes when class ends. Yesterday&apos;s classes show as{" "}
+        <strong className="text-foreground">Class Done</strong>.
       </p>
 
       {sessions.length === 0 ? (
@@ -78,14 +79,13 @@ export default async function StudentClassesPage() {
                     )}
                   </div>
                   {canJoinLive ? (
-                    session.hasJoinLink ? (
-                      <JoinClassButton sessionId={session.id} />
-                    ) : (
-                      <div className="rounded-xl border border-dashed border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 shrink-0">
-                        <p className="font-semibold">Link coming soon</p>
-                        <p className="mt-1 text-xs">Your trainer will add the Google Meet link before class.</p>
-                      </div>
-                    )
+                    <JoinClassButton
+                      sessionId={session.id}
+                      sessionDate={session.date}
+                      sessionTime={session.time}
+                      programSlug={programSlug}
+                      hasJoinLink={session.hasJoinLink}
+                    />
                   ) : (
                     <div className="rounded-xl border border-dashed border-indigo-300 bg-indigo-50 px-4 py-3 text-sm text-indigo-900 shrink-0 max-w-xs">
                       <p className="font-semibold">Your module starts next month</p>
