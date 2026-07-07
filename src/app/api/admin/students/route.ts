@@ -6,7 +6,10 @@ import { hashPassword } from "@/lib/auth/password";
 import { generateStudentPassword } from "@/lib/auth/generate-password";
 import { sendPasswordResetNotifications } from "@/lib/notifications/password-reset-notice";
 import { deleteAdminStudent } from "@/lib/api/admin-students";
-import { savePortalPasswordForStudentEmail } from "@/lib/auth/portal-password-vault";
+import {
+  savePortalPasswordForEnrollment,
+  savePortalPasswordForStudentEmail,
+} from "@/lib/auth/portal-password-vault";
 import { getPortalLoginUrl } from "@/lib/site-url";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
@@ -22,10 +25,12 @@ const patchSchema = z.discriminatedUnion("action", [
   }),
   z.object({
     id: z.string(),
+    enrollmentId: z.string().optional(),
     action: z.literal("resetPassword"),
   }),
   z.object({
     id: z.string(),
+    enrollmentId: z.string().optional(),
     action: z.literal("update"),
     level: z.string().min(1).optional(),
     batch: z.string().min(1).optional(),
@@ -68,6 +73,58 @@ export async function PATCH(request: Request) {
 
   if (parsed.data.action === "resetPassword") {
     const plainPassword = generateStudentPassword();
+    const enrollmentId = "enrollmentId" in parsed.data ? parsed.data.enrollmentId : undefined;
+
+    if (enrollmentId) {
+      const enrollment = await prisma.enrollment.findUnique({
+        where: { id: enrollmentId },
+        select: { email: true, status: true, level: true, whatsapp: true },
+      });
+
+      if (
+        !enrollment ||
+        enrollment.status !== "approved" ||
+        enrollment.email.toLowerCase() !== student.email.toLowerCase()
+      ) {
+        return NextResponse.json(createApiResponse(false, { error: "Enrollment not found" }), {
+          status: 404,
+        });
+      }
+
+      await savePortalPasswordForEnrollment(enrollmentId, plainPassword);
+
+      const whatsapp = student.phone ?? enrollment.whatsapp ?? "";
+      const notifications = await sendPasswordResetNotifications({
+        fullName: student.name,
+        email: student.email,
+        whatsapp,
+        password: plainPassword,
+      });
+
+      const parts: string[] = [];
+      if (notifications.whatsappSent) parts.push("WhatsApp");
+
+      const notificationSummary =
+        parts.length > 0
+          ? ` New password sent via ${parts.join(" and ")}.`
+          : notifications.warnings.length > 0
+            ? ` Password saved but WhatsApp failed: ${notifications.warnings.join("; ")}`
+            : ` Password saved for ${enrollment.level}.`;
+
+      return NextResponse.json(
+        createApiResponse(true, {
+          message: `Password reset for ${enrollment.level}.${notificationSummary}`,
+          data: {
+            loginId: student.email,
+            password: plainPassword,
+            loginUrl: getPortalLoginUrl(),
+            enrollmentId,
+            module: enrollment.level,
+          },
+        })
+      );
+    }
+
     const passwordHash = await hashPassword(plainPassword);
     await updateUserPasswordHash(student.id, passwordHash);
     await savePortalPasswordForStudentEmail(student.email, plainPassword);
@@ -111,6 +168,49 @@ export async function PATCH(request: Request) {
     return NextResponse.json(
       createApiResponse(false, { message: "Provide module or batch to update" }),
       { status: 400 }
+    );
+  }
+
+  const enrollmentId = "enrollmentId" in parsed.data ? parsed.data.enrollmentId : undefined;
+
+  if (enrollmentId) {
+    const enrollment = await prisma.enrollment.findUnique({
+      where: { id: enrollmentId },
+      select: { email: true, status: true, level: true },
+    });
+
+    if (
+      !enrollment ||
+      enrollment.status !== "approved" ||
+      enrollment.email.toLowerCase() !== student.email.toLowerCase()
+    ) {
+      return NextResponse.json(createApiResponse(false, { error: "Enrollment not found" }), {
+        status: 404,
+      });
+    }
+
+    const updatedEnrollment = await prisma.enrollment.update({
+      where: { id: enrollmentId },
+      data: {
+        level: parsed.data.level ?? undefined,
+        batch: parsed.data.batch ?? undefined,
+      },
+    });
+
+    if (
+      student.programSlug &&
+      student.level === enrollment.level &&
+      parsed.data.level &&
+      parsed.data.level !== student.level
+    ) {
+      await updateUser(student.id, { level: parsed.data.level });
+    }
+
+    return NextResponse.json(
+      createApiResponse(true, {
+        data: updatedEnrollment,
+        message: "Enrollment module/batch updated.",
+      })
     );
   }
 

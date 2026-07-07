@@ -25,7 +25,7 @@ import { toast } from "@/lib/ui/toast";
 import { useAdminPermissions } from "@/components/admin/admin-permissions";
 import { OpenStudentProfileButton, AdminStudentProfileButton } from "@/components/admin/admin-student-profile-drawer";
 import type { AdminCredentialRow } from "@/lib/api/admin-credentials";
-import { revealStudentPassword } from "@/lib/api/admin-client";
+import { revealEnrollmentPassword } from "@/lib/api/admin-client";
 
 interface CredentialsMeta {
   total: number;
@@ -126,7 +126,7 @@ export function AdminCredentialsPanel() {
     if (cached) return cached;
 
     setLoadingId(row.id);
-    const result = await revealStudentPassword(row.id);
+    const result = await revealEnrollmentPassword(row.id);
     setLoadingId(null);
 
     if (!result.password) {
@@ -190,7 +190,7 @@ export function AdminCredentialsPanel() {
       const res = await fetch("/api/admin/whatsapp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "resendLogin", studentId: row.id }),
+        body: JSON.stringify({ action: "resendLogin", enrollmentId: row.id }),
       });
       const json = await res.json();
       if (json.success) {
@@ -247,7 +247,7 @@ export function AdminCredentialsPanel() {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          id: editRow.id,
+          id: editRow.studentId,
           email,
           phone: editPhone.trim(),
         }),
@@ -263,7 +263,7 @@ export function AdminCredentialsPanel() {
 
       setRows((current) =>
         current.map((item) =>
-          item.id === editRow.id
+          item.studentId === editRow.studentId
             ? {
                 ...item,
                 email: updatedEmail,
@@ -287,7 +287,11 @@ export function AdminCredentialsPanel() {
       const res = await fetch("/api/admin/students", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: row.id, action: "resetPassword" }),
+        body: JSON.stringify({
+          id: row.studentId,
+          enrollmentId: row.id,
+          action: "resetPassword",
+        }),
       });
       const json = await res.json();
       if (!json.success) {
@@ -431,7 +435,7 @@ export function AdminCredentialsPanel() {
         </div>
 
         <p className="text-xs text-muted">
-          {loading ? "Loading..." : `${filtered.length} of ${rows.length} students`}
+          {loading ? "Loading..." : `${filtered.length} of ${rows.length} module logins`}
         </p>
       </div>
 
@@ -455,7 +459,7 @@ export function AdminCredentialsPanel() {
                 !row.hasLoggedIn && "bg-red-50/40"
               )}
             >
-              <OpenStudentProfileButton target={{ studentId: row.id }} className="font-semibold text-sm">
+              <OpenStudentProfileButton target={{ studentId: row.studentId }} className="font-semibold text-sm">
                 {row.name}
               </OpenStudentProfileButton>
               <p className="text-xs text-muted">{row.course} · {row.module}</p>
@@ -465,7 +469,7 @@ export function AdminCredentialsPanel() {
                 {row.hasStoredPassword ? " · Password saved" : " · No password"}
               </p>
               <div className="flex flex-wrap gap-2 pt-1">
-                <AdminStudentProfileButton target={{ studentId: row.id }} compact />
+                <AdminStudentProfileButton target={{ studentId: row.studentId }} compact />
                 {canWrite && row.hasStoredPassword && (
                   <Button
                     size="sm"
@@ -520,7 +524,7 @@ export function AdminCredentialsPanel() {
                     >
                       <td className="px-3 py-2.5">
                         <OpenStudentProfileButton
-                          target={{ studentId: row.id }}
+                          target={{ studentId: row.studentId }}
                           className="font-medium text-sm hover:underline"
                         >
                           {row.name}
@@ -631,7 +635,7 @@ export function AdminCredentialsPanel() {
                       </td>
                       <td className="px-3 py-2.5">
                         <div className="flex gap-1">
-                          <AdminStudentProfileButton target={{ studentId: row.id }} compact />
+                          <AdminStudentProfileButton target={{ studentId: row.studentId }} compact />
                           <button
                             type="button"
                             title="Copy full login details"

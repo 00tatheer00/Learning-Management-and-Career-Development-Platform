@@ -4,7 +4,10 @@ import { getProgramBySlug } from "@/lib/data/programs";
 import { getPortalLoginUrl } from "@/lib/site-url";
 
 export interface AdminCredentialRow {
+  /** Approved enrollment id (unique row key). */
   id: string;
+  /** Portal user id for account-level actions. */
+  studentId: string;
   name: string;
   email: string;
   whatsapp: string;
@@ -23,52 +26,49 @@ export interface AdminCredentialRow {
 
 export async function getAdminCredentialRows(): Promise<AdminCredentialRow[]> {
   const loginUrl = getPortalLoginUrl();
-  const students = await prisma.user.findMany({
-    where: { role: "student" },
-    orderBy: { createdAt: "desc" },
-  });
-
-  if (students.length === 0) return [];
-
-  const emails = students.map((student) => student.email.toLowerCase());
   const enrollments = await prisma.enrollment.findMany({
-    where: { email: { in: emails }, status: "approved" },
-    orderBy: { reviewedAt: "desc" },
+    where: { status: "approved" },
+    orderBy: [{ reviewedAt: "desc" }, { createdAt: "desc" }],
   });
 
-  const enrollmentByEmail = new Map<string, (typeof enrollments)[number][]>();
+  if (enrollments.length === 0) return [];
+
+  const emails = [...new Set(enrollments.map((entry) => entry.email.toLowerCase()))];
+  const students = await prisma.user.findMany({
+    where: { role: "student", email: { in: emails } },
+  });
+  const studentByEmail = new Map(students.map((student) => [student.email.toLowerCase(), student]));
+
+  const rows: AdminCredentialRow[] = [];
+
   for (const enrollment of enrollments) {
-    const key = enrollment.email.toLowerCase();
-    const list = enrollmentByEmail.get(key) ?? [];
-    list.push(enrollment);
-    enrollmentByEmail.set(key, list);
-  }
+    const student = studentByEmail.get(enrollment.email.toLowerCase());
+    if (!student) continue;
 
-  return students.map((student) => {
-    const approved = enrollmentByEmail.get(student.email.toLowerCase()) ?? [];
-    const enrollment =
-      approved.find((entry) => entry.program === student.programSlug) ?? approved[0];
-    const programSlug = student.programSlug ?? enrollment?.program ?? "";
-    const course = getProgramBySlug(programSlug)?.title ?? (programSlug || "—");
+    const programSlug = enrollment.program;
+    const course = getProgramBySlug(programSlug)?.title ?? programSlug;
 
-    return {
-      id: student.id,
-      name: student.name,
+    rows.push({
+      id: enrollment.id,
+      studentId: student.id,
+      name: enrollment.fullName || student.name,
       email: student.email,
-      whatsapp: student.phone ?? enrollment?.whatsapp ?? "—",
+      whatsapp: student.phone ?? enrollment.whatsapp ?? "—",
       course,
       programSlug,
-      module: student.level ?? enrollment?.level ?? "—",
-      batch: student.batch ?? enrollment?.batch ?? "—",
+      module: enrollment.level,
+      batch: enrollment.batch ?? "—",
       password: null,
-      hasStoredPassword: Boolean(enrollment?.portalPasswordEnc),
+      hasStoredPassword: Boolean(enrollment.portalPasswordEnc),
       hasLoggedIn: Boolean(student.firstLoginAt),
       firstLoginAt: student.firstLoginAt?.toISOString() ?? null,
       lastLoginAt: student.lastLoginAt?.toISOString() ?? null,
-      approvedAt: enrollment?.reviewedAt?.toISOString() ?? student.createdAt.toISOString(),
+      approvedAt: enrollment.reviewedAt?.toISOString() ?? student.createdAt.toISOString(),
       loginUrl,
-    };
-  });
+    });
+  }
+
+  return rows;
 }
 
 export async function updateStudentLoginDetails(

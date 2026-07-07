@@ -12,7 +12,7 @@ import {
   updateStudentLoginDetails,
 } from "@/lib/api/admin-credentials";
 import { generateMissingPortalPasswords } from "@/lib/api/admin-credentials-bulk";
-import { revealStudentPortalPassword } from "@/lib/api/admin-portal-password";
+import { revealEnrollmentPortalPassword, revealStudentPortalPassword } from "@/lib/api/admin-portal-password";
 
 export async function GET() {
   const user = await getAdminUser();
@@ -89,7 +89,8 @@ const postSchema = z.discriminatedUnion("action", [
   }),
   z.object({
     action: z.literal("revealPassword"),
-    studentId: z.string(),
+    enrollmentId: z.string().optional(),
+    studentId: z.string().optional(),
   }),
   z.object({
     action: z.literal("bulkResendLogin"),
@@ -111,7 +112,15 @@ export async function POST(request: Request) {
   }
 
   if (parsed.data.action === "revealPassword") {
-    const result = await revealStudentPortalPassword(parsed.data.studentId);
+    if (!parsed.data.enrollmentId && !parsed.data.studentId) {
+      return NextResponse.json(createApiResponse(false, { message: "Provide enrollmentId or studentId." }), {
+        status: 400,
+      });
+    }
+
+    const result = parsed.data.enrollmentId
+      ? await revealEnrollmentPortalPassword(parsed.data.enrollmentId)
+      : await revealStudentPortalPassword(parsed.data.studentId!);
     if (!result.password) {
       return NextResponse.json(createApiResponse(false, { error: result.error ?? "Password not available" }), {
         status: result.error === "Student not found" ? 404 : 400,

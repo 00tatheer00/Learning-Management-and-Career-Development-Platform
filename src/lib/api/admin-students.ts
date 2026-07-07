@@ -6,7 +6,10 @@ import { DEFAULT_BATCH_NAME } from "@/lib/constants/batch";
 import { formatAppliedDate, formatAppliedDateTime } from "@/lib/utils";
 
 export interface AdminStudentRow {
+  /** Approved enrollment id (unique row key). */
   id: string;
+  /** Portal user id for account-level actions. */
+  studentId: string;
   name: string;
   email: string;
   whatsapp: string;
@@ -27,60 +30,52 @@ export interface AdminStudentRow {
 }
 
 export async function getAdminStudentRows(): Promise<AdminStudentRow[]> {
-  const students = await prisma.user.findMany({
-    where: { role: "student" },
-    orderBy: { createdAt: "desc" },
-  });
-
-  if (students.length === 0) return [];
-
-  const emails = students.map((student) => student.email.toLowerCase());
   const enrollments = await prisma.enrollment.findMany({
-    where: { email: { in: emails } },
-    orderBy: { createdAt: "desc" },
+    where: { status: "approved" },
+    orderBy: [{ reviewedAt: "desc" }, { createdAt: "desc" }],
   });
 
-  const enrollmentByEmail = new Map<string, (typeof enrollments)[number][]>();
+  if (enrollments.length === 0) return [];
+
+  const emails = [...new Set(enrollments.map((entry) => entry.email.toLowerCase()))];
+  const students = await prisma.user.findMany({
+    where: { role: "student", email: { in: emails } },
+  });
+  const studentByEmail = new Map(students.map((student) => [student.email.toLowerCase(), student]));
+
+  const rows: AdminStudentRow[] = [];
+
   for (const enrollment of enrollments) {
-    const key = enrollment.email.toLowerCase();
-    const list = enrollmentByEmail.get(key) ?? [];
-    list.push(enrollment);
-    enrollmentByEmail.set(key, list);
-  }
+    const student = studentByEmail.get(enrollment.email.toLowerCase());
+    if (!student) continue;
 
-  return students.map((student) => {
-    const studentEnrollments = enrollmentByEmail.get(student.email.toLowerCase()) ?? [];
-    const approvedEnrollments = studentEnrollments.filter(
-      (entry) => entry.status === "approved"
-    );
-    const enrollment =
-      approvedEnrollments.find((entry) => entry.program === student.programSlug) ??
-      approvedEnrollments[0] ??
-      studentEnrollments[0];
-    const programSlug = student.programSlug ?? enrollment?.program ?? "";
-    const course = getProgramBySlug(programSlug)?.title ?? (programSlug || "—");
+    const programSlug = enrollment.program;
+    const course = getProgramBySlug(programSlug)?.title ?? programSlug;
 
-    return {
-      id: student.id,
-      name: student.name,
+    rows.push({
+      id: enrollment.id,
+      studentId: student.id,
+      name: enrollment.fullName || student.name,
       email: student.email,
-      whatsapp: student.phone ?? enrollment?.whatsapp ?? "—",
-      fatherName: enrollment?.fatherName ?? "—",
-      cnic: enrollment?.cnic ?? "—",
-      institution: enrollment?.institution ?? "—",
-      classSemester: enrollment?.classSemester ?? "—",
-      fieldOfStudy: enrollment?.fieldOfStudy ?? "—",
+      whatsapp: student.phone ?? enrollment.whatsapp ?? "—",
+      fatherName: enrollment.fatherName ?? "—",
+      cnic: enrollment.cnic ?? "—",
+      institution: enrollment.institution ?? "—",
+      classSemester: enrollment.classSemester ?? "—",
+      fieldOfStudy: enrollment.fieldOfStudy ?? "—",
       course,
       programSlug,
-      module: student.level ?? enrollment?.level ?? "—",
-      batch: student.batch ?? enrollment?.batch ?? DEFAULT_BATCH_NAME,
-      hasLaptop: enrollment?.hasLaptop ?? "—",
-      internetAvailable: enrollment?.internetAvailable ?? "—",
+      module: enrollment.level,
+      batch: enrollment.batch ?? DEFAULT_BATCH_NAME,
+      hasLaptop: enrollment.hasLaptop ?? "—",
+      internetAvailable: enrollment.internetAvailable ?? "—",
       isActive: student.isActive,
       joinedAt: student.createdAt.toISOString(),
-      appliedAt: enrollment?.createdAt.toISOString() ?? student.createdAt.toISOString(),
-    };
-  });
+      appliedAt: enrollment.createdAt.toISOString(),
+    });
+  }
+
+  return rows;
 }
 
 function escapeCsv(value: string) {

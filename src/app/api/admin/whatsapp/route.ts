@@ -8,7 +8,10 @@ import {
 } from "@/lib/auth/admin-access";
 import { createApiResponse } from "@/lib/api/enrollment";
 import { getUltraMsgInstanceStatus } from "@/lib/notifications/whatsapp";
-import { resendStudentLoginWhatsApp } from "@/lib/notifications/student-login-whatsapp";
+import {
+  resendEnrollmentLoginWhatsApp,
+  resendStudentLoginWhatsApp,
+} from "@/lib/notifications/student-login-whatsapp";
 
 const WHATSAPP_TEST_DISABLED_MESSAGE =
   "Test messages are disabled. Use Resend Login or approve a student to verify WhatsApp.";
@@ -27,7 +30,8 @@ const postSchema = z.discriminatedUnion("action", [
   }),
   z.object({
     action: z.literal("resendLogin"),
-    studentId: z.string(),
+    enrollmentId: z.string().optional(),
+    studentId: z.string().optional(),
   }),
 ]);
 
@@ -54,7 +58,17 @@ export async function POST(request: Request) {
     );
   }
 
-  const result = await resendStudentLoginWhatsApp(parsed.data.studentId);
+  if (!parsed.data.enrollmentId && !parsed.data.studentId) {
+    return NextResponse.json(
+      createApiResponse(false, { message: "Provide enrollmentId or studentId." }),
+      { status: 400 }
+    );
+  }
+
+  const result = parsed.data.enrollmentId
+    ? await resendEnrollmentLoginWhatsApp(parsed.data.enrollmentId)
+    : await resendStudentLoginWhatsApp(parsed.data.studentId!);
+
   if (!result.success) {
     return NextResponse.json(createApiResponse(false, { error: result.error ?? "Send failed" }), {
       status: 400,

@@ -1,7 +1,10 @@
 import { getProgramBySlug } from "@/lib/data/programs";
 import { buildApprovalWhatsAppMessage } from "@/lib/notifications/approval-templates";
 import { sendLoginResendWhatsApp } from "@/lib/notifications/whatsapp";
-import { getStudentPortalPasswordForWhatsApp } from "@/lib/api/admin-portal-password";
+import {
+  getEnrollmentPortalPasswordForWhatsApp,
+  getStudentPortalPasswordForWhatsApp,
+} from "@/lib/api/admin-portal-password";
 import { getPortalLoginUrl } from "@/lib/site-url";
 
 export async function sendStudentLoginWhatsApp(input: {
@@ -26,6 +29,45 @@ export async function sendStudentLoginWhatsApp(input: {
   });
 
   return sendLoginResendWhatsApp(input.whatsapp, message);
+}
+
+export async function resendEnrollmentLoginWhatsApp(enrollmentId: string): Promise<{
+  success: boolean;
+  message: string;
+  error?: string;
+}> {
+  const lookup = await getEnrollmentPortalPasswordForWhatsApp(enrollmentId);
+  if (!lookup.password || !lookup.enrollment) {
+    return {
+      success: false,
+      message: "",
+      error: lookup.error ?? "Login password not available",
+    };
+  }
+
+  const { student, enrollment, password } = lookup;
+
+  const result = await sendStudentLoginWhatsApp({
+    fullName: student.name,
+    email: student.email,
+    whatsapp: student.phone ?? enrollment.whatsapp,
+    program: enrollment.program,
+    level: enrollment.level,
+    password,
+  });
+
+  if (!result.sent) {
+    return {
+      success: false,
+      message: "",
+      error: result.error ?? "WhatsApp message was not sent",
+    };
+  }
+
+  return {
+    success: true,
+    message: `Login details sent on WhatsApp to ${student.phone ?? enrollment.whatsapp}.`,
+  };
 }
 
 export async function resendStudentLoginWhatsApp(studentId: string): Promise<{

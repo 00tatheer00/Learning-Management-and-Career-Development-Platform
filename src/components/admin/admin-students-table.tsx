@@ -102,21 +102,26 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
     return false;
   };
 
-  const refreshStudent = (id: string, patch: Partial<AdminStudentRow>) => {
+  const refreshStudent = (studentId: string, patch: Partial<AdminStudentRow>) => {
     setStudents((current) =>
-      current.map((student) => (student.id === id ? { ...student, ...patch } : student))
+      current.map((student) =>
+        student.studentId === studentId ? { ...student, ...patch } : student
+      )
     );
   };
 
   const handleToggleActive = async (student: AdminStudentRow) => {
     const action = student.isActive ? "deactivate" : "activate";
-    const ok = await runAction(student.id, { action });
-    if (ok) refreshStudent(student.id, { isActive: !student.isActive });
+    const ok = await runAction(student.studentId, { action });
+    if (ok) refreshStudent(student.studentId, { isActive: !student.isActive });
     setLoadingId(null);
   };
 
   const handleResetPassword = async (student: AdminStudentRow) => {
-    const ok = await runAction(student.id, { action: "resetPassword" });
+    const ok = await runAction(student.studentId, {
+      action: "resetPassword",
+      enrollmentId: student.id,
+    });
     setLoadingId(null);
     if (!ok) return;
   };
@@ -129,14 +134,21 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
 
   const saveEdit = async () => {
     if (!editStudent) return;
-    const ok = await runAction(editStudent.id, {
+    const ok = await runAction(editStudent.studentId, {
       action: "update",
+      enrollmentId: editStudent.id,
       level: editModule,
       batch: editBatch,
     });
     setLoadingId(null);
     if (ok) {
-      refreshStudent(editStudent.id, { module: editModule, batch: editBatch });
+      setStudents((current) =>
+        current.map((student) =>
+          student.id === editStudent.id
+            ? { ...student, module: editModule, batch: editBatch }
+            : student
+        )
+      );
       setEditStudent(null);
     }
   };
@@ -147,12 +159,14 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
     const res = await fetch("/api/admin/students", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: deleteTarget.id }),
+      body: JSON.stringify({ id: deleteTarget.studentId }),
     });
     const data = await res.json();
     if (data.success) {
       toast.success(data.message ?? "Student deleted.");
-      setStudents((current) => current.filter((student) => student.id !== deleteTarget.id));
+      setStudents((current) =>
+        current.filter((student) => student.studentId !== deleteTarget.studentId)
+      );
       setDeleteTarget(null);
     } else {
       toast.error(data.message ?? data.error ?? "Delete failed.");
@@ -383,7 +397,7 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
       </div>
 
       <p className="text-sm text-muted">
-        {filtered.length} of {students.length} students shown
+        {filtered.length} of {students.length} enrollments shown
       </p>
 
       {filtered.length === 0 && (
@@ -413,7 +427,7 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
               </div>
               <div className="min-w-0 flex-1">
                 <OpenStudentProfileButton
-                  target={{ studentId: student.id }}
+                  target={{ studentId: student.studentId }}
                   className="font-semibold hover:underline"
                 >
                   {student.name}
@@ -441,7 +455,7 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
             </div>
             <p className="mt-2 text-xs text-muted font-mono break-all">{student.cnic}</p>
             <div className="mt-3 flex flex-wrap gap-2 border-t border-border pt-3">
-              <AdminStudentProfileButton target={{ studentId: student.id }} compact />
+              <AdminStudentProfileButton target={{ studentId: student.studentId }} compact />
               {canWrite && (
                 <>
                   <button
@@ -517,7 +531,7 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
                       </div>
                       <div>
                         <OpenStudentProfileButton
-                          target={{ studentId: student.id }}
+                          target={{ studentId: student.studentId }}
                           className="font-semibold text-foreground hover:underline"
                         >
                           {student.name}
@@ -563,7 +577,7 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
                   </td>
                   <td className="px-4 py-4">
                     <div className="flex flex-wrap gap-2">
-                      <AdminStudentProfileButton target={{ studentId: student.id }} compact />
+                      <AdminStudentProfileButton target={{ studentId: student.studentId }} compact />
                       {canWrite && (
                         <>
                           <button
