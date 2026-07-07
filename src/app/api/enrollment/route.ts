@@ -9,6 +9,7 @@ import {
 } from "@/lib/api/enrollment-history";
 import { sendAdminNewRegistrationAlert } from "@/lib/notifications/admin-registration-alert";
 import { uploadPaymentScreenshot } from "@/lib/cloudinary";
+import { rateLimitByIp } from "@/lib/security/rate-limit";
 import {
   isPaymentScreenshotImage,
   MAX_PAYMENT_SCREENSHOT_BYTES,
@@ -56,6 +57,17 @@ function friendlyValidationMessage(issue: z.ZodIssue | undefined): string {
 
 export async function POST(request: Request) {
   try {
+    const limited = await rateLimitByIp(request, "enrollment", 3, 60 * 60);
+    if (limited) {
+      return NextResponse.json(
+        createApiResponse(false, {
+          error: "Too many requests",
+          message: "Too many registration attempts from this connection. Please try again later.",
+        }),
+        { status: 429 }
+      );
+    }
+
     let formData: FormData;
     try {
       formData = await request.formData();

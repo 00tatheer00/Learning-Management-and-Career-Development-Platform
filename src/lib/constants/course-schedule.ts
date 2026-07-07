@@ -36,11 +36,3 @@ export function getProgramClassSchedule(
   }
   return PROGRAM_CLASS_SCHEDULE["web-development"];
 }
-
-/** @deprecated Use getProgramClassSchedule(programSlug) */
-export const MODULE_1_CLASS_START = {
-  moduleLabel: "Module 1",
-  startDateLabel: "6 July 2026",
-  headline: PROGRAM_CLASS_SCHEDULE["web-development"].headline,
-  subline: PROGRAM_CLASS_SCHEDULE["web-development"].subline,
-} as const;

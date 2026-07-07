@@ -225,8 +225,22 @@ export async function getSubmissions(studentId?: string): Promise<AssignmentSubm
 }
 
 export async function createSubmission(
-  data: Omit<AssignmentSubmission, "id" | "submittedAt" | "status">
-): Promise<AssignmentSubmission> {
+  data: Omit<AssignmentSubmission, "id" | "submittedAt" | "status">,
+  studentProgramSlug: string
+): Promise<{ submission?: AssignmentSubmission; error?: string }> {
+  const assignment = await prisma.assignment.findUnique({
+    where: { id: data.assignmentId },
+    select: { id: true, programSlug: true },
+  });
+
+  if (!assignment) {
+    return { error: "Assignment not found" };
+  }
+
+  if (assignment.programSlug !== studentProgramSlug) {
+    return { error: "This assignment is not for your program" };
+  }
+
   const submission = await prisma.assignmentSubmission.create({
     data: {
       id: crypto.randomUUID(),
@@ -237,7 +251,8 @@ export async function createSubmission(
       status: "submitted",
     },
   });
-  return mapSubmission(submission);
+
+  return { submission: mapSubmission(submission) };
 }
 
 export async function updateSubmission(

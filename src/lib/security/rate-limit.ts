@@ -1,5 +1,6 @@
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
+import { checkInMemoryRateLimit } from "@/lib/security/in-memory-rate-limit";
 
 function createRatelimit(requests: number, window: `${number} ${"s" | "m" | "h" | "d"}`) {
   if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
@@ -60,8 +61,15 @@ export async function rateLimitByIp(
   requests: number,
   windowSeconds: number
 ): Promise<boolean> {
-  const limiter = getCustomRateLimit(key, requests, windowSeconds);
   const ip = getClientIp(request);
-  const result = await checkRateLimit(limiter, `${key}:${ip}`);
-  return !result.success;
+  const identifier = `${key}:${ip}`;
+  const limiter = getCustomRateLimit(key, requests, windowSeconds);
+
+  if (limiter) {
+    const result = await checkRateLimit(limiter, identifier);
+    return !result.success;
+  }
+
+  const fallback = checkInMemoryRateLimit(identifier, requests, windowSeconds * 1000);
+  return !fallback.allowed;
 }

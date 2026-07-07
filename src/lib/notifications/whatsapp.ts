@@ -126,7 +126,8 @@ export type WhatsAppPurpose =
   | "rejection"
   | "login_resend"
   | "forgot_password"
-  | "password_reset";
+  | "password_reset"
+  | "assignment_review";
 
 const ALLOWED_WHATSAPP_PURPOSES = new Set<WhatsAppPurpose>([
   "approval",
@@ -134,10 +135,11 @@ const ALLOWED_WHATSAPP_PURPOSES = new Set<WhatsAppPurpose>([
   "login_resend",
   "forgot_password",
   "password_reset",
+  "assignment_review",
 ]);
 
 const WHATSAPP_BLOCKED_MESSAGE =
-  "This WhatsApp message type is disabled. Allowed: approve, reject, single login resend, password reset.";
+  "This WhatsApp message type is disabled. Allowed: approve, reject, login resend, password reset, assignment review.";
 
 export async function sendApprovalWhatsApp(
   phone: string,
@@ -172,6 +174,13 @@ export async function sendPasswordResetWhatsApp(
   message: string
 ): Promise<{ sent: boolean; error?: string }> {
   return sendWhatsAppMessage(phone, message, "password_reset");
+}
+
+export async function sendAssignmentReviewWhatsApp(
+  phone: string,
+  message: string
+): Promise<{ sent: boolean; error?: string }> {
+  return sendWhatsAppMessage(phone, message, "assignment_review");
 }
 
 export async function sendWhatsAppMessage(

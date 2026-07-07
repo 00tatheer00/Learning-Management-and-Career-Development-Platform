@@ -1,4 +1,4 @@
-import { sendWhatsAppMessage } from "@/lib/notifications/whatsapp";
+import { sendAssignmentReviewWhatsApp } from "@/lib/notifications/whatsapp";
 
 interface SubmissionReviewNoticeInput {
   studentName: string;
@@ -37,7 +37,7 @@ export async function sendSubmissionReviewNotifications(
 
   if (input.whatsapp) {
     const emoji = input.status === "approved" ? "✅" : "📝";
-    const result = await sendWhatsAppMessage(
+    const result = await sendAssignmentReviewWhatsApp(
       input.whatsapp,
       `${emoji} *Assignment Review*\n\n${text}`
     );

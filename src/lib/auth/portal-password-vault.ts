@@ -5,10 +5,12 @@ const ALGORITHM = "aes-256-gcm";
 const KEY_SALT = "eest-portal-password-vault";
 
 function getEncryptionKey(): Buffer {
-  const secret =
-    process.env.PORTAL_PASSWORD_SECRET ??
-    process.env.NEXTAUTH_SECRET ??
-    process.env.AUTH_SECRET;
+  const portalSecret = process.env.PORTAL_PASSWORD_SECRET?.trim();
+  const fallback = process.env.NEXTAUTH_SECRET ?? process.env.AUTH_SECRET;
+  if (process.env.NODE_ENV === "production" && !portalSecret) {
+    throw new Error("PORTAL_PASSWORD_SECRET is required in production");
+  }
+  const secret = portalSecret ?? fallback;
   if (!secret) {
     throw new Error("PORTAL_PASSWORD_SECRET, NEXTAUTH_SECRET, or AUTH_SECRET is required");
   }

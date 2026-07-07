@@ -13,7 +13,16 @@ const schema = z.object({
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user || user.role !== "student") {
-    return NextResponse.json(createApiResponse(false, { error: STUDENT_UR.api.unauthorized }), { status: 403 });
+    return NextResponse.json(createApiResponse(false, { error: STUDENT_UR.api.unauthorized }), {
+      status: 403,
+    });
+  }
+
+  if (!user.programSlug) {
+    return NextResponse.json(
+      createApiResponse(false, { error: "Your course is not assigned yet." }),
+      { status: 403 }
+    );
   }
 
   const body = await request.json();
@@ -25,14 +34,24 @@ export async function POST(request: Request) {
     );
   }
 
-  const submission = await createSubmission({
-    assignmentId: parsed.data.assignmentId,
-    studentId: user.id,
-    studentName: user.name,
-    content: parsed.data.content,
-  });
+  const result = await createSubmission(
+    {
+      assignmentId: parsed.data.assignmentId,
+      studentId: user.id,
+      studentName: user.name,
+      content: parsed.data.content,
+    },
+    user.programSlug
+  );
+
+  if (!result.submission) {
+    return NextResponse.json(
+      createApiResponse(false, { error: result.error ?? "Could not submit assignment" }),
+      { status: result.error === "Assignment not found" ? 404 : 403 }
+    );
+  }
 
   return NextResponse.json(
-    createApiResponse(true, { data: submission, message: STUDENT_UR.api.assignmentSuccess })
+    createApiResponse(true, { data: result.submission, message: STUDENT_UR.api.assignmentSuccess })
   );
 }

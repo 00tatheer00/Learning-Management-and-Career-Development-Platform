@@ -8,6 +8,7 @@ import {
   getEmailFromAddress,
   getEmailReplyTo,
 } from "@/lib/notifications/email-config";
+import { escapeHtml } from "@/lib/security/escape-html";
 import { rateLimitByIp } from "@/lib/security/rate-limit";
 
 const schema = z.object({
@@ -61,10 +62,10 @@ export async function POST(request: Request) {
       ].join("\n"),
       html: `
         <div style="font-family:Arial,sans-serif;line-height:1.6">
-          <p><strong>Name:</strong> ${parsed.data.name}</p>
-          <p><strong>Email:</strong> ${parsed.data.email}</p>
+          <p><strong>Name:</strong> ${escapeHtml(parsed.data.name)}</p>
+          <p><strong>Email:</strong> ${escapeHtml(parsed.data.email)}</p>
           <hr />
-          <p>${parsed.data.message.replace(/\n/g, "<br/>")}</p>
+          <p>${escapeHtml(parsed.data.message).replace(/\n/g, "<br/>")}</p>
         </div>
       `,
     });

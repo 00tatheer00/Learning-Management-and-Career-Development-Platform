@@ -6,11 +6,20 @@ const prisma = new PrismaClient({
   datasources: { db: { url: getDatabaseUrl() } },
 });
 
+function seedPassword(envKey: string, devDefault: string): string {
+  const value = process.env[envKey]?.trim();
+  if (value) return value;
+  if (process.env.NODE_ENV === "production") {
+    throw new Error(`Set ${envKey} before running seed in production.`);
+  }
+  return devDefault;
+}
+
 const DEFAULT_USERS = [
   {
     id: "admin-1",
     email: "admin@eest.com",
-    password: "admin@321",
+    password: seedPassword("SEED_ADMIN_PASSWORD", "admin@321"),
     role: "admin" as const,
     name: "Tatheer Hussain",
     phone: "03374005515",
@@ -19,7 +28,7 @@ const DEFAULT_USERS = [
   {
     id: "admin-komal",
     email: "komal@eest.com",
-    password: "komal@003",
+    password: seedPassword("SEED_KOMAL_PASSWORD", "komal@003"),
     role: "admin_readonly" as const,
     name: "Komal",
     phone: "03115969527",
@@ -28,7 +37,7 @@ const DEFAULT_USERS = [
   {
     id: "trainer-tatheer",
     email: "tatheer@eest.com",
-    password: "tatheer@321",
+    password: seedPassword("SEED_TRAINER_TATHEER_PASSWORD", "tatheer@321"),
     role: "trainer" as const,
     name: "S Tatheer Hussain",
     phone: "03374005515",
@@ -39,7 +48,7 @@ const DEFAULT_USERS = [
   {
     id: "trainer-talha",
     email: "talha@eest.com",
-    password: "talha@321",
+    password: seedPassword("SEED_TRAINER_TALHA_PASSWORD", "talha@321"),
     role: "trainer" as const,
     name: "Talha Iqbal",
     phone: "03001234567",
@@ -50,7 +59,7 @@ const DEFAULT_USERS = [
   {
     id: "student-1",
     email: "student@eest.com",
-    password: "student123",
+    password: seedPassword("SEED_STUDENT_PASSWORD", "student123"),
     role: "student" as const,
     name: "Demo Student",
     phone: "03001234567",

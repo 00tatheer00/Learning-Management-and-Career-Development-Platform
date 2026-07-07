@@ -83,6 +83,7 @@ openssl rand -base64 32
 | `EMAIL_REPLY_TO` | No | Reply address, e.g. `eeschooltech@gmail.com` |
 | `ULTRAMSG_INSTANCE_ID` | Yes (approval WhatsApp) | UltraMsg instance ID, e.g. `instance181496` |
 | `ULTRAMSG_TOKEN` | Yes (approval WhatsApp) | UltraMsg API token |
+| `PORTAL_PASSWORD_SECRET` | Yes (production) | Encrypts stored portal passwords (use a value different from `NEXTAUTH_SECRET`) |
 
 When admin approves a student, the platform sends a designed congratulations email and WhatsApp message with portal login URL and credentials.
 
@@ -102,7 +103,53 @@ npm run dev
 
 ---
 
-## 6. Deploy to Vercel
+---
+
+## 6. CI/CD (GitHub Actions + Vercel)
+
+### CI — every push & PR to `main`
+
+`.github/workflows/ci-cd.yml` runs:
+
+1. `npm run lint`
+2. `npm test`
+3. `npm run build`
+
+If any step fails, the PR is blocked and production deploy does not run.
+
+### CD — deploy after tests pass
+
+On **push to `main`** only, after CI succeeds, GitHub Actions deploys to Vercel production using:
+
+- `VERCEL_TOKEN`
+- `VERCEL_ORG_ID`
+- `VERCEL_PROJECT_ID`
+
+Add these in **GitHub → Repository → Settings → Secrets and variables → Actions**.
+
+**Get IDs locally** (after `npx vercel link`):
+
+```bash
+cat .vercel/project.json
+# { "orgId": "team_...", "projectId": "prj_..." }
+```
+
+**Create token:** [vercel.com/account/tokens](https://vercel.com/account/tokens)
+
+### Avoid double production deploys
+
+`vercel.json` includes `ignoreCommand` so Vercel’s Git integration **skips** production builds on `main`. GitHub Actions is the only production deploy path. Preview deploys for branches/PRs still use Vercel as usual.
+
+### Optional: require CI before merge
+
+GitHub → **Settings → Branches → Branch protection** on `main`:
+
+- Require status check: **Lint, Test & Build**
+- Require pull request reviews (optional)
+
+---
+
+## 7. Deploy to Vercel (first time)
 
 1. Push code to GitHub
 2. [vercel.com](https://vercel.com) → Import repository
@@ -118,7 +165,7 @@ npm run db:seed
 
 ---
 
-## 7. Custom domain on Vercel
+## 8. Custom domain on Vercel
 
 1. Vercel project → Settings → Domains
 2. Add `school.emergingedge.tech` (or your domain)
@@ -129,9 +176,10 @@ npm run db:seed
 
 ---
 
-## 8. Security checklist (production)
+## 9. Security checklist (production)
 
-- [ ] Change all demo passwords (`admin123`, etc.) or remove demo accounts
+- [ ] GitHub Actions secrets set (`VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`)
+- [ ] `PORTAL_PASSWORD_SECRET` set on Vercel (separate from `NEXTAUTH_SECRET`)
 - [ ] Set strong `AUTH_SECRET` (never commit to git)
 - [ ] Enable Upstash rate limiting
 - [ ] MongoDB user has minimum required permissions
@@ -140,7 +188,7 @@ npm run db:seed
 
 ---
 
-## 9. Demo accounts (change in production!)
+## 10. Demo accounts (change in production!)
 
 | Role | Email | Password |
 |------|-------|----------|
@@ -151,7 +199,7 @@ npm run db:seed
 
 ---
 
-## 10. Useful commands
+## 11. Useful commands
 
 ```bash
 npm run db:push    # Sync Prisma schema to MongoDB

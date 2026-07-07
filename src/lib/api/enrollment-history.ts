@@ -77,8 +77,11 @@ export function mapApplicationSummaries(
     status: EnrollmentStatus;
     createdAt: Date;
     paymentScreenshot: string | null;
-  }>
+  }>,
+  options?: { includePaymentScreenshots?: boolean }
 ): ApplicantApplicationSummary[] {
+  const includePaymentScreenshots = options?.includePaymentScreenshots ?? false;
+
   return records.map((record) => ({
     id: record.id,
     courseTitle: getProgramBySlug(record.program)?.title ?? record.program,
@@ -86,7 +89,9 @@ export function mapApplicationSummaries(
     level: record.level,
     status: record.status,
     appliedAt: record.createdAt.toISOString(),
-    paymentScreenshot: record.paymentScreenshot ?? undefined,
+    ...(includePaymentScreenshots && record.paymentScreenshot
+      ? { paymentScreenshot: record.paymentScreenshot }
+      : {}),
   }));
 }
 

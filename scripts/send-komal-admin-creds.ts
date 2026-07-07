@@ -5,7 +5,7 @@ import { getDatabaseUrl } from "../src/lib/database-url";
 
 const KOMAL_PHONE = "03115969527";
 const KOMAL_EMAIL = "komal@eest.com";
-const KOMAL_PASSWORD = "komal@003";
+const KOMAL_PASSWORD = process.env.SEED_KOMAL_PASSWORD ?? process.env.KOMAL_PASSWORD ?? "";
 
 function buildViewerAdminWhatsAppMessage() {
   const loginUrl = getPortalLoginUrl();
@@ -34,6 +34,9 @@ Learn. Build. Lead.`;
 }
 
 async function main() {
+  if (!KOMAL_PASSWORD) {
+    throw new Error("Set SEED_KOMAL_PASSWORD or KOMAL_PASSWORD before running this script.");
+  }
   const prisma = new PrismaClient({
     datasources: { db: { url: getDatabaseUrl() } },
   });
