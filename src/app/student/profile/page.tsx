@@ -3,6 +3,8 @@ import { getProgramBySlug } from "@/lib/data/programs";
 import { getProgramCategory } from "@/lib/constants/program-categories";
 import { PortalPageHeader } from "@/components/portal/portal-ui";
 import { ProgramCategoryBadge } from "@/components/portal/program-category-badge";
+import { StudentModuleEnrollmentsCard } from "@/components/portal/student-module-enrollments-card";
+import { getStudentModuleEnrollmentViews } from "@/lib/api/student-module-enrollments";
 import { UserCircle, Envelope, Phone, BookOpen, GraduationCap, ChalkboardTeacher } from "@phosphor-icons/react/ssr";
 import { getTrainersByProgramSlug } from "@/lib/data/trainers";
 
@@ -16,13 +18,17 @@ export default async function StudentProfilePage() {
     ? getTrainersByProgramSlug(user.programSlug).find((t) => t.id === user.trainerId) ??
       getTrainersByProgramSlug(user.programSlug).find((t) => t.featured)
     : null;
+  const moduleEnrollments =
+    user.programSlug && user.email
+      ? await getStudentModuleEnrollmentViews(user.email, user.programSlug)
+      : [];
 
   const fields = [
     { icon: UserCircle, label: "Full Name", value: user.name },
     { icon: Envelope, label: "Email", value: user.email },
     { icon: Phone, label: "Phone / WhatsApp", value: user.phone ?? "—" },
     { icon: BookOpen, label: "Program Category", value: category?.sidebarLabel ?? program?.title ?? "—" },
-    { icon: GraduationCap, label: "Current Module", value: user.level ?? "—" },
+    { icon: GraduationCap, label: "Active Module", value: user.level ?? "—" },
     { icon: ChalkboardTeacher, label: "Assigned Trainer", value: trainer?.name ?? "—" },
   ];
 
@@ -59,6 +65,10 @@ export default async function StudentProfilePage() {
             </div>
           ))}
         </div>
+      </div>
+
+      <div className="mt-6">
+        <StudentModuleEnrollmentsCard enrollments={moduleEnrollments} />
       </div>
     </div>
   );

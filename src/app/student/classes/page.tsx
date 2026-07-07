@@ -1,20 +1,26 @@
 import { getCurrentUser } from "@/lib/auth/session";
 import { getLiveSessionsPreview } from "@/lib/api/portal-data";
 import { getStudentClassSchedule } from "@/lib/constants/student-portal-ur";
-import { canAccessModuleOneClasses } from "@/lib/modules/student-module-access";
 import { PortalPageHeader, EmptyState } from "@/components/portal/portal-ui";
 import { StudentLiveSessionCard } from "@/components/portal/student-live-session-card";
 import { ModuleStartsSoonNotice } from "@/components/portal/module-starts-soon-notice";
 import { sortLiveSessionsForDisplay } from "@/lib/sessions/join-window";
+import {
+  getStudentModuleEnrollmentViews,
+  studentHasLiveClassAccess,
+} from "@/lib/api/student-module-enrollments";
 
 export default async function StudentClassesPage() {
   const user = await getCurrentUser();
   if (!user) return null;
 
   const programSlug = user.programSlug ?? "web-development";
+  const moduleEnrollments = user.email
+    ? await getStudentModuleEnrollmentViews(user.email, programSlug)
+    : [];
   const sessions = sortLiveSessionsForDisplay(await getLiveSessionsPreview(programSlug));
   const classSchedule = getStudentClassSchedule(programSlug);
-  const canJoinLive = canAccessModuleOneClasses(programSlug, user.level);
+  const canJoinLive = studentHasLiveClassAccess(programSlug, moduleEnrollments);
 
   return (
     <div>

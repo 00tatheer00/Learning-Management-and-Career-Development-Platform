@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { StudentTrainerCard } from "@/components/portal/student-trainer-card";
 import { StudentWhatsAppGroupCard } from "@/components/portal/student-whatsapp-group-card";
 import { StudentNextClassCard } from "@/components/portal/student-next-class-card";
+import { StudentModuleEnrollmentsCard } from "@/components/portal/student-module-enrollments-card";
 import { StudentModuleRoadmap } from "@/components/portal/student-module-roadmap";
 import { StudentClassProgressCard } from "@/components/portal/student-class-progress-card";
 import { StudentAttendanceProgressCard } from "@/components/portal/student-attendance";
@@ -28,10 +29,13 @@ import { ProgramCategoryBadge } from "@/components/portal/program-category-badge
 import { HELP_CONFIG } from "@/lib/constants/help";
 import { getProgramCategory } from "@/lib/constants/program-categories";
 import { getStudentClassSchedule } from "@/lib/constants/student-portal-ur";
-import { canAccessModuleOneClasses } from "@/lib/modules/student-module-access";
 import { ModuleStartsSoonNotice } from "@/components/portal/module-starts-soon-notice";
 import { findNextUpcomingSession } from "@/lib/utils/session-datetime";
 import { getApprovedEnrollmentLevels } from "@/lib/auth/student-module-sync";
+import {
+  getStudentModuleEnrollmentViews,
+  studentHasLiveClassAccess,
+} from "@/lib/api/student-module-enrollments";
 
 export default async function StudentDashboardPage() {
   const user = await getCurrentUser();
@@ -48,9 +52,12 @@ export default async function StudentDashboardPage() {
   const enrolledModules = user.email
     ? await getApprovedEnrollmentLevels(user.email, programSlug)
     : [];
+  const moduleEnrollments = user.email
+    ? await getStudentModuleEnrollmentViews(user.email, programSlug)
+    : [];
   const nextSession = findNextUpcomingSession(sessions, programSlug);
   const courseLabel = category?.sidebarLabel ?? "Your course";
-  const canJoinLive = canAccessModuleOneClasses(programSlug, user.level);
+  const canJoinLive = studentHasLiveClassAccess(programSlug, moduleEnrollments);
 
   return (
     <div className="space-y-4">
@@ -80,6 +87,8 @@ export default async function StudentDashboardPage() {
       )}
 
       <StudentWhatsAppGroupCard variant="banner" />
+
+      <StudentModuleEnrollmentsCard enrollments={moduleEnrollments} />
 
       {nextSession ? (
         <StudentNextClassCard
@@ -119,7 +128,7 @@ export default async function StudentDashboardPage() {
         <StatCard compact label="Video Lessons" value={materials.length} accent="orange" icon={<BookOpen size={16} weight="duotone" />} href="/student/course" />
         <StatCard compact label="Assignments" value={assignments.length} accent="blue" icon={<ClipboardText size={16} weight="duotone" />} href="/student/assignments" />
         <StatCard compact label="Live Classes" value={sessions.length} accent="green" icon={<VideoCamera size={16} weight="duotone" />} href="/student/classes" />
-        <StatCard compact label="Your Module" value={user.level ?? "—"} accent="slate" icon={<GraduationCap size={16} weight="duotone" />} />
+        <StatCard compact label="Your Modules" value={enrolledModules.length || user.level || "—"} accent="slate" icon={<GraduationCap size={16} weight="duotone" />} />
       </div>
 
       <div>

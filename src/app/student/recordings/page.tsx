@@ -1,16 +1,22 @@
 import { getCurrentUser } from "@/lib/auth/session";
 import { getClassRecordings } from "@/lib/api/class-recordings";
-import { canAccessModuleOneClasses } from "@/lib/modules/student-module-access";
 import { PortalPageHeader } from "@/components/portal/portal-ui";
 import { ModuleStartsSoonNotice } from "@/components/portal/module-starts-soon-notice";
 import { StudentRecordingsContent } from "@/components/portal/student-recordings-content";
+import {
+  getStudentModuleEnrollmentViews,
+  studentHasLiveClassAccess,
+} from "@/lib/api/student-module-enrollments";
 
 export default async function StudentRecordingsPage() {
   const user = await getCurrentUser();
   if (!user) return null;
 
   const programSlug = user.programSlug ?? "web-development";
-  const canAccess = canAccessModuleOneClasses(programSlug, user.level);
+  const moduleEnrollments = user.email
+    ? await getStudentModuleEnrollmentViews(user.email, programSlug)
+    : [];
+  const canAccess = studentHasLiveClassAccess(programSlug, moduleEnrollments);
   const recordings = canAccess ? await getClassRecordings(programSlug) : [];
 
   return (

@@ -1,7 +1,7 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { z } from "zod";
-import { verifyPassword } from "@/lib/auth/password";
+import { verifyStudentLoginPassword } from "@/lib/api/student-module-enrollments";
 import {
   clearActiveSession,
   isActiveSession,
@@ -44,7 +44,7 @@ export const authOptions: NextAuthOptions = {
 
           if (!user || !user.isActive) return null;
 
-          const valid = await verifyPassword(parsed.data.password, user.passwordHash);
+          const valid = await verifyStudentLoginPassword(parsed.data.email, parsed.data.password);
           if (!valid) return null;
 
           return {

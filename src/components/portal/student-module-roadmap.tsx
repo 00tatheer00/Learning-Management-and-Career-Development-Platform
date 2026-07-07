@@ -16,13 +16,17 @@ export function StudentModuleRoadmap({
 }: StudentModuleRoadmapProps) {
   const program = getProgramBySlug(programSlug);
   const category = getProgramCategory(programSlug);
-  const modules = program?.modules ?? [];
+  const allModules = program?.modules ?? [];
+  const enrolledSet = new Set(enrolledModules);
+  const modules =
+    enrolledModules.length > 0
+      ? allModules.filter((mod) => enrolledSet.has(mod.name))
+      : allModules;
 
   if (modules.length === 0) return null;
 
-  const enrolledSet = new Set(enrolledModules);
   const currentIndex = currentModule
-    ? modules.findIndex((mod) => mod.name === currentModule)
+    ? allModules.findIndex((mod) => mod.name === currentModule)
     : -1;
 
   return (
@@ -39,17 +43,21 @@ export function StudentModuleRoadmap({
         <div>
           <h2 className="text-lg font-bold">Your Module Roadmap</h2>
           <p className="text-sm text-muted">
-            {program?.title} · {modules.length} modules
-            {currentModule ? ` · You are in ${currentModule}` : ""}
+            {program?.title}
+            {enrolledModules.length > 0
+              ? ` · ${enrolledModules.length} enrolled module${enrolledModules.length === 1 ? "" : "s"}`
+              : ` · ${allModules.length} modules`}
+            {currentModule ? ` · Active: ${currentModule}` : ""}
           </p>
         </div>
       </div>
 
       <div className="space-y-0">
         {modules.map((mod, index) => {
-          const isCurrent = currentIndex >= 0 ? index === currentIndex : mod.name === currentModule;
-          const isCompleted = currentIndex >= 0 && index < currentIndex;
-          const isUpcoming = currentIndex >= 0 && index > currentIndex;
+          const globalIndex = allModules.findIndex((item) => item.name === mod.name);
+          const isCurrent = currentModule ? mod.name === currentModule : false;
+          const isCompleted = globalIndex >= 0 && currentIndex >= 0 && globalIndex < currentIndex;
+          const isUpcoming = globalIndex >= 0 && currentIndex >= 0 && globalIndex > currentIndex;
           const isEnrolled = enrolledSet.has(mod.name);
 
           return (
@@ -121,9 +129,9 @@ export function StudentModuleRoadmap({
         })}
       </div>
 
-      {currentIndex >= 0 && currentIndex < modules.length - 1 && (
+      {currentIndex >= 0 && currentIndex < allModules.length - 1 && enrolledModules.length <= 1 && (
         <p className="mt-2 text-sm text-muted rounded-xl bg-surface px-4 py-3 border border-border">
-          Next up: <strong>{modules[currentIndex + 1]?.name}</strong> — register again when you
+          Next up: <strong>{allModules[currentIndex + 1]?.name}</strong> — register again when you
           finish this module and pay the next PKR 1,000 fee.
         </p>
       )}
