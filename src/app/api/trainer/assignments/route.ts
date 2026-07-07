@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth/session";
-import { requireTrainerProgram } from "@/lib/auth/trainer-scope";
+import { requireTrainerProgram, resolveTrainerId } from "@/lib/auth/trainer-scope";
 import { createAssignment } from "@/lib/api/portal-data";
 import { createApiResponse } from "@/lib/api/enrollment";
 
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
       description: parsed.data.description,
       dueDate: parsed.data.dueDate,
       programSlug,
-      trainerId: user.trainerId ?? user.id,
+      trainerId: resolveTrainerId(user),
     });
 
     return NextResponse.json(createApiResponse(true, { data: assignment }));

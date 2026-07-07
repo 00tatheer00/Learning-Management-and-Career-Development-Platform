@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth/session";
-import { requireTrainerProgram } from "@/lib/auth/trainer-scope";
+import { requireTrainerProgram, resolveTrainerId } from "@/lib/auth/trainer-scope";
 import { createLiveSession } from "@/lib/api/portal-data";
 import { createApiResponse } from "@/lib/api/enrollment";
 import { isValidMeetLink, normalizeMeetLink } from "@/lib/sessions/meet-link";
@@ -57,7 +57,7 @@ export async function POST(request: Request) {
       roomType: isPortal ? "portal" : "meet",
       programSlug,
       notes: parsed.data.notes,
-      trainerId: user.trainerId ?? user.id,
+      trainerId: resolveTrainerId(user),
       trainerName: user.name,
     });
 

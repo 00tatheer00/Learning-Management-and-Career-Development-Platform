@@ -36,3 +36,8 @@ export function filterStudentsByProgram<T extends { programSlug?: string }>(
 ): T[] {
   return students.filter((s) => s.programSlug === programSlug);
 }
+
+/** Consistent trainer entity id — linked trainer profile or user account id. */
+export function resolveTrainerId(user: { id: string; trainerId?: string | null }): string {
+  return user.trainerId ?? user.id;
+}

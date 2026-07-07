@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth/session";
+import { resolveTrainerId } from "@/lib/auth/trainer-scope";
 import { getLiveSessionById, updateLiveSession } from "@/lib/api/portal-data";
 import { createApiResponse } from "@/lib/api/enrollment";
 import { isValidMeetLink, normalizeMeetLink } from "@/lib/sessions/meet-link";
@@ -37,7 +38,7 @@ export async function PATCH(
     });
   }
 
-  const trainerId = user.trainerId ?? user.id;
+  const trainerId = resolveTrainerId(user);
   if (existing.trainerId !== trainerId) {
     return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), {
       status: 403,

@@ -3,6 +3,7 @@ import { getSessionRoomName, generateRoomPassword } from "@/lib/portal-video/con
 import { sessionHasJoinLink } from "@/lib/sessions/meet-link";
 import { getAdminProgramStats } from "@/lib/api/admin-program-stats";
 import { DEFAULT_BATCH_NAME } from "@/lib/constants/batch";
+import { getTodayYmdInPakistan } from "@/lib/utils/pakistan-time";
 import type {
   Assignment,
   AssignmentSubmission,
@@ -380,7 +381,7 @@ export async function getPortalStats() {
     prisma.liveSession.findMany(),
   ]);
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = getTodayYmdInPakistan();
 
   return {
     pendingEnrollments: programStats.pendingEnrollments,

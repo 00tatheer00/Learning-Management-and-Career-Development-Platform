@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth/session";
+import { resolveTrainerId } from "@/lib/auth/trainer-scope";
 import { getLiveSessionById } from "@/lib/api/portal-data";
 import { PortalLiveRoom } from "@/components/portal/portal-live-room";
 import { isPortalRoomSession } from "@/lib/portal-video/config";
@@ -21,7 +22,7 @@ export default async function TrainerLiveClassPage({
     redirect("/trainer/classes");
   }
 
-  if (session.trainerId !== (user.trainerId ?? user.id)) {
+  if (session.trainerId !== resolveTrainerId(user)) {
     redirect("/trainer/classes");
   }
 

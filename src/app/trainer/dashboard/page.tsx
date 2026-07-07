@@ -5,7 +5,9 @@ import {
   filterStudentsByProgram,
   getTrainerCourseTitle,
   getTrainerDesignation,
+  resolveTrainerId,
 } from "@/lib/auth/trainer-scope";
+import { getTodayYmdInPakistan } from "@/lib/utils/pakistan-time";
 import { getAssignments, getLiveSessions, getSubmissions } from "@/lib/api/portal-data";
 import { getUsersByRole } from "@/lib/auth/users";
 import { groupStudentsByModule } from "@/lib/trainer/group-students-by-module";
@@ -33,7 +35,7 @@ export default async function TrainerDashboardPage() {
     );
   }
 
-  const trainerId = user.trainerId ?? user.id;
+  const trainerId = resolveTrainerId(user);
   const courseTitle = getTrainerCourseTitle(programSlug);
   const designation = getTrainerDesignation(programSlug);
 
@@ -52,7 +54,7 @@ export default async function TrainerDashboardPage() {
   const submissions = allSubmissions.filter((s) => assignmentIds.has(s.assignmentId));
 
   const pendingReviews = submissions.filter((s) => s.status === "submitted").length;
-  const today = new Date().toISOString().split("T")[0];
+  const today = getTodayYmdInPakistan();
   const upcomingSessions = sessions.filter((s) => s.date >= today).length;
 
   return (

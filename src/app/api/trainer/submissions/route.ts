@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth/session";
-import { requireTrainerProgram } from "@/lib/auth/trainer-scope";
+import { requireTrainerProgram, resolveTrainerId } from "@/lib/auth/trainer-scope";
 import { getAssignments, updateSubmission } from "@/lib/api/portal-data";
 import { createApiResponse } from "@/lib/api/enrollment";
 import { prisma } from "@/lib/prisma";
@@ -23,7 +23,7 @@ export async function PATCH(request: Request) {
 
   try {
     const programSlug = requireTrainerProgram(user);
-    const trainerId = user.trainerId ?? user.id;
+    const trainerId = resolveTrainerId(user);
     const parsed = schema.safeParse(await request.json());
     if (!parsed.success) {
       return NextResponse.json(createApiResponse(false, { message: "Invalid data" }), {

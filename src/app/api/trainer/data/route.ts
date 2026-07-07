@@ -6,6 +6,7 @@ import {
   getTrainerCourseTitle,
   getTrainerDesignation,
   requireTrainerProgram,
+  resolveTrainerId,
 } from "@/lib/auth/trainer-scope";
 import { getUsersByRole } from "@/lib/auth/users";
 import {
@@ -26,7 +27,7 @@ export async function GET() {
 
   try {
     const programSlug = requireTrainerProgram(user);
-    const trainerId = user.trainerId ?? user.id;
+    const trainerId = resolveTrainerId(user);
 
     const [allStudents, allAssignments, allSessions, allSubmissions] = await Promise.all([
       getUsersByRole("student"),

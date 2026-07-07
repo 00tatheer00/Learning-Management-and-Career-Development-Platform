@@ -6,6 +6,7 @@ import {
   GraduationCap,
   VideoCamera,
   ChalkboardTeacher,
+  FilmStrip,
 } from "@phosphor-icons/react/ssr";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getAssignments, getLiveSessionsPreview, getMaterials } from "@/lib/api/portal-data";
@@ -21,6 +22,7 @@ import { StudentTrainerCard } from "@/components/portal/student-trainer-card";
 import { StudentWhatsAppGroupCard } from "@/components/portal/student-whatsapp-group-card";
 import { StudentNextClassCard } from "@/components/portal/student-next-class-card";
 import { StudentModuleRoadmap } from "@/components/portal/student-module-roadmap";
+import { StudentClassProgressCard } from "@/components/portal/student-class-progress-card";
 import { ProgramCategoryBadge } from "@/components/portal/program-category-badge";
 import { HELP_CONFIG } from "@/lib/constants/help";
 import { getProgramCategory } from "@/lib/constants/program-categories";
@@ -74,6 +76,8 @@ export default async function StudentDashboardPage() {
         </PortalSurfaceCard>
       )}
 
+      <StudentClassProgressCard programSlug={programSlug} />
+
       <StudentModuleRoadmap programSlug={programSlug} currentModule={user.level} />
 
       <StudentTrainerCard programSlug={programSlug} trainerId={user.trainerId} />
@@ -91,6 +95,7 @@ export default async function StudentDashboardPage() {
           <QuickActionCard compact href="/student/course" title="Watch Lessons" description="Course videos & materials" icon={<BookOpen size={18} weight="duotone" />} gradient="from-orange-500 to-amber-500" />
           <QuickActionCard compact href="/student/assignments" title="Submit Homework" description="View & submit assignments" icon={<ClipboardText size={18} weight="duotone" />} gradient="from-blue-500 to-indigo-500" />
           <QuickActionCard compact href="/student/trainer" title="My Trainer" description="Your program trainer" icon={<ChalkboardTeacher size={18} weight="duotone" />} gradient="from-violet-500 to-purple-600" />
+          <QuickActionCard compact href="/student/recordings" title="Class Recordings" description="Rewatch past classes" icon={<FilmStrip size={18} weight="duotone" />} gradient="from-rose-500 to-orange-500" />
           <QuickActionCard compact href="/student/whatsapp" title="WhatsApp Group" description="Join the class group" icon={<ChatsCircle size={18} weight="duotone" />} gradient="from-emerald-500 to-teal-600" />
           <QuickActionCard compact href={HELP_CONFIG.whatsappUrl} title="Need Help?" description="Message us anytime" icon={<ChatsCircle size={18} weight="fill" />} gradient="from-[#25D366] to-[#128C7E]" />
         </div>

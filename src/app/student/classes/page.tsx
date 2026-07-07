@@ -4,6 +4,7 @@ import { getLiveSessionsPreview } from "@/lib/api/portal-data";
 import { getStudentClassSchedule } from "@/lib/constants/student-portal-ur";
 import { PortalPageHeader, EmptyState } from "@/components/portal/portal-ui";
 import { JoinClassButton } from "@/components/portal/join-class-button";
+import { getTodayYmdInPakistan } from "@/lib/utils/pakistan-time";
 
 export default async function StudentClassesPage() {
   const user = await getCurrentUser();
@@ -12,7 +13,7 @@ export default async function StudentClassesPage() {
   const programSlug = user.programSlug ?? "web-development";
   const sessions = await getLiveSessionsPreview(programSlug);
   const classSchedule = getStudentClassSchedule(programSlug);
-  const today = new Date().toISOString().split("T")[0];
+  const today = getTodayYmdInPakistan();
 
   return (
     <div>

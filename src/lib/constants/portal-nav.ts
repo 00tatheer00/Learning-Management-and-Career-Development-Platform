@@ -14,6 +14,7 @@ import {
   Key,
   Broadcast,
   ListChecks,
+  FilmStrip,
 } from "@phosphor-icons/react";
 
 import type { UserRole } from "@/types/portal";
@@ -30,6 +31,7 @@ export const PORTAL_NAV: Record<UserRole, PortalNavItem[]> = {
     { href: "/student/dashboard", label: "Home", icon: House, description: "Your main page" },
     { href: "/student/course", label: "My Course", icon: BookOpen, description: "Videos & lessons" },
     { href: "/student/classes", label: "Live Classes", icon: VideoCamera, description: "Join online class" },
+    { href: "/student/recordings", label: "Class Recordings", icon: FilmStrip, description: "Rewatch past classes" },
     { href: "/student/trainer", label: "My Trainer", icon: ChalkboardTeacher, description: "Your course trainer" },
     { href: "/student/assignments", label: "Assignments", icon: ClipboardText, description: "Submit homework" },
     { href: "/student/whatsapp", label: "WhatsApp Group", icon: ChatsCircle, description: "Chat with class" },
@@ -39,6 +41,7 @@ export const PORTAL_NAV: Record<UserRole, PortalNavItem[]> = {
     { href: "/trainer/dashboard", label: "Home", icon: House, description: "Trainer dashboard" },
     { href: "/trainer/students", label: "My Students", icon: Users, description: "See enrolled students" },
     { href: "/trainer/classes", label: "Live Classes", icon: VideoCamera, description: "Schedule Google Meet classes" },
+    { href: "/trainer/recordings", label: "Class Recordings", icon: FilmStrip, description: "Upload Drive links for students" },
     { href: "/trainer/assignments", label: "Assignments", icon: ClipboardText, description: "Create & review work" },
     { href: "/trainer/materials", label: "Course Videos", icon: BookOpen, description: "Learning materials" },
     { href: "/trainer/settings", label: "Settings", icon: Gear, description: "Edit your profile" },
