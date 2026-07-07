@@ -2,8 +2,10 @@ import { CalendarBlank } from "@phosphor-icons/react/ssr";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getLiveSessionsPreview } from "@/lib/api/portal-data";
 import { getStudentClassSchedule } from "@/lib/constants/student-portal-ur";
+import { canAccessModuleOneClasses } from "@/lib/modules/student-module-access";
 import { PortalPageHeader, EmptyState } from "@/components/portal/portal-ui";
 import { JoinClassButton } from "@/components/portal/join-class-button";
+import { ModuleStartsSoonNotice } from "@/components/portal/module-starts-soon-notice";
 import { getTodayYmdInPakistan } from "@/lib/utils/pakistan-time";
 
 export default async function StudentClassesPage() {
@@ -14,14 +16,25 @@ export default async function StudentClassesPage() {
   const sessions = await getLiveSessionsPreview(programSlug);
   const classSchedule = getStudentClassSchedule(programSlug);
   const today = getTodayYmdInPakistan();
+  const canJoinLive = canAccessModuleOneClasses(programSlug, user.level);
 
   return (
     <div>
       <PortalPageHeader
         eyebrow="Student Portal"
         title="Live Classes"
-        description="Tap Join Class to open Google Meet directly when your trainer has added the link."
+        description={
+          canJoinLive
+            ? "Tap Join Class to open Google Meet directly when your trainer has added the link."
+            : "Your module batch has not started yet. Module 1 students are in live classes now."
+        }
       />
+
+      {!canJoinLive && (
+        <div className="mb-6">
+          <ModuleStartsSoonNotice programSlug={programSlug} studentModule={user.level} />
+        </div>
+      )}
 
       <p className="mb-4 text-sm rounded-xl border border-primary/20 bg-primary/5 p-4">
         <span className="font-semibold text-foreground">{classSchedule.headline}</span>
@@ -64,12 +77,19 @@ export default async function StudentClassesPage() {
                       </p>
                     )}
                   </div>
-                  {session.hasJoinLink ? (
-                    <JoinClassButton sessionId={session.id} />
+                  {canJoinLive ? (
+                    session.hasJoinLink ? (
+                      <JoinClassButton sessionId={session.id} />
+                    ) : (
+                      <div className="rounded-xl border border-dashed border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 shrink-0">
+                        <p className="font-semibold">Link coming soon</p>
+                        <p className="mt-1 text-xs">Your trainer will add the Google Meet link before class.</p>
+                      </div>
+                    )
                   ) : (
-                    <div className="rounded-xl border border-dashed border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 shrink-0">
-                      <p className="font-semibold">Link coming soon</p>
-                      <p className="mt-1 text-xs">Your trainer will add the Google Meet link before class.</p>
+                    <div className="rounded-xl border border-dashed border-indigo-300 bg-indigo-50 px-4 py-3 text-sm text-indigo-900 shrink-0 max-w-xs">
+                      <p className="font-semibold">Your module starts next month</p>
+                      <p className="mt-1 text-xs">This class is for Module 1 students only.</p>
                     </div>
                   )}
                 </div>

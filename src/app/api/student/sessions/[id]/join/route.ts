@@ -5,6 +5,7 @@ import { createApiResponse } from "@/lib/api/enrollment";
 import { recordClassJoin } from "@/lib/api/class-attendance";
 import { recordUserActivity } from "@/lib/auth/user-activity";
 import { isPortalRoomSession } from "@/lib/portal-video/config";
+import { canAccessModuleOneClasses } from "@/lib/modules/student-module-access";
 import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
 
 export async function GET(
@@ -31,6 +32,15 @@ export async function GET(
     return NextResponse.json(createApiResponse(false, { error: STUDENT_UR.api.unauthorized }), {
       status: 403,
     });
+  }
+
+  if (!canAccessModuleOneClasses(session.programSlug, user.level)) {
+    return NextResponse.json(
+      createApiResponse(false, {
+        message: STUDENT_UR.joinClass.moduleNotStarted,
+      }),
+      { status: 403 }
+    );
   }
 
   if (!isPortalRoomSession(session) && !session.meetLink?.trim()) {

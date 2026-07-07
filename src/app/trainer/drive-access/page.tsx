@@ -20,6 +20,7 @@ export default async function TrainerDriveAccessPage() {
   return (
     <TrainerDriveAccessPanel
       students={students}
+      programSlug={programSlug}
       courseTitle={getTrainerCourseTitle(programSlug)}
     />
   );

@@ -11,6 +11,7 @@ export async function getTrainerPortalStudents(programSlug: string) {
       id: true,
       name: true,
       email: true,
+      level: true,
     },
     orderBy: { name: "asc" },
   });

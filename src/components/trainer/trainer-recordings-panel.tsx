@@ -140,7 +140,7 @@ export function TrainerRecordingsPanel({ programSlug, courseTitle }: TrainerReco
           <li>
             Share with{" "}
             <Link href="/trainer/drive-access" className="text-primary font-semibold underline">
-              portal student emails only
+              Module 1 student emails only
             </Link>{" "}
             — Viewer + disable download/print/copy.
           </li>

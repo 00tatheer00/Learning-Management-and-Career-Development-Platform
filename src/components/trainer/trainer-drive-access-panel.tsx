@@ -10,50 +10,84 @@ import {
   DRIVE_DOWNLOAD_NOTE,
   DRIVE_SHARE_STEPS,
 } from "@/lib/constants/drive-sharing-guide";
+import { getFirstModuleName } from "@/lib/modules/student-module-access";
+import { groupStudentsByModule } from "@/lib/trainer/group-students-by-module";
+import { cn } from "@/lib/utils";
 import { toast } from "@/lib/ui/toast";
 
 export interface DriveAccessStudent {
   id: string;
   name: string;
   email: string;
+  level?: string | null;
 }
 
 interface TrainerDriveAccessPanelProps {
   students: DriveAccessStudent[];
+  programSlug: string;
   courseTitle: string;
 }
 
 export function TrainerDriveAccessPanel({
   students,
+  programSlug,
   courseTitle,
 }: TrainerDriveAccessPanelProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [copied, setCopied] = useState(false);
+  const [copiedModule, setCopiedModule] = useState<string | null>(null);
+  const [activeModule, setActiveModule] = useState<string | null>(null);
 
-  const emails = useMemo(
-    () => students.map((student) => student.email.trim().toLowerCase()).filter(Boolean),
-    [students]
+  const firstModuleName = getFirstModuleName(programSlug);
+  const moduleGroups = useMemo(
+    () =>
+      groupStudentsByModule(
+        students.map((student) => ({
+          ...student,
+          level: student.level ?? undefined,
+        })),
+        programSlug
+      ),
+    [students, programSlug]
   );
 
-  const emailBlob = useMemo(() => formatEmailsForDriveShare(emails), [emails]);
+  const selectedModule =
+    activeModule ?? firstModuleName ?? moduleGroups[0]?.moduleName ?? null;
 
-  const copyEmails = useCallback(async () => {
-    if (emails.length === 0) {
-      toast.warning("No students", "No active portal students to copy.");
-      return;
-    }
+  const selectedGroup = moduleGroups.find((group) => group.moduleName === selectedModule);
+  const selectedEmails = useMemo(
+    () =>
+      (selectedGroup?.students ?? [])
+        .map((student) => student.email?.trim().toLowerCase())
+        .filter(Boolean),
+    [selectedGroup]
+  );
+  const emailBlob = useMemo(() => formatEmailsForDriveShare(selectedEmails), [selectedEmails]);
 
-    try {
-      await navigator.clipboard.writeText(emailBlob);
-      setCopied(true);
-      toast.success("Emails copied!", "Paste into Google Drive → Share → Add people.");
-      window.setTimeout(() => setCopied(false), 2500);
-    } catch {
-      textareaRef.current?.focus();
-      textareaRef.current?.select();
-      toast.info("Select & copy", "Emails are selected — press Ctrl+C to copy.");
-    }
-  }, [emailBlob, emails.length]);
+  const copyModuleEmails = useCallback(
+    async (moduleName: string, emails: string[]) => {
+      if (emails.length === 0) {
+        toast.warning("No students", `No emails in ${moduleName}.`);
+        return;
+      }
+
+      const blob = formatEmailsForDriveShare(emails);
+      try {
+        await navigator.clipboard.writeText(blob);
+        setCopiedModule(moduleName);
+        toast.success(
+          `${moduleName} emails copied`,
+          "Paste into Google Drive → Share → Add people."
+        );
+        window.setTimeout(() => setCopiedModule(null), 2500);
+      } catch {
+        setActiveModule(moduleName);
+        textareaRef.current?.focus();
+        textareaRef.current?.select();
+        toast.info("Select & copy", "Emails are selected — press Ctrl+C to copy.");
+      }
+    },
+    []
+  );
 
   const selectAllInBox = () => {
     textareaRef.current?.focus();
@@ -65,13 +99,8 @@ export function TrainerDriveAccessPanel({
       <PortalPageHeader
         eyebrow="Trainer Portal"
         title="Drive Access"
-        description={`Only these ${courseTitle} portal students should get recording access on Google Drive.`}
-      >
-        <Button size="lg" onClick={copyEmails} disabled={emails.length === 0} className="gap-2">
-          {copied ? <Check size={18} weight="bold" /> : <Copy size={18} weight="bold" />}
-          {copied ? "Copied!" : "Copy all emails"}
-        </Button>
-      </PortalPageHeader>
+        description={`Copy portal student emails by module for ${courseTitle}. Share recordings only with the module that is live.`}
+      />
 
       <div className="mb-6 rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/5 to-background p-5 sm:p-6">
         <div className="flex items-start gap-3">
@@ -79,12 +108,18 @@ export function TrainerDriveAccessPanel({
             <ShareNetwork size={22} weight="duotone" />
           </span>
           <div>
-            <p className="font-bold text-pt">Share recordings with portal students only</p>
+            <p className="font-bold text-pt">Module-wise Drive sharing</p>
             <ol className="mt-2 text-sm text-pt-muted space-y-1.5 list-decimal list-inside">
               {DRIVE_SHARE_STEPS.map((step) => (
                 <li key={step}>{step}</li>
               ))}
             </ol>
+            {firstModuleName && (
+              <p className="mt-3 text-sm rounded-xl bg-primary/10 border border-primary/20 px-3 py-2 text-pt">
+                <strong>Right now:</strong> only share class recordings with{" "}
+                <strong>{firstModuleName}</strong> emails. Other modules start next month.
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -102,20 +137,67 @@ export function TrainerDriveAccessPanel({
         </div>
       </div>
 
+      <div className="flex flex-wrap gap-2 mb-4">
+        {moduleGroups.map((group) => {
+          const isFirst = group.moduleName === firstModuleName;
+          const isActive = group.moduleName === selectedModule;
+          const emails = group.students
+            .map((s) => s.email?.trim().toLowerCase())
+            .filter(Boolean);
+
+          return (
+            <button
+              key={group.moduleName}
+              type="button"
+              onClick={() => setActiveModule(group.moduleName)}
+              className={cn(
+                "rounded-xl border px-3 py-2 text-left transition-all",
+                isActive
+                  ? "border-primary bg-primary/10 ring-2 ring-primary/20"
+                  : "border-pt bg-background hover:border-primary/30"
+              )}
+            >
+              <p className="text-xs font-bold text-pt">{group.moduleName}</p>
+              <p className="text-[10px] text-pt-muted mt-0.5">
+                {group.students.length} student{group.students.length === 1 ? "" : "s"}
+                {isFirst ? " · Live now" : " · Starts later"}
+              </p>
+              <Button
+                type="button"
+                size="sm"
+                variant="secondary"
+                className="mt-2 h-7 text-[10px] gap-1"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  void copyModuleEmails(group.moduleName, emails);
+                }}
+              >
+                {copiedModule === group.moduleName ? (
+                  <Check size={12} weight="bold" />
+                ) : (
+                  <Copy size={12} />
+                )}
+                Copy emails
+              </Button>
+            </button>
+          );
+        })}
+      </div>
+
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="rounded-2xl border border-pt bg-background p-5 shadow-sm">
-          <div className="flex items-center justify-between gap-3 mb-4">
-            <div className="flex items-center gap-2">
-              <Users size={20} weight="duotone" className="text-primary" />
-              <h2 className="font-bold text-pt">Portal students ({students.length})</h2>
-            </div>
+          <div className="flex items-center gap-2 mb-4">
+            <Users size={20} weight="duotone" className="text-primary" />
+            <h2 className="font-bold text-pt">
+              {selectedModule ?? "Students"} ({selectedGroup?.students.length ?? 0})
+            </h2>
           </div>
 
-          {students.length === 0 ? (
-            <p className="text-sm text-pt-muted">No active students in your course yet.</p>
+          {!selectedGroup || selectedGroup.students.length === 0 ? (
+            <p className="text-sm text-pt-muted">No students in this module yet.</p>
           ) : (
             <ul className="max-h-[420px] overflow-y-auto space-y-2">
-              {students.map((student) => (
+              {selectedGroup.students.map((student) => (
                 <li
                   key={student.id}
                   className="flex items-center justify-between gap-3 rounded-xl border border-pt/70 bg-surface/40 px-3 py-2.5"
@@ -131,10 +213,12 @@ export function TrainerDriveAccessPanel({
         <div className="rounded-2xl border border-pt bg-background p-5 shadow-sm">
           <div className="flex items-center gap-2 mb-2">
             <EnvelopeSimple size={20} weight="duotone" className="text-primary" />
-            <h2 className="font-bold text-pt">Emails for Google Drive</h2>
+            <h2 className="font-bold text-pt">
+              {selectedModule ? `${selectedModule} emails` : "Emails for Google Drive"}
+            </h2>
           </div>
           <p className="text-xs text-pt-muted mb-3">
-            Comma-separated — ready to paste in Drive share dialog. Click the box to select all.
+            Comma-separated for Drive share. Only share Module 1 recordings with Module 1 emails.
           </p>
           <textarea
             ref={textareaRef}
@@ -147,7 +231,12 @@ export function TrainerDriveAccessPanel({
             <Button variant="secondary" size="sm" onClick={selectAllInBox} disabled={!emailBlob}>
               Select all
             </Button>
-            <Button size="sm" onClick={copyEmails} disabled={!emailBlob} className="gap-1.5">
+            <Button
+              size="sm"
+              onClick={() => selectedModule && copyModuleEmails(selectedModule, selectedEmails)}
+              disabled={!emailBlob || !selectedModule}
+              className="gap-1.5"
+            >
               <Copy size={14} />
               Copy for Drive
             </Button>

@@ -27,6 +27,8 @@ import { ProgramCategoryBadge } from "@/components/portal/program-category-badge
 import { HELP_CONFIG } from "@/lib/constants/help";
 import { getProgramCategory } from "@/lib/constants/program-categories";
 import { getStudentClassSchedule } from "@/lib/constants/student-portal-ur";
+import { canAccessModuleOneClasses } from "@/lib/modules/student-module-access";
+import { ModuleStartsSoonNotice } from "@/components/portal/module-starts-soon-notice";
 import { findNextUpcomingSession } from "@/lib/utils/session-datetime";
 
 export default async function StudentDashboardPage() {
@@ -43,6 +45,7 @@ export default async function StudentDashboardPage() {
   const classSchedule = getStudentClassSchedule(programSlug);
   const nextSession = findNextUpcomingSession(sessions);
   const courseLabel = category?.sidebarLabel ?? "Your course";
+  const canJoinLive = canAccessModuleOneClasses(programSlug, user.level);
 
   return (
     <div className="space-y-4">
@@ -52,15 +55,34 @@ export default async function StudentDashboardPage() {
         description={`${courseLabel} · classes, lessons & trainer for your program.`}
       >
         <ProgramCategoryBadge programSlug={programSlug} />
-        <Button size="sm" asChild className="h-8 text-xs">
-          <Link href="/student/classes">Join Live Class</Link>
-        </Button>
+        {canJoinLive ? (
+          <Button size="sm" asChild className="h-8 text-xs">
+            <Link href="/student/classes">Join Live Class</Link>
+          </Button>
+        ) : (
+          <Button size="sm" variant="secondary" asChild className="h-8 text-xs">
+            <Link href="/student/classes">Class schedule</Link>
+          </Button>
+        )}
       </PortalPageHeader>
+
+      {!canJoinLive && (
+        <ModuleStartsSoonNotice
+          programSlug={programSlug}
+          studentModule={user.level}
+          compact
+        />
+      )}
 
       <StudentWhatsAppGroupCard variant="banner" />
 
       {nextSession ? (
-        <StudentNextClassCard session={nextSession} />
+        <StudentNextClassCard
+          session={nextSession}
+          canJoinLive={canJoinLive}
+          programSlug={programSlug}
+          studentModule={user.level}
+        />
       ) : (
         <PortalSurfaceCard className="p-4 text-sm text-zinc-500 border-dashed">
           <p className="font-semibold text-foreground">{classSchedule.startDateLabel}</p>
@@ -76,7 +98,7 @@ export default async function StudentDashboardPage() {
         </PortalSurfaceCard>
       )}
 
-      <StudentClassProgressCard programSlug={programSlug} />
+      {canJoinLive && <StudentClassProgressCard programSlug={programSlug} />}
 
       <StudentModuleRoadmap programSlug={programSlug} currentModule={user.level} />
 

@@ -59,6 +59,8 @@ export const STUDENT_UR = {
 
   joinClass: {
     cannotJoin: "Class join nahi ho sakti",
+    moduleNotStarted:
+      "Abhi yeh class Module 1 students ke liye hai. Aapka module agle mahine se shuru hoga — WhatsApp par update milega.",
     tryAgain: "Dubara try karein ya trainer se link check karein.",
     enteringPresent: "Class mein ja rahe hain — hazir",
     enteringLate: "Class mein ja rahe hain — late",
