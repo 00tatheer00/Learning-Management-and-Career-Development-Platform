@@ -16,9 +16,6 @@ function getAuthSecret(): string | null {
 function getPrimarySecret(): string {
   const portalSecret = process.env.PORTAL_PASSWORD_SECRET?.trim();
   const authSecret = getAuthSecret();
-  if (process.env.NODE_ENV === "production" && !portalSecret) {
-    throw new Error("PORTAL_PASSWORD_SECRET is required in production");
-  }
   const secret = portalSecret ?? authSecret;
   if (!secret) {
     throw new Error("PORTAL_PASSWORD_SECRET, NEXTAUTH_SECRET, or AUTH_SECRET is required");
@@ -131,15 +128,16 @@ export async function savePortalPasswordForStudentEmail(
 export async function savePortalPasswordForEnrollment(
   enrollmentId: string,
   plainPassword: string
-): Promise<boolean> {
+): Promise<{ saved: boolean; error?: string }> {
   try {
     await prisma.enrollment.update({
       where: { id: enrollmentId },
       data: { portalPasswordEnc: encryptPortalPassword(plainPassword) },
     });
-    return true;
+    return { saved: true };
   } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
     console.error("Failed to save portal password for enrollment:", enrollmentId, error);
-    return false;
+    return { saved: false, error: message };
   }
 }

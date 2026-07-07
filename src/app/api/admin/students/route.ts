@@ -72,39 +72,77 @@ export async function PATCH(request: Request) {
   }
 
   if (parsed.data.action === "resetPassword") {
-    const plainPassword = generateStudentPassword();
-    const enrollmentId = "enrollmentId" in parsed.data ? parsed.data.enrollmentId : undefined;
+    try {
+      const plainPassword = generateStudentPassword();
+      const enrollmentId = "enrollmentId" in parsed.data ? parsed.data.enrollmentId : undefined;
 
-    if (enrollmentId) {
-      const enrollment = await prisma.enrollment.findUnique({
-        where: { id: enrollmentId },
-        select: { email: true, status: true, level: true, whatsapp: true },
-      });
-
-      if (
-        !enrollment ||
-        enrollment.status !== "approved" ||
-        enrollment.email.toLowerCase() !== student.email.toLowerCase()
-      ) {
-        return NextResponse.json(createApiResponse(false, { error: "Enrollment not found" }), {
-          status: 404,
+      if (enrollmentId) {
+        const enrollment = await prisma.enrollment.findUnique({
+          where: { id: enrollmentId },
+          select: { email: true, status: true, level: true, whatsapp: true },
         });
-      }
 
-      const saved = await savePortalPasswordForEnrollment(enrollmentId, plainPassword);
-      if (!saved) {
+        if (
+          !enrollment ||
+          enrollment.status !== "approved" ||
+          enrollment.email.toLowerCase() !== student.email.toLowerCase()
+        ) {
+          return NextResponse.json(createApiResponse(false, { error: "Enrollment not found" }), {
+            status: 404,
+          });
+        }
+
+        const passwordHash = await hashPassword(plainPassword);
+        await updateUserPasswordHash(student.id, passwordHash);
+
+        const vaultResult = await savePortalPasswordForEnrollment(enrollmentId, plainPassword);
+        const vaultWarning = vaultResult.saved
+          ? ""
+          : ` Portal vault save failed: ${vaultResult.error ?? "unknown error"}. Login still works with this password.`;
+
+        const whatsapp = student.phone ?? enrollment.whatsapp ?? "";
+        const notifications = await sendPasswordResetNotifications({
+          fullName: student.name,
+          email: student.email,
+          whatsapp,
+          password: plainPassword,
+        });
+
+        const parts: string[] = [];
+        if (notifications.whatsappSent) parts.push("WhatsApp");
+
+        const notificationSummary =
+          parts.length > 0
+            ? ` New password sent via ${parts.join(" and ")}.`
+            : notifications.warnings.length > 0
+              ? ` Password saved but WhatsApp failed: ${notifications.warnings.join("; ")}`
+              : ` Password saved for ${enrollment.level}.`;
+
         return NextResponse.json(
-          createApiResponse(false, {
-            error: "Password could not be saved. Check server logs and try again.",
-          }),
-          { status: 500 }
+          createApiResponse(true, {
+            message: `Password reset for ${enrollment.level}.${notificationSummary}${vaultWarning}`,
+            data: {
+              loginId: student.email,
+              password: plainPassword,
+              loginUrl: getPortalLoginUrl(),
+              enrollmentId,
+              module: enrollment.level,
+              vaultSaved: vaultResult.saved,
+            },
+          })
         );
       }
 
       const passwordHash = await hashPassword(plainPassword);
       await updateUserPasswordHash(student.id, passwordHash);
+      await savePortalPasswordForStudentEmail(student.email, plainPassword);
 
-      const whatsapp = student.phone ?? enrollment.whatsapp ?? "";
+      const enrollment = await prisma.enrollment.findFirst({
+        where: { email: student.email.toLowerCase(), status: "approved" },
+        orderBy: { createdAt: "desc" },
+      });
+
+      const whatsapp = student.phone ?? enrollment?.whatsapp ?? "";
       const notifications = await sendPasswordResetNotifications({
         fullName: student.name,
         email: student.email,
@@ -120,59 +158,30 @@ export async function PATCH(request: Request) {
           ? ` New password sent via ${parts.join(" and ")}.`
           : notifications.warnings.length > 0
             ? ` Password saved but WhatsApp failed: ${notifications.warnings.join("; ")}`
-            : ` Password saved for ${enrollment.level}.`;
+            : " Password saved in Portal Logins.";
 
       return NextResponse.json(
         createApiResponse(true, {
-          message: `Password reset for ${enrollment.level}.${notificationSummary}`,
+          message: `Password reset.${notificationSummary}`,
           data: {
             loginId: student.email,
             password: plainPassword,
             loginUrl: getPortalLoginUrl(),
-            enrollmentId,
-            module: enrollment.level,
           },
         })
       );
+    } catch (error) {
+      console.error("Password reset failed:", error);
+      return NextResponse.json(
+        createApiResponse(false, {
+          error:
+            error instanceof Error
+              ? error.message
+              : "Password reset failed. Check server logs and try again.",
+        }),
+        { status: 500 }
+      );
     }
-
-    const passwordHash = await hashPassword(plainPassword);
-    await updateUserPasswordHash(student.id, passwordHash);
-    await savePortalPasswordForStudentEmail(student.email, plainPassword);
-
-    const enrollment = await prisma.enrollment.findFirst({
-      where: { email: student.email.toLowerCase(), status: "approved" },
-      orderBy: { createdAt: "desc" },
-    });
-
-    const whatsapp = student.phone ?? enrollment?.whatsapp ?? "";
-    const notifications = await sendPasswordResetNotifications({
-      fullName: student.name,
-      email: student.email,
-      whatsapp,
-      password: plainPassword,
-    });
-
-    const parts: string[] = [];
-    if (notifications.whatsappSent) parts.push("WhatsApp");
-
-    const notificationSummary =
-      parts.length > 0
-        ? ` New password sent via ${parts.join(" and ")}.`
-        : notifications.warnings.length > 0
-          ? ` Password saved but WhatsApp failed: ${notifications.warnings.join("; ")}`
-          : " Password saved in Portal Logins.";
-
-    return NextResponse.json(
-      createApiResponse(true, {
-        message: `Password reset.${notificationSummary}`,
-        data: {
-          loginId: student.email,
-          password: plainPassword,
-          loginUrl: getPortalLoginUrl(),
-        },
-      })
-    );
   }
 
   if (!parsed.data.level && !parsed.data.batch) {

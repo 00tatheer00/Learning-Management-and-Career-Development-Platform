@@ -32,13 +32,15 @@ export async function generateMissingPortalPasswords(): Promise<{
       }
 
       const plainPassword = generateStudentPassword();
-      const saved = await savePortalPasswordForEnrollment(row.id, plainPassword);
-      if (saved) {
+      const vaultResult = await savePortalPasswordForEnrollment(row.id, plainPassword);
+      if (vaultResult.saved) {
         const passwordHash = await hashPassword(plainPassword);
         await updateUserPasswordHash(row.studentId, passwordHash);
         generated += 1;
       } else {
-        errors.push(`${row.name} (${row.module}): password not saved to vault`);
+        errors.push(
+          `${row.name} (${row.module}): ${vaultResult.error ?? "password not saved to vault"}`
+        );
       }
     } catch (error) {
       errors.push(

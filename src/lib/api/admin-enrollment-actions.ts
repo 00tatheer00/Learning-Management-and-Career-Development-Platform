@@ -112,7 +112,7 @@ export async function approveEnrollmentAndCreateAccount(
     await updateUserPasswordHash(user.id, passwordHash);
   }
 
-  const passwordSaved = await savePortalPasswordForEnrollment(enrollmentId, plainPassword);
+  const passwordSaved = (await savePortalPasswordForEnrollment(enrollmentId, plainPassword)).saved;
   if (!passwordSaved) {
     console.warn(
       "Approval succeeded but portal password was not saved — use Portal Logins → Generate & Save."
