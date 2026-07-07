@@ -1,4 +1,6 @@
-export { parseSessionDateTime } from "@/lib/sessions/live-session-datetime";
+import { parseSessionDateTime } from "@/lib/sessions/live-session-datetime";
+
+export { parseSessionDateTime };
 
 export function getSessionCountdownParts(target: Date, now = new Date()) {
   const diffMs = target.getTime() - now.getTime();
