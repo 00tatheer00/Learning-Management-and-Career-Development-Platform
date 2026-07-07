@@ -12,6 +12,7 @@ import {
   updateStudentLoginDetails,
 } from "@/lib/api/admin-credentials";
 import { generateMissingPortalPasswords } from "@/lib/api/admin-credentials-bulk";
+import { syncStudentLoginHashesFromVault } from "@/lib/api/admin-credentials-sync";
 import { revealEnrollmentPortalPassword, revealStudentPortalPassword } from "@/lib/api/admin-portal-password";
 
 export async function GET() {
@@ -88,6 +89,9 @@ const postSchema = z.discriminatedUnion("action", [
     action: z.literal("generateMissing"),
   }),
   z.object({
+    action: z.literal("syncLoginHashes"),
+  }),
+  z.object({
     action: z.literal("revealPassword"),
     enrollmentId: z.string().optional(),
     studentId: z.string().optional(),
@@ -143,6 +147,22 @@ export async function POST(request: Request) {
         error: "Bulk WhatsApp is disabled. Approve students one by one or share login manually.",
       }),
       { status: 403 }
+    );
+  }
+
+  if (parsed.data.action === "syncLoginHashes") {
+    const result = await syncStudentLoginHashesFromVault();
+    const message =
+      result.synced > 0
+        ? `Synced login password for ${result.synced} student account(s).`
+        : "All student logins already match saved passwords.";
+
+    return NextResponse.json(
+      createApiResponse(true, {
+        data: result,
+        message:
+          result.errors.length > 0 ? `${message} ${result.errors.length} error(s).` : message,
+      })
     );
   }
 

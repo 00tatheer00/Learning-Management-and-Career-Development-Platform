@@ -91,7 +91,18 @@ export async function PATCH(request: Request) {
         });
       }
 
-      await savePortalPasswordForEnrollment(enrollmentId, plainPassword);
+      const saved = await savePortalPasswordForEnrollment(enrollmentId, plainPassword);
+      if (!saved) {
+        return NextResponse.json(
+          createApiResponse(false, {
+            error: "Password could not be saved. Check server logs and try again.",
+          }),
+          { status: 500 }
+        );
+      }
+
+      const passwordHash = await hashPassword(plainPassword);
+      await updateUserPasswordHash(student.id, passwordHash);
 
       const whatsapp = student.phone ?? enrollment.whatsapp ?? "";
       const notifications = await sendPasswordResetNotifications({

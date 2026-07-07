@@ -6,6 +6,7 @@ import {
   createUserWithPasswordHash,
   getUserByEmail,
   updateUser,
+  updateUserPasswordHash,
 } from "@/lib/auth/users";
 import { buildStudentProgramAssignment } from "@/lib/auth/program-assignment";
 import { resolveActiveStudentModule } from "@/lib/modules/student-module-access";
@@ -108,6 +109,7 @@ export async function approveEnrollmentAndCreateAccount(
       isActive: true,
       avatarInitials,
     });
+    await updateUserPasswordHash(user.id, passwordHash);
   }
 
   const passwordSaved = await savePortalPasswordForEnrollment(enrollmentId, plainPassword);

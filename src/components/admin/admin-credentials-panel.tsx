@@ -63,6 +63,7 @@ export function AdminCredentialsPanel() {
   const [revealedPasswords, setRevealedPasswords] = useState<Record<string, string>>({});
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [bulkGenerating, setBulkGenerating] = useState(false);
+  const [syncingLogins, setSyncingLogins] = useState(false);
   const [credentialModal, setCredentialModal] = useState<{
     name: string;
     loginId: string;
@@ -202,6 +203,28 @@ export function AdminCredentialsPanel() {
       toast.error("WhatsApp send failed");
     } finally {
       setLoadingId(null);
+    }
+  };
+
+  const handleSyncLoginHashes = async () => {
+    setSyncingLogins(true);
+    try {
+      const res = await fetch("/api/admin/credentials", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "syncLoginHashes" }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        toast.success(json.message ?? "Student logins synced.");
+        await load();
+      } else {
+        toast.error(json.error ?? json.message ?? "Sync failed");
+      }
+    } catch {
+      toast.error("Sync failed");
+    } finally {
+      setSyncingLogins(false);
     }
   };
 
@@ -348,6 +371,18 @@ export function AdminCredentialsPanel() {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
+            {canWrite && (
+              <Button
+                size="sm"
+                variant="secondary"
+                disabled={syncingLogins}
+                onClick={() => void handleSyncLoginHashes()}
+                className="h-8 gap-1.5 text-xs"
+              >
+                <ArrowClockwise size={14} />
+                {syncingLogins ? "Syncing..." : "Fix login mismatches"}
+              </Button>
+            )}
             {canWrite && meta.missing > 0 && (
               <Button
                 size="sm"

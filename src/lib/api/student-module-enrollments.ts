@@ -26,13 +26,13 @@ export async function getStudentModuleEnrollmentViews(
 ): Promise<StudentModuleEnrollmentView[]> {
   const enrollments = await prisma.enrollment.findMany({
     where: {
-      email: email.trim().toLowerCase(),
       program: programSlug,
       status: "approved",
     },
     orderBy: { reviewedAt: "asc" },
     select: {
       id: true,
+      email: true,
       level: true,
       program: true,
       portalPasswordEnc: true,
@@ -40,8 +40,13 @@ export async function getStudentModuleEnrollmentViews(
     },
   });
 
+  const normalizedEmail = email.trim().toLowerCase();
+  const approvedForStudent = enrollments.filter(
+    (enrollment) => enrollment.email.trim().toLowerCase() === normalizedEmail
+  );
+
   const order = getProgramModuleNames(programSlug);
-  const sorted = [...enrollments].sort(
+  const sorted = [...approvedForStudent].sort(
     (a, b) => order.indexOf(a.level) - order.indexOf(b.level)
   );
 
@@ -66,6 +71,9 @@ export async function verifyStudentLoginPassword(
   password: string
 ): Promise<boolean> {
   const normalizedEmail = email.trim().toLowerCase();
+  const normalizedPassword = password.trim();
+  if (!normalizedPassword) return false;
+
   const user = await prisma.user.findUnique({
     where: { email: normalizedEmail },
     select: { passwordHash: true },
@@ -74,27 +82,35 @@ export async function verifyStudentLoginPassword(
   if (!user) return false;
 
   const { verifyPassword } = await import("@/lib/auth/password");
-  if (await verifyPassword(password, user.passwordHash)) {
+  if (await verifyPassword(normalizedPassword, user.passwordHash)) {
     return true;
   }
 
-  const enrollments = await prisma.enrollment.findMany({
-    where: {
-      email: normalizedEmail,
-      status: "approved",
-      portalPasswordEnc: { not: null },
-    },
-    select: { portalPasswordEnc: true },
-  });
+  const enrollments = await getApprovedEnrollmentsWithVaultForEmail(normalizedEmail);
 
   for (const enrollment of enrollments) {
     const stored = decryptPortalPassword(enrollment.portalPasswordEnc);
-    if (stored && stored === password) {
+    if (stored && stored === normalizedPassword) {
       return true;
     }
   }
 
   return false;
+}
+
+async function getApprovedEnrollmentsWithVaultForEmail(email: string) {
+  const normalizedEmail = email.trim().toLowerCase();
+  const enrollments = await prisma.enrollment.findMany({
+    where: {
+      status: "approved",
+      portalPasswordEnc: { not: null },
+    },
+    select: { email: true, portalPasswordEnc: true },
+  });
+
+  return enrollments.filter(
+    (enrollment) => enrollment.email.trim().toLowerCase() === normalizedEmail
+  );
 }
 
 export function studentHasLiveClassAccess(

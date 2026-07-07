@@ -44,7 +44,10 @@ export const authOptions: NextAuthOptions = {
 
           if (!user || !user.isActive) return null;
 
-          const valid = await verifyStudentLoginPassword(parsed.data.email, parsed.data.password);
+          const valid = await verifyStudentLoginPassword(
+            parsed.data.email,
+            parsed.data.password.trim()
+          );
           if (!valid) return null;
 
           return {

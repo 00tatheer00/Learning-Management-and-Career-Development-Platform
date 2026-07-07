@@ -3,6 +3,7 @@ import { hashPassword } from "@/lib/auth/password";
 import { generateStudentPassword } from "@/lib/auth/generate-password";
 import { savePortalPasswordForEnrollment } from "@/lib/auth/portal-password-vault";
 import { decryptPortalPassword } from "@/lib/auth/portal-password-vault";
+import { updateUserPasswordHash } from "@/lib/auth/users";
 import { getAdminCredentialRows } from "@/lib/api/admin-credentials";
 
 export async function generateMissingPortalPasswords(): Promise<{
@@ -33,6 +34,8 @@ export async function generateMissingPortalPasswords(): Promise<{
       const plainPassword = generateStudentPassword();
       const saved = await savePortalPasswordForEnrollment(row.id, plainPassword);
       if (saved) {
+        const passwordHash = await hashPassword(plainPassword);
+        await updateUserPasswordHash(row.studentId, passwordHash);
         generated += 1;
       } else {
         errors.push(`${row.name} (${row.module}): password not saved to vault`);
