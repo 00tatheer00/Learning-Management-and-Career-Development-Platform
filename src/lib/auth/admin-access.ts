@@ -3,10 +3,10 @@ import "server-only";
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/session";
 import { createApiResponse } from "@/lib/api/enrollment";
-import { canAdminWrite, isAdminRole } from "@/lib/auth/admin-roles";
+import { canAdminWrite, canAdminApproveReject, isAdminRole } from "@/lib/auth/admin-roles";
 import type { PortalUser } from "@/types/portal";
 
-export { canAdminWrite, isAdminRole } from "@/lib/auth/admin-roles";
+export { canAdminWrite, canAdminApproveReject, isAdminRole } from "@/lib/auth/admin-roles";
 
 export async function getAdminUser(): Promise<PortalUser | null> {
   const user = await getCurrentUser();
@@ -30,6 +30,16 @@ export function readOnlyAdminResponse() {
   );
 }
 
+export function approveRejectDeniedResponse() {
+  return NextResponse.json(
+    createApiResponse(false, {
+      error: "Approve/reject not allowed",
+      message: "Only Tatheer can approve or reject registrations.",
+    }),
+    { status: 403 }
+  );
+}
+
 export async function requireAdminRead(): Promise<PortalUser | NextResponse> {
   const user = await getAdminUser();
   if (!user) return unauthorizedAdminResponse();
@@ -40,6 +50,13 @@ export async function requireAdminWrite(): Promise<PortalUser | NextResponse> {
   const user = await getAdminUser();
   if (!user) return unauthorizedAdminResponse();
   if (!canAdminWrite(user.role)) return readOnlyAdminResponse();
+  return user;
+}
+
+export async function requireAdminApproveReject(): Promise<PortalUser | NextResponse> {
+  const user = await getAdminUser();
+  if (!user) return unauthorizedAdminResponse();
+  if (!canAdminApproveReject(user.role)) return approveRejectDeniedResponse();
   return user;
 }
 

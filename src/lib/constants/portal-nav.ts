@@ -58,7 +58,7 @@ export const PORTAL_NAV: Record<UserRole, PortalNavItem[]> = {
   admin_readonly: [
     { href: "/admin/dashboard", label: "Home", icon: ChartBar, description: "Overview & stats" },
     { href: "/admin/live-classes", label: "Portal Classes", icon: Broadcast, description: "In-portal video rooms" },
-    { href: "/admin/enrollments", label: "Registrations", icon: ClipboardText, description: "View applications" },
+    { href: "/admin/enrollments", label: "Registrations", icon: ClipboardText, description: "Manage applications" },
     { href: "/admin/students", label: "Students", icon: GraduationCap, description: "All students" },
     { href: "/admin/credentials", label: "Portal Logins", icon: Key, description: "Student login IDs" },
     { href: "/admin/attendance", label: "Attendance", icon: ListChecks, description: "Class join records" },
@@ -96,7 +96,7 @@ export const PORTAL_LABELS: Record<UserRole, string> = {
   student: "Student Portal",
   trainer: "Trainer Portal",
   admin: "Super Admin",
-  admin_readonly: "Viewer Admin",
+  admin_readonly: "Admin",
 };
 
 export const PORTAL_COLORS: Record<UserRole, string> = {

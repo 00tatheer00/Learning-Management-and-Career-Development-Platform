@@ -2,7 +2,7 @@ import type { LiveSession } from "@/types/portal";
 import type { PortalUser } from "@/types/portal";
 import type { LiveRoomRole } from "@/lib/portal-video/config";
 import { isPortalRoomSession } from "@/lib/portal-video/config";
-import { canAdminWrite } from "@/lib/auth/admin-roles";
+import { canAdminWrite, isAdminRole } from "@/lib/auth/admin-roles";
 
 export function resolveLiveSessionAccess(
   session: LiveSession,
@@ -12,16 +12,8 @@ export function resolveLiveSessionAccess(
     return { allowed: false, role: "student", error: "This class uses an external meeting link." };
   }
 
-  if (user.role === "admin" && canAdminWrite(user.role)) {
+  if (isAdminRole(user.role) && canAdminWrite(user.role)) {
     return { allowed: true, role: "admin" };
-  }
-
-  if (user.role === "admin_readonly") {
-    return {
-      allowed: false,
-      role: "student",
-      error: "View-only admin cannot join live classes as host.",
-    };
   }
 
   if (user.role === "trainer") {

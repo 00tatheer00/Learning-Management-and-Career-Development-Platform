@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import {
   getAdminUser,
+  requireAdminApproveReject,
   requireAdminWrite,
   unauthorizedAdminResponse,
   isNextResponse,
@@ -32,7 +33,7 @@ const patchSchema = z.object({
 });
 
 export async function PATCH(request: Request) {
-  const user = await requireAdminWrite();
+  const user = await requireAdminApproveReject();
   if (isNextResponse(user)) return user;
 
   const body = await request.json();
@@ -107,7 +108,7 @@ const bulkSchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const user = await requireAdminWrite();
+  const user = await requireAdminApproveReject();
   if (isNextResponse(user)) return user;
 
   const body = await request.json();

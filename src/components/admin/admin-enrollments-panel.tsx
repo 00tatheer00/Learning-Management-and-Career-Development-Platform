@@ -50,7 +50,7 @@ function hasPaymentScreenshot(url?: string | null): boolean {
 }
 
 export function AdminEnrollmentsPanel() {
-  const { canWrite } = useAdminPermissions();
+  const { canWrite, canApproveReject } = useAdminPermissions();
   const [enrollments, setEnrollments] = useState<AdminEnrollmentRow[]>([]);
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [bulkLoading, setBulkLoading] = useState(false);
@@ -436,7 +436,7 @@ export function AdminEnrollmentsPanel() {
           ))}
         </div>
 
-        {canWrite && statusFilter === "pending" && pendingFilteredIds.length > 0 && (
+        {canApproveReject && statusFilter === "pending" && pendingFilteredIds.length > 0 && (
           <div className="flex flex-wrap items-center gap-3 border-t border-border pt-4">
             <button
               type="button"
@@ -487,7 +487,7 @@ export function AdminEnrollmentsPanel() {
                   <div className="flex flex-col gap-6 lg:flex-row">
                     <div className="flex-1">
                       <div className="mb-3 flex flex-wrap items-center gap-2">
-                        {canWrite && isPending && (
+                        {canApproveReject && isPending && (
                           <input
                             type="checkbox"
                             checked={selectedIds.includes(enrollment.id)}
@@ -673,7 +673,7 @@ export function AdminEnrollmentsPanel() {
                     )}
                   </div>
 
-                  {canWrite && isPending && (
+                  {canApproveReject && isPending && (
                     <div className="mt-5 flex flex-wrap gap-3 border-t border-border pt-5">
                       <Button
                         size="lg"

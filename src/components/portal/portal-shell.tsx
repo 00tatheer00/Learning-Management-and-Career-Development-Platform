@@ -46,7 +46,7 @@ function getAdminDisplayName(name: string, role: UserRole) {
   const parts = name.trim().split(/\s+/).filter(Boolean);
   const firstName = parts[0] ?? name;
   if (role === "admin_readonly") {
-    return `Viewer Admin · ${firstName}`;
+    return `Admin · ${firstName}`;
   }
   const tatheer = parts.find((part) => part.toLowerCase() === "tatheer");
   const displayFirst =
