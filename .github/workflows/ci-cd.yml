@@ -5,6 +5,7 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 concurrency:
   group: ci-cd-${{ github.workflow }}-${{ github.ref }}
@@ -50,30 +51,3 @@ jobs:
           NEXTAUTH_SECRET: ${{ env.CI_NEXTAUTH_SECRET }}
           NEXTAUTH_URL: ${{ env.CI_NEXTAUTH_URL }}
           PORTAL_PASSWORD_SECRET: ${{ env.CI_PORTAL_PASSWORD_SECRET }}
-
-  deploy:
-    name: Deploy to Vercel (Production)
-    needs: quality
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.VERCEL_TOKEN != ''
-    runs-on: ubuntu-latest
-    environment:
-      name: production
-      url: https://school.emergingedge.tech
-    permissions:
-      contents: read
-      deployments: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
-        id: vercel
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: --prod
-
-      - name: Deployment URL
-        run: echo "Live at ${{ steps.vercel.outputs.preview-url }}"
