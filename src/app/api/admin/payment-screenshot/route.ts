@@ -1,14 +1,20 @@
 import { NextResponse } from "next/server";
 import { requireAdminRead, isNextResponse } from "@/lib/auth/admin-access";
 import { createApiResponse } from "@/lib/api/enrollment";
-import { getSignedCloudinaryUrl } from "@/lib/cloudinary";
+import {
+  fetchFirstAvailableImage,
+  resolvePaymentScreenshotCandidates,
+} from "@/lib/cloudinary";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(request: Request) {
   const admin = await requireAdminRead();
   if (isNextResponse(admin)) return admin;
 
-  const enrollmentId = new URL(request.url).searchParams.get("enrollmentId")?.trim();
+  const { searchParams } = new URL(request.url);
+  const enrollmentId = searchParams.get("enrollmentId")?.trim();
+  const mode = searchParams.get("mode")?.trim();
+
   if (!enrollmentId) {
     return NextResponse.json(
       createApiResponse(false, { error: "enrollmentId is required" }),
@@ -30,24 +36,39 @@ export async function GET(request: Request) {
     });
   }
 
-  if (enrollment.paymentScreenshotPublicId) {
-    try {
-      const signedUrl = getSignedCloudinaryUrl(enrollment.paymentScreenshotPublicId);
-      return NextResponse.redirect(signedUrl);
-    } catch (error) {
-      console.error("Signed payment screenshot URL failed:", error);
+  const candidates = resolvePaymentScreenshotCandidates(enrollment);
+
+  if (candidates.length === 0) {
+    return NextResponse.json(createApiResponse(false, { error: "No payment screenshot" }), {
+      status: 404,
+    });
+  }
+
+  if (mode === "redirect") {
+    return NextResponse.redirect(candidates[0]!);
+  }
+
+  try {
+    const image = await fetchFirstAvailableImage(candidates);
+    if (!image) {
       return NextResponse.json(
-        createApiResponse(false, { error: "Could not open payment screenshot" }),
-        { status: 500 }
+        createApiResponse(false, { error: "Could not load payment screenshot from Cloudinary" }),
+        { status: 404 }
       );
     }
-  }
 
-  if (enrollment.paymentScreenshot?.startsWith("http")) {
-    return NextResponse.redirect(enrollment.paymentScreenshot);
+    return new NextResponse(new Uint8Array(image.buffer), {
+      status: 200,
+      headers: {
+        "Content-Type": image.contentType,
+        "Cache-Control": "private, max-age=300",
+      },
+    });
+  } catch (error) {
+    console.error("Payment screenshot proxy failed:", error);
+    return NextResponse.json(
+      createApiResponse(false, { error: "Could not open payment screenshot" }),
+      { status: 500 }
+    );
   }
-
-  return NextResponse.json(createApiResponse(false, { error: "No payment screenshot" }), {
-    status: 404,
-  });
 }

@@ -527,7 +527,7 @@ function AdminStudentProfileDrawer() {
                       )}
                       {enrollment.hasPaymentScreenshot && (
                         <a
-                          href={paymentScreenshotHref(enrollment.id)}
+                          href={paymentScreenshotHref(enrollment.id, "redirect")}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1 text-xs font-semibold text-primary mt-2 hover:underline"

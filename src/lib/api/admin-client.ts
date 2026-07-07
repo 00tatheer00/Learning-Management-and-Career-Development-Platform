@@ -9,6 +9,8 @@ export async function revealStudentPassword(studentId: string): Promise<string |
   return (json.data?.password as string | undefined) ?? null;
 }
 
-export function paymentScreenshotHref(enrollmentId: string): string {
-  return `/api/admin/payment-screenshot?enrollmentId=${encodeURIComponent(enrollmentId)}`;
+export function paymentScreenshotHref(enrollmentId: string, mode: "inline" | "redirect" = "inline"): string {
+  const params = new URLSearchParams({ enrollmentId });
+  if (mode === "redirect") params.set("mode", "redirect");
+  return `/api/admin/payment-screenshot?${params.toString()}`;
 }

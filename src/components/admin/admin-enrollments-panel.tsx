@@ -648,7 +648,7 @@ export function AdminEnrollmentsPanel() {
                                   </span>
                                   {prev.hasPaymentScreenshot && (
                                     <a
-                                      href={paymentScreenshotHref(prev.id)}
+                                      href={paymentScreenshotHref(prev.id, "redirect")}
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       className="text-xs font-semibold text-primary underline"
