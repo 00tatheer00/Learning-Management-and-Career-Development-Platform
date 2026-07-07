@@ -1,10 +1,15 @@
 "use client";
 
 import { useCallback, useMemo, useRef, useState } from "react";
-import { Check, Copy, EnvelopeSimple, ShareNetwork, Users } from "@phosphor-icons/react";
+import { Check, Copy, EnvelopeSimple, Prohibit, ShareNetwork, Users } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { PortalPageHeader } from "@/components/portal/portal-ui";
 import { formatEmailsForDriveShare } from "@/lib/utils/drive-share";
+import {
+  DRIVE_DOWNLOAD_LIMITATION,
+  DRIVE_DOWNLOAD_NOTE,
+  DRIVE_SHARE_STEPS,
+} from "@/lib/constants/drive-sharing-guide";
 import { toast } from "@/lib/ui/toast";
 
 export interface DriveAccessStudent {
@@ -76,11 +81,23 @@ export function TrainerDriveAccessPanel({
           <div>
             <p className="font-bold text-pt">Share recordings with portal students only</p>
             <ol className="mt-2 text-sm text-pt-muted space-y-1.5 list-decimal list-inside">
-              <li>Upload your class video to Google Drive.</li>
-              <li>Click <strong className="text-pt">Copy all emails</strong> above.</li>
-              <li>In Drive → Share → paste emails → Viewer access.</li>
-              <li>Then add the link in <strong className="text-pt">Class Recordings</strong>.</li>
+              {DRIVE_SHARE_STEPS.map((step) => (
+                <li key={step}>{step}</li>
+              ))}
             </ol>
+          </div>
+        </div>
+      </div>
+
+      <div className="mb-6 rounded-2xl border border-amber-500/30 bg-amber-500/5 p-4 sm:p-5">
+        <div className="flex items-start gap-3">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/15 text-amber-700 dark:text-amber-300">
+            <Prohibit size={20} weight="duotone" />
+          </span>
+          <div className="text-sm">
+            <p className="font-bold text-pt">Block downloads on Drive</p>
+            <p className="mt-1 text-pt-muted">{DRIVE_DOWNLOAD_NOTE}</p>
+            <p className="mt-2 text-xs text-pt-muted">{DRIVE_DOWNLOAD_LIMITATION}</p>
           </div>
         </div>
       </div>

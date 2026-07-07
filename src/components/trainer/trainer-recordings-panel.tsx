@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PortalPageHeader, EmptyState } from "@/components/portal/portal-ui";
 import { getClassProgress } from "@/lib/class-schedule";
+import { DRIVE_DOWNLOAD_NOTE } from "@/lib/constants/drive-sharing-guide";
 import { toast } from "@/lib/ui/toast";
 
 interface Recording {
@@ -135,16 +136,17 @@ export function TrainerRecordingsPanel({ programSlug, courseTitle }: TrainerReco
       <div className="mb-6 rounded-2xl border border-primary/20 bg-primary/5 p-4 text-sm text-pt-muted">
         <p className="font-semibold text-pt">How to upload</p>
         <ol className="mt-2 list-decimal list-inside space-y-1">
-          <li>Upload the class video to Google Drive (or YouTube).</li>
+          <li>Upload the class video to <strong className="text-pt">Google Drive</strong> (school Workspace account).</li>
           <li>
             Share with{" "}
             <Link href="/trainer/drive-access" className="text-primary font-semibold underline">
               portal student emails only
             </Link>{" "}
-            — not public link.
+            — Viewer + disable download/print/copy.
           </li>
-          <li>Paste the link here with the correct class number.</li>
+          <li>Paste the Drive link here with the correct class number.</li>
         </ol>
+        <p className="mt-2 text-xs text-amber-800 dark:text-amber-200">{DRIVE_DOWNLOAD_NOTE}</p>
         <Button variant="secondary" size="sm" asChild className="mt-3 gap-1.5">
           <Link href="/trainer/drive-access">
             <ShareNetwork size={16} />
