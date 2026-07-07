@@ -1,13 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { LinkSimple, PencilSimple, VideoCamera } from "@phosphor-icons/react";
+import { LinkSimple, PencilSimple, VideoCamera, CheckCircle } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PortalPageHeader, EmptyState } from "@/components/portal/portal-ui";
 import { toast } from "@/lib/ui/toast";
 import { cn } from "@/lib/utils";
+import {
+  getSessionLifecycleState,
+  sortLiveSessionsForDisplay,
+} from "@/lib/sessions/join-window";
 
 interface LiveSession {
   id: string;
@@ -43,6 +47,14 @@ export default function TrainerClassesPage() {
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editLink, setEditLink] = useState("");
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(new Date()), 30_000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  const sortedSessions = sortLiveSessionsForDisplay(sessions, now);
 
   const load = () =>
     fetch("/api/trainer/data")
@@ -223,41 +235,56 @@ export default function TrainerClassesPage() {
             description='Tap "Schedule Class" to add your first live session.'
           />
         ) : (
-          sessions.map((session) => {
+          sortedSessions.map((session) => {
             const hasLink = Boolean(session.meetLink?.trim()) || session.roomType === "portal";
             const isEditing = editingId === session.id;
+            const lifecycle = getSessionLifecycleState({
+              sessionDate: session.date,
+              sessionTime: session.time,
+              programSlug: session.programSlug,
+              hasJoinLink: hasLink,
+              now,
+            });
+            const isDone = lifecycle.phase === "done";
 
             return (
               <div
                 key={session.id}
-                className="rounded-2xl border border-border bg-background p-5 space-y-4"
+                className={cn(
+                  "rounded-2xl border border-border bg-background p-5 space-y-4",
+                  isDone && "bg-surface/50 opacity-90"
+                )}
               >
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                   <div>
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <p className="font-bold text-lg">{session.title}</p>
                       <span
                         className={cn(
                           "text-[10px] font-bold uppercase rounded-full px-2 py-0.5",
-                          hasLink
-                            ? "bg-emerald-100 text-emerald-800"
-                            : "bg-amber-100 text-amber-800"
+                          lifecycle.badgeClassName
                         )}
                       >
-                        {hasLink ? "Link ready" : "Link needed"}
+                        {lifecycle.badgeLabel}
                       </span>
                     </div>
                     <p className="text-muted text-sm">
                       {session.date} · {session.time}
                     </p>
-                    {hasLink && session.roomType === "meet" && !isEditing && (
+                    {isDone && (
+                      <p className="mt-2 text-sm text-muted flex items-center gap-1.5">
+                        <CheckCircle size={16} weight="fill" className="text-slate-500 shrink-0" />
+                        Class completed — students see this as Done in their portal.
+                      </p>
+                    )}
+                    {hasLink && session.roomType === "meet" && !isEditing && !isDone && (
                       <p className="text-xs text-muted mt-2 truncate max-w-md">
                         {session.meetLink}
                       </p>
                     )}
                   </div>
 
-                  {session.roomType === "meet" && hasLink && !isEditing && (
+                  {session.roomType === "meet" && hasLink && !isEditing && lifecycle.canTrainerOpenMeet && (
                     <Button asChild className="shrink-0">
                       <a href={session.meetLink} target="_blank" rel="noopener noreferrer">
                         <VideoCamera size={18} weight="duotone" /> Open Meet
@@ -266,7 +293,7 @@ export default function TrainerClassesPage() {
                   )}
                 </div>
 
-                {session.roomType === "meet" && (
+                {session.roomType === "meet" && lifecycle.canTrainerEditLink && (
                   <div className="rounded-xl border border-border bg-surface p-4">
                     {isEditing ? (
                       <div className="space-y-3">

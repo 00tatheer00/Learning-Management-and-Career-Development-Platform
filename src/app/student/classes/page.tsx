@@ -1,21 +1,19 @@
-import { CalendarBlank } from "@phosphor-icons/react/ssr";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getLiveSessionsPreview } from "@/lib/api/portal-data";
 import { getStudentClassSchedule } from "@/lib/constants/student-portal-ur";
 import { canAccessModuleOneClasses } from "@/lib/modules/student-module-access";
 import { PortalPageHeader, EmptyState } from "@/components/portal/portal-ui";
-import { JoinClassButton } from "@/components/portal/join-class-button";
+import { StudentLiveSessionCard } from "@/components/portal/student-live-session-card";
 import { ModuleStartsSoonNotice } from "@/components/portal/module-starts-soon-notice";
-import { getTodayYmdInPakistan } from "@/lib/utils/pakistan-time";
+import { sortLiveSessionsForDisplay } from "@/lib/sessions/join-window";
 
 export default async function StudentClassesPage() {
   const user = await getCurrentUser();
   if (!user) return null;
 
   const programSlug = user.programSlug ?? "web-development";
-  const sessions = await getLiveSessionsPreview(programSlug);
+  const sessions = sortLiveSessionsForDisplay(await getLiveSessionsPreview(programSlug));
   const classSchedule = getStudentClassSchedule(programSlug);
-  const today = getTodayYmdInPakistan();
   const canJoinLive = canAccessModuleOneClasses(programSlug, user.level);
 
   return (
@@ -25,7 +23,7 @@ export default async function StudentClassesPage() {
         title="Live Classes"
         description={
           canJoinLive
-            ? "Join opens 10 minutes before class and closes at class end time. Hover the button for details."
+            ? "Join opens 10 minutes before class and closes at class end time. Completed classes show as Done."
             : "Your module batch has not started yet. Module 1 students are in live classes now."
         }
       />
@@ -44,8 +42,8 @@ export default async function StudentClassesPage() {
 
       <p className="mb-6 text-sm text-muted rounded-xl border border-border bg-surface p-4">
         <strong className="text-foreground">Join Class</strong> opens 10 minutes before the scheduled
-        time and closes when class ends. Yesterday&apos;s classes show as{" "}
-        <strong className="text-foreground">Class Done</strong>.
+        time and closes when class ends. Past classes show as{" "}
+        <strong className="text-foreground">Done</strong> — use Class Recordings to rewatch.
       </p>
 
       {sessions.length === 0 ? (
@@ -55,47 +53,14 @@ export default async function StudentClassesPage() {
         />
       ) : (
         <div className="space-y-4">
-          {sessions.map((session) => {
-            const isUpcoming = session.date >= today;
-            return (
-              <div
-                key={session.id}
-                className={`rounded-2xl border-2 p-5 sm:p-6 ${
-                  isUpcoming ? "border-primary/30 bg-primary/5" : "border-border bg-background opacity-75"
-                }`}
-              >
-                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                  <div>
-                    <div className="flex items-center gap-2 text-sm text-muted mb-2">
-                      <CalendarBlank size={18} weight="duotone" />
-                      {session.date} · {session.time}
-                    </div>
-                    <h2 className="text-xl font-bold">{session.title}</h2>
-                    <p className="text-muted mt-1">Trainer: {session.trainerName}</p>
-                    {session.notes && (
-                      <p className="text-sm text-muted mt-2 bg-background rounded-lg p-3 border border-border">
-                        {session.notes}
-                      </p>
-                    )}
-                  </div>
-                  {canJoinLive ? (
-                    <JoinClassButton
-                      sessionId={session.id}
-                      sessionDate={session.date}
-                      sessionTime={session.time}
-                      programSlug={programSlug}
-                      hasJoinLink={session.hasJoinLink}
-                    />
-                  ) : (
-                    <div className="rounded-xl border border-dashed border-indigo-300 bg-indigo-50 px-4 py-3 text-sm text-indigo-900 shrink-0 max-w-xs">
-                      <p className="font-semibold">Your module starts next month</p>
-                      <p className="mt-1 text-xs">This class is for Module 1 students only.</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+          {sessions.map((session) => (
+            <StudentLiveSessionCard
+              key={session.id}
+              session={session}
+              programSlug={programSlug}
+              canJoinLive={canJoinLive}
+            />
+          ))}
         </div>
       )}
     </div>

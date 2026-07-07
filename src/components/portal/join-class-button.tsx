@@ -104,7 +104,7 @@ export function JoinClassButton({
   return (
     <div
       className={cn("relative shrink-0", className)}
-      onMouseEnter={() => !isOpen && setShowHint(true)}
+      onMouseEnter={() => !isOpen && !isDone && setShowHint(true)}
       onMouseLeave={() => setShowHint(false)}
     >
       <Button
@@ -113,17 +113,17 @@ export function JoinClassButton({
         variant={isDone ? "secondary" : isOpen ? "default" : "outline"}
         className={cn(
           "h-14 text-base gap-2",
-          !isOpen && "opacity-90"
+          !isOpen && !isDone && "opacity-90"
         )}
         onClick={handleJoin}
-        disabled={loading}
+        disabled={loading || isDone}
         aria-disabled={!isOpen}
       >
         <VideoCamera size={22} weight="duotone" />
         {loading ? "Joining..." : windowState.buttonLabel}
       </Button>
 
-      {!isOpen && showHint && (
+      {!isOpen && !isDone && showHint && (
         <div
           role="tooltip"
           className="absolute right-0 bottom-full z-20 mb-2 w-[min(100vw-2rem,280px)] rounded-xl border border-border bg-background p-3 text-left shadow-lg"

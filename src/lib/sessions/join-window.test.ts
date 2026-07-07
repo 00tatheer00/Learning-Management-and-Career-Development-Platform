@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getJoinWindowState } from "@/lib/sessions/join-window";
+import { getJoinWindowState, getSessionLifecycleState } from "@/lib/sessions/join-window";
 
 describe("join window", () => {
   const webSession = {
@@ -59,5 +59,35 @@ describe("join window", () => {
     });
     expect(state.phase).toBe("no_link");
     expect(state.buttonLabel).toBe("Link coming soon");
+  });
+});
+
+describe("session lifecycle", () => {
+  it("marks yesterday's class as Done for trainer and student views", () => {
+    const now = new Date("2026-07-08T12:00:00.000Z");
+    const state = getSessionLifecycleState({
+      sessionDate: "2026-07-06",
+      sessionTime: "10:00 PM",
+      programSlug: "web-development",
+      hasJoinLink: true,
+      now,
+    });
+    expect(state.phase).toBe("done");
+    expect(state.badgeLabel).toBe("Done");
+    expect(state.canTrainerOpenMeet).toBe(false);
+    expect(state.canTrainerEditLink).toBe(false);
+  });
+
+  it("shows Link ready for an upcoming class with a meet link", () => {
+    const now = new Date("2026-07-07T12:00:00.000Z");
+    const state = getSessionLifecycleState({
+      sessionDate: "2026-07-07",
+      sessionTime: "10:00 PM",
+      programSlug: "web-development",
+      hasJoinLink: true,
+      now,
+    });
+    expect(state.phase).toBe("upcoming");
+    expect(state.badgeLabel).toBe("Link ready");
   });
 });

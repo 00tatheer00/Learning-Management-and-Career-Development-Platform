@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { CalendarBlank, Clock, VideoCamera } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,8 @@ import {
   getSessionCountdownParts,
   parseSessionDateTime,
 } from "@/lib/utils/session-datetime";
+import { getSessionLifecycleState } from "@/lib/sessions/join-window";
+import { cn } from "@/lib/utils";
 
 interface StudentNextClassCardProps {
   session: {
@@ -31,9 +33,27 @@ export function StudentNextClassCard({
   programSlug,
   studentModule,
 }: StudentNextClassCardProps) {
+  const [now, setNow] = useState(() => new Date());
   const sessionAt = parseSessionDateTime(session.date, session.time);
   const [countdown, setCountdown] = useState(() =>
     sessionAt ? getSessionCountdownParts(sessionAt) : null
+  );
+
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(new Date()), 30_000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  const lifecycle = useMemo(
+    () =>
+      getSessionLifecycleState({
+        sessionDate: session.date,
+        sessionTime: session.time,
+        programSlug,
+        hasJoinLink: session.hasJoinLink,
+        now,
+      }),
+    [session.date, session.time, session.hasJoinLink, programSlug, now]
   );
 
   useEffect(() => {
@@ -47,17 +67,28 @@ export function StudentNextClassCard({
 
   return (
     <div
-      className={`rounded-2xl border-2 p-5 sm:p-6 mb-8 ${
-        countdown?.isSoon
+      className={cn(
+        "rounded-2xl border-2 p-5 sm:p-6 mb-8",
+        lifecycle.phase === "live"
           ? "border-emerald-400 bg-gradient-to-br from-emerald-50 to-white shadow-sm"
-          : "border-primary/30 bg-primary/5"
-      }`}
+          : countdown?.isSoon
+            ? "border-emerald-400 bg-gradient-to-br from-emerald-50 to-white shadow-sm"
+            : "border-primary/30 bg-primary/5"
+      )}
     >
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
         <div className="flex-1">
-          <p className="text-sm font-semibold text-primary uppercase tracking-wider mb-1 flex items-center gap-2">
+          <p className="text-sm font-semibold text-primary uppercase tracking-wider mb-1 flex items-center gap-2 flex-wrap">
             <VideoCamera size={18} weight="duotone" />
-            Next Live Class
+            {lifecycle.phase === "live" ? "Live Class Now" : "Next Live Class"}
+            <span
+              className={cn(
+                "text-[10px] font-bold uppercase rounded-full px-2 py-0.5 normal-case tracking-normal",
+                lifecycle.badgeClassName
+              )}
+            >
+              {lifecycle.badgeLabel}
+            </span>
           </p>
           <h2 className="text-xl sm:text-2xl font-bold mb-2">{session.title}</h2>
           <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted">
@@ -79,7 +110,7 @@ export function StudentNextClassCard({
         </div>
 
         <div className="flex flex-col items-stretch sm:items-end gap-3 shrink-0">
-          {countdown && (
+          {countdown && lifecycle.phase !== "live" && (
             <div
               className={`rounded-2xl px-4 py-3 sm:px-5 sm:py-4 text-center w-full sm:min-w-[160px] sm:w-auto ${
                 countdown.isSoon

@@ -7,7 +7,7 @@ import {
   getTrainerDesignation,
   resolveTrainerId,
 } from "@/lib/auth/trainer-scope";
-import { getTodayYmdInPakistan } from "@/lib/utils/pakistan-time";
+import { countUpcomingLiveSessions } from "@/lib/sessions/join-window";
 import { getAssignments, getLiveSessions, getSubmissions } from "@/lib/api/portal-data";
 import { getUsersByRole } from "@/lib/auth/users";
 import { groupStudentsByModule } from "@/lib/trainer/group-students-by-module";
@@ -54,8 +54,7 @@ export default async function TrainerDashboardPage() {
   const submissions = allSubmissions.filter((s) => assignmentIds.has(s.assignmentId));
 
   const pendingReviews = submissions.filter((s) => s.status === "submitted").length;
-  const today = getTodayYmdInPakistan();
-  const upcomingSessions = sessions.filter((s) => s.date >= today).length;
+  const upcomingSessions = countUpcomingLiveSessions(sessions);
 
   return (
     <div className="space-y-4">

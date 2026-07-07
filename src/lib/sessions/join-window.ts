@@ -160,3 +160,101 @@ export function isSessionFullyEnded(
   });
   return state.phase === "ended";
 }
+
+export type SessionLifecyclePhase = "done" | "live" | "upcoming";
+
+export interface SessionLifecycleState {
+  phase: SessionLifecyclePhase;
+  badgeLabel: string;
+  badgeClassName: string;
+  canTrainerOpenMeet: boolean;
+  canTrainerEditLink: boolean;
+  joinState: JoinWindowState;
+}
+
+export function getSessionLifecycleState(input: {
+  sessionDate: string;
+  sessionTime: string;
+  programSlug: string;
+  hasJoinLink?: boolean;
+  now?: Date;
+}): SessionLifecycleState {
+  const joinState = getJoinWindowState({
+    sessionDate: input.sessionDate,
+    sessionTime: input.sessionTime,
+    programSlug: input.programSlug,
+    hasJoinLink: input.hasJoinLink ?? true,
+    now: input.now,
+  });
+
+  if (joinState.phase === "ended") {
+    return {
+      phase: "done",
+      badgeLabel: "Done",
+      badgeClassName: "bg-slate-100 text-slate-700",
+      canTrainerOpenMeet: false,
+      canTrainerEditLink: false,
+      joinState,
+    };
+  }
+
+  if (joinState.phase === "open") {
+    return {
+      phase: "live",
+      badgeLabel: "Live now",
+      badgeClassName: "bg-emerald-100 text-emerald-800",
+      canTrainerOpenMeet: true,
+      canTrainerEditLink: true,
+      joinState,
+    };
+  }
+
+  const hasLink = input.hasJoinLink !== false && joinState.phase !== "no_link";
+  return {
+    phase: "upcoming",
+    badgeLabel: hasLink ? "Link ready" : "Link needed",
+    badgeClassName: hasLink
+      ? "bg-sky-100 text-sky-800"
+      : "bg-amber-100 text-amber-800",
+    canTrainerOpenMeet: hasLink,
+    canTrainerEditLink: true,
+    joinState,
+  };
+}
+
+export function sortLiveSessionsForDisplay<
+  T extends { date: string; time: string; programSlug: string }
+>(sessions: T[], now = new Date()): T[] {
+  return [...sessions].sort((a, b) => {
+    const aDone =
+      getSessionLifecycleState({
+        sessionDate: a.date,
+        sessionTime: a.time,
+        programSlug: a.programSlug,
+        now,
+      }).phase === "done";
+    const bDone =
+      getSessionLifecycleState({
+        sessionDate: b.date,
+        sessionTime: b.time,
+        programSlug: b.programSlug,
+        now,
+      }).phase === "done";
+    if (aDone !== bDone) return aDone ? 1 : -1;
+    return a.date.localeCompare(b.date) || a.time.localeCompare(b.time);
+  });
+}
+
+export function countUpcomingLiveSessions<
+  T extends { date: string; time: string; programSlug: string }
+>(sessions: T[], now = new Date()): number {
+  return sessions.filter(
+    (session) =>
+      getSessionLifecycleState({
+        sessionDate: session.date,
+        sessionTime: session.time,
+        programSlug: session.programSlug,
+        now,
+      }).phase !== "done"
+  ).length;
+}
