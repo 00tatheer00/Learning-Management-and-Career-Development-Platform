@@ -27,7 +27,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAdminPermissions } from "@/components/admin/admin-permissions";
 import type { AdminStudentProfile } from "@/lib/api/admin-student-profile";
-import { paymentScreenshotHref, revealStudentPassword } from "@/lib/api/admin-client";
+import { paymentScreenshotHref, revealEnrollmentPassword, revealStudentPassword } from "@/lib/api/admin-client";
 import { cn, formatAppliedDateTime } from "@/lib/utils";
 import { toast } from "@/lib/ui/toast";
 
@@ -40,6 +40,7 @@ interface AdminStudentProfileContextValue {
   open: boolean;
   loading: boolean;
   profile: AdminStudentProfile | null;
+  target: StudentProfileTarget | null;
   openProfile: (target: StudentProfileTarget) => void;
   closeProfile: () => void;
   refreshProfile: () => Promise<void>;
@@ -49,10 +50,24 @@ const AdminStudentProfileContext = createContext<AdminStudentProfileContextValue
 
 function buildProfileUrl(target: StudentProfileTarget) {
   const params = new URLSearchParams();
-  if ("studentId" in target) params.set("studentId", target.studentId);
-  if ("email" in target) params.set("email", target.email);
-  if ("enrollmentId" in target) params.set("enrollmentId", target.enrollmentId);
+  if ("enrollmentId" in target && target.enrollmentId.trim()) {
+    params.set("enrollmentId", target.enrollmentId.trim());
+    return `/api/admin/students/profile?${params.toString()}`;
+  }
+  if ("studentId" in target && target.studentId.trim()) {
+    params.set("studentId", target.studentId.trim());
+  }
+  if ("email" in target && target.email.trim()) {
+    params.set("email", target.email.trim());
+  }
   return `/api/admin/students/profile?${params.toString()}`;
+}
+
+function isValidProfileTarget(target: StudentProfileTarget) {
+  if ("enrollmentId" in target) return Boolean(target.enrollmentId.trim());
+  if ("studentId" in target) return Boolean(target.studentId.trim());
+  if ("email" in target) return Boolean(target.email.trim());
+  return false;
 }
 
 async function copyText(label: string, value: string) {
@@ -91,7 +106,12 @@ export function AdminStudentProfileProvider({ children }: { children: ReactNode 
 
   const openProfile = useCallback(
     (nextTarget: StudentProfileTarget) => {
+      if (!isValidProfileTarget(nextTarget)) {
+        toast.error("Could not open student profile");
+        return;
+      }
       setTarget(nextTarget);
+      setProfile(null);
       setOpen(true);
       void loadProfile(nextTarget);
     },
@@ -121,8 +141,8 @@ export function AdminStudentProfileProvider({ children }: { children: ReactNode 
   }, [open, closeProfile]);
 
   const value = useMemo(
-    () => ({ open, loading, profile, openProfile, closeProfile, refreshProfile }),
-    [open, loading, profile, openProfile, closeProfile, refreshProfile]
+    () => ({ open, loading, profile, target, openProfile, closeProfile, refreshProfile }),
+    [open, loading, profile, target, openProfile, closeProfile, refreshProfile]
   );
 
   return (
@@ -202,7 +222,7 @@ export function AdminStudentProfileButton({
 }
 
 function AdminStudentProfileDrawer() {
-  const { open, loading, profile, closeProfile, refreshProfile } = useAdminStudentProfile();
+  const { open, loading, profile, target, closeProfile, refreshProfile } = useAdminStudentProfile();
   const { canWrite } = useAdminPermissions();
   const [showPassword, setShowPassword] = useState(false);
   const [revealedPassword, setRevealedPassword] = useState<string | null>(null);
@@ -222,10 +242,15 @@ function AdminStudentProfileDrawer() {
     if (!profile?.studentId) return;
     setActionLoading(action);
     try {
+      const body: Record<string, string> = { id: profile.studentId, action };
+      if (action === "resetPassword" && profile.focusedEnrollmentId) {
+        body.enrollmentId = profile.focusedEnrollmentId;
+      }
+
       const res = await fetch("/api/admin/students", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: profile.studentId, action }),
+        body: JSON.stringify(body),
       });
       const json = await res.json();
       if (json.success) {
@@ -254,11 +279,18 @@ function AdminStudentProfileDrawer() {
       return;
     }
 
-    if (!profile?.studentId) return;
+    if (!profile?.studentId && !profile?.focusedEnrollmentId) return;
 
     if (!revealedPassword) {
       setActionLoading("password");
-      const result = await revealStudentPassword(profile.studentId);
+      const enrollmentId =
+        profile.focusedEnrollmentId ??
+        (target && "enrollmentId" in target ? target.enrollmentId : undefined);
+      const result = enrollmentId
+        ? await revealEnrollmentPassword(enrollmentId)
+        : profile.studentId
+          ? await revealStudentPassword(profile.studentId)
+          : { password: null as string | null, error: "Could not load password" };
       setActionLoading(null);
       if (!result.password) {
         toast.error(result.error ?? "Could not load password");
@@ -271,13 +303,21 @@ function AdminStudentProfileDrawer() {
   };
 
   const resendWhatsApp = async () => {
-    if (!profile?.studentId) return;
+    if (!profile?.studentId && !profile?.focusedEnrollmentId) return;
     setActionLoading("whatsapp");
     try {
+      const body = profile.focusedEnrollmentId
+        ? { action: "resendLogin", enrollmentId: profile.focusedEnrollmentId }
+        : profile.studentId
+          ? { action: "resendLogin", studentId: profile.studentId }
+          : null;
+
+      if (!body) return;
+
       const res = await fetch("/api/admin/whatsapp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "resendLogin", studentId: profile.studentId }),
+        body: JSON.stringify(body),
       });
       const json = await res.json();
       if (json.success) {
@@ -300,7 +340,7 @@ function AdminStudentProfileDrawer() {
     .toUpperCase();
 
   return (
-    <div className="fixed inset-0 z-[70] flex justify-end">
+    <div className="fixed inset-0 z-[80] flex justify-end">
       <button
         type="button"
         aria-label="Close student profile"

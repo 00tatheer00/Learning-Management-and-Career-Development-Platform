@@ -30,6 +30,7 @@ export interface AdminStudentProfileAttendance {
 
 export interface AdminStudentProfile {
   studentId: string | null;
+  focusedEnrollmentId: string | null;
   name: string;
   email: string;
   whatsapp: string;
@@ -96,7 +97,10 @@ function mapEnrollment(
   };
 }
 
-async function buildProfileForEmail(email: string): Promise<AdminStudentProfile | null> {
+async function buildProfileForEmail(
+  email: string,
+  focusedEnrollmentId?: string
+): Promise<AdminStudentProfile | null> {
   const normalizedEmail = email.trim().toLowerCase();
   if (!normalizedEmail) return null;
 
@@ -132,7 +136,12 @@ async function buildProfileForEmail(email: string): Promise<AdminStudentProfile 
   );
 
   const latestEnrollment = enrollments[0] ?? null;
+  const focusedEnrollment =
+    (focusedEnrollmentId
+      ? enrollments.find((entry) => entry.id === focusedEnrollmentId)
+      : null) ?? null;
   const approvedEnrollment =
+    focusedEnrollment ??
     enrollments.find((e) => e.status === "approved" && e.program === student?.programSlug) ??
     enrollments.find((e) => e.status === "approved") ??
     latestEnrollment;
@@ -151,18 +160,22 @@ async function buildProfileForEmail(email: string): Promise<AdminStudentProfile 
   let late = 0;
 
   if (student) {
-    const records = await getAttendanceReport({ limit: 500 });
-    const studentRecords = records.filter((r) => r.studentId === student.id);
-    present = studentRecords.filter((r) => r.status === "present").length;
-    late = studentRecords.filter((r) => r.status === "late").length;
-    attendanceRows = studentRecords.slice(0, 8).map((r) => ({
-      id: r.id,
-      sessionTitle: r.sessionTitle,
-      sessionDate: r.sessionDate,
-      sessionTime: r.sessionTime,
-      status: r.status,
-      joinedAt: r.joinedAt,
-    }));
+    try {
+      const records = await getAttendanceReport({ limit: 500 });
+      const studentRecords = records.filter((r) => r.studentId === student.id);
+      present = studentRecords.filter((r) => r.status === "present").length;
+      late = studentRecords.filter((r) => r.status === "late").length;
+      attendanceRows = studentRecords.slice(0, 8).map((r) => ({
+        id: r.id,
+        sessionTitle: r.sessionTitle,
+        sessionDate: r.sessionDate,
+        sessionTime: r.sessionTime,
+        status: r.status,
+        joinedAt: r.joinedAt,
+      }));
+    } catch (error) {
+      console.error("Failed to load attendance for student profile:", error);
+    }
   }
 
   const programSlug = student?.programSlug ?? approvedEnrollment?.program ?? latestEnrollment?.program ?? null;
@@ -170,6 +183,7 @@ async function buildProfileForEmail(email: string): Promise<AdminStudentProfile 
 
   return {
     studentId: student?.id ?? null,
+    focusedEnrollmentId: focusedEnrollment?.id ?? approvedEnrollment?.id ?? null,
     name: student?.name ?? latestEnrollment?.fullName ?? "Student",
     email: normalizedEmail,
     whatsapp: student?.phone ?? latestEnrollment?.whatsapp ?? "—",
@@ -189,7 +203,9 @@ async function buildProfileForEmail(email: string): Promise<AdminStudentProfile 
     joinedAt: student?.createdAt.toISOString() ?? null,
     loginUrl: getPortalLoginUrl(),
     password: null,
-    hasStoredPassword: Boolean(approvedEnrollment?.portalPasswordEnc),
+    hasStoredPassword: Boolean(
+      focusedEnrollment?.portalPasswordEnc ?? approvedEnrollment?.portalPasswordEnc
+    ),
     trainer,
     enrollments: enrollments.map((e) =>
       mapEnrollment(e, reviewerNameById, applicationNumberById.get(e.id) ?? 1)
@@ -208,20 +224,24 @@ export async function getAdminStudentProfile(input: {
   email?: string;
   enrollmentId?: string;
 }): Promise<AdminStudentProfile | null> {
-  if (input.studentId) {
-    const student = await prisma.user.findUnique({ where: { id: input.studentId } });
+  const studentId = input.studentId?.trim();
+  const email = input.email?.trim();
+  const enrollmentId = input.enrollmentId?.trim();
+
+  if (enrollmentId) {
+    const enrollment = await prisma.enrollment.findUnique({ where: { id: enrollmentId } });
+    if (!enrollment) return null;
+    return buildProfileForEmail(enrollment.email, enrollmentId);
+  }
+
+  if (studentId) {
+    const student = await prisma.user.findUnique({ where: { id: studentId } });
     if (!student || student.role !== "student") return null;
     return buildProfileForEmail(student.email);
   }
 
-  if (input.enrollmentId) {
-    const enrollment = await prisma.enrollment.findUnique({ where: { id: input.enrollmentId } });
-    if (!enrollment) return null;
-    return buildProfileForEmail(enrollment.email);
-  }
-
-  if (input.email) {
-    return buildProfileForEmail(input.email);
+  if (email) {
+    return buildProfileForEmail(email);
   }
 
   return null;

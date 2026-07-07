@@ -494,7 +494,7 @@ export function AdminCredentialsPanel() {
                 !row.hasLoggedIn && "bg-red-50/40"
               )}
             >
-              <OpenStudentProfileButton target={{ studentId: row.studentId }} className="font-semibold text-sm">
+              <OpenStudentProfileButton target={{ enrollmentId: row.id }} className="font-semibold text-sm">
                 {row.name}
               </OpenStudentProfileButton>
               <p className="text-xs text-muted">{row.course} · {row.module}</p>
@@ -504,7 +504,7 @@ export function AdminCredentialsPanel() {
                 {row.hasStoredPassword ? " · Password saved" : " · No password"}
               </p>
               <div className="flex flex-wrap gap-2 pt-1">
-                <AdminStudentProfileButton target={{ studentId: row.studentId }} compact />
+                <AdminStudentProfileButton target={{ enrollmentId: row.id }} compact />
                 {canWrite && row.hasStoredPassword && (
                   <Button
                     size="sm"
@@ -559,7 +559,7 @@ export function AdminCredentialsPanel() {
                     >
                       <td className="px-3 py-2.5">
                         <OpenStudentProfileButton
-                          target={{ studentId: row.studentId }}
+                          target={{ enrollmentId: row.id }}
                           className="font-medium text-sm hover:underline"
                         >
                           {row.name}
@@ -670,7 +670,7 @@ export function AdminCredentialsPanel() {
                       </td>
                       <td className="px-3 py-2.5">
                         <div className="flex gap-1">
-                          <AdminStudentProfileButton target={{ studentId: row.studentId }} compact />
+                          <AdminStudentProfileButton target={{ enrollmentId: row.id }} compact />
                           <button
                             type="button"
                             title="Copy full login details"

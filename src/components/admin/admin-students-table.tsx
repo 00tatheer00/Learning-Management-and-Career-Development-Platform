@@ -427,7 +427,7 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
               </div>
               <div className="min-w-0 flex-1">
                 <OpenStudentProfileButton
-                  target={{ studentId: student.studentId }}
+                  target={{ enrollmentId: student.id }}
                   className="font-semibold hover:underline"
                 >
                   {student.name}
@@ -455,7 +455,7 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
             </div>
             <p className="mt-2 text-xs text-muted font-mono break-all">{student.cnic}</p>
             <div className="mt-3 flex flex-wrap gap-2 border-t border-border pt-3">
-              <AdminStudentProfileButton target={{ studentId: student.studentId }} compact />
+              <AdminStudentProfileButton target={{ enrollmentId: student.id }} compact />
               {canWrite && (
                 <>
                   <button
@@ -531,7 +531,7 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
                       </div>
                       <div>
                         <OpenStudentProfileButton
-                          target={{ studentId: student.studentId }}
+                          target={{ enrollmentId: student.id }}
                           className="font-semibold text-foreground hover:underline"
                         >
                           {student.name}
@@ -577,7 +577,7 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
                   </td>
                   <td className="px-4 py-4">
                     <div className="flex flex-wrap gap-2">
-                      <AdminStudentProfileButton target={{ studentId: student.studentId }} compact />
+                      <AdminStudentProfileButton target={{ enrollmentId: student.id }} compact />
                       {canWrite && (
                         <>
                           <button
