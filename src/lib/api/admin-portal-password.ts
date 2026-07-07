@@ -130,3 +130,8 @@ export async function getStudentPortalPasswordForWhatsApp(studentId: string): Pr
 
   return { password, enrollment, student };
 }
+
+export async function getStoredPortalPasswordForEmail(email: string): Promise<string | null> {
+  const enrollments = await getApprovedEnrollmentsForStudentEmail(email);
+  return decryptFromEnrollments(enrollments);
+}
