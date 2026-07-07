@@ -9,7 +9,7 @@ import type {
 } from "@/lib/api/enrollment-history";
 import type { EnrollmentRecord } from "@/types/portal";
 
-export interface AdminEnrollmentRow extends EnrollmentRecord {
+export interface AdminEnrollmentRow extends Omit<EnrollmentRecord, "paymentScreenshot"> {
   courseTitle: string;
   reviewerName?: string;
   applicationNumber: number;
@@ -19,6 +19,7 @@ export interface AdminEnrollmentRow extends EnrollmentRecord {
   duplicateMatch: DuplicateMatchInfo | null;
   approvalWhatsAppSent?: boolean | null;
   approvalWhatsAppError?: string | null;
+  hasPaymentScreenshot: boolean;
 }
 
 export async function getAdminEnrollmentRows(): Promise<AdminEnrollmentRow[]> {
@@ -59,7 +60,7 @@ export async function getAdminEnrollmentRows(): Promise<AdminEnrollmentRow[]> {
       internetAvailable: record.internetAvailable as "yes" | "no",
       confirmInfoCorrect: record.confirmInfoCorrect,
       agreeToPolicies: record.agreeToPolicies,
-      paymentScreenshot: record.paymentScreenshot ?? undefined,
+      hasPaymentScreenshot: Boolean(record.paymentScreenshot || record.paymentScreenshotPublicId),
       status: record.status,
       reviewedAt: record.reviewedAt?.toISOString(),
       reviewedBy: record.reviewedBy ?? undefined,

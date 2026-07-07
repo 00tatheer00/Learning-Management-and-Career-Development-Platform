@@ -95,10 +95,12 @@ export async function getUltraMsgInstanceStatus(): Promise<{
   }
 
   try {
-    const response = await fetch(
-      `https://api.ultramsg.com/${instanceId}/instance/status?token=${encodeURIComponent(token)}`,
-      { cache: "no-store" }
-    );
+    const response = await fetch(`https://api.ultramsg.com/${instanceId}/instance/status`, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ token }).toString(),
+      cache: "no-store",
+    });
 
     const data = (await response.json()) as UltraMsgStatusResponse;
     const status = data.status?.accountStatus?.status ?? "unknown";

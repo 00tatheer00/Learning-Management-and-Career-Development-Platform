@@ -24,6 +24,7 @@ import { toast } from "@/lib/ui/toast";
 import { useAdminPermissions } from "@/components/admin/admin-permissions";
 import { OpenStudentProfileButton, AdminStudentProfileButton } from "@/components/admin/admin-student-profile-drawer";
 import type { AdminCredentialRow } from "@/lib/api/admin-credentials";
+import { revealStudentPassword } from "@/lib/api/admin-client";
 
 interface CredentialsMeta {
   total: number;
@@ -58,6 +59,7 @@ export function AdminCredentialsPanel() {
   const [showMissingOnly, setShowMissingOnly] = useState(false);
   const [showNeverLoggedInOnly, setShowNeverLoggedInOnly] = useState(false);
   const [visiblePasswords, setVisiblePasswords] = useState<Set<string>>(new Set());
+  const [revealedPasswords, setRevealedPasswords] = useState<Record<string, string>>({});
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [bulkGenerating, setBulkGenerating] = useState(false);
   const [credentialModal, setCredentialModal] = useState<{
@@ -118,13 +120,36 @@ export function AdminCredentialsPanel() {
     });
   };
 
+  const revealPassword = async (row: AdminCredentialRow) => {
+    if (visiblePasswords.has(row.id)) {
+      togglePassword(row.id);
+      return;
+    }
+
+    if (!revealedPasswords[row.id]) {
+      setLoadingId(row.id);
+      const password = await revealStudentPassword(row.id);
+      setLoadingId(null);
+      if (!password) {
+        toast.error("Could not load password");
+        return;
+      }
+      setRevealedPasswords((current) => ({ ...current, [row.id]: password }));
+    }
+
+    togglePassword(row.id);
+  };
+
+  const getRowPassword = (row: AdminCredentialRow) => revealedPasswords[row.id] ?? null;
+
   const buildWhatsAppMessage = (row: AdminCredentialRow) => {
-    if (!row.password) return "";
+    const password = getRowPassword(row);
+    if (!password) return "";
     const programLevel = getProgramBySlug(row.programSlug)?.level ?? "—";
     return buildApprovalWhatsAppMessage({
       studentName: row.name,
       email: row.email,
-      password: row.password,
+      password,
       courseName: row.course,
       module: row.module,
       level: programLevel,
@@ -248,10 +273,11 @@ export function AdminCredentialsPanel() {
       const loginUrl = (json.data?.loginUrl as string | undefined) ?? row.loginUrl;
 
       if (password) {
+        setRevealedPasswords((current) => ({ ...current, [row.id]: password }));
         setRows((current) =>
           current.map((item) =>
             item.id === row.id
-              ? { ...item, password, hasStoredPassword: true }
+              ? { ...item, hasStoredPassword: true }
               : item
           )
         );
@@ -402,6 +428,7 @@ export function AdminCredentialsPanel() {
               {!loading &&
                 filtered.map((row) => {
                   const visible = visiblePasswords.has(row.id);
+                  const password = getRowPassword(row);
                   return (
                     <tr
                       key={row.id}
@@ -479,15 +506,16 @@ export function AdminCredentialsPanel() {
                         </div>
                       </td>
                       <td className="px-3 py-2.5">
-                        {row.password ? (
+                        {row.hasStoredPassword ? (
                           <div className="flex items-center gap-1">
                             <span className="font-mono text-[11px]">
-                              {visible ? row.password : "••••••"}
+                              {visible ? password ?? "…" : "••••••"}
                             </span>
                             <button
                               type="button"
                               title={visible ? "Hide" : "Show"}
-                              onClick={() => togglePassword(row.id)}
+                              disabled={loadingId === row.id}
+                              onClick={() => void revealPassword(row)}
                               className="rounded p-1 hover:bg-surface text-muted"
                             >
                               {visible ? <EyeSlash size={12} /> : <Eye size={12} />}
@@ -495,8 +523,9 @@ export function AdminCredentialsPanel() {
                             <button
                               type="button"
                               title="Copy password"
-                              onClick={() => void copyText("Password", row.password!)}
-                              className="rounded p-1 hover:bg-surface text-muted"
+                              disabled={!password}
+                              onClick={() => void copyText("Password", password!)}
+                              className="rounded p-1 hover:bg-surface text-muted disabled:opacity-40"
                             >
                               <Copy size={12} />
                             </button>
@@ -525,11 +554,11 @@ export function AdminCredentialsPanel() {
                           <button
                             type="button"
                             title="Copy full login details"
-                            disabled={!row.password}
+                            disabled={!password}
                             onClick={() =>
                               void copyText(
                                 "Login details",
-                                `Login ID: ${row.email}\nPassword: ${row.password}\nPortal: ${row.loginUrl}`
+                                `Login ID: ${row.email}\nPassword: ${password}\nPortal: ${row.loginUrl}`
                               )
                             }
                             className="rounded border border-border p-1.5 hover:bg-surface disabled:opacity-40"
@@ -541,7 +570,7 @@ export function AdminCredentialsPanel() {
                               <button
                                 type="button"
                                 title="Send login on WhatsApp"
-                                disabled={!row.password || loadingId === row.id}
+                                disabled={!row.hasStoredPassword || loadingId === row.id}
                                 onClick={() => void handleResendWhatsApp(row)}
                                 className="rounded border border-[#25D366]/40 bg-[#25D366]/10 p-1.5 text-[#128C7E] hover:bg-[#25D366]/20 disabled:opacity-40"
                               >
@@ -561,7 +590,7 @@ export function AdminCredentialsPanel() {
                           <button
                             type="button"
                             title="Copy WhatsApp message"
-                            disabled={!row.password}
+                            disabled={!password}
                             onClick={() => void copyText("WhatsApp message", buildWhatsAppMessage(row))}
                             className="rounded border border-border p-1.5 hover:bg-surface disabled:opacity-40"
                           >

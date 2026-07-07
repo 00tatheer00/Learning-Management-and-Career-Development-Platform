@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import { decryptPortalPassword } from "@/lib/auth/portal-password-vault";
 import { getProgramBySlug } from "@/lib/data/programs";
 import { getPortalLoginUrl } from "@/lib/site-url";
 import { DEFAULT_BATCH_NAME } from "@/lib/constants/batch";
@@ -16,7 +15,7 @@ export interface AdminStudentProfileEnrollment {
   reviewedAt: string | null;
   reviewerName: string | null;
   adminNotes: string | null;
-  paymentScreenshot: string | null;
+  hasPaymentScreenshot: boolean;
   applicationNumber: number;
 }
 
@@ -74,6 +73,7 @@ function mapEnrollment(
     reviewedBy: string | null;
     adminNotes: string | null;
     paymentScreenshot: string | null;
+    paymentScreenshotPublicId: string | null;
   },
   reviewerNameById: Map<string, string>,
   applicationNumber: number
@@ -91,7 +91,7 @@ function mapEnrollment(
       ? reviewerNameById.get(record.reviewedBy) ?? "Admin"
       : null,
     adminNotes: record.adminNotes ?? null,
-    paymentScreenshot: record.paymentScreenshot ?? null,
+    hasPaymentScreenshot: Boolean(record.paymentScreenshot || record.paymentScreenshotPublicId),
     applicationNumber,
   };
 }
@@ -136,10 +136,6 @@ async function buildProfileForEmail(email: string): Promise<AdminStudentProfile 
     enrollments.find((e) => e.status === "approved" && e.program === student?.programSlug) ??
     enrollments.find((e) => e.status === "approved") ??
     latestEnrollment;
-
-  const password = approvedEnrollment
-    ? decryptPortalPassword(approvedEnrollment.portalPasswordEnc)
-    : null;
 
   let trainer: AdminStudentProfile["trainer"] = null;
   if (student?.trainerId) {
@@ -192,8 +188,8 @@ async function buildProfileForEmail(email: string): Promise<AdminStudentProfile 
     lastLoginAt: student?.lastLoginAt?.toISOString() ?? null,
     joinedAt: student?.createdAt.toISOString() ?? null,
     loginUrl: getPortalLoginUrl(),
-    password,
-    hasStoredPassword: Boolean(password),
+    password: null,
+    hasStoredPassword: Boolean(approvedEnrollment?.portalPasswordEnc),
     trainer,
     enrollments: enrollments.map((e) =>
       mapEnrollment(e, reviewerNameById, applicationNumberById.get(e.id) ?? 1)

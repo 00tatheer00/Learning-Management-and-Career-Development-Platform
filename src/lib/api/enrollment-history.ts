@@ -10,7 +10,7 @@ export interface ApplicantApplicationSummary {
   level: string;
   status: EnrollmentStatus;
   appliedAt: string;
-  paymentScreenshot?: string;
+  hasPaymentScreenshot?: boolean;
 }
 
 export type DuplicateMatchField = "email" | "cnic" | "both" | null;
@@ -162,6 +162,7 @@ export function enrichRowsWithApplicationMeta<
     program: string;
     level: string;
     paymentScreenshot?: string;
+    hasPaymentScreenshot?: boolean;
   },
 >(rows: T[]) {
   return rows.map((row) => {
@@ -180,7 +181,9 @@ export function enrichRowsWithApplicationMeta<
         level: item.level,
         status: item.status,
         appliedAt: item.createdAt,
-        paymentScreenshot: item.paymentScreenshot,
+        hasPaymentScreenshot: Boolean(
+          item.hasPaymentScreenshot || item.paymentScreenshot?.startsWith("http")
+        ),
       }))
       .sort((a, b) => new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime());
 

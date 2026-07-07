@@ -12,6 +12,7 @@ import {
   updateStudentLoginDetails,
 } from "@/lib/api/admin-credentials";
 import { generateMissingPortalPasswords } from "@/lib/api/admin-credentials-bulk";
+import { revealStudentPortalPassword } from "@/lib/api/admin-portal-password";
 
 export async function GET() {
   const user = await getAdminUser();
@@ -87,6 +88,10 @@ const postSchema = z.discriminatedUnion("action", [
     action: z.literal("generateMissing"),
   }),
   z.object({
+    action: z.literal("revealPassword"),
+    studentId: z.string(),
+  }),
+  z.object({
     action: z.literal("bulkResendLogin"),
     studentIds: z.array(z.string()).optional(),
     neverLoggedInOnly: z.boolean().optional(),
@@ -94,8 +99,8 @@ const postSchema = z.discriminatedUnion("action", [
 ]);
 
 export async function POST(request: Request) {
-  const user = await requireAdminWrite();
-  if (isNextResponse(user)) return user;
+  const user = await getAdminUser();
+  if (!user) return unauthorizedAdminResponse();
 
   const body = await request.json();
   const parsed = postSchema.safeParse(body);
@@ -104,6 +109,24 @@ export async function POST(request: Request) {
       status: 400,
     });
   }
+
+  if (parsed.data.action === "revealPassword") {
+    const result = await revealStudentPortalPassword(parsed.data.studentId);
+    if (!result.password) {
+      return NextResponse.json(createApiResponse(false, { error: result.error ?? "Password not available" }), {
+        status: result.error === "Student not found" ? 404 : 400,
+      });
+    }
+
+    return NextResponse.json(
+      createApiResponse(true, {
+        data: { password: result.password },
+      })
+    );
+  }
+
+  const writeUser = await requireAdminWrite();
+  if (isNextResponse(writeUser)) return writeUser;
 
   if (parsed.data.action === "bulkResendLogin") {
     return NextResponse.json(

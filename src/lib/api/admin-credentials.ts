@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import { decryptPortalPassword } from "@/lib/auth/portal-password-vault";
 import { getUserByEmail, updateUser } from "@/lib/auth/users";
 import { getProgramBySlug } from "@/lib/data/programs";
 import { getPortalLoginUrl } from "@/lib/site-url";
@@ -51,7 +50,6 @@ export async function getAdminCredentialRows(): Promise<AdminCredentialRow[]> {
       approved.find((entry) => entry.program === student.programSlug) ?? approved[0];
     const programSlug = student.programSlug ?? enrollment?.program ?? "";
     const course = getProgramBySlug(programSlug)?.title ?? (programSlug || "—");
-    const password = decryptPortalPassword(enrollment?.portalPasswordEnc);
 
     return {
       id: student.id,
@@ -62,8 +60,8 @@ export async function getAdminCredentialRows(): Promise<AdminCredentialRow[]> {
       programSlug,
       module: student.level ?? enrollment?.level ?? "—",
       batch: student.batch ?? enrollment?.batch ?? "—",
-      password,
-      hasStoredPassword: Boolean(password),
+      password: null,
+      hasStoredPassword: Boolean(enrollment?.portalPasswordEnc),
       hasLoggedIn: Boolean(student.firstLoginAt),
       firstLoginAt: student.firstLoginAt?.toISOString() ?? null,
       lastLoginAt: student.lastLoginAt?.toISOString() ?? null,

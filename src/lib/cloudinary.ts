@@ -54,6 +54,8 @@ async function uploadEnrollmentImage(
     folder,
     public_id: publicId,
     resource_type: "image",
+    type: "authenticated",
+    access_mode: "authenticated",
     overwrite: true,
     invalidate: true,
     transformation: [{ width: 800, height: 800, crop: "limit" }],
@@ -63,6 +65,20 @@ async function uploadEnrollmentImage(
     url: result.secure_url,
     publicId: result.public_id,
   };
+}
+
+export function getSignedCloudinaryUrl(
+  publicId: string,
+  options?: { expiresInSeconds?: number }
+): string {
+  ensureCloudinary();
+  const expiresAt = Math.floor(Date.now() / 1000) + (options?.expiresInSeconds ?? 900);
+  return cloudinary.url(publicId, {
+    type: "authenticated",
+    sign_url: true,
+    secure: true,
+    expires_at: expiresAt,
+  });
 }
 
 export function getScreenshotUrl(paymentScreenshot?: string | null): string | null {

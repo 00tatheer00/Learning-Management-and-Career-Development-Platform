@@ -27,6 +27,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAdminPermissions } from "@/components/admin/admin-permissions";
 import type { AdminStudentProfile } from "@/lib/api/admin-student-profile";
+import { paymentScreenshotHref, revealStudentPassword } from "@/lib/api/admin-client";
 import { cn, formatAppliedDateTime } from "@/lib/utils";
 import { toast } from "@/lib/ui/toast";
 
@@ -204,7 +205,13 @@ function AdminStudentProfileDrawer() {
   const { open, loading, profile, closeProfile, refreshProfile } = useAdminStudentProfile();
   const { canWrite } = useAdminPermissions();
   const [showPassword, setShowPassword] = useState(false);
+  const [revealedPassword, setRevealedPassword] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  useEffect(() => {
+    setShowPassword(false);
+    setRevealedPassword(null);
+  }, [profile?.studentId]);
 
   if (!open) return null;
 
@@ -223,6 +230,13 @@ function AdminStudentProfileDrawer() {
       const json = await res.json();
       if (json.success) {
         toast.success(json.message ?? `${label} done.`);
+        if (action === "resetPassword") {
+          const password = json.data?.password as string | undefined;
+          if (password) {
+            setRevealedPassword(password);
+            setShowPassword(true);
+          }
+        }
         await refreshProfile();
       } else {
         toast.error(json.message ?? json.error ?? `${label} failed`);
@@ -232,6 +246,28 @@ function AdminStudentProfileDrawer() {
     } finally {
       setActionLoading(null);
     }
+  };
+
+  const toggleRevealPassword = async () => {
+    if (showPassword) {
+      setShowPassword(false);
+      return;
+    }
+
+    if (!profile?.studentId) return;
+
+    if (!revealedPassword) {
+      setActionLoading("password");
+      const password = await revealStudentPassword(profile.studentId);
+      setActionLoading(null);
+      if (!password) {
+        toast.error("Could not load password");
+        return;
+      }
+      setRevealedPassword(password);
+    }
+
+    setShowPassword(true);
   };
 
   const resendWhatsApp = async () => {
@@ -383,7 +419,7 @@ function AdminStudentProfileDrawer() {
                           <p className="font-mono text-sm text-pt truncate">
                             {profile.hasStoredPassword
                               ? showPassword
-                                ? profile.password
+                                ? revealedPassword ?? "…"
                                 : "••••••••"
                               : "Not saved"}
                           </p>
@@ -393,7 +429,8 @@ function AdminStudentProfileDrawer() {
                             <>
                               <button
                                 type="button"
-                                onClick={() => setShowPassword((v) => !v)}
+                                onClick={() => void toggleRevealPassword()}
+                                disabled={actionLoading === "password"}
                                 className="rounded-lg p-2 hover:bg-pt-muted text-pt-muted"
                                 aria-label={showPassword ? "Hide password" : "Show password"}
                               >
@@ -401,8 +438,9 @@ function AdminStudentProfileDrawer() {
                               </button>
                               <button
                                 type="button"
-                                onClick={() => void copyText("Password", profile.password ?? "")}
-                                className="rounded-lg p-2 hover:bg-pt-muted text-pt-muted"
+                                disabled={!revealedPassword}
+                                onClick={() => void copyText("Password", revealedPassword ?? "")}
+                                className="rounded-lg p-2 hover:bg-pt-muted text-pt-muted disabled:opacity-40"
                                 aria-label="Copy password"
                               >
                                 <Copy size={16} />
@@ -487,9 +525,9 @@ function AdminStudentProfileDrawer() {
                           {enrollment.adminNotes}
                         </p>
                       )}
-                      {enrollment.paymentScreenshot?.startsWith("http") && (
+                      {enrollment.hasPaymentScreenshot && (
                         <a
-                          href={enrollment.paymentScreenshot}
+                          href={paymentScreenshotHref(enrollment.id)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1 text-xs font-semibold text-primary mt-2 hover:underline"

@@ -30,6 +30,7 @@ import { Alert } from "@/components/ui/alert";
 import { useAdminPermissions } from "@/components/admin/admin-permissions";
 import { OpenStudentProfileButton, AdminStudentProfileButton } from "@/components/admin/admin-student-profile-drawer";
 import type { AdminEnrollmentRow } from "@/lib/api/admin-enrollments";
+import { paymentScreenshotHref } from "@/lib/api/admin-client";
 
 type StatusFilter = "all" | "pending" | "approved" | "rejected";
 type QuickFilter = "all" | "today" | "returning" | "duplicates" | "whatsapp-failed" | "no-payment";
@@ -43,10 +44,6 @@ function isCreatedToday(iso: string): boolean {
     date.getMonth() === now.getMonth() &&
     date.getDate() === now.getDate()
   );
-}
-
-function hasPaymentScreenshot(url?: string | null): boolean {
-  return Boolean(url?.startsWith("http"));
 }
 
 export function AdminEnrollmentsPanel() {
@@ -132,7 +129,7 @@ export function AdminEnrollmentsPanel() {
       ) {
         return false;
       }
-      if (quickFilter === "no-payment" && hasPaymentScreenshot(enrollment.paymentScreenshot)) {
+      if (quickFilter === "no-payment" && enrollment.hasPaymentScreenshot) {
         return false;
       }
       if (!query) return true;
@@ -466,8 +463,8 @@ export function AdminEnrollmentsPanel() {
           <p className="py-10 text-center text-muted">No registrations match your filters.</p>
         ) : (
           filtered.map((enrollment) => {
-            const screenshotUrl = enrollment.paymentScreenshot?.startsWith("http")
-              ? enrollment.paymentScreenshot
+            const screenshotUrl = enrollment.hasPaymentScreenshot
+              ? paymentScreenshotHref(enrollment.id)
               : null;
             const isPending = enrollment.status === "pending";
 
@@ -626,9 +623,9 @@ export function AdminEnrollmentsPanel() {
                                   <span className="text-xs text-muted">
                                     {formatAppliedDateTime(prev.appliedAt)}
                                   </span>
-                                  {prev.paymentScreenshot?.startsWith("http") && (
+                                  {prev.hasPaymentScreenshot && (
                                     <a
-                                      href={prev.paymentScreenshot}
+                                      href={paymentScreenshotHref(prev.id)}
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       className="text-xs font-semibold text-primary underline"
