@@ -27,22 +27,24 @@ export default function StudentPortalPage() {
         label="Student Portal"
         title="Your Learning Hub"
         description="Access courses, track progress, join live sessions, and connect with your learning community."
+        action={
+          <Button size="lg" asChild>
+            <Link href="/login">Student Login</Link>
+          </Button>
+        }
       />
 
-      <section className="section-padding pt-0">
+      <section className="section-padding pt-0 -mt-4">
         <div className="container-custom max-w-4xl">
-          <div className="rounded-2xl border border-border bg-background p-8 lg:p-12 text-center mb-12 shadow-sm">
-            <div className="flex justify-center mb-6">
-              <SiteLogo variant="login" href={null} />
+          <div className="rounded-2xl border border-border bg-background p-6 lg:p-8 text-center mb-12 shadow-sm">
+            <div className="flex justify-center mb-4">
+              <SiteLogo variant="login" href={null} className="!h-14 sm:!h-16" />
             </div>
-            <h2 className="text-2xl font-bold mb-4">Sign In to Continue</h2>
-            <p className="text-muted mb-6 max-w-lg mx-auto">
+            <h2 className="text-xl font-bold mb-2">Sign In to Continue</h2>
+            <p className="text-muted max-w-lg mx-auto text-sm sm:text-base">
               Enrolled students can access the full portal with their credentials.
               New students will receive login details after enrollment confirmation.
             </p>
-            <Button size="lg" asChild>
-              <Link href="/login">Student Login</Link>
-            </Button>
           </div>
 
           <StudentPortalFeatures />

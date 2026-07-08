@@ -23,7 +23,7 @@ export function ModuleStartsSoonNotice({
       )}
     >
       <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#c9a84c]/10 text-[#c9a84c] border border-[#c9a84c]/25">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/25">
           <CalendarBlank size={22} weight="duotone" />
         </span>
         <div>

@@ -18,9 +18,9 @@ type Reminder = {
 };
 
 function ReminderIcon({ type }: { type: Reminder["icon"] }) {
-  if (type === "calendar") return <CalendarBlank size={16} weight="duotone" className="text-[#c9a84c]" />;
-  if (type === "chat") return <ChatsCircle size={16} weight="duotone" className="text-[#c9a84c]" />;
-  return <Bell size={16} weight="duotone" className="text-[#c9a84c]" />;
+  if (type === "calendar") return <CalendarBlank size={16} weight="duotone" className="text-primary" />;
+  if (type === "chat") return <ChatsCircle size={16} weight="duotone" className="text-primary" />;
+  return <Bell size={16} weight="duotone" className="text-primary" />;
 }
 
 export function StudentDashboardRail({
@@ -70,18 +70,18 @@ export function StudentDashboardRail({
           avatarUrl={avatarUrl}
           avatarInitials={avatarInitials}
           size="lg"
-          className="mx-auto ring-2 ring-[#c9a84c]/30"
+          className="mx-auto ring-2 ring-primary/30"
         />
         <p className="mt-3 font-semibold text-pt">{name}</p>
         <p className="text-xs text-pt-muted mt-0.5">Student · {category?.shortLabel ?? "Course"}</p>
         {moduleName && (
-          <p className="text-[10px] font-medium uppercase tracking-wider text-[#c9a84c]/80 mt-1">
+          <p className="text-[10px] font-medium uppercase tracking-wider text-primary/80 mt-1">
             {moduleName}
           </p>
         )}
         <Link
           href="/student/profile"
-          className="mt-4 inline-flex items-center justify-center gap-1.5 w-full rounded-xl border border-[#c9a84c]/25 bg-[#c9a84c]/10 py-2 text-xs font-semibold text-[#dbb85a] hover:bg-[#c9a84c]/18 transition-colors"
+          className="mt-4 inline-flex items-center justify-center gap-1.5 w-full rounded-xl border border-primary/25 bg-primary/10 py-2 text-xs font-semibold text-primary hover:bg-primary/18 transition-colors"
         >
           <UserCircle size={16} weight="duotone" />
           Profile
@@ -105,8 +105,8 @@ export function StudentDashboardRail({
                 className={cn(
                   "aspect-square flex items-center justify-center rounded-lg text-[11px] font-medium",
                   day == null && "invisible",
-                  isToday && "bg-[#c9a84c] text-[#0a0a0b]",
-                  !isToday && hasClass && "bg-[#c9a84c]/20 text-[#dbb85a] border border-[#c9a84c]/30",
+                  isToday && "bg-primary text-primary-foreground",
+                  !isToday && hasClass && "bg-primary/20 text-primary border border-primary/30",
                   !isToday && !hasClass && day != null && "text-pt-muted"
                 )}
               >
@@ -129,7 +129,7 @@ export function StudentDashboardRail({
                   href={item.href}
                   className="flex items-start gap-2.5 rounded-xl p-2 -mx-2 hover:bg-white/[0.04] transition-colors"
                 >
-                  <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#c9a84c]/10 border border-[#c9a84c]/15">
+                  <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 border border-primary/15">
                     <ReminderIcon type={item.icon} />
                   </span>
                   <span className="min-w-0">

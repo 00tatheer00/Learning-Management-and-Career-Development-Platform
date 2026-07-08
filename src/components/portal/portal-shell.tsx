@@ -61,7 +61,7 @@ interface PortalShellProps {
 }
 
 export function PortalShell({ user, children }: PortalShellProps) {
-  const defaultTheme = user.role === "student" ? "dark" : "light";
+  const defaultTheme: "light" | "dark" = user.role === "student" ? "light" : "light";
   return (
     <PortalThemeProvider defaultTheme={defaultTheme}>
       <PortalShellInner user={user}>{children}</PortalShellInner>
@@ -129,7 +129,7 @@ function PortalShellInner({ user, children }: PortalShellProps) {
       <aside
         className={cn(
           "hidden lg:flex flex-col fixed inset-y-0 left-0 z-40 bg-pt-surface border-r border-pt transition-[width] duration-300 ease-in-out",
-          isStudent && "student-sidebar border-pt-subtle",
+          isStudent && "student-sidebar",
           sidebarCollapsed ? "w-[4.5rem]" : "w-[17rem]"
         )}
       >
@@ -204,7 +204,7 @@ function PortalShellInner({ user, children }: PortalShellProps) {
               variant="ghost"
               size="sm"
               asChild
-              className={cn("h-8 text-xs px-2 sm:px-3", isStudent && "text-pt-muted hover:text-[#c9a84c]")}
+              className={cn("h-8 text-xs px-2 sm:px-3", isStudent && "text-pt-muted hover:text-primary")}
             >
               <Link href="/" title="Back to website">
                 <House size={15} weight="duotone" />
@@ -274,11 +274,12 @@ function SidebarContent({
       : "Student Portal";
 
   return (
-    <div className="relative flex flex-col h-full overflow-hidden bg-pt-surface">
+    <div className={cn("relative flex flex-col h-full overflow-hidden bg-pt-surface", isStudent && "student-sidebar-inner")}>
       {/* Logo + collapse */}
       <div
         className={cn(
           "shrink-0 border-b border-pt-subtle",
+          isStudent && "student-sidebar-header",
           collapsed ? "px-2 py-3" : "px-4 py-4"
         )}
       >
@@ -330,7 +331,7 @@ function SidebarContent({
         {!collapsed && (
           <div className={cn(
             "mt-3 flex items-center gap-2.5 rounded-xl border px-2.5 py-2",
-            isStudent ? "border-pt-subtle bg-pt-muted/60" : "border-pt-subtle bg-pt-muted"
+            isStudent ? "student-sidebar-profile" : "border-pt-subtle bg-pt-muted"
           )}>
             <PortalAvatar
               name={user.name}
@@ -345,7 +346,7 @@ function SidebarContent({
                 <ProgramCategoryBadge programSlug={user.programSlug} className="mt-0.5" />
               )}
               {isStudent && user.programSlug && (
-                <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wider text-[#c9a84c]/80 truncate">
+                <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary truncate">
                   {getProgramCategory(user.programSlug)?.shortLabel ?? "Student"}
                 </p>
               )}
@@ -398,7 +399,9 @@ function SidebarContent({
                       pressable,
                       "relative flex items-center rounded-lg text-sm font-medium",
                       collapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5",
-                      active ? "portal-nav-link-active" : "portal-nav-link hover:bg-pt-muted"
+                      active
+                        ? "portal-nav-link-active"
+                        : cn("portal-nav-link", !isStudent && "hover:bg-pt-muted")
                     )}
                   >
                     <Icon

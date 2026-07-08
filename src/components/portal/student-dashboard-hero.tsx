@@ -69,7 +69,7 @@ export function StudentDashboardHero({
                 : `${schedule.headline} · ${schedule.daysLabel}`}
             </p>
             {moduleName && (
-              <p className="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-[#dbb85a]">
+              <p className="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-primary">
                 <GraduationCap size={14} weight="duotone" />
                 {programTitle} · {moduleName}
               </p>
@@ -81,7 +81,7 @@ export function StudentDashboardHero({
               <Button
                 size="lg"
                 asChild
-                className="student-cta-glow rounded-xl bg-[#c9a84c] text-[#0a0a0b] hover:bg-[#dbb85a] border-0 font-semibold"
+                className="student-cta-glow rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 border-0 font-semibold"
               >
                 <Link href="/student/classes">
                   <VideoCamera size={18} weight="duotone" />
@@ -104,7 +104,7 @@ export function StudentDashboardHero({
               size="lg"
               variant="ghost"
               asChild
-              className="rounded-xl text-zinc-300 hover:text-[#dbb85a] hover:bg-white/6"
+              className="rounded-xl text-zinc-300 hover:text-primary hover:bg-white/6"
             >
               <Link href="/student/course">
                 <BookOpen size={18} weight="duotone" />
@@ -116,9 +116,9 @@ export function StudentDashboardHero({
 
         <div className="hidden sm:flex shrink-0 items-center justify-center">
           <div className="student-welcome-orb relative flex h-28 w-28 lg:h-32 lg:w-32 items-center justify-center rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur-md">
-            <Sparkle size={48} weight="duotone" className="text-[#c9a84c]/80" />
-            <div className="absolute -right-2 -top-2 h-10 w-10 rounded-2xl bg-[#c9a84c]/20 border border-[#c9a84c]/30 flex items-center justify-center">
-              <BookOpen size={20} weight="duotone" className="text-[#dbb85a]" />
+            <Sparkle size={48} weight="duotone" className="text-primary/80" />
+            <div className="absolute -right-2 -top-2 h-10 w-10 rounded-2xl bg-primary/20 border border-primary/30 flex items-center justify-center">
+              <BookOpen size={20} weight="duotone" className="text-primary" />
             </div>
           </div>
         </div>

@@ -26,7 +26,7 @@ export function StudentUpcomingLessonsTable({
         </div>
         <Link
           href="/student/classes"
-          className="text-xs font-semibold text-[#c9a84c] hover:text-[#dbb85a] transition-colors"
+          className="text-xs font-semibold text-primary hover:text-primary/80 transition-colors"
         >
           View all
         </Link>
@@ -64,7 +64,7 @@ export function StudentUpcomingLessonsTable({
                   </td>
                   <td className="px-3 py-3.5 text-pt-muted whitespace-nowrap">
                     <span className="flex items-center gap-1.5">
-                      <CalendarBlank size={14} className="text-[#c9a84c]/70 shrink-0" />
+                      <CalendarBlank size={14} className="text-primary/70 shrink-0" />
                       {session.date}
                     </span>
                     <span className="flex items-center gap-1.5 text-xs mt-0.5">
@@ -76,7 +76,7 @@ export function StudentUpcomingLessonsTable({
                     {canJoinLive ? (
                       <Link
                         href="/student/classes"
-                        className="inline-flex items-center rounded-full bg-[#c9a84c]/15 border border-[#c9a84c]/25 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#dbb85a] hover:bg-[#c9a84c]/25 transition-colors"
+                        className="inline-flex items-center rounded-full bg-primary/15 border border-primary/25 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-primary hover:bg-primary/25 transition-colors"
                       >
                         Open
                       </Link>

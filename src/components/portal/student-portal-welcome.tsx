@@ -131,7 +131,7 @@ function StudentWhatsAppGroupPrompt({ onClose }: { onClose: () => void }) {
   return (
     <Modal open={open} onClose={handleLater} title={STUDENT_UR.whatsappModal.title}>
       <div className="text-center">
-        <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-[#c9a84c]/15 text-[#c9a84c] mb-4 border border-[#c9a84c]/30">
+        <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary/15 text-primary mb-4 border border-primary/30">
           <WhatsappLogo size={36} weight="fill" />
         </div>
 
@@ -142,7 +142,7 @@ function StudentWhatsAppGroupPrompt({ onClose }: { onClose: () => void }) {
         <ul className="space-y-2.5 text-left mb-6">
           {STUDENT_UR.whatsappModal.bullets.map((item) => (
             <li key={item} className="flex items-start gap-2.5 text-sm">
-              <CheckCircle size={18} weight="fill" className="text-[#c9a84c] shrink-0 mt-0.5" />
+              <CheckCircle size={18} weight="fill" className="text-primary shrink-0 mt-0.5" />
               {item}
             </li>
           ))}
@@ -151,7 +151,7 @@ function StudentWhatsAppGroupPrompt({ onClose }: { onClose: () => void }) {
         <div className="flex flex-col gap-3">
           <Button
             size="lg"
-            className="w-full h-12 text-base bg-[#c9a84c] hover:bg-[#dbb85a] text-[#0a0a0b] font-semibold"
+            className="w-full h-12 text-base bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
             onClick={handleJoin}
           >
             <WhatsappLogo size={20} weight="fill" />

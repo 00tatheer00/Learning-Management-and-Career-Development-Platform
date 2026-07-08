@@ -18,7 +18,7 @@ export function StudentDailySpark({ name }: { name: string }) {
     <StudentReveal delay={0.08} y={12}>
       <div className="student-spark-strip relative overflow-hidden rounded-2xl border border-pt px-4 py-3.5 sm:px-5">
         <div className="relative z-10 flex items-start gap-3">
-          <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#c9a84c]/15 text-[#8a6d28]">
+          <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-[[#1873cc]]">
             <Sparkle size={18} weight="fill" className="student-sparkle" />
           </span>
           <div className="min-w-0">

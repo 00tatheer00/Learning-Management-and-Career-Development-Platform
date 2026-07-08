@@ -97,7 +97,7 @@ export default async function StudentDashboardPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <p className="text-xs font-medium uppercase tracking-[0.14em] text-pt-faint">Dashboard</p>
         <p className="student-dashboard-date flex items-center gap-2 text-sm text-pt-muted">
-          <CalendarBlank size={16} weight="duotone" className="text-[#c9a84c]/80" />
+          <CalendarBlank size={16} weight="duotone" className="text-primary/80" />
           {formatDashboardDate()}
         </p>
       </div>
@@ -134,7 +134,7 @@ export default async function StudentDashboardPage() {
                 <p className="font-semibold text-pt">No upcoming class scheduled yet</p>
                 <p className="text-sm text-pt-muted mt-1">
                   Your trainer will add the next session. Check{" "}
-                  <Link href="/student/classes" className="text-[#c9a84c] font-medium hover:underline">
+                  <Link href="/student/classes" className="text-primary font-medium hover:underline">
                     Live Classes
                   </Link>{" "}
                   for updates.

@@ -29,14 +29,14 @@ export async function StudentAttendanceProgressCard({
 
   const barTone =
     percentage >= 80
-      ? "from-[#c9a84c] to-[#8a6d28]"
+      ? "from-primary to-[#1873cc]"
       : percentage >= 50
         ? "from-[#71717a] to-[#52525b]"
         : "from-rose-700 to-rose-900";
 
   return (
     <div className="rounded-2xl border border-pt overflow-hidden portal-card">
-      <div className="px-5 py-4 border-b border-pt bg-gradient-to-r from-[#141416] to-[#0a0a0b] text-white">
+      <div className="px-5 py-4 border-b border-pt bg-gradient-to-r from-[#1a4d8f] to-[#1e90ff] text-white">
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-widest text-white/75">
@@ -87,7 +87,7 @@ function StatPill({
   tone: "emerald" | "amber" | "rose";
 }) {
   const tones = {
-    emerald: "text-[#dbb85a] bg-[#c9a84c]/10 border-[#c9a84c]/25",
+    emerald: "text-primary bg-primary/10 border-primary/25",
     amber: "text-[#a1a1aa] bg-pt-muted border-pt",
     rose: "text-rose-300 bg-rose-950/30 border-rose-800/40",
   };
@@ -126,7 +126,7 @@ export async function StudentAttendancePageContent() {
   const percentage = stats.percentage;
   const barTone =
     percentage >= 80
-      ? "from-[#c9a84c] to-[#8a6d28]"
+      ? "from-primary to-[#1873cc]"
       : percentage >= 50
         ? "from-[#71717a] to-[#52525b]"
         : "from-rose-700 to-rose-900";
@@ -187,7 +187,7 @@ export async function StudentAttendancePageContent() {
                       className={cn(
                         "flex flex-wrap items-center justify-between gap-2 rounded-xl border px-3 py-2 text-sm",
                         session.status === "present" && "border-[#1f6b45]/20 bg-[#1f6b45]/5",
-                        session.status === "late" && "border-[#c9a84c]/30 bg-[#c9a84c]/8",
+                        session.status === "late" && "border-primary/30 bg-primary/8",
                         session.status === "absent" && "border-rose-300 bg-rose-50",
                         session.status === "upcoming" && "border-pt bg-surface/40"
                       )}
@@ -237,7 +237,7 @@ export async function StudentAttendancePageContent() {
                     "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold",
                     record.status === "present"
                       ? "bg-[#ecf8f1] text-[#1f6b45]"
-                      : "bg-[#fbf6e8] text-[#8a6d28]"
+                      : "bg-primary/10 text-[[#1873cc]]"
                   )}
                 >
                   {record.status === "present" ? (
@@ -272,7 +272,7 @@ function DayStatusBadge({
     late: {
       label: "Late",
       icon: <Clock size={compact ? 12 : 14} weight="fill" />,
-      className: "bg-[#fbf6e8] text-[#8a6d28]",
+      className: "bg-primary/10 text-[[#1873cc]]",
     },
     absent: {
       label: "Absent",

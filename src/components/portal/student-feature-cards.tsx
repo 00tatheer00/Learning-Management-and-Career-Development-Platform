@@ -61,11 +61,11 @@ export function StudentFeatureCards({
             )}
           >
             <div className="flex items-start justify-between gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.08] border border-white/10 text-[#dbb85a]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.08] border border-white/10 text-primary">
                 <Icon size={22} weight="duotone" />
               </div>
               {count != null && (
-                <span className="text-xs font-bold tabular-nums text-[#c9a84c] bg-[#c9a84c]/10 border border-[#c9a84c]/20 rounded-full px-2 py-0.5">
+                <span className="text-xs font-bold tabular-nums text-primary bg-primary/10 border border-primary/20 rounded-full px-2 py-0.5">
                   {count}
                 </span>
               )}

@@ -2,7 +2,7 @@ import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
 
 export type EnrollableProgramSlug = (typeof ENROLLABLE_PROGRAM_SLUGS)[number];
 
-export const PREMIUM_HEADER_GRADIENT_FALLBACK = "from-[#141416] to-[#0a0a0b]";
+export const PREMIUM_HEADER_GRADIENT_FALLBACK = "from-[#1a4d8f] to-[#1e90ff]";
 
 export const PROGRAM_CATEGORIES: Record<
   EnrollableProgramSlug,
@@ -22,8 +22,8 @@ export const PROGRAM_CATEGORIES: Record<
     shortLabel: "Web",
     sidebarLabel: "Web Development",
     primaryTrainerSeedId: "trainer-tatheer",
-    badgeClass: "bg-[#18181b] text-[#dbb85a] border-[#c9a84c]/25",
-    headerGradient: "from-[#141416] to-[#0a0a0b]",
+    badgeClass: "bg-primary/10 text-[#1873cc] border-primary/25",
+    headerGradient: "from-[#1a4d8f] to-[#1e90ff]",
   },
   "app-development": {
     slug: "app-development",
@@ -31,8 +31,8 @@ export const PROGRAM_CATEGORIES: Record<
     shortLabel: "App",
     sidebarLabel: "App Development",
     primaryTrainerSeedId: "trainer-talha",
-    badgeClass: "bg-[#18181b] text-[#dbb85a] border-[#c9a84c]/25",
-    headerGradient: "from-[#111114] to-[#0a0a0b]",
+    badgeClass: "bg-primary/10 text-[#1873cc] border-primary/25",
+    headerGradient: "from-[#1a4d8f] to-[#1e90ff]",
   },
 };
 

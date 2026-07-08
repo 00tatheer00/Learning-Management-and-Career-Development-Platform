@@ -1,16 +1,21 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 interface PageHeroProps {
   label?: string;
   title: string;
   description?: string;
+  action?: React.ReactNode;
 }
 
-export function PageHero({ label, title, description }: PageHeroProps) {
+export function PageHero({ label, title, description, action }: PageHeroProps) {
   return (
-    <section className="relative pt-32 pb-16 lg:pt-40 lg:pb-20 overflow-hidden">
+    <section className={cn(
+      "relative pt-32 pb-16 lg:pt-40 lg:pb-20 overflow-hidden",
+      action && "pb-10 lg:pb-14"
+    )}>
       <div className="absolute inset-0 grid-pattern" aria-hidden="true" />
       <div
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-primary/10 blur-[120px]"
@@ -35,6 +40,7 @@ export function PageHero({ label, title, description }: PageHeroProps) {
               {description}
             </p>
           )}
+          {action && <div className="mt-6 flex justify-center">{action}</div>}
         </motion.div>
       </div>
     </section>

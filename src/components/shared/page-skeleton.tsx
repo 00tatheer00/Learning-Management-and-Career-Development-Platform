@@ -65,35 +65,16 @@ export function PortalPageSkeleton() {
 
 export function FormPageSkeleton() {
   return (
-    <div className="login-page">
-      <div className="login-hero hidden lg:flex flex-1 p-10">
-        <div className="space-y-6 w-full">
-          <Skeleton className="h-12 w-40 rounded-lg bg-white/10" />
-          <div className="mt-auto space-y-3 max-w-md">
-            <Skeleton className="h-10 w-48 rounded-lg bg-white/10" />
-            <Skeleton className="h-6 w-64 rounded-lg bg-white/10" />
-            <Skeleton className="h-16 w-full rounded-lg bg-white/10" />
-          </div>
+    <div className="min-h-screen pt-24 pb-16 px-4 max-w-3xl mx-auto space-y-6">
+      <Skeleton className="h-8 w-48" />
+      <Skeleton className="h-4 w-full max-w-md" />
+      {Array.from({ length: 5 }).map((_, i) => (
+        <div key={i} className="space-y-2">
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-12 w-full rounded-lg" />
         </div>
-      </div>
-      <div className="login-panel flex-1">
-        <div className="login-card w-full max-w-md space-y-4">
-          <Skeleton className="h-8 w-40" />
-          <Skeleton className="h-4 w-56" />
-          <div className="grid grid-cols-3 gap-2">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton key={i} className="h-16 rounded-xl" />
-            ))}
-          </div>
-          {Array.from({ length: 2 }).map((_, i) => (
-            <div key={i} className="space-y-2">
-              <Skeleton className="h-4 w-20" />
-              <Skeleton className="h-12 w-full rounded-xl" />
-            </div>
-          ))}
-          <Skeleton className="h-12 w-full rounded-xl" />
-        </div>
-      </div>
+      ))}
+      <Skeleton className="h-14 w-full rounded-lg" />
     </div>
   );
 }
