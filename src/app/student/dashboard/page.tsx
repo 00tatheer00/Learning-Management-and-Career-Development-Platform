@@ -162,56 +162,56 @@ export default async function StudentDashboardPage() {
             title="Watch Lessons"
             description="Course videos & materials"
             icon={<BookOpen size={20} weight="duotone" />}
-            gradient="from-stone-700 to-stone-800"
+            gradient="from-[#1a365d] to-[#122847]"
           />
           <QuickActionCard
             href="/student/assignments"
             title="Submit Homework"
             description="View & submit assignments"
             icon={<ClipboardText size={20} weight="duotone" />}
-            gradient="from-stone-600 to-stone-700"
+            gradient="from-[#234876] to-[#1a365d]"
           />
           <QuickActionCard
             href="/student/classes"
             title="Live Classes"
             description="Join scheduled sessions"
             icon={<VideoCamera size={20} weight="duotone" />}
-            gradient="from-[#5a6b62] to-[#3d4a44]"
+            gradient="from-[#1f6b45] to-[#144d31]"
           />
           <QuickActionCard
             href="/student/recordings"
             title="Class Recordings"
             description="Rewatch past classes"
             icon={<FilmStrip size={20} weight="duotone" />}
-            gradient="from-[#8a6b55] to-[#6b513f]"
+            gradient="from-[#8a6d28] to-[#6b5420]"
           />
           <QuickActionCard
             href="/student/trainer"
             title="My Trainer"
             description="Meet your instructor"
             icon={<ChalkboardTeacher size={20} weight="duotone" />}
-            gradient="from-slate-700 to-slate-800"
+            gradient="from-[#1e3358] to-[#0e1830]"
           />
           <QuickActionCard
             href="/student/profile"
             title="My Profile"
             description="Account & module logins"
             icon={<GraduationCap size={20} weight="duotone" />}
-            gradient="from-zinc-700 to-zinc-800"
+            gradient="from-slate-700 to-slate-900"
           />
           <QuickActionCard
             href="/student/whatsapp"
             title="WhatsApp Group"
             description="Join the class chat"
             icon={<ChatsCircle size={20} weight="duotone" />}
-            gradient="from-[#4a6b58] to-[#365243]"
+            gradient="from-[#1f6b45] to-[#163f2c]"
           />
           <QuickActionCard
             href={HELP_CONFIG.whatsappUrl}
             title="Need Help?"
             description="Message support anytime"
             icon={<ChatsCircle size={20} weight="fill" />}
-            gradient="from-[#3d5c48] to-[#2d4638]"
+            gradient="from-[#234876] to-[#152f52]"
           />
         </div>
       </div>

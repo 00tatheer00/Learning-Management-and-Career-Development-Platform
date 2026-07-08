@@ -707,33 +707,33 @@ body {
   }
 }
 
-/* ── Student portal — premium (warm stone + muted copper, no neon) ── */
+/* ── Student portal — luxury academy (navy + pearl + champagne) ── */
 .portal-shell[data-portal-role="student"] {
-  --primary: #9a6b4f;
-  --primary-foreground: #fafaf9;
-  --primary-glow: rgba(154, 107, 79, 0.12);
-  --accent: #b08968;
-  --ring: #9a6b4f;
+  --primary: #1a365d;
+  --primary-foreground: #f8fafc;
+  --primary-glow: rgba(26, 54, 93, 0.12);
+  --accent: #c9a84c;
+  --ring: #1a365d;
 }
 
 .portal-shell[data-portal-role="student"][data-portal-theme="light"] {
-  --pt-bg: #f5f3f0;
-  --pt-surface: #fffcf9;
-  --pt-muted: #f0ebe5;
+  --pt-bg: #f4f6fb;
+  --pt-surface: #ffffff;
+  --pt-muted: #eef1f7;
   --pt-elevated: #ffffff;
-  --pt-border: rgba(68, 54, 42, 0.08);
-  --pt-border-subtle: rgba(68, 54, 42, 0.05);
-  --pt-text: #1c1917;
-  --pt-text-secondary: #44403c;
-  --pt-text-muted: #78716c;
-  --pt-text-faint: #a8a29e;
-  --pt-nav-hover: rgba(154, 107, 79, 0.06);
-  --pt-nav-active-bg: rgba(154, 107, 79, 0.1);
-  --pt-nav-active-text: #7c4f38;
-  --pt-header-bg: rgba(255, 252, 249, 0.86);
-  --pt-shadow: 0 1px 2px rgba(28, 25, 23, 0.03), 0 1px 1px rgba(28, 25, 23, 0.02);
-  --pt-shadow-md: 0 12px 40px -16px rgba(28, 25, 23, 0.14);
-  --pt-progress-track: #ebe6e0;
+  --pt-border: rgba(15, 23, 42, 0.07);
+  --pt-border-subtle: rgba(15, 23, 42, 0.04);
+  --pt-text: #0f172a;
+  --pt-text-secondary: #334155;
+  --pt-text-muted: #64748b;
+  --pt-text-faint: #94a3b8;
+  --pt-nav-hover: rgba(26, 54, 93, 0.05);
+  --pt-nav-active-bg: rgba(26, 54, 93, 0.09);
+  --pt-nav-active-text: #1a365d;
+  --pt-header-bg: rgba(255, 255, 255, 0.88);
+  --pt-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 1px rgba(15, 23, 42, 0.02);
+  --pt-shadow-md: 0 18px 48px -20px rgba(15, 23, 42, 0.18);
+  --pt-progress-track: #e2e8f0;
   --background: var(--pt-bg);
   --foreground: var(--pt-text);
   --card: var(--pt-surface);
@@ -744,48 +744,48 @@ body {
   --surface-muted: var(--pt-border-subtle);
   --muted-foreground: var(--pt-text-muted);
   background:
-    radial-gradient(ellipse 70% 45% at 8% -8%, rgba(154, 107, 79, 0.07), transparent 52%),
-    radial-gradient(ellipse 55% 40% at 96% 0%, rgba(68, 64, 60, 0.04), transparent 48%),
+    radial-gradient(ellipse 65% 42% at 6% -6%, rgba(26, 54, 93, 0.07), transparent 55%),
+    radial-gradient(ellipse 48% 36% at 98% 2%, rgba(201, 168, 76, 0.06), transparent 50%),
     var(--pt-bg);
 }
 
 .portal-shell[data-portal-role="student"][data-portal-theme="dark"] {
-  --primary: #c4a484;
-  --primary-foreground: #1c1917;
-  --primary-glow: rgba(196, 164, 132, 0.14);
-  --accent: #d4b896;
-  --ring: #c4a484;
-  --pt-bg: #0c0b0a;
-  --pt-surface: #141211;
-  --pt-muted: #1c1917;
-  --pt-elevated: #211e1b;
-  --pt-border: rgba(255, 255, 255, 0.07);
+  --primary: #c9a84c;
+  --primary-foreground: #0b1220;
+  --primary-glow: rgba(201, 168, 76, 0.14);
+  --accent: #e0c878;
+  --ring: #c9a84c;
+  --pt-bg: #070b14;
+  --pt-surface: #0f1524;
+  --pt-muted: #151c2e;
+  --pt-elevated: #1a2338;
+  --pt-border: rgba(255, 255, 255, 0.08);
   --pt-border-subtle: rgba(255, 255, 255, 0.04);
-  --pt-text: #f5f5f4;
-  --pt-text-secondary: #d6d3d1;
-  --pt-text-muted: #a8a29e;
-  --pt-text-faint: #78716c;
+  --pt-text: #f1f5f9;
+  --pt-text-secondary: #cbd5e1;
+  --pt-text-muted: #94a3b8;
+  --pt-text-faint: #64748b;
   --pt-nav-hover: rgba(255, 255, 255, 0.04);
-  --pt-nav-active-bg: rgba(196, 164, 132, 0.12);
-  --pt-nav-active-text: #e7d3b8;
-  --pt-header-bg: rgba(12, 11, 10, 0.88);
-  --pt-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-  --pt-shadow-md: 0 16px 48px -12px rgba(0, 0, 0, 0.55);
-  --pt-progress-track: rgba(255, 255, 255, 0.06);
+  --pt-nav-active-bg: rgba(201, 168, 76, 0.12);
+  --pt-nav-active-text: #e0c878;
+  --pt-header-bg: rgba(7, 11, 20, 0.9);
+  --pt-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+  --pt-shadow-md: 0 20px 56px -16px rgba(0, 0, 0, 0.55);
+  --pt-progress-track: rgba(255, 255, 255, 0.08);
   background:
-    radial-gradient(ellipse 60% 40% at 5% -5%, rgba(196, 164, 132, 0.07), transparent 50%),
-    radial-gradient(ellipse 45% 35% at 100% 0%, rgba(255, 255, 255, 0.02), transparent 45%),
+    radial-gradient(ellipse 55% 40% at 4% -4%, rgba(59, 91, 145, 0.16), transparent 52%),
+    radial-gradient(ellipse 40% 32% at 100% 0%, rgba(201, 168, 76, 0.06), transparent 48%),
     var(--pt-bg);
 }
 
 .portal-shell[data-portal-role="student"] .student-portal-content {
-  animation: student-fade-in 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: student-fade-in 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @keyframes student-fade-in {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
@@ -794,43 +794,44 @@ body {
 }
 
 .portal-shell[data-portal-role="student"] .portal-nav-link-active {
-  box-shadow: inset 2px 0 0 0 var(--pt-nav-active-text);
+  box-shadow: inset 2.5px 0 0 0 var(--pt-nav-active-text);
   font-weight: 600;
   letter-spacing: -0.01em;
 }
 
 .portal-shell[data-portal-role="student"] .portal-card {
-  border-radius: 1.125rem;
-  backdrop-filter: blur(8px);
+  border-radius: 1.25rem;
+  backdrop-filter: blur(10px);
   transition:
-    box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1),
     border-color 0.25s ease,
-    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .portal-shell[data-portal-role="student"] .portal-card:hover {
   box-shadow: var(--pt-shadow-md);
-  border-color: color-mix(in srgb, var(--primary) 22%, var(--pt-border));
+  border-color: color-mix(in srgb, var(--primary) 28%, var(--pt-border));
+  transform: translateY(-1px);
 }
 
 .student-hero-card {
   position: relative;
   overflow: hidden;
-  border-radius: 1.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow:
-    0 24px 64px -28px rgba(28, 25, 23, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  color: #fafaf9;
-  background: linear-gradient(145deg, #2a2420 0%, #1c1917 48%, #141211 100%);
+    0 28px 72px -30px rgba(11, 27, 51, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  color: #f8fafc;
+  background: linear-gradient(145deg, #1a365d 0%, #122847 42%, #0b1b33 100%);
 }
 
 .student-hero-card.student-hero-web {
-  background: linear-gradient(145deg, #3d322c 0%, #2a2420 42%, #1a1714 100%);
+  background: linear-gradient(145deg, #1e4068 0%, #152f52 40%, #0c1f3a 100%);
 }
 
 .student-hero-card.student-hero-app {
-  background: linear-gradient(145deg, #2a2c38 0%, #1e2030 45%, #16171f 100%);
+  background: linear-gradient(145deg, #1e3358 0%, #162642 42%, #0e1830 100%);
 }
 
 .student-hero-card::before {
@@ -838,8 +839,9 @@ body {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 50% 60% at 90% 10%, rgba(196, 164, 132, 0.18), transparent 55%),
-    radial-gradient(ellipse 40% 50% at 5% 90%, rgba(255, 255, 255, 0.04), transparent 50%);
+    radial-gradient(ellipse 55% 70% at 92% 8%, rgba(201, 168, 76, 0.22), transparent 58%),
+    radial-gradient(ellipse 45% 55% at 0% 100%, rgba(96, 145, 210, 0.18), transparent 55%),
+    radial-gradient(ellipse 30% 40% at 40% 0%, rgba(255, 255, 255, 0.06), transparent 50%);
   pointer-events: none;
 }
 
@@ -847,85 +849,87 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, transparent 40%);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, transparent 38%),
+    linear-gradient(115deg, transparent 60%, rgba(201, 168, 76, 0.08) 100%);
   pointer-events: none;
 }
 
 .student-badge-live {
-  background: rgba(110, 140, 120, 0.2);
-  border: 1px solid rgba(160, 190, 170, 0.35);
-  color: #c8ddd0;
+  background: rgba(110, 170, 140, 0.2);
+  border: 1px solid rgba(150, 210, 180, 0.35);
+  color: #c8ebd8;
 }
 
 .portal-shell[data-portal-theme="light"] .student-badge-live {
-  background: #eef4f0;
-  border-color: #c5d6cb;
-  color: #3d5c4a;
+  background: #ecf8f1;
+  border-color: #b7e0c8;
+  color: #1f6b45;
 }
 
 .student-badge-pending {
-  background: rgba(196, 164, 132, 0.15);
-  border: 1px solid rgba(196, 164, 132, 0.3);
-  color: #e7d3b8;
+  background: rgba(201, 168, 76, 0.16);
+  border: 1px solid rgba(201, 168, 76, 0.35);
+  color: #f0dfb0;
 }
 
 .portal-shell[data-portal-theme="light"] .student-badge-pending {
-  background: #f4ebe3;
-  border-color: #e0d0c0;
-  color: #6b4f3c;
+  background: #fbf6e8;
+  border-color: #ead9a8;
+  color: #8a6d28;
 }
 
 .portal-shell[data-portal-role="student"] .portal-tone-amber {
-  border-color: rgb(196 164 132 / 0.35);
-  background: linear-gradient(to bottom right, rgb(250 245 240 / 0.95), var(--pt-surface));
+  border-color: rgb(201 168 76 / 0.35);
+  background: linear-gradient(to bottom right, rgb(255 251 240 / 0.95), var(--pt-surface));
 }
 .portal-shell[data-portal-role="student"] .portal-tone-emerald {
-  border-color: rgb(160 190 170 / 0.45);
-  background: linear-gradient(to bottom right, rgb(246 250 247 / 0.95), var(--pt-surface));
+  border-color: rgb(110 170 140 / 0.35);
+  background: linear-gradient(to bottom right, rgb(243 251 247 / 0.95), var(--pt-surface));
 }
 .portal-shell[data-portal-role="student"] .portal-tone-indigo {
-  border-color: rgb(165 170 190 / 0.4);
-  background: linear-gradient(to bottom right, rgb(246 247 250 / 0.95), var(--pt-surface));
+  border-color: rgb(100 130 180 / 0.35);
+  background: linear-gradient(to bottom right, rgb(243 247 252 / 0.95), var(--pt-surface));
 }
 .portal-shell[data-portal-role="student"] .portal-tone-sky {
-  border-color: rgb(180 185 190 / 0.4);
-  background: linear-gradient(to bottom right, rgb(248 249 250 / 0.95), var(--pt-surface));
+  border-color: rgb(120 160 200 / 0.3);
+  background: linear-gradient(to bottom right, rgb(245 249 252 / 0.95), var(--pt-surface));
 }
 
 .portal-shell[data-portal-role="student"][data-portal-theme="dark"] .portal-tone-amber {
-  border-color: rgb(196 164 132 / 0.2);
-  background: linear-gradient(to bottom right, rgb(50 42 36 / 0.5), var(--pt-surface));
+  border-color: rgb(201 168 76 / 0.22);
+  background: linear-gradient(to bottom right, rgb(40 34 20 / 0.45), var(--pt-surface));
 }
 .portal-shell[data-portal-role="student"][data-portal-theme="dark"] .portal-tone-emerald {
-  border-color: rgb(110 140 120 / 0.25);
-  background: linear-gradient(to bottom right, rgb(30 40 35 / 0.45), var(--pt-surface));
+  border-color: rgb(110 170 140 / 0.22);
+  background: linear-gradient(to bottom right, rgb(20 36 30 / 0.45), var(--pt-surface));
 }
 .portal-shell[data-portal-role="student"][data-portal-theme="dark"] .portal-tone-indigo {
-  border-color: rgb(120 125 150 / 0.25);
-  background: linear-gradient(to bottom right, rgb(35 36 48 / 0.45), var(--pt-surface));
+  border-color: rgb(100 130 180 / 0.25);
+  background: linear-gradient(to bottom right, rgb(24 32 52 / 0.5), var(--pt-surface));
 }
 .portal-shell[data-portal-role="student"][data-portal-theme="dark"] .portal-tone-sky {
-  border-color: rgb(140 145 150 / 0.2);
-  background: linear-gradient(to bottom right, rgb(38 38 40 / 0.45), var(--pt-surface));
+  border-color: rgb(120 160 200 / 0.2);
+  background: linear-gradient(to bottom right, rgb(22 30 44 / 0.45), var(--pt-surface));
 }
 
 .portal-shell[data-portal-role="student"] .portal-stat-accent-orange {
-  background: rgb(250 247 243);
-  border-color: rgb(232 220 208);
+  background: rgb(255 251 240);
+  border-color: rgb(237 220 170);
 }
 .portal-shell[data-portal-role="student"] .portal-stat-accent-green {
-  background: rgb(246 249 247);
-  border-color: rgb(214 226 218);
+  background: rgb(243 251 247);
+  border-color: rgb(196 226 210);
 }
 .portal-shell[data-portal-role="student"] .portal-stat-accent-blue {
-  background: rgb(247 248 250);
-  border-color: rgb(220 224 230);
+  background: rgb(243 247 252);
+  border-color: rgb(198 214 235);
 }
 .portal-shell[data-portal-role="student"] .portal-stat-accent-slate {
-  background: rgb(250 250 249);
-  border-color: rgb(231 229 228);
+  background: rgb(248 250 252);
+  border-color: rgb(226 232 240);
 }
-.portal-shell[data-portal-role="student"] .portal-stat-text-orange { color: rgb(87 66 52); }
-.portal-shell[data-portal-role="student"] .portal-stat-text-green { color: rgb(61 92 74); }
-.portal-shell[data-portal-role="student"] .portal-stat-text-blue { color: rgb(55 65 81); }
-.portal-shell[data-portal-role="student"] .portal-stat-text-slate { color: rgb(41 37 36); }
+.portal-shell[data-portal-role="student"] .portal-stat-text-orange { color: rgb(138 109 40); }
+.portal-shell[data-portal-role="student"] .portal-stat-text-green { color: rgb(31 107 69); }
+.portal-shell[data-portal-role="student"] .portal-stat-text-blue { color: rgb(26 54 93); }
+.portal-shell[data-portal-role="student"] .portal-stat-text-slate { color: rgb(15 23 42); }

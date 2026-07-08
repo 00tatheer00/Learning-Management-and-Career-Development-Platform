@@ -89,10 +89,10 @@ export function StudentWelcomeCelebration({
           initial={{ scale: 0.85, opacity: 0, y: 24 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           transition={{ type: "spring", stiffness: 260, damping: 20 }}
-          className="relative w-full max-w-md overflow-hidden rounded-3xl border border-stone-200 bg-gradient-to-b from-white to-stone-50 shadow-2xl"
+          className="relative w-full max-w-md overflow-hidden rounded-3xl border border-blue-100 bg-gradient-to-b from-white to-slate-50 shadow-2xl"
         >
-          <div className="pointer-events-none absolute -left-8 -top-8 h-32 w-32 rounded-full bg-stone-300/20 blur-2xl" />
-          <div className="pointer-events-none absolute -bottom-10 -right-8 h-36 w-36 rounded-full bg-stone-400/15 blur-2xl" />
+          <div className="pointer-events-none absolute -left-8 -top-8 h-32 w-32 rounded-full bg-[#1a365d]/10 blur-2xl" />
+          <div className="pointer-events-none absolute -bottom-10 -right-8 h-36 w-36 rounded-full bg-[#c9a84c]/20 blur-2xl" />
 
           <div className="relative px-6 py-8 text-center sm:px-8 sm:py-10">
             <motion.div

@@ -115,14 +115,14 @@ export function StudentNextClassCard({
               className={cn(
                 "rounded-2xl px-5 py-4 text-center w-full sm:min-w-[168px]",
                 countdown.isSoon
-                  ? "bg-[#4a5c52] text-stone-50 shadow-lg shadow-stone-900/15"
+                  ? "bg-[#1f6b45] text-white shadow-lg shadow-[#1f6b45]/25"
                   : "bg-pt-muted border border-pt"
               )}
             >
               <p
                 className={cn(
                   "text-[10px] font-bold uppercase tracking-[0.14em]",
-                  countdown.isSoon ? "text-stone-200" : "text-pt-faint"
+                  countdown.isSoon ? "text-slate-200" : "text-pt-faint"
                 )}
               >
                 Starts in

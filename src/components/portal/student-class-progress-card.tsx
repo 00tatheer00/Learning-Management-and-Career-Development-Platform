@@ -67,7 +67,7 @@ export async function StudentClassProgressCard({ programSlug }: StudentClassProg
                 key={slot.classNumber}
                 className={cn(
                   "min-w-[120px] rounded-xl border px-3 py-2.5 text-center",
-                  isDone && "border-[#4a6b58]/25 bg-[#4a6b58]/5",
+                  isDone && "border-[#1f6b45]/25 bg-[#1f6b45]/5",
                   isToday && "border-primary/40 bg-primary/5 ring-1 ring-primary/20",
                   !isDone && !isToday && "border-pt bg-surface/50"
                 )}
@@ -79,7 +79,7 @@ export async function StudentClassProgressCard({ programSlug }: StudentClassProg
                   {isDone ? "Done" : isToday ? (slot.status === "live" ? "Live" : "Today") : "Soon"}
                 </p>
                 {isDone && hasRecording && (
-                  <PlayCircle size={14} className="mx-auto mt-1 text-[#4a5c52]" weight="fill" />
+                  <PlayCircle size={14} className="mx-auto mt-1 text-[#1f6b45]" weight="fill" />
                 )}
                 {isDone && !hasRecording && (
                   <Clock size={14} className="mx-auto mt-1 text-pt-muted" />
@@ -90,7 +90,7 @@ export async function StudentClassProgressCard({ programSlug }: StudentClassProg
         </div>
         {progress.completedCount > 0 && (
           <p className="mt-3 text-xs text-pt-muted flex items-center gap-1.5">
-            <CheckCircle size={14} className="text-[#4a5c52]" weight="fill" />
+            <CheckCircle size={14} className="text-[#1f6b45]" weight="fill" />
             {recordings.length} recording{recordings.length === 1 ? "" : "s"} available —{" "}
             <Link href="/student/recordings" className="text-primary font-semibold underline">
               watch now

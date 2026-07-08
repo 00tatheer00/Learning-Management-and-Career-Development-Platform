@@ -71,27 +71,27 @@ const accentStyles = {
   orange: {
     wrap: "portal-stat-accent-orange border",
     text: "portal-stat-text-orange",
-    icon: "bg-stone-600 text-stone-50",
+    icon: "bg-[#c9a84c] text-[#0b1b33]",
   },
   green: {
     wrap: "portal-stat-accent-green border",
     text: "portal-stat-text-green",
-    icon: "bg-[#5a6b62] text-stone-50",
+    icon: "bg-[#1f6b45] text-white",
   },
   blue: {
     wrap: "portal-stat-accent-blue border",
     text: "portal-stat-text-blue",
-    icon: "bg-slate-600 text-stone-50",
+    icon: "bg-[#1a365d] text-white",
   },
   sky: {
     wrap: "portal-stat-accent-sky border",
     text: "portal-stat-text-sky",
-    icon: "bg-stone-500 text-stone-50",
+    icon: "bg-[#3b5b91] text-white",
   },
   slate: {
     wrap: "portal-stat-accent-slate border",
     text: "portal-stat-text-slate",
-    icon: "bg-zinc-600 text-stone-50",
+    icon: "bg-slate-700 text-white",
   },
 };
 
@@ -177,7 +177,7 @@ export function QuickActionCard({
   description,
   href,
   icon,
-  gradient = "from-stone-700 to-stone-800",
+  gradient = "from-[#1a365d] to-[#0b1b33]",
   color,
   compact = false,
 }: QuickActionCardProps) {

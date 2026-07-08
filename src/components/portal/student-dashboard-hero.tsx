@@ -31,32 +31,32 @@ export function StudentDashboardHero({
   return (
     <section className={cn("student-hero-card mb-6 p-6 sm:p-8 lg:p-10", heroVariant)}>
       <div className="relative z-10 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-        <div className="min-w-0 space-y-4">
+        <div className="min-w-0 space-y-5">
           <div className="flex flex-wrap items-center gap-2">
             <ProgramCategoryBadge programSlug={programSlug} variant="onDark" />
             {canJoinLive ? (
-              <span className="student-badge-live rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em]">
+              <span className="student-badge-live rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em]">
                 Live classes active
               </span>
             ) : (
-              <span className="student-badge-pending rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em]">
+              <span className="student-badge-pending rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em]">
                 Module starts soon
               </span>
             )}
           </div>
           <div>
-            <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-stone-400">
+            <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-sky-200/70">
               Welcome back
             </p>
-            <h1 className="mt-1.5 text-3xl sm:text-4xl font-semibold tracking-tight text-stone-50">
+            <h1 className="mt-2 text-3xl sm:text-4xl lg:text-[2.75rem] font-semibold tracking-tight text-white leading-[1.1]">
               {firstName}
             </h1>
-            <p className="text-sm sm:text-base text-stone-300/90 mt-2.5 max-w-xl leading-relaxed">
+            <p className="text-sm sm:text-base text-slate-300/95 mt-3 max-w-xl leading-relaxed">
               {programTitle}
               {moduleName ? ` · ${moduleName}` : ""}
             </p>
           </div>
-          <div className="flex flex-wrap gap-2.5 pt-1">
+          <div className="flex flex-wrap gap-2.5 pt-0.5">
             {[
               { label: "Lessons", value: materialsCount },
               { label: "Tasks", value: assignmentsCount },
@@ -64,14 +64,14 @@ export function StudentDashboardHero({
             ].map((stat) => (
               <div
                 key={stat.label}
-                className="rounded-2xl bg-white/[0.06] backdrop-blur-sm border border-white/[0.08] px-3.5 py-2.5 text-center min-w-[4.75rem]"
+                className="rounded-2xl bg-white/[0.08] backdrop-blur-md border border-white/[0.12] px-4 py-2.5 text-center min-w-[5rem] shadow-sm"
               >
-                <p className="text-[9px] uppercase tracking-[0.16em] text-stone-400 font-medium">
+                <p className="text-[9px] uppercase tracking-[0.16em] text-sky-100/60 font-medium">
                   {stat.label}
                 </p>
                 <p
                   className={cn(
-                    "mt-0.5 font-semibold tabular-nums text-stone-50",
+                    "mt-0.5 font-semibold tabular-nums text-white",
                     typeof stat.value === "string" ? "text-sm truncate max-w-[7rem]" : "text-lg"
                   )}
                 >
@@ -87,7 +87,7 @@ export function StudentDashboardHero({
             <Button
               size="lg"
               asChild
-              className="bg-stone-50 text-stone-900 hover:bg-white shadow-lg shadow-black/20 border-0"
+              className="bg-[#c9a84c] text-[#0b1b33] hover:bg-[#d4b55e] shadow-lg shadow-black/25 border-0 font-semibold"
             >
               <Link href="/student/classes">
                 <VideoCamera size={18} weight="duotone" />
@@ -99,7 +99,7 @@ export function StudentDashboardHero({
               size="lg"
               variant="secondary"
               asChild
-              className="bg-white/[0.08] text-stone-100 border-white/10 hover:bg-white/[0.14]"
+              className="bg-white/[0.1] text-white border-white/15 hover:bg-white/[0.16]"
             >
               <Link href="/student/classes">View Schedule</Link>
             </Button>
@@ -108,7 +108,7 @@ export function StudentDashboardHero({
             size="lg"
             variant="secondary"
             asChild
-            className="bg-white/[0.06] text-stone-200 border-white/10 hover:bg-white/[0.12]"
+            className="bg-white/[0.08] text-slate-100 border-white/12 hover:bg-white/[0.14]"
           >
             <Link href="/student/course">
               <BookOpen size={18} weight="duotone" />
@@ -119,7 +119,7 @@ export function StudentDashboardHero({
             size="lg"
             variant="secondary"
             asChild
-            className="bg-white/[0.06] text-stone-200 border-white/10 hover:bg-white/[0.12]"
+            className="bg-white/[0.08] text-slate-100 border-white/12 hover:bg-white/[0.14]"
           >
             <Link href="/student/recordings">
               <FilmStrip size={18} weight="duotone" />
@@ -130,7 +130,7 @@ export function StudentDashboardHero({
             size="lg"
             variant="secondary"
             asChild
-            className="bg-white/[0.06] text-stone-200 border-white/10 hover:bg-white/[0.12] hidden sm:inline-flex"
+            className="bg-white/[0.08] text-slate-100 border-white/12 hover:bg-white/[0.14] hidden sm:inline-flex"
           >
             <Link href="/student/profile">
               <GraduationCap size={18} weight="duotone" />

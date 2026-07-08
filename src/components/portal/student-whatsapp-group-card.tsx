@@ -21,7 +21,7 @@ export function StudentWhatsAppGroupCard({
   return (
     <div
       className={cn(
-        "portal-card rounded-2xl portal-tone-emerald border border-stone-200/60",
+        "portal-card rounded-2xl portal-tone-emerald border border-blue-100/60",
         isBanner ? "p-5 sm:p-6" : "p-6 sm:p-10 text-center max-w-xl mx-auto",
         className
       )}
@@ -33,7 +33,7 @@ export function StudentWhatsAppGroupCard({
         )}
       >
         <div className={cn("flex gap-4", isBanner ? "items-start sm:items-center" : "flex-col items-center")}>
-          <div className="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#4a6b58] text-stone-50 shadow-sm">
+          <div className="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#1f6b45] text-white shadow-sm">
             <WhatsappLogo size={isBanner ? 28 : 40} weight="fill" />
           </div>
           <div className={cn(!isBanner && "text-center")}>
@@ -49,7 +49,7 @@ export function StudentWhatsAppGroupCard({
         <Button
           size="lg"
           className={cn(
-            "h-14 text-base bg-[#4a6b58] hover:bg-[#3d5c48] text-stone-50 shrink-0",
+            "h-14 text-base bg-[#1f6b45] hover:bg-[#185636] text-white shrink-0",
             isBanner ? "w-full sm:w-auto" : "w-full"
           )}
           asChild
@@ -66,7 +66,7 @@ export function StudentWhatsAppGroupCard({
           <div className="space-y-3 text-left mb-8 mt-8">
             {STUDENT_UR.whatsappCard.bullets.map((item) => (
               <div key={item} className="flex items-start gap-3 text-sm">
-                <ChatsCircle size={20} weight="duotone" className="text-[#5a6b62] shrink-0 mt-0.5" />
+                <ChatsCircle size={20} weight="duotone" className="text-[#1f6b45] shrink-0 mt-0.5" />
                 {item}
               </div>
             ))}
