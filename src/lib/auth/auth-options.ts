@@ -10,7 +10,6 @@ import {
   rotateActiveSession,
 } from "@/lib/auth/session-control";
 import { prisma } from "@/lib/prisma";
-import { checkRateLimit, loginRateLimit } from "@/lib/security/rate-limit";
 import type { UserRole } from "@/types/portal";
 
 const credentialsSchema = z.object({
@@ -26,18 +25,10 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials, req) {
+      async authorize(credentials) {
         try {
           const parsed = credentialsSchema.safeParse(credentials);
           if (!parsed.success) return null;
-
-          const ip =
-            req?.headers?.["x-forwarded-for"]?.toString().split(",")[0]?.trim() ??
-            req?.headers?.["x-real-ip"]?.toString() ??
-            "unknown";
-
-          const rate = await checkRateLimit(loginRateLimit, `login:${ip}`);
-          if (!rate.success) return null;
 
           const user = await prisma.user.findUnique({
             where: { email: parsed.data.email.toLowerCase() },
