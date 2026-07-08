@@ -4,7 +4,7 @@ import { createApiResponse } from "@/lib/api/enrollment";
 import { getAdminStudentProfile } from "@/lib/api/admin-student-profile";
 
 export async function GET(request: Request) {
-  const admin = await requireAdminRead();
+  const admin = await requireAdminRead(request);
   if (isNextResponse(admin)) return admin;
 
   try {

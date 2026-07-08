@@ -16,8 +16,8 @@ import {
 const WHATSAPP_TEST_DISABLED_MESSAGE =
   "Test messages are disabled. Use Resend Login or approve a student to verify WhatsApp.";
 
-export async function GET() {
-  const user = await getAdminUser();
+export async function GET(request: Request) {
+  const user = await getAdminUser(request);
   if (!user) return unauthorizedAdminResponse();
 
   const status = await getUltraMsgInstanceStatus();
@@ -36,7 +36,7 @@ const postSchema = z.discriminatedUnion("action", [
 ]);
 
 export async function POST(request: Request) {
-  const user = await requireAdminWrite();
+  const user = await requireAdminWrite(request);
   if (isNextResponse(user)) return user;
 
   const body = await request.json();

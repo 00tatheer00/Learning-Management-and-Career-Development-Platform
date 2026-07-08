@@ -36,7 +36,7 @@ const patchSchema = z.discriminatedUnion("action", [
 ]);
 
 export async function PATCH(request: Request) {
-  const admin = await requireAdminWrite();
+  const admin = await requireAdminWrite(request);
   if (isNextResponse(admin)) return admin;
 
   const body = await request.json();
@@ -281,7 +281,7 @@ const deleteSchema = z.object({
 });
 
 export async function DELETE(request: Request) {
-  const admin = await requireAdminWrite();
+  const admin = await requireAdminWrite(request);
   if (isNextResponse(admin)) return admin;
 
   const body = await request.json();

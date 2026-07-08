@@ -88,7 +88,7 @@ export function AdminStudentProfileProvider({ children }: { children: ReactNode 
   const loadProfile = useCallback(async (nextTarget: StudentProfileTarget) => {
     setLoading(true);
     try {
-      const res = await fetch(buildProfileUrl(nextTarget), { cache: "no-store" });
+      const res = await fetch(buildProfileUrl(nextTarget), { cache: "no-store", credentials: "same-origin" });
       const json = await res.json();
       if (json.success && json.data) {
         setProfile(json.data);

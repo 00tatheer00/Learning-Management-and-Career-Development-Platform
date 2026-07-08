@@ -16,8 +16,11 @@ import { syncStudentLoginHashesFromVault } from "@/lib/api/admin-credentials-syn
 import { repairStudentLoginPasswords } from "@/lib/auth/student-login-password";
 import { revealEnrollmentPortalPassword, revealStudentPortalPassword } from "@/lib/api/admin-portal-password";
 
-export async function GET() {
-  const user = await getAdminUser();
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
+export async function GET(request: Request) {
+  const user = await getAdminUser(request);
   if (!user) return unauthorizedAdminResponse();
 
   const rows = await getAdminCredentialRows();
@@ -47,7 +50,7 @@ const patchSchema = z.object({
 });
 
 export async function PATCH(request: Request) {
-  const user = await requireAdminWrite();
+  const user = await requireAdminWrite(request);
   if (isNextResponse(user)) return user;
 
   const body = await request.json();
@@ -109,7 +112,7 @@ const postSchema = z.discriminatedUnion("action", [
 ]);
 
 export async function POST(request: Request) {
-  const user = await getAdminUser();
+  const user = await getAdminUser(request);
   if (!user) return unauthorizedAdminResponse();
 
   const body = await request.json();
@@ -143,7 +146,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const writeUser = await requireAdminWrite();
+  const writeUser = await requireAdminWrite(request);
   if (isNextResponse(writeUser)) return writeUser;
 
   if (parsed.data.action === "bulkResendLogin") {

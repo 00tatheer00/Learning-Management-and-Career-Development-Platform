@@ -80,7 +80,7 @@ export function AdminCredentialsPanel() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/admin/credentials", { cache: "no-store" });
+      const res = await fetch("/api/admin/credentials", { cache: "no-store", credentials: "same-origin" });
       const json = await res.json();
       if (json.success) {
         setRows(json.data?.rows ?? []);
@@ -190,6 +190,7 @@ export function AdminCredentialsPanel() {
     try {
       const res = await fetch("/api/admin/whatsapp", {
         method: "POST",
+        credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "resendLogin", enrollmentId: row.id }),
       });
@@ -211,6 +212,7 @@ export function AdminCredentialsPanel() {
     try {
       const res = await fetch("/api/admin/credentials", {
         method: "POST",
+        credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "syncLoginHashes" }),
       });
@@ -233,6 +235,7 @@ export function AdminCredentialsPanel() {
     try {
       const res = await fetch("/api/admin/credentials", {
         method: "POST",
+        credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "generateMissing" }),
       });
@@ -268,6 +271,7 @@ export function AdminCredentialsPanel() {
     try {
       const res = await fetch("/api/admin/credentials", {
         method: "PATCH",
+        credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: editRow.studentId,
@@ -309,6 +313,7 @@ export function AdminCredentialsPanel() {
     try {
       const res = await fetch("/api/admin/credentials", {
         method: "POST",
+        credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "repairStudentLogins", email: row.email }),
       });
@@ -357,6 +362,7 @@ export function AdminCredentialsPanel() {
     try {
       const res = await fetch("/api/admin/students", {
         method: "PATCH",
+        credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: row.studentId,

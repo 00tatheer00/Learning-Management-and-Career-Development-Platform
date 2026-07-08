@@ -4,6 +4,7 @@ export async function revealEnrollmentPassword(enrollmentId: string): Promise<{
 }> {
   const res = await fetch("/api/admin/credentials", {
     method: "POST",
+    credentials: "same-origin",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       action: "revealPassword",
@@ -28,6 +29,7 @@ export async function revealStudentPassword(studentId: string): Promise<{
 }> {
   const res = await fetch("/api/admin/credentials", {
     method: "POST",
+    credentials: "same-origin",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       action: "revealPassword",

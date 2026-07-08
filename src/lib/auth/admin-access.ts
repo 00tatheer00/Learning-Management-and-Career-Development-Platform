@@ -8,8 +8,8 @@ import type { PortalUser } from "@/types/portal";
 
 export { canAdminWrite, canAdminApproveReject, isAdminRole } from "@/lib/auth/admin-roles";
 
-export async function getAdminUser(): Promise<PortalUser | null> {
-  const user = await getCurrentUser();
+export async function getAdminUser(request?: Request): Promise<PortalUser | null> {
+  const user = await getCurrentUser(request);
   if (!user || !isAdminRole(user.role)) return null;
   return user;
 }
@@ -40,21 +40,23 @@ export function approveRejectDeniedResponse() {
   );
 }
 
-export async function requireAdminRead(): Promise<PortalUser | NextResponse> {
-  const user = await getAdminUser();
+export async function requireAdminRead(request?: Request): Promise<PortalUser | NextResponse> {
+  const user = await getAdminUser(request);
   if (!user) return unauthorizedAdminResponse();
   return user;
 }
 
-export async function requireAdminWrite(): Promise<PortalUser | NextResponse> {
-  const user = await getAdminUser();
+export async function requireAdminWrite(request?: Request): Promise<PortalUser | NextResponse> {
+  const user = await getAdminUser(request);
   if (!user) return unauthorizedAdminResponse();
   if (!canAdminWrite(user.role)) return readOnlyAdminResponse();
   return user;
 }
 
-export async function requireAdminApproveReject(): Promise<PortalUser | NextResponse> {
-  const user = await getAdminUser();
+export async function requireAdminApproveReject(
+  request?: Request
+): Promise<PortalUser | NextResponse> {
+  const user = await getAdminUser(request);
   if (!user) return unauthorizedAdminResponse();
   if (!canAdminApproveReject(user.role)) return approveRejectDeniedResponse();
   return user;
