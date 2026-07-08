@@ -266,15 +266,36 @@
 }
 
 .student-glass-welcome {
-  background: linear-gradient(135deg, #0f2744 0%, #1a4d8f 48%, #1e90ff 100%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(135deg, #0c2347 0%, #1456a8 42%, #1e90ff 100%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   box-shadow: 0 20px 50px -24px rgba(30, 144, 255, 0.35);
   color: #ffffff;
 }
 
-.portal-shell[data-portal-theme="light"] .student-glass-welcome {
-  background: linear-gradient(135deg, #dbeafe 0%, #3b82f6 45%, #1e90ff 100%);
-  border-color: rgba(30, 144, 255, 0.2);
+.portal-shell[data-portal-theme="light"] .student-glass-welcome,
+.portal-shell[data-portal-theme="dark"] .student-glass-welcome {
+  background: linear-gradient(135deg, #0c2347 0%, #1456a8 42%, #1e90ff 100%);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.student-glass-welcome .student-hero-text {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.student-glass-welcome .student-hero-subtext {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.student-glass-welcome .student-hero-badge-pending {
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+}
+
+.student-glass-welcome .student-hero-badge-live {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  color: #ffffff;
 }
 
 .portal-shell[data-portal-theme="light"] .student-glass-welcome h1,

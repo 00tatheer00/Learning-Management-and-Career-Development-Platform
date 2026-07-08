@@ -55,7 +55,7 @@ export async function StudentAttendanceProgressCard({
       </div>
 
       <div className="p-4 sm:p-5">
-        <div className="h-3 rounded-full bg-surface overflow-hidden">
+        <div className="h-3 rounded-full bg-slate-200 overflow-hidden">
           <div
             className={cn("h-full rounded-full bg-gradient-to-r transition-all", barTone)}
             style={{ width: `${percentage}%` }}
@@ -87,9 +87,9 @@ function StatPill({
   tone: "emerald" | "amber" | "rose";
 }) {
   const tones = {
-    emerald: "text-primary bg-primary/10 border-primary/25",
-    amber: "text-[#a1a1aa] bg-pt-muted border-pt",
-    rose: "text-rose-300 bg-rose-950/30 border-rose-800/40",
+    emerald: "text-white bg-emerald-600 border-emerald-700 shadow-sm",
+    amber: "text-white bg-amber-500 border-amber-600 shadow-sm",
+    rose: "text-white bg-rose-600 border-rose-700 shadow-sm",
   };
 
   return (
@@ -141,7 +141,7 @@ export async function StudentAttendancePageContent() {
       <PortalSurfaceCard className="p-5 sm:p-6">
         <p className="text-xs font-bold uppercase tracking-widest text-pt-faint">Overall</p>
         <p className="text-4xl font-bold text-pt mt-1">{percentage}%</p>
-        <div className="mt-4 h-4 rounded-full bg-surface overflow-hidden">
+        <div className="mt-4 h-4 rounded-full bg-slate-200 overflow-hidden">
           <div
             className={cn("h-full rounded-full bg-gradient-to-r", barTone)}
             style={{ width: `${percentage}%` }}
@@ -186,9 +186,9 @@ export async function StudentAttendancePageContent() {
                       key={session.sessionId ?? `${day.date}-${index}`}
                       className={cn(
                         "flex flex-wrap items-center justify-between gap-2 rounded-xl border px-3 py-2 text-sm",
-                        session.status === "present" && "border-[#1f6b45]/20 bg-[#1f6b45]/5",
-                        session.status === "late" && "border-primary/30 bg-primary/8",
-                        session.status === "absent" && "border-rose-300 bg-rose-50",
+                        session.status === "present" && "border-emerald-300 bg-emerald-50",
+                        session.status === "late" && "border-amber-300 bg-amber-50",
+                        session.status === "absent" && "border-rose-300 bg-rose-100",
                         session.status === "upcoming" && "border-pt bg-surface/40"
                       )}
                     >
@@ -236,8 +236,8 @@ export async function StudentAttendancePageContent() {
                   className={cn(
                     "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold",
                     record.status === "present"
-                      ? "bg-[#ecf8f1] text-[#1f6b45]"
-                      : "bg-primary/10 text-[[#1873cc]]"
+                      ? "bg-emerald-600 text-white"
+                      : "bg-amber-500 text-white"
                   )}
                 >
                   {record.status === "present" ? (
@@ -267,27 +267,27 @@ function DayStatusBadge({
     present: {
       label: "Present",
       icon: <CheckCircle size={compact ? 12 : 14} weight="fill" />,
-      className: "bg-[#ecf8f1] text-[#1f6b45]",
+      className: "bg-emerald-600 text-white",
     },
     late: {
       label: "Late",
       icon: <Clock size={compact ? 12 : 14} weight="fill" />,
-      className: "bg-primary/10 text-[[#1873cc]]",
+      className: "bg-amber-500 text-white",
     },
     absent: {
       label: "Absent",
       icon: <XCircle size={compact ? 12 : 14} weight="fill" />,
-      className: "bg-rose-50 text-rose-800",
+      className: "bg-rose-600 text-white",
     },
     upcoming: {
       label: "Upcoming",
       icon: <CalendarBlank size={compact ? 12 : 14} weight="duotone" />,
-      className: "bg-surface text-pt-muted border border-pt",
+      className: "bg-sky-600 text-white",
     },
     untracked: {
       label: "Not tracked",
       icon: <CalendarBlank size={compact ? 12 : 14} weight="duotone" />,
-      className: "bg-surface text-pt-muted border border-pt",
+      className: "bg-slate-500 text-white",
     },
   }[status];
 
