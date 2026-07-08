@@ -13,6 +13,7 @@ import {
 } from "@/lib/api/admin-credentials";
 import { generateMissingPortalPasswords } from "@/lib/api/admin-credentials-bulk";
 import { syncStudentLoginHashesFromVault } from "@/lib/api/admin-credentials-sync";
+import { repairStudentLoginPasswords } from "@/lib/auth/student-login-password";
 import { revealEnrollmentPortalPassword, revealStudentPortalPassword } from "@/lib/api/admin-portal-password";
 
 export async function GET() {
@@ -92,6 +93,10 @@ const postSchema = z.discriminatedUnion("action", [
     action: z.literal("syncLoginHashes"),
   }),
   z.object({
+    action: z.literal("repairStudentLogins"),
+    email: z.string().email(),
+  }),
+  z.object({
     action: z.literal("revealPassword"),
     enrollmentId: z.string().optional(),
     studentId: z.string().optional(),
@@ -162,6 +167,31 @@ export async function POST(request: Request) {
         data: result,
         message:
           result.errors.length > 0 ? `${message} ${result.errors.length} error(s).` : message,
+      })
+    );
+  }
+
+  if (parsed.data.action === "repairStudentLogins") {
+    const result = await repairStudentLoginPasswords(parsed.data.email);
+    if (result.passwords.length === 0) {
+      return NextResponse.json(
+        createApiResponse(false, {
+          error: result.errors[0] ?? "Could not repair student logins.",
+        }),
+        { status: 400 }
+      );
+    }
+
+    const message =
+      result.repaired > 0
+        ? `Repaired ${result.repaired} missing module password(s) for ${parsed.data.email}.`
+        : `Verified all module passwords for ${parsed.data.email}.`;
+
+    return NextResponse.json(
+      createApiResponse(true, {
+        data: result,
+        message:
+          result.errors.length > 0 ? `${message} ${result.errors.length} warning(s).` : message,
       })
     );
   }

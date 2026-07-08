@@ -304,6 +304,54 @@ export function AdminCredentialsPanel() {
     }
   };
 
+  const handleRepairStudentLogins = async (row: AdminCredentialRow) => {
+    setLoadingId(row.id);
+    try {
+      const res = await fetch("/api/admin/credentials", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "repairStudentLogins", email: row.email }),
+      });
+      const json = await res.json();
+      if (!json.success) {
+        toast.error(json.error ?? json.message ?? "Repair failed");
+        return;
+      }
+
+      const passwords = json.data?.passwords as
+        | Array<{ enrollmentId: string; password: string; module: string }>
+        | undefined;
+      if (passwords?.length) {
+        setRevealedPasswords((current) => {
+          const next = { ...current };
+          for (const entry of passwords) {
+            next[entry.enrollmentId] = entry.password;
+          }
+          return next;
+        });
+        const currentModule = passwords.find((entry) => entry.enrollmentId === row.id);
+        if (currentModule) {
+          setCredentialModal({
+            name: row.name,
+            loginId: row.email,
+            password: currentModule.password,
+            loginUrl: row.loginUrl,
+            course: row.course,
+            module: currentModule.module,
+            programSlug: row.programSlug,
+          });
+        }
+      }
+
+      toast.success(json.message ?? "All module logins repaired.");
+      await load();
+    } catch {
+      toast.error("Repair failed");
+    } finally {
+      setLoadingId(null);
+    }
+  };
+
   const handleResetPassword = async (row: AdminCredentialRow) => {
     setLoadingId(row.id);
     try {
@@ -690,6 +738,15 @@ export function AdminCredentialsPanel() {
                                 className="rounded border border-[#25D366]/40 bg-[#25D366]/10 p-1.5 text-[#128C7E] hover:bg-[#25D366]/20 disabled:opacity-40"
                               >
                                 <ChatsCircle size={14} weight="fill" />
+                              </button>
+                              <button
+                                type="button"
+                                title="Repair all module logins for this student"
+                                disabled={loadingId === row.id}
+                                onClick={() => void handleRepairStudentLogins(row)}
+                                className="rounded border border-amber-300/60 bg-amber-50 p-1.5 text-amber-800 hover:bg-amber-100"
+                              >
+                                <ArrowClockwise size={14} />
                               </button>
                               <button
                                 type="button"

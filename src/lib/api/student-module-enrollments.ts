@@ -66,52 +66,7 @@ export async function getStudentModuleEnrollmentViews(
   }));
 }
 
-export async function verifyStudentLoginPassword(
-  email: string,
-  password: string
-): Promise<boolean> {
-  const normalizedEmail = email.trim().toLowerCase();
-  const normalizedPassword = password.trim();
-  if (!normalizedPassword) return false;
-
-  const user = await prisma.user.findUnique({
-    where: { email: normalizedEmail },
-    select: { passwordHash: true },
-  });
-
-  if (!user) return false;
-
-  const { verifyPassword } = await import("@/lib/auth/password");
-  if (await verifyPassword(normalizedPassword, user.passwordHash)) {
-    return true;
-  }
-
-  const enrollments = await getApprovedEnrollmentsWithVaultForEmail(normalizedEmail);
-
-  for (const enrollment of enrollments) {
-    const stored = decryptPortalPassword(enrollment.portalPasswordEnc);
-    if (stored && stored === normalizedPassword) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-async function getApprovedEnrollmentsWithVaultForEmail(email: string) {
-  const normalizedEmail = email.trim().toLowerCase();
-  const enrollments = await prisma.enrollment.findMany({
-    where: {
-      status: "approved",
-      portalPasswordEnc: { not: null },
-    },
-    select: { email: true, portalPasswordEnc: true },
-  });
-
-  return enrollments.filter(
-    (enrollment) => enrollment.email.trim().toLowerCase() === normalizedEmail
-  );
-}
+export { verifyStudentLoginPassword } from "@/lib/auth/student-login-password";
 
 export function studentHasLiveClassAccess(
   programSlug: string,

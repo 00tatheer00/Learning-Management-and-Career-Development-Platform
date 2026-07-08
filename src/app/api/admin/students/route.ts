@@ -1,15 +1,12 @@
 import { NextResponse } from "next/server";
 import { requireAdminWrite, isNextResponse } from "@/lib/auth/admin-access";
 import { createApiResponse } from "@/lib/api/enrollment";
-import { getUserById, updateUser, updateUserPasswordHash } from "@/lib/auth/users";
-import { hashPassword } from "@/lib/auth/password";
+import { getUserById, updateUser } from "@/lib/auth/users";
 import { generateStudentPassword } from "@/lib/auth/generate-password";
+import { issueEnrollmentLoginPassword } from "@/lib/auth/student-login-password";
 import { sendPasswordResetNotifications } from "@/lib/notifications/password-reset-notice";
 import { deleteAdminStudent } from "@/lib/api/admin-students";
-import {
-  savePortalPasswordForEnrollment,
-  savePortalPasswordForStudentEmail,
-} from "@/lib/auth/portal-password-vault";
+import { savePortalPasswordForStudentEmail } from "@/lib/auth/portal-password-vault";
 import { getPortalLoginUrl } from "@/lib/site-url";
 import { resetPortalWelcomeForEnrollment } from "@/lib/api/student-portal-welcome";
 import { prisma } from "@/lib/prisma";
@@ -93,14 +90,23 @@ export async function PATCH(request: Request) {
           });
         }
 
-        const passwordHash = await hashPassword(plainPassword);
-        await updateUserPasswordHash(student.id, passwordHash);
         await resetPortalWelcomeForEnrollment(enrollmentId);
 
-        const vaultResult = await savePortalPasswordForEnrollment(enrollmentId, plainPassword);
-        const vaultWarning = vaultResult.saved
-          ? ""
-          : ` Portal vault save failed: ${vaultResult.error ?? "unknown error"}. Login still works with this password.`;
+        const issue = await issueEnrollmentLoginPassword({
+          studentId: student.id,
+          enrollmentId,
+          plainPassword,
+          syncAccountHash: true,
+        });
+
+        if (!issue.ok) {
+          return NextResponse.json(
+            createApiResponse(false, {
+              error: issue.error ?? "Password could not be saved and verified.",
+            }),
+            { status: 500 }
+          );
+        }
 
         const whatsapp = student.phone ?? enrollment.whatsapp ?? "";
         const notifications = await sendPasswordResetNotifications({
@@ -122,29 +128,50 @@ export async function PATCH(request: Request) {
 
         return NextResponse.json(
           createApiResponse(true, {
-            message: `Password reset for ${enrollment.level}.${notificationSummary}${vaultWarning}`,
+            message: `Password reset for ${enrollment.level}.${notificationSummary}`,
             data: {
               loginId: student.email,
               password: plainPassword,
               loginUrl: getPortalLoginUrl(),
               enrollmentId,
               module: enrollment.level,
-              vaultSaved: vaultResult.saved,
+              vaultSaved: issue.vaultSaved,
             },
           })
         );
       }
 
-      const passwordHash = await hashPassword(plainPassword);
-      await updateUserPasswordHash(student.id, passwordHash);
-      await savePortalPasswordForStudentEmail(student.email, plainPassword);
-
-      const enrollment = await prisma.enrollment.findFirst({
+      const latestEnrollment = await prisma.enrollment.findFirst({
         where: { email: student.email.toLowerCase(), status: "approved" },
         orderBy: { createdAt: "desc" },
+        select: { id: true, whatsapp: true },
       });
 
-      const whatsapp = student.phone ?? enrollment?.whatsapp ?? "";
+      if (!latestEnrollment) {
+        return NextResponse.json(createApiResponse(false, { error: "Enrollment not found" }), {
+          status: 404,
+        });
+      }
+
+      const issue = await issueEnrollmentLoginPassword({
+        studentId: student.id,
+        enrollmentId: latestEnrollment.id,
+        plainPassword,
+        syncAccountHash: true,
+      });
+
+      if (!issue.ok) {
+        return NextResponse.json(
+          createApiResponse(false, {
+            error: issue.error ?? "Password could not be saved and verified.",
+          }),
+          { status: 500 }
+        );
+      }
+
+      await savePortalPasswordForStudentEmail(student.email, plainPassword);
+
+      const whatsapp = student.phone ?? latestEnrollment.whatsapp ?? "";
       const notifications = await sendPasswordResetNotifications({
         fullName: student.name,
         email: student.email,

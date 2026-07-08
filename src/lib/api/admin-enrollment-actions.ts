@@ -6,18 +6,17 @@ import {
   createUserWithPasswordHash,
   getUserByEmail,
   updateUser,
-  updateUserPasswordHash,
 } from "@/lib/auth/users";
 import { buildStudentProgramAssignment } from "@/lib/auth/program-assignment";
 import { resolveActiveStudentModule } from "@/lib/modules/student-module-access";
 import { getApprovedEnrollmentLevels } from "@/lib/auth/student-module-sync";
 import { hashPassword } from "@/lib/auth/password";
 import { generateStudentPassword } from "@/lib/auth/generate-password";
+import { issueEnrollmentLoginPassword } from "@/lib/auth/student-login-password";
 import { sendApprovalWelcomeNotifications } from "@/lib/notifications/approval-welcome";
 import { sendRejectionNotifications } from "@/lib/notifications/rejection-notice";
 import { deleteCloudinaryImage } from "@/lib/cloudinary";
 import { prisma } from "@/lib/prisma";
-import { savePortalPasswordForEnrollment } from "@/lib/auth/portal-password-vault";
 import { getPortalLoginUrl } from "@/lib/site-url";
 import type { EnrollmentRecord } from "@/types/portal";
 
@@ -61,7 +60,7 @@ export async function approveEnrollmentAndCreateAccount(
 
   const user = await getUserByEmail(enrollment.email);
   const plainPassword = generateStudentPassword();
-  const passwordHash = await hashPassword(plainPassword);
+  const isNewStudent = !user;
 
   const avatarInitials = enrollment.fullName
     .split(" ")
@@ -87,7 +86,7 @@ export async function approveEnrollmentAndCreateAccount(
   if (!user) {
     await createUserWithPasswordHash({
       email: enrollment.email,
-      passwordHash,
+      passwordHash: await hashPassword(plainPassword),
       role: "student",
       name: enrollment.fullName,
       phone: enrollment.whatsapp,
@@ -109,13 +108,24 @@ export async function approveEnrollmentAndCreateAccount(
       isActive: true,
       avatarInitials,
     });
-    await updateUserPasswordHash(user.id, passwordHash);
   }
 
-  const passwordSaved = (await savePortalPasswordForEnrollment(enrollmentId, plainPassword)).saved;
+  const student = await getUserByEmail(enrollment.email);
+  if (!student) {
+    return { enrollment, message: "Registration approved but student account missing.", error: "Student account missing" };
+  }
+
+  const passwordIssue = await issueEnrollmentLoginPassword({
+    studentId: student.id,
+    enrollmentId,
+    plainPassword,
+    syncAccountHash: isNewStudent,
+  });
+  const passwordSaved = passwordIssue.ok;
   if (!passwordSaved) {
     console.warn(
-      "Approval succeeded but portal password was not saved — use Portal Logins → Generate & Save."
+      "Approval succeeded but portal password was not verified:",
+      passwordIssue.error ?? "unknown error"
     );
   }
 
@@ -139,8 +149,6 @@ export async function approveEnrollmentAndCreateAccount(
       approvalWhatsAppError: whatsappError,
     },
   });
-
-  const student = await getUserByEmail(enrollment.email);
 
   const message = notifications.whatsappSent
     ? "Registration approved. Module login saved. WhatsApp sent to student."

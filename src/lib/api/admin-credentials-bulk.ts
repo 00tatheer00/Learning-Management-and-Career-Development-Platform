@@ -1,9 +1,7 @@
 import { prisma } from "@/lib/prisma";
-import { hashPassword } from "@/lib/auth/password";
 import { generateStudentPassword } from "@/lib/auth/generate-password";
-import { savePortalPasswordForEnrollment } from "@/lib/auth/portal-password-vault";
 import { decryptPortalPassword } from "@/lib/auth/portal-password-vault";
-import { updateUserPasswordHash } from "@/lib/auth/users";
+import { issueEnrollmentLoginPassword } from "@/lib/auth/student-login-password";
 import { getAdminCredentialRows } from "@/lib/api/admin-credentials";
 
 export async function generateMissingPortalPasswords(): Promise<{
@@ -32,14 +30,18 @@ export async function generateMissingPortalPasswords(): Promise<{
       }
 
       const plainPassword = generateStudentPassword();
-      const vaultResult = await savePortalPasswordForEnrollment(row.id, plainPassword);
-      if (vaultResult.saved) {
-        const passwordHash = await hashPassword(plainPassword);
-        await updateUserPasswordHash(row.studentId, passwordHash);
+      const issue = await issueEnrollmentLoginPassword({
+        studentId: row.studentId,
+        enrollmentId: row.id,
+        plainPassword,
+        syncAccountHash: true,
+      });
+
+      if (issue.ok) {
         generated += 1;
       } else {
         errors.push(
-          `${row.name} (${row.module}): ${vaultResult.error ?? "password not saved to vault"}`
+          `${row.name} (${row.module}): ${issue.error ?? "password not saved to vault"}`
         );
       }
     } catch (error) {
