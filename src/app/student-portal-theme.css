@@ -252,3 +252,135 @@
     animation: none !important;
   }
 }
+
+/* ── Glassmorphism layer (obsidian + gold) ── */
+.portal-shell[data-portal-role="student"] .student-ambient-orbs {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.portal-shell[data-portal-role="student"] .student-ambient-orbs span {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(80px);
+  opacity: 0.45;
+}
+
+.portal-shell[data-portal-role="student"] .student-ambient-orbs span:nth-child(1) {
+  width: 420px;
+  height: 420px;
+  top: -120px;
+  right: 10%;
+  background: rgba(201, 168, 76, 0.12);
+}
+
+.portal-shell[data-portal-role="student"] .student-ambient-orbs span:nth-child(2) {
+  width: 360px;
+  height: 360px;
+  bottom: -80px;
+  left: -60px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.portal-shell[data-portal-role="student"] .student-ambient-orbs span:nth-child(3) {
+  width: 280px;
+  height: 280px;
+  top: 40%;
+  left: 35%;
+  background: rgba(201, 168, 76, 0.06);
+}
+
+.portal-shell[data-portal-role="student"][data-portal-theme="dark"] .student-sidebar {
+  background: rgba(17, 17, 20, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right-color: rgba(255, 255, 255, 0.06);
+}
+
+.portal-shell[data-portal-role="student"][data-portal-theme="dark"] .student-topbar {
+  background: rgba(10, 10, 11, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.student-glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow:
+    0 8px 32px -12px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.portal-shell[data-portal-theme="light"] .student-glass-card {
+  background: rgba(255, 255, 255, 0.72);
+  border-color: rgba(10, 10, 11, 0.08);
+  box-shadow: 0 12px 40px -16px rgba(10, 10, 11, 0.12);
+}
+
+.student-glass-welcome {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(201, 168, 76, 0.08) 45%,
+    rgba(10, 10, 11, 0.4) 100%
+  );
+  border: 1px solid rgba(201, 168, 76, 0.2);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow:
+    0 24px 64px -24px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.portal-shell[data-portal-theme="light"] .student-glass-welcome {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(201, 168, 76, 0.12) 50%,
+    rgba(250, 249, 247, 0.95) 100%
+  );
+  border-color: rgba(201, 168, 76, 0.25);
+  color: var(--pt-text);
+}
+
+.portal-shell[data-portal-theme="light"] .student-glass-welcome h1,
+.portal-shell[data-portal-theme="light"] .student-glass-welcome .text-white {
+  color: var(--pt-text);
+}
+
+.student-glass-card-gold {
+  background: linear-gradient(145deg, rgba(201, 168, 76, 0.14), rgba(255, 255, 255, 0.03));
+  border-color: rgba(201, 168, 76, 0.22);
+}
+
+.student-glass-card-charcoal {
+  background: linear-gradient(145deg, rgba(28, 28, 33, 0.85), rgba(255, 255, 255, 0.04));
+}
+
+.student-glass-card-muted {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(24, 24, 27, 0.6));
+}
+
+.student-glass-card-warm {
+  background: linear-gradient(145deg, rgba(201, 168, 76, 0.08), rgba(17, 17, 20, 0.7));
+}
+
+.student-glass-card:hover {
+  border-color: rgba(201, 168, 76, 0.28);
+  box-shadow:
+    0 16px 48px -16px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.student-welcome-orb {
+  box-shadow: 0 20px 50px -20px rgba(201, 168, 76, 0.25);
+}
+
+.student-dashboard-date {
+  font-variant-numeric: tabular-nums;
+}

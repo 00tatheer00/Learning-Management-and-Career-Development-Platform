@@ -70,7 +70,7 @@ export function StudentNextClassCard({
   return (
     <div
       className={cn(
-        "portal-card rounded-2xl p-5 sm:p-6",
+        "portal-card student-glass-card rounded-2xl p-5 sm:p-6",
         isLive || countdown?.isSoon
           ? "ring-1 ring-[#c9a84c]/25"
           : ""

@@ -2,7 +2,13 @@
 
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import { BookOpen, VideoCamera, CalendarBlank } from "@phosphor-icons/react";
+import {
+  BookOpen,
+  VideoCamera,
+  CalendarBlank,
+  GraduationCap,
+  Sparkle,
+} from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { ProgramCategoryBadge } from "@/components/portal/program-category-badge";
 import { getProgramCategory } from "@/lib/constants/program-categories";
@@ -32,51 +38,50 @@ export function StudentDashboardHero({
 
   return (
     <motion.section
-      className="student-hero-card"
-      initial={reduce ? false : { opacity: 0, y: 20 }}
+      className="student-glass-welcome relative overflow-hidden rounded-3xl"
+      initial={reduce ? false : { opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease }}
+      transition={{ duration: 0.55, ease }}
     >
-      <div className="student-hero-orb student-hero-orb-a" aria-hidden />
-
-      <div className="relative z-10 p-6 sm:p-8 lg:p-10">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-          <div className="min-w-0 space-y-4 max-w-2xl">
-            <div className="flex flex-wrap items-center gap-2">
-              <ProgramCategoryBadge programSlug={programSlug} variant="onDark" />
-              {canJoinLive ? (
-                <span className="student-badge-live rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em]">
-                  Live classes active
-                </span>
-              ) : (
-                <span className="student-badge-pending rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em]">
-                  Module starts soon
-                </span>
-              )}
-            </div>
-
-            <div>
-              <h1 className="text-3xl sm:text-4xl lg:text-[2.65rem] font-semibold tracking-tight text-white leading-[1.08]">
-                {firstName}
-              </h1>
-              <p className="text-sm sm:text-base text-zinc-400 mt-2.5 leading-relaxed">
-                {programTitle}
-                {moduleName ? (
-                  <>
-                    <span className="text-[#c9a84c]/80 mx-2">·</span>
-                    {moduleName}
-                  </>
-                ) : null}
-              </p>
-            </div>
+      <div className="relative z-10 flex flex-col gap-6 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
+        <div className="min-w-0 space-y-4 max-w-xl">
+          <div className="flex flex-wrap items-center gap-2">
+            <ProgramCategoryBadge programSlug={programSlug} variant="onDark" />
+            {canJoinLive ? (
+              <span className="student-badge-live rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em]">
+                Live now
+              </span>
+            ) : (
+              <span className="student-badge-pending rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em]">
+                Starting soon
+              </span>
+            )}
           </div>
 
-          <div className="flex flex-wrap gap-2.5 shrink-0">
+          <div>
+            <p className="text-sm text-zinc-400 font-medium">Welcome back,</p>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold tracking-tight text-white mt-0.5">
+              {firstName}!
+            </h1>
+            <p className="text-sm sm:text-base text-zinc-400 mt-2 leading-relaxed">
+              {canJoinLive
+                ? "Your classes are live — join from the portal or check what’s next below."
+                : `${schedule.headline} · ${schedule.daysLabel}`}
+            </p>
+            {moduleName && (
+              <p className="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-[#dbb85a]">
+                <GraduationCap size={14} weight="duotone" />
+                {programTitle} · {moduleName}
+              </p>
+            )}
+          </div>
+
+          <div className="flex flex-wrap gap-2.5 pt-1">
             {canJoinLive ? (
               <Button
                 size="lg"
                 asChild
-                className="student-cta-glow bg-[#c9a84c] text-[#0a0a0b] hover:bg-[#dbb85a] border-0 font-semibold shadow-lg shadow-black/30"
+                className="student-cta-glow rounded-xl bg-[#c9a84c] text-[#0a0a0b] hover:bg-[#dbb85a] border-0 font-semibold"
               >
                 <Link href="/student/classes">
                   <VideoCamera size={18} weight="duotone" />
@@ -87,7 +92,7 @@ export function StudentDashboardHero({
               <Button
                 size="lg"
                 asChild
-                className="bg-white/[0.08] text-white border border-white/12 hover:bg-white/[0.12]"
+                className="rounded-xl bg-white/10 text-white border border-white/15 hover:bg-white/14 backdrop-blur-sm"
               >
                 <Link href="/student/classes">
                   <CalendarBlank size={18} weight="duotone" />
@@ -99,7 +104,7 @@ export function StudentDashboardHero({
               size="lg"
               variant="ghost"
               asChild
-              className="text-zinc-300 hover:text-[#dbb85a] hover:bg-white/[0.06]"
+              className="rounded-xl text-zinc-300 hover:text-[#dbb85a] hover:bg-white/6"
             >
               <Link href="/student/course">
                 <BookOpen size={18} weight="duotone" />
@@ -109,17 +114,13 @@ export function StudentDashboardHero({
           </div>
         </div>
 
-        <div className="student-hero-status mt-6 -mx-6 sm:-mx-8 lg:-mx-10 px-6 sm:px-8 lg:px-10 py-3.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-          <span className="inline-flex items-center gap-1.5 text-[#dbb85a] font-medium">
-            <CalendarBlank size={16} weight="duotone" />
-            {schedule.headline}
-          </span>
-          <span className="text-zinc-500">{schedule.daysLabel}</span>
-          {!canJoinLive && (
-            <span className="text-zinc-500 text-xs sm:ml-auto">
-              Your module batch opens next — we&apos;ll notify you on WhatsApp.
-            </span>
-          )}
+        <div className="hidden sm:flex shrink-0 items-center justify-center">
+          <div className="student-welcome-orb relative flex h-28 w-28 lg:h-32 lg:w-32 items-center justify-center rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur-md">
+            <Sparkle size={48} weight="duotone" className="text-[#c9a84c]/80" />
+            <div className="absolute -right-2 -top-2 h-10 w-10 rounded-2xl bg-[#c9a84c]/20 border border-[#c9a84c]/30 flex items-center justify-center">
+              <BookOpen size={20} weight="duotone" className="text-[#dbb85a]" />
+            </div>
+          </div>
         </div>
       </div>
     </motion.section>

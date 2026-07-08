@@ -118,6 +118,13 @@ function PortalShellInner({ user, children }: PortalShellProps) {
       suppressHydrationWarning
     >
       {user.role === "student" && <StudentSingleSessionGuard />}
+      {isStudent && (
+        <div className="student-ambient-orbs" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </div>
+      )}
       {/* Sidebar desktop */}
       <aside
         className={cn(
@@ -217,7 +224,7 @@ function PortalShellInner({ user, children }: PortalShellProps) {
         </header>
 
         <main id="main-content" className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8">
-          <div className={cn(isStudent && "student-portal-content mx-auto max-w-5xl w-full")}>
+          <div className={cn(isStudent && "student-portal-content relative z-[1] mx-auto max-w-7xl w-full")}>
             {children}
           </div>
         </main>
