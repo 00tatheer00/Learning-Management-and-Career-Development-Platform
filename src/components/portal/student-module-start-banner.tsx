@@ -24,7 +24,7 @@ export function StudentModuleStartBanner({
         <div
           className={cn(
             "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-white shadow-sm",
-            isApp ? "bg-indigo-600" : "bg-amber-500"
+            isApp ? "bg-slate-600" : "bg-stone-600"
           )}
         >
           <CalendarBlank size={24} weight="duotone" />

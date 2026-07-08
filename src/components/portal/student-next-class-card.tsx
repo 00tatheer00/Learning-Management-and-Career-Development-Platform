@@ -72,7 +72,7 @@ export function StudentNextClassCard({
       className={cn(
         "portal-card rounded-2xl p-5 sm:p-6",
         isLive || countdown?.isSoon
-          ? "portal-tone-emerald ring-2 ring-emerald-500/20"
+          ? "portal-tone-emerald ring-1 ring-[#5a6b62]/25"
           : "portal-tone-sky"
       )}
     >
@@ -115,14 +115,14 @@ export function StudentNextClassCard({
               className={cn(
                 "rounded-2xl px-5 py-4 text-center w-full sm:min-w-[168px]",
                 countdown.isSoon
-                  ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/25"
+                  ? "bg-[#4a5c52] text-stone-50 shadow-lg shadow-stone-900/15"
                   : "bg-pt-muted border border-pt"
               )}
             >
               <p
                 className={cn(
                   "text-[10px] font-bold uppercase tracking-[0.14em]",
-                  countdown.isSoon ? "text-emerald-100" : "text-pt-faint"
+                  countdown.isSoon ? "text-stone-200" : "text-pt-faint"
                 )}
               >
                 Starts in

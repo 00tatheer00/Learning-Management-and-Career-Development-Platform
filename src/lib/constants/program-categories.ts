@@ -2,6 +2,8 @@ import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
 
 export type EnrollableProgramSlug = (typeof ENROLLABLE_PROGRAM_SLUGS)[number];
 
+export const PREMIUM_HEADER_GRADIENT_FALLBACK = "from-stone-800 to-stone-900";
+
 export const PROGRAM_CATEGORIES: Record<
   EnrollableProgramSlug,
   {
@@ -20,8 +22,8 @@ export const PROGRAM_CATEGORIES: Record<
     shortLabel: "Web",
     sidebarLabel: "Web Development",
     primaryTrainerSeedId: "trainer-tatheer",
-    badgeClass: "bg-orange-100 text-orange-800 border-orange-200",
-    headerGradient: "from-orange-500 to-amber-500",
+    badgeClass: "bg-stone-100 text-stone-700 border-stone-200",
+    headerGradient: "from-stone-800 to-stone-900",
   },
   "app-development": {
     slug: "app-development",
@@ -29,8 +31,8 @@ export const PROGRAM_CATEGORIES: Record<
     shortLabel: "App",
     sidebarLabel: "App Development",
     primaryTrainerSeedId: "trainer-talha",
-    badgeClass: "bg-indigo-100 text-indigo-800 border-indigo-200",
-    headerGradient: "from-indigo-500 to-violet-500",
+    badgeClass: "bg-slate-100 text-slate-700 border-slate-200",
+    headerGradient: "from-slate-800 to-slate-950",
   },
 };
 

@@ -9,7 +9,7 @@ import {
 } from "@phosphor-icons/react/ssr";
 import type { ClassRecordingRecord } from "@/lib/api/class-recordings";
 import { getClassProgress, type ClassSlot } from "@/lib/class-schedule";
-import { getProgramCategory } from "@/lib/constants/program-categories";
+import { getProgramCategory, PREMIUM_HEADER_GRADIENT_FALLBACK } from "@/lib/constants/program-categories";
 import { cn } from "@/lib/utils";
 
 interface StudentRecordingsContentProps {
@@ -73,7 +73,7 @@ export function StudentRecordingsContent({
       <div
         className={cn(
           "relative overflow-hidden rounded-3xl border border-white/10 p-6 sm:p-8 text-white shadow-xl bg-gradient-to-br",
-          category?.headerGradient ?? "from-orange-500 to-amber-500"
+          category?.headerGradient ?? PREMIUM_HEADER_GRADIENT_FALLBACK
         )}
       >
         <div className="absolute -right-8 -top-8 h-40 w-40 rounded-full bg-white/10 blur-2xl" />

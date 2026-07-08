@@ -89,16 +89,16 @@ export function StudentWelcomeCelebration({
           initial={{ scale: 0.85, opacity: 0, y: 24 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           transition={{ type: "spring", stiffness: 260, damping: 20 }}
-          className="relative w-full max-w-md overflow-hidden rounded-3xl border border-orange-200 bg-gradient-to-b from-white to-orange-50 shadow-2xl"
+          className="relative w-full max-w-md overflow-hidden rounded-3xl border border-stone-200 bg-gradient-to-b from-white to-stone-50 shadow-2xl"
         >
-          <div className="pointer-events-none absolute -left-8 -top-8 h-32 w-32 rounded-full bg-orange-300/30 blur-2xl" />
-          <div className="pointer-events-none absolute -bottom-10 -right-8 h-36 w-36 rounded-full bg-amber-300/30 blur-2xl" />
+          <div className="pointer-events-none absolute -left-8 -top-8 h-32 w-32 rounded-full bg-stone-300/20 blur-2xl" />
+          <div className="pointer-events-none absolute -bottom-10 -right-8 h-36 w-36 rounded-full bg-stone-400/15 blur-2xl" />
 
           <div className="relative px-6 py-8 text-center sm:px-8 sm:py-10">
             <motion.div
               animate={{ rotate: [0, -8, 8, -4, 0], scale: [1, 1.08, 1] }}
               transition={{ duration: 1.2, repeat: Infinity, repeatDelay: 1.4 }}
-              className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-orange-500 to-amber-400 text-white shadow-lg"
+              className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-stone-700 to-stone-900 text-white shadow-lg"
             >
               <Trophy size={42} weight="fill" />
             </motion.div>
@@ -108,7 +108,7 @@ export function StudentWelcomeCelebration({
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15 }}
             >
-              <p className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-orange-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-orange-700">
+              <p className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-stone-700">
                 <Sparkle size={14} weight="fill" />
                 {STUDENT_UR.celebration.badge}
               </p>

@@ -26,79 +26,112 @@ export function StudentDashboardHero({
   const firstName = name.split(" ")[0] ?? name;
   const category = getProgramCategory(programSlug);
   const programTitle = getProgramBySlug(programSlug)?.title ?? category?.title ?? "Your course";
-  const gradient = category?.headerGradient ?? "from-orange-500 to-amber-500";
+  const heroVariant = programSlug === "app-development" ? "student-hero-app" : "student-hero-web";
 
   return (
-    <section
-      className={cn(
-        "student-hero-card mb-6 p-6 sm:p-8 bg-gradient-to-br",
-        gradient
-      )}
-    >
-      <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-        <div className="min-w-0 space-y-3">
+    <section className={cn("student-hero-card mb-6 p-6 sm:p-8 lg:p-10", heroVariant)}>
+      <div className="relative z-10 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+        <div className="min-w-0 space-y-4">
           <div className="flex flex-wrap items-center gap-2">
             <ProgramCategoryBadge programSlug={programSlug} variant="onDark" />
             {canJoinLive ? (
-              <span className="student-badge-live rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide">
+              <span className="student-badge-live rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em]">
                 Live classes active
               </span>
             ) : (
-              <span className="student-badge-pending rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide">
+              <span className="student-badge-pending rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em]">
                 Module starts soon
               </span>
             )}
           </div>
           <div>
-            <p className="text-sm font-medium text-white/85">Welcome back</p>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mt-0.5">{firstName}</h1>
-            <p className="text-sm sm:text-base text-white/90 mt-2 max-w-xl leading-relaxed">
+            <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-stone-400">
+              Welcome back
+            </p>
+            <h1 className="mt-1.5 text-3xl sm:text-4xl font-semibold tracking-tight text-stone-50">
+              {firstName}
+            </h1>
+            <p className="text-sm sm:text-base text-stone-300/90 mt-2.5 max-w-xl leading-relaxed">
               {programTitle}
               {moduleName ? ` · ${moduleName}` : ""}
             </p>
           </div>
-          <div className="flex flex-wrap gap-2 pt-1">
-            <div className="rounded-xl bg-white/15 backdrop-blur border border-white/20 px-3 py-2 text-center min-w-[4.5rem]">
-              <p className="text-[10px] uppercase tracking-wider text-white/75">Lessons</p>
-              <p className="text-lg font-bold tabular-nums">{materialsCount}</p>
-            </div>
-            <div className="rounded-xl bg-white/15 backdrop-blur border border-white/20 px-3 py-2 text-center min-w-[4.5rem]">
-              <p className="text-[10px] uppercase tracking-wider text-white/75">Tasks</p>
-              <p className="text-lg font-bold tabular-nums">{assignmentsCount}</p>
-            </div>
-            <div className="rounded-xl bg-white/15 backdrop-blur border border-white/20 px-3 py-2 text-center min-w-[4.5rem]">
-              <p className="text-[10px] uppercase tracking-wider text-white/75">Module</p>
-              <p className="text-sm font-bold truncate max-w-[7rem]">{moduleName ?? "—"}</p>
-            </div>
+          <div className="flex flex-wrap gap-2.5 pt-1">
+            {[
+              { label: "Lessons", value: materialsCount },
+              { label: "Tasks", value: assignmentsCount },
+              { label: "Module", value: moduleName ?? "—" },
+            ].map((stat) => (
+              <div
+                key={stat.label}
+                className="rounded-2xl bg-white/[0.06] backdrop-blur-sm border border-white/[0.08] px-3.5 py-2.5 text-center min-w-[4.75rem]"
+              >
+                <p className="text-[9px] uppercase tracking-[0.16em] text-stone-400 font-medium">
+                  {stat.label}
+                </p>
+                <p
+                  className={cn(
+                    "mt-0.5 font-semibold tabular-nums text-stone-50",
+                    typeof stat.value === "string" ? "text-sm truncate max-w-[7rem]" : "text-lg"
+                  )}
+                >
+                  {stat.value}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
 
-        <div className="relative z-10 flex flex-wrap gap-2 shrink-0">
+        <div className="relative z-10 flex flex-wrap gap-2.5 shrink-0">
           {canJoinLive ? (
-            <Button size="lg" asChild className="bg-white text-zinc-900 hover:bg-white/90 shadow-lg">
+            <Button
+              size="lg"
+              asChild
+              className="bg-stone-50 text-stone-900 hover:bg-white shadow-lg shadow-black/20 border-0"
+            >
               <Link href="/student/classes">
                 <VideoCamera size={18} weight="duotone" />
                 Join Live Class
               </Link>
             </Button>
           ) : (
-            <Button size="lg" variant="secondary" asChild className="bg-white/15 text-white border-white/25 hover:bg-white/25">
+            <Button
+              size="lg"
+              variant="secondary"
+              asChild
+              className="bg-white/[0.08] text-stone-100 border-white/10 hover:bg-white/[0.14]"
+            >
               <Link href="/student/classes">View Schedule</Link>
             </Button>
           )}
-          <Button size="lg" variant="secondary" asChild className="bg-white/10 text-white border-white/25 hover:bg-white/20">
+          <Button
+            size="lg"
+            variant="secondary"
+            asChild
+            className="bg-white/[0.06] text-stone-200 border-white/10 hover:bg-white/[0.12]"
+          >
             <Link href="/student/course">
               <BookOpen size={18} weight="duotone" />
               My Course
             </Link>
           </Button>
-          <Button size="lg" variant="secondary" asChild className="bg-white/10 text-white border-white/25 hover:bg-white/20">
+          <Button
+            size="lg"
+            variant="secondary"
+            asChild
+            className="bg-white/[0.06] text-stone-200 border-white/10 hover:bg-white/[0.12]"
+          >
             <Link href="/student/recordings">
               <FilmStrip size={18} weight="duotone" />
               Recordings
             </Link>
           </Button>
-          <Button size="lg" variant="secondary" asChild className="bg-white/10 text-white border-white/25 hover:bg-white/20 hidden sm:inline-flex">
+          <Button
+            size="lg"
+            variant="secondary"
+            asChild
+            className="bg-white/[0.06] text-stone-200 border-white/10 hover:bg-white/[0.12] hidden sm:inline-flex"
+          >
             <Link href="/student/profile">
               <GraduationCap size={18} weight="duotone" />
               Profile

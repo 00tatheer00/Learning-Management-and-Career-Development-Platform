@@ -71,27 +71,27 @@ const accentStyles = {
   orange: {
     wrap: "portal-stat-accent-orange border",
     text: "portal-stat-text-orange",
-    icon: "bg-amber-500 text-white",
+    icon: "bg-stone-600 text-stone-50",
   },
   green: {
     wrap: "portal-stat-accent-green border",
     text: "portal-stat-text-green",
-    icon: "bg-emerald-500 text-white",
+    icon: "bg-[#5a6b62] text-stone-50",
   },
   blue: {
     wrap: "portal-stat-accent-blue border",
     text: "portal-stat-text-blue",
-    icon: "bg-blue-500 text-white",
+    icon: "bg-slate-600 text-stone-50",
   },
   sky: {
     wrap: "portal-stat-accent-sky border",
     text: "portal-stat-text-sky",
-    icon: "bg-sky-500 text-white",
+    icon: "bg-stone-500 text-stone-50",
   },
   slate: {
     wrap: "portal-stat-accent-slate border",
     text: "portal-stat-text-slate",
-    icon: "bg-zinc-500 text-white",
+    icon: "bg-zinc-600 text-stone-50",
   },
 };
 
@@ -177,7 +177,7 @@ export function QuickActionCard({
   description,
   href,
   icon,
-  gradient = "from-orange-500 to-amber-500",
+  gradient = "from-stone-700 to-stone-800",
   color,
   compact = false,
 }: QuickActionCardProps) {
@@ -186,7 +186,7 @@ export function QuickActionCard({
       href={href}
       className={cn(
         portalPressable,
-        "group flex items-center portal-card rounded-2xl transition-all duration-200 hover:border-primary/25 hover:shadow-pt-md hover:-translate-y-0.5",
+        "group flex items-center portal-card rounded-2xl transition-all duration-250 hover:border-primary/30 hover:shadow-pt-md hover:-translate-y-0.5",
         compact ? "gap-3 p-3" : "gap-3.5 p-4"
       )}
     >
@@ -240,7 +240,7 @@ export function PortalSurfaceCard({
 
   if (href) {
     return (
-      <Link href={href} className={cn(base, "block hover:border-orange-500/30 hover:shadow-pt-md")}>
+      <Link href={href} className={cn(base, "block hover:border-primary/25 hover:shadow-pt-md")}>
         {children}
       </Link>
     );

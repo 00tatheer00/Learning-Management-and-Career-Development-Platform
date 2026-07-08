@@ -1,6 +1,6 @@
 import { getCurrentUser } from "@/lib/auth/session";
 import { getProgramBySlug } from "@/lib/data/programs";
-import { getProgramCategory } from "@/lib/constants/program-categories";
+import { getProgramCategory, PREMIUM_HEADER_GRADIENT_FALLBACK } from "@/lib/constants/program-categories";
 import { PortalPageHeader, PortalSurfaceCard } from "@/components/portal/portal-ui";
 import { ProgramCategoryBadge } from "@/components/portal/program-category-badge";
 import { StudentModuleEnrollmentsCard } from "@/components/portal/student-module-enrollments-card";
@@ -33,7 +33,7 @@ export default async function StudentProfilePage() {
     { icon: ChalkboardTeacher, label: "Assigned Trainer", value: trainer?.name ?? "—" },
   ];
 
-  const gradient = category?.headerGradient ?? "from-orange-500 to-amber-500";
+  const gradient = category?.headerGradient ?? PREMIUM_HEADER_GRADIENT_FALLBACK;
 
   return (
     <div className="space-y-6">

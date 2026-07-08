@@ -131,7 +131,7 @@ function StudentWhatsAppGroupPrompt({ onClose }: { onClose: () => void }) {
   return (
     <Modal open={open} onClose={handleLater} title={STUDENT_UR.whatsappModal.title}>
       <div className="text-center">
-        <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-[#25D366] text-white mb-4">
+        <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-[#4a6b58] text-white mb-4">
           <WhatsappLogo size={36} weight="fill" />
         </div>
 
@@ -142,7 +142,7 @@ function StudentWhatsAppGroupPrompt({ onClose }: { onClose: () => void }) {
         <ul className="space-y-2.5 text-left mb-6">
           {STUDENT_UR.whatsappModal.bullets.map((item) => (
             <li key={item} className="flex items-start gap-2.5 text-sm">
-              <CheckCircle size={18} weight="fill" className="text-[#25D366] shrink-0 mt-0.5" />
+              <CheckCircle size={18} weight="fill" className="text-[#4a6b58] shrink-0 mt-0.5" />
               {item}
             </li>
           ))}
@@ -151,7 +151,7 @@ function StudentWhatsAppGroupPrompt({ onClose }: { onClose: () => void }) {
         <div className="flex flex-col gap-3">
           <Button
             size="lg"
-            className="w-full h-12 text-base bg-[#25D366] hover:bg-[#20bd5a]"
+            className="w-full h-12 text-base bg-[#4a6b58] hover:bg-[#3d5c48] text-stone-50"
             onClick={handleJoin}
           >
             <WhatsappLogo size={20} weight="fill" />

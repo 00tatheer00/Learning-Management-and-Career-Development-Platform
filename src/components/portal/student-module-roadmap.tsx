@@ -1,6 +1,6 @@
 import { CheckCircle, MapTrifold } from "@phosphor-icons/react/ssr";
 import { getProgramBySlug } from "@/lib/data/programs";
-import { getProgramCategory } from "@/lib/constants/program-categories";
+import { getProgramCategory, PREMIUM_HEADER_GRADIENT_FALLBACK } from "@/lib/constants/program-categories";
 import { cn } from "@/lib/utils";
 
 interface StudentModuleRoadmapProps {
@@ -35,7 +35,7 @@ export function StudentModuleRoadmap({
         <div
           className={cn(
             "flex h-11 w-11 items-center justify-center rounded-xl text-white bg-gradient-to-br",
-            category?.headerGradient ?? "from-orange-500 to-amber-500"
+            category?.headerGradient ?? PREMIUM_HEADER_GRADIENT_FALLBACK
           )}
         >
           <MapTrifold size={22} weight="duotone" />

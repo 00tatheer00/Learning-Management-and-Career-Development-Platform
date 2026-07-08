@@ -109,7 +109,7 @@ export const PORTAL_LABELS: Record<UserRole, string> = {
 };
 
 export const PORTAL_COLORS: Record<UserRole, string> = {
-  student: "from-orange-500 to-amber-500",
+  student: "from-stone-700 to-stone-900",
   trainer: "from-blue-500 to-indigo-500",
   admin: "from-slate-700 to-slate-900",
   admin_readonly: "from-violet-600 to-indigo-900",

@@ -121,6 +121,7 @@ function PortalShellInner({ user, children }: PortalShellProps) {
       <aside
         className={cn(
           "hidden lg:flex flex-col fixed inset-y-0 left-0 z-40 bg-pt-surface border-r border-pt transition-[width] duration-300 ease-in-out",
+          user.role === "student" && "border-pt-subtle shadow-pt",
           sidebarCollapsed ? "w-[4.5rem]" : "w-[17rem]"
         )}
       >
@@ -161,7 +162,10 @@ function PortalShellInner({ user, children }: PortalShellProps) {
           sidebarCollapsed ? "lg:pl-[4.5rem]" : "lg:pl-[17rem]"
         )}
       >
-        <header className="shrink-0 sticky top-0 z-30 border-b border-pt bg-pt-header backdrop-blur-md px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
+        <header className={cn(
+          "shrink-0 sticky top-0 z-30 border-b border-pt bg-pt-header backdrop-blur-xl px-4 sm:px-6 h-14 flex items-center justify-between gap-4",
+          user.role === "student" && "border-pt-subtle"
+        )}>
           <div className="flex items-center gap-3 min-w-0">
             <button
               type="button"

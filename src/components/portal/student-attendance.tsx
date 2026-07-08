@@ -28,7 +28,11 @@ export async function StudentAttendanceProgressCard({
   const percentage = stats.percentage;
 
   const barTone =
-    percentage >= 80 ? "from-emerald-500 to-teal-500" : percentage >= 50 ? "from-amber-500 to-orange-500" : "from-rose-500 to-red-500";
+    percentage >= 80
+      ? "from-stone-600 to-stone-700"
+      : percentage >= 50
+        ? "from-stone-500 to-amber-800"
+        : "from-rose-700 to-rose-800";
 
   return (
     <div className="rounded-2xl border border-pt overflow-hidden shadow-sm bg-gradient-to-br from-background to-surface/50">
@@ -83,9 +87,9 @@ function StatPill({
   tone: "emerald" | "amber" | "rose";
 }) {
   const tones = {
-    emerald: "text-emerald-700 bg-emerald-500/10 border-emerald-500/20",
-    amber: "text-amber-700 bg-amber-500/10 border-amber-500/20",
-    rose: "text-rose-700 bg-rose-500/10 border-rose-500/20",
+    emerald: "text-[#3d5c48] bg-[#4a6b58]/10 border-[#4a6b58]/20",
+    amber: "text-stone-700 bg-stone-500/10 border-stone-500/20",
+    rose: "text-rose-800 bg-rose-900/10 border-rose-900/15",
   };
 
   return (
@@ -121,7 +125,11 @@ export async function StudentAttendancePageContent() {
   const stats = await getStudentAttendanceSummary(user.id, programSlug);
   const percentage = stats.percentage;
   const barTone =
-    percentage >= 80 ? "from-emerald-500 to-teal-500" : percentage >= 50 ? "from-amber-500 to-orange-500" : "from-rose-500 to-red-500";
+    percentage >= 80
+      ? "from-stone-600 to-stone-700"
+      : percentage >= 50
+        ? "from-stone-500 to-amber-800"
+        : "from-rose-700 to-rose-800";
 
   return (
     <div className="space-y-4">
@@ -178,9 +186,9 @@ export async function StudentAttendancePageContent() {
                       key={session.sessionId ?? `${day.date}-${index}`}
                       className={cn(
                         "flex flex-wrap items-center justify-between gap-2 rounded-xl border px-3 py-2 text-sm",
-                        session.status === "present" && "border-emerald-500/25 bg-emerald-500/5",
-                        session.status === "late" && "border-amber-500/25 bg-amber-500/5",
-                        session.status === "absent" && "border-rose-500/25 bg-rose-500/5",
+                        session.status === "present" && "border-[#4a6b58]/20 bg-[#4a6b58]/5",
+                        session.status === "late" && "border-stone-400/25 bg-stone-500/5",
+                        session.status === "absent" && "border-rose-700/20 bg-rose-900/5",
                         session.status === "upcoming" && "border-pt bg-surface/40"
                       )}
                     >
@@ -228,8 +236,8 @@ export async function StudentAttendancePageContent() {
                   className={cn(
                     "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold",
                     record.status === "present"
-                      ? "bg-emerald-100 text-emerald-800"
-                      : "bg-amber-100 text-amber-800"
+                      ? "bg-[#eef4f0] text-[#3d5c48]"
+                      : "bg-stone-100 text-stone-700"
                   )}
                 >
                   {record.status === "present" ? (
@@ -259,17 +267,17 @@ function DayStatusBadge({
     present: {
       label: "Present",
       icon: <CheckCircle size={compact ? 12 : 14} weight="fill" />,
-      className: "bg-emerald-100 text-emerald-800",
+      className: "bg-[#eef4f0] text-[#3d5c48]",
     },
     late: {
       label: "Late",
       icon: <Clock size={compact ? 12 : 14} weight="fill" />,
-      className: "bg-amber-100 text-amber-800",
+      className: "bg-stone-100 text-stone-700",
     },
     absent: {
       label: "Absent",
       icon: <XCircle size={compact ? 12 : 14} weight="fill" />,
-      className: "bg-rose-100 text-rose-800",
+      className: "bg-rose-50 text-rose-800",
     },
     upcoming: {
       label: "Upcoming",
