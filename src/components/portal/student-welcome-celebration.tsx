@@ -98,7 +98,7 @@ export function StudentWelcomeCelebration({
             <motion.div
               animate={{ rotate: [0, -8, 8, -4, 0], scale: [1, 1.08, 1] }}
               transition={{ duration: 1.2, repeat: Infinity, repeatDelay: 1.4 }}
-              className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-stone-700 to-stone-900 text-white shadow-lg"
+              className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-[#1a365d] to-[#0b1b33] text-white shadow-lg"
             >
               <Trophy size={42} weight="fill" />
             </motion.div>
@@ -108,7 +108,7 @@ export function StudentWelcomeCelebration({
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15 }}
             >
-              <p className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-stone-700">
+              <p className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-[#fbf6e8] px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#8a6d28]">
                 <Sparkle size={14} weight="fill" />
                 {STUDENT_UR.celebration.badge}
               </p>
