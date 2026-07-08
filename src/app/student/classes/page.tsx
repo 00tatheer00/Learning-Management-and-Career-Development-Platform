@@ -1,7 +1,7 @@
 import { getCurrentUser } from "@/lib/auth/session";
 import { getLiveSessionsPreview } from "@/lib/api/portal-data";
 import { getStudentClassSchedule } from "@/lib/constants/student-portal-ur";
-import { PortalPageHeader, EmptyState } from "@/components/portal/portal-ui";
+import { PortalPageHeader, EmptyState, PortalSurfaceCard } from "@/components/portal/portal-ui";
 import { StudentLiveSessionCard } from "@/components/portal/student-live-session-card";
 import { ModuleStartsSoonNotice } from "@/components/portal/module-starts-soon-notice";
 import { sortLiveSessionsForDisplay } from "@/lib/sessions/join-window";
@@ -23,34 +23,31 @@ export default async function StudentClassesPage() {
   const canJoinLive = studentHasLiveClassAccess(programSlug, moduleEnrollments);
 
   return (
-    <div>
+    <div className="space-y-6">
       <PortalPageHeader
-        eyebrow="Student Portal"
+        eyebrow="Live learning"
         title="Live Classes"
         description={
           canJoinLive
-            ? "Join opens 10 minutes before class and closes at class end time. Completed classes show as Done."
+            ? "Join opens 10 minutes before class. Past sessions show as Done — rewatch from Recordings."
             : "Your module batch has not started yet. Module 1 students are in live classes now."
         }
       />
 
       {!canJoinLive && (
-        <div className="mb-6">
-          <ModuleStartsSoonNotice programSlug={programSlug} studentModule={user.level} />
-        </div>
+        <ModuleStartsSoonNotice programSlug={programSlug} studentModule={user.level} />
       )}
 
-      <p className="mb-4 text-sm rounded-xl border border-primary/20 bg-primary/5 p-4">
-        <span className="font-semibold text-foreground">{classSchedule.headline}</span>
-        <br />
-        <span className="text-muted">{classSchedule.daysLabel} · {classSchedule.subline}</span>
-      </p>
-
-      <p className="mb-6 text-sm text-muted rounded-xl border border-border bg-surface p-4">
-        <strong className="text-foreground">Join Class</strong> opens 10 minutes before the scheduled
-        time and closes when class ends. Past classes show as{" "}
-        <strong className="text-foreground">Done</strong> — use Class Recordings to rewatch.
-      </p>
+      <PortalSurfaceCard className="p-4 sm:p-5 portal-tone-sky">
+        <p className="font-semibold text-pt">{classSchedule.headline}</p>
+        <p className="text-sm text-pt-muted mt-1">
+          {classSchedule.daysLabel} · {classSchedule.subline}
+        </p>
+        <p className="text-sm text-pt-muted mt-3 pt-3 border-t border-pt-subtle">
+          <strong className="text-pt">Join Class</strong> opens 10 minutes before the scheduled time
+          and closes when class ends.
+        </p>
+      </PortalSurfaceCard>
 
       {sessions.length === 0 ? (
         <EmptyState
@@ -58,7 +55,7 @@ export default async function StudentClassesPage() {
           description={`${classSchedule.startDateLabel}. ${classSchedule.daysLabel}. ${classSchedule.subline}`}
         />
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {sessions.map((session) => (
             <StudentLiveSessionCard
               key={session.id}

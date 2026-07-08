@@ -22,12 +22,12 @@ export function PortalPageHeader({
   children,
 }: PortalPageHeaderProps) {
   return (
-    <div className={cn("mb-4 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3", className)}>
+    <div className={cn("mb-6 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4", className)}>
       <div className="min-w-0">
-        <p className="text-[11px] font-semibold uppercase tracking-widest text-pt-faint">{eyebrow}</p>
-        <h1 className="text-xl font-bold text-pt tracking-tight mt-0.5">{title}</h1>
+        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-pt-faint">{eyebrow}</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-pt tracking-tight mt-1">{title}</h1>
         {description && (
-          <p className="text-xs text-pt-muted mt-1 max-w-2xl leading-relaxed">{description}</p>
+          <p className="text-sm text-pt-muted mt-2 max-w-2xl leading-relaxed">{description}</p>
         )}
       </div>
       {children && <div className="shrink-0 flex flex-wrap items-center gap-2">{children}</div>}
@@ -46,7 +46,7 @@ export function PortalSectionTitle({
 }) {
   return (
     <div className={cn("flex items-center justify-between gap-3 mb-2.5", className)}>
-      <p className="text-[10px] font-bold uppercase tracking-widest text-pt-faint">{title}</p>
+      <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-pt-faint">{title}</p>
       {action}
     </div>
   );
@@ -133,11 +133,11 @@ export function StatCard({
     </>
   );
 
-  const className = cn("rounded-xl border block", style.wrap, compact ? "p-2.5" : "p-4");
+  const className = cn("rounded-2xl border block transition-all duration-200", style.wrap, compact ? "p-3" : "p-4");
 
   if (href) {
     return (
-      <Link href={href} className={cn(portalPressable, className, "hover:shadow-pt-md")}>
+      <Link href={href} className={cn(portalPressable, className, "hover:shadow-pt-md hover:-translate-y-0.5")}>
         {inner}
       </Link>
     );
@@ -186,8 +186,8 @@ export function QuickActionCard({
       href={href}
       className={cn(
         portalPressable,
-        "group flex items-center portal-card rounded-xl hover:border-orange-500/30 hover:shadow-pt-md",
-        compact ? "gap-2.5 p-2.5" : "gap-3 p-3.5"
+        "group flex items-center portal-card rounded-2xl transition-all duration-200 hover:border-primary/25 hover:shadow-pt-md hover:-translate-y-0.5",
+        compact ? "gap-3 p-3" : "gap-3.5 p-4"
       )}
     >
       <div
@@ -233,7 +233,7 @@ export function PortalSurfaceCard({
   onClick?: () => void;
 }) {
   const base = cn(
-    "portal-card rounded-xl",
+    "portal-card rounded-2xl",
     (href || onClick) && portalPressable,
     className
   );

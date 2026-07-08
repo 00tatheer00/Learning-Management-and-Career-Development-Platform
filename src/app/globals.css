@@ -706,3 +706,93 @@ body {
     transform: translateX(200%);
   }
 }
+
+/* ── Student portal polish ── */
+.portal-shell[data-portal-role="student"][data-portal-theme="light"] {
+  --pt-bg: #f1f5f9;
+  --pt-surface: #ffffff;
+  --pt-muted: #f8fafc;
+  --pt-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.02);
+  --pt-shadow-md: 0 10px 40px -12px rgba(15, 23, 42, 0.12);
+  background:
+    radial-gradient(ellipse 80% 50% at 0% -10%, rgba(234, 88, 12, 0.07), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 100% 0%, rgba(99, 102, 241, 0.06), transparent 50%),
+    var(--pt-bg);
+}
+
+.portal-shell[data-portal-role="student"][data-portal-theme="dark"] {
+  background:
+    radial-gradient(ellipse 70% 45% at 0% -5%, rgba(234, 88, 12, 0.08), transparent 50%),
+    radial-gradient(ellipse 50% 35% at 100% 0%, rgba(99, 102, 241, 0.1), transparent 45%),
+    var(--pt-bg);
+}
+
+.portal-shell[data-portal-role="student"] .student-portal-content {
+  animation: student-fade-in 0.45s ease-out;
+}
+
+@keyframes student-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.portal-shell[data-portal-role="student"] .portal-nav-link-active {
+  box-shadow: inset 3px 0 0 0 var(--pt-nav-active-text);
+  font-weight: 600;
+}
+
+.portal-shell[data-portal-role="student"] .portal-card {
+  border-radius: 1rem;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.portal-shell[data-portal-role="student"] .portal-card:hover {
+  box-shadow: var(--pt-shadow-md);
+}
+
+.student-hero-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: var(--pt-shadow-md);
+  color: white;
+}
+
+.student-hero-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 85% 15%, rgba(255, 255, 255, 0.22), transparent 45%);
+  pointer-events: none;
+}
+
+.student-badge-live {
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(110, 231, 183, 0.45);
+  color: rgb(167 243 208);
+}
+
+.portal-shell[data-portal-theme="light"] .student-badge-live {
+  background: rgb(236 253 245);
+  border-color: rgb(167 243 208);
+  color: rgb(4 120 87);
+}
+
+.student-badge-pending {
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(165, 180, 252, 0.35);
+  color: rgb(199 210 254);
+}
+
+.portal-shell[data-portal-theme="light"] .student-badge-pending {
+  background: rgb(238 242 255);
+  border-color: rgb(199 210 254);
+  color: rgb(67 56 202);
+}

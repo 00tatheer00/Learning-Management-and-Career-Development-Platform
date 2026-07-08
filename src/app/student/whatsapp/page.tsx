@@ -3,9 +3,9 @@ import { StudentWhatsAppGroupCard } from "@/components/portal/student-whatsapp-g
 
 export default function StudentWhatsAppPage() {
   return (
-    <div>
+    <div className="space-y-6">
       <PortalPageHeader
-        eyebrow="Student Portal"
+        eyebrow="Community"
         title="WhatsApp Group"
         description="Join the official class group for live links, videos, and announcements."
       />

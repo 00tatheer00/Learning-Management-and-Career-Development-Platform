@@ -79,7 +79,9 @@ function PortalShellInner({ user, children }: PortalShellProps) {
   const websiteLabel = "Website";
   const headerTitle = isAdmin
     ? getAdminDisplayName(user.name, user.role)
-    : `Hello, ${user.name.split(" ")[0]} 👋`;
+    : user.role === "student"
+      ? user.name.split(" ")[0]
+      : user.name;
 
   useEffect(() => {
     const stored = localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
@@ -111,6 +113,7 @@ function PortalShellInner({ user, children }: PortalShellProps) {
     <div
       className="portal-shell portal-font min-h-screen lg:h-dvh lg:overflow-hidden bg-pt-bg flex text-pt"
       data-portal-theme={theme}
+      data-portal-role={user.role}
       suppressHydrationWarning
     >
       {user.role === "student" && <StudentSingleSessionGuard />}
@@ -118,7 +121,7 @@ function PortalShellInner({ user, children }: PortalShellProps) {
       <aside
         className={cn(
           "hidden lg:flex flex-col fixed inset-y-0 left-0 z-40 bg-pt-surface border-r border-pt transition-[width] duration-300 ease-in-out",
-          sidebarCollapsed ? "w-[4.5rem]" : "w-64"
+          sidebarCollapsed ? "w-[4.5rem]" : "w-[17rem]"
         )}
       >
         <SidebarContent
@@ -155,10 +158,10 @@ function PortalShellInner({ user, children }: PortalShellProps) {
       <div
         className={cn(
           "flex-1 flex flex-col min-h-0 lg:overflow-hidden transition-[padding] duration-300 ease-in-out",
-          sidebarCollapsed ? "lg:pl-[4.5rem]" : "lg:pl-64"
+          sidebarCollapsed ? "lg:pl-[4.5rem]" : "lg:pl-[17rem]"
         )}
       >
-        <header className="shrink-0 sticky top-0 z-30 border-b border-pt bg-pt-header backdrop-blur-md px-4 sm:px-5 h-14 flex items-center justify-between gap-4">
+        <header className="shrink-0 sticky top-0 z-30 border-b border-pt bg-pt-header backdrop-blur-md px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <button
               type="button"
@@ -169,10 +172,19 @@ function PortalShellInner({ user, children }: PortalShellProps) {
               <List size={22} weight="bold" />
             </button>
             <div className="min-w-0">
-              <p className="text-[11px] text-pt-muted uppercase tracking-wide">
+              <p className="text-[10px] text-pt-faint uppercase tracking-[0.14em] font-semibold">
                 {PORTAL_LABELS[user.role]}
               </p>
-              <p className="font-semibold text-sm truncate text-pt">{headerTitle}</p>
+              <p className="font-semibold text-sm sm:text-base truncate text-pt">
+                {user.role === "student" ? (
+                  <>
+                    <span className="text-pt-muted font-normal">Welcome, </span>
+                    {headerTitle}
+                  </>
+                ) : (
+                  headerTitle
+                )}
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-1 sm:gap-2 shrink-0">
@@ -196,13 +208,15 @@ function PortalShellInner({ user, children }: PortalShellProps) {
           </div>
         </header>
 
-        <main id="main-content" className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-5">
-          {user.role === "student" && (
-            <div className="mb-4">
-              <StudentModuleStartBanner programSlug={user.programSlug} />
-            </div>
-          )}
-          {children}
+        <main id="main-content" className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-6">
+          <div className={cn(user.role === "student" && "student-portal-content mx-auto max-w-6xl w-full")}>
+            {user.role === "student" && pathname === "/student/dashboard" && (
+              <div className="mb-5">
+                <StudentModuleStartBanner programSlug={user.programSlug} />
+              </div>
+            )}
+            {children}
+          </div>
         </main>
         {user.role === "student" && (
           <StudentPortalWelcome studentId={user.id} studentName={user.name} />
@@ -365,7 +379,7 @@ function SidebarContent({
                     className={cn(
                       pressable,
                       "relative flex items-center rounded-lg text-sm font-medium",
-                      collapsed ? "justify-center p-2.5" : "gap-2.5 px-2.5 py-2",
+                      collapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5",
                       active ? "portal-nav-link-active" : "portal-nav-link hover:bg-pt-muted"
                     )}
                   >

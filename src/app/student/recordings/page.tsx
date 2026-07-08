@@ -22,7 +22,7 @@ export default async function StudentRecordingsPage() {
   return (
     <div>
       <PortalPageHeader
-        eyebrow="Student Portal"
+        eyebrow="On demand"
         title="Class Recordings"
         description={
           canAccess

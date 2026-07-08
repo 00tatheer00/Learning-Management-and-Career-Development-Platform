@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { PlayCircle, LinkSimple, FileText } from "@phosphor-icons/react/ssr";
+import { PlayCircle, LinkSimple, FileText, ArrowSquareOut } from "@phosphor-icons/react/ssr";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getMaterials } from "@/lib/api/portal-data";
 import { getProgramBySlug } from "@/lib/data/programs";
 import { CourseModulesSyllabus } from "@/components/portal/course-modules-syllabus";
-import { PortalPageHeader, EmptyState } from "@/components/portal/portal-ui";
+import { PortalPageHeader, EmptyState, PortalSurfaceCard } from "@/components/portal/portal-ui";
 import { Button } from "@/components/ui/button";
 
 const typeIcons = {
@@ -22,73 +22,82 @@ export default async function StudentCoursePage() {
   const program = getProgramBySlug(programSlug);
 
   return (
-    <div>
+    <div className="space-y-8">
       <PortalPageHeader
-        eyebrow="Student Portal"
+        eyebrow="Learning"
         title="My Course"
-        description={`${program?.title ?? "Your course"} — your modules and lessons`}
+        description={`${program?.title ?? "Your course"} — syllabus, lessons, and practice materials`}
       />
 
       {program && program.modules.length > 0 && (
-        <div className="mb-10">
-          <h2 className="text-lg font-bold mb-1">Course Syllabus</h2>
-          <p className="text-sm text-muted mb-5">
-            You are currently on: <strong className="text-foreground">{user.level ?? "—"}</strong>
+        <PortalSurfaceCard className="p-5 sm:p-6">
+          <h2 className="text-lg font-bold text-pt mb-1">Course Syllabus</h2>
+          <p className="text-sm text-pt-muted mb-5">
+            You are on: <strong className="text-pt">{user.level ?? "—"}</strong>
             {" · "}
-            Click a module to see all topics you will study
+            Tap a module to explore topics
           </p>
           <CourseModulesSyllabus
             program={program}
             activeModuleName={user.level ?? undefined}
           />
-        </div>
+        </PortalSurfaceCard>
       )}
 
-      <h2 className="text-lg font-bold mb-4">Lessons &amp; Materials</h2>
+      <div>
+        <h2 className="text-lg font-bold text-pt mb-4">Lessons &amp; Materials</h2>
 
-      {materials.length === 0 ? (
-        <EmptyState
-          title="No lessons yet"
-          description="Your trainer will add videos soon. Check WhatsApp for updates."
-          action={
-            <Button asChild>
-              <Link href="/student/whatsapp">Open WhatsApp Group</Link>
-            </Button>
-          }
-        />
-      ) : (
-        <div className="space-y-4">
-          {materials.map((material, index) => {
-            const Icon = typeIcons[material.type];
-            return (
-              <a
-                key={material.id}
-                href={material.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex flex-col sm:flex-row items-start gap-4 rounded-2xl border border-border bg-background p-5 hover:border-primary/30 hover:shadow-md transition-all group"
-              >
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary font-bold">
-                  {index + 1}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Icon size={18} weight="duotone" className="text-primary" />
-                    <span className="text-xs font-semibold uppercase text-muted">
-                      {material.type === "video" ? "Video Lesson" : material.type === "link" ? "Practice Link" : "Document"}
-                    </span>
+        {materials.length === 0 ? (
+          <EmptyState
+            title="No lessons yet"
+            description="Your trainer will add videos soon. Check WhatsApp for updates."
+            action={
+              <Button asChild>
+                <Link href="/student/whatsapp">Open WhatsApp Group</Link>
+              </Button>
+            }
+          />
+        ) : (
+          <div className="grid gap-3">
+            {materials.map((material, index) => {
+              const Icon = typeIcons[material.type];
+              return (
+                <a
+                  key={material.id}
+                  href={material.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group portal-card rounded-2xl p-5 flex flex-col sm:flex-row items-start gap-4 hover:border-primary/30 hover:shadow-pt-md hover:-translate-y-0.5 transition-all"
+                >
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary font-bold text-lg">
+                    {index + 1}
                   </div>
-                  <p className="font-semibold text-lg group-hover:text-primary transition-colors">
-                    {material.title}
-                  </p>
-                  <p className="text-sm text-muted mt-0.5">{material.description}</p>
-                </div>
-                <span className="text-primary font-semibold text-sm shrink-0 sm:ml-auto">Open →</span>
-              </a>
-            );
-          })}
-        </div>
-      )}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Icon size={18} weight="duotone" className="text-primary" />
+                      <span className="text-[10px] font-bold uppercase tracking-wide text-pt-faint">
+                        {material.type === "video"
+                          ? "Video Lesson"
+                          : material.type === "link"
+                            ? "Practice Link"
+                            : "Document"}
+                      </span>
+                    </div>
+                    <p className="font-semibold text-lg text-pt group-hover:text-primary transition-colors">
+                      {material.title}
+                    </p>
+                    <p className="text-sm text-pt-muted mt-0.5">{material.description}</p>
+                  </div>
+                  <span className="inline-flex items-center gap-1 text-primary font-semibold text-sm shrink-0 sm:ml-auto">
+                    Open
+                    <ArrowSquareOut size={14} />
+                  </span>
+                </a>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -29,15 +29,15 @@ export interface PortalNavItem {
 
 export const PORTAL_NAV: Record<UserRole, PortalNavItem[]> = {
   student: [
-    { href: "/student/dashboard", label: "Home", icon: House, description: "Your main page" },
-    { href: "/student/course", label: "My Course", icon: BookOpen, description: "Videos & lessons" },
+    { href: "/student/dashboard", label: "Home", icon: House, description: "Your dashboard" },
+    { href: "/student/course", label: "My Course", icon: BookOpen, description: "Lessons & syllabus" },
     { href: "/student/classes", label: "Live Classes", icon: VideoCamera, description: "Join online class" },
-    { href: "/student/attendance", label: "Attendance", icon: ListChecks, description: "Your class attendance %" },
-    { href: "/student/recordings", label: "Class Recordings", icon: FilmStrip, description: "Rewatch past classes" },
-    { href: "/student/trainer", label: "My Trainer", icon: ChalkboardTeacher, description: "Your course trainer" },
-    { href: "/student/assignments", label: "Assignments", icon: ClipboardText, description: "Submit homework" },
-    { href: "/student/whatsapp", label: "WhatsApp Group", icon: ChatsCircle, description: "Chat with class" },
-    { href: "/student/profile", label: "My Profile", icon: UserCircle, description: "Your details" },
+    { href: "/student/recordings", label: "Recordings", icon: FilmStrip, description: "Rewatch past classes" },
+    { href: "/student/assignments", label: "Assignments", icon: ClipboardText, description: "Homework & tasks" },
+    { href: "/student/attendance", label: "Attendance", icon: ListChecks, description: "Your attendance %" },
+    { href: "/student/trainer", label: "My Trainer", icon: ChalkboardTeacher, description: "Your instructor" },
+    { href: "/student/whatsapp", label: "WhatsApp", icon: ChatsCircle, description: "Class group chat" },
+    { href: "/student/profile", label: "Profile", icon: UserCircle, description: "Account & logins" },
   ],
   trainer: [
     { href: "/trainer/dashboard", label: "Home", icon: House, description: "Trainer dashboard" },

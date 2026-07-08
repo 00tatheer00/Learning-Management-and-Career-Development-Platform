@@ -82,19 +82,19 @@ export default function StudentAssignmentsPage() {
   };
 
   return (
-    <div>
+    <div className="space-y-6">
       <PortalPageHeader
-        eyebrow="Student Portal"
+        eyebrow="Homework"
         title="Assignments"
-        description="Read the task, write your answer, and click Submit. Your trainer will review it."
+        description="Read the task, write your answer, and submit. Your trainer will review it."
       />
 
       {pageLoading ? (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {[1, 2].map((i) => (
             <div
               key={i}
-              className="h-32 rounded-2xl border border-border bg-surface/60 animate-pulse"
+              className="h-32 rounded-2xl border border-pt bg-pt-muted/50 animate-pulse"
             />
           ))}
         </div>
@@ -104,35 +104,35 @@ export default function StudentAssignmentsPage() {
           description="Your trainer will post assignments here when they are ready."
         />
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {assignments.map((assignment) => {
             const submission = getSubmission(assignment.id);
             const isOpen = selectedId === assignment.id;
 
             return (
-              <div key={assignment.id} className="rounded-2xl border border-border bg-background p-5 sm:p-6">
+              <div key={assignment.id} className="portal-card rounded-2xl p-5 sm:p-6">
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div>
-                    <h2 className="text-lg font-bold">{assignment.title}</h2>
-                    <p className="text-sm text-muted flex items-center gap-1.5 mt-1">
+                    <h2 className="text-lg font-bold text-pt">{assignment.title}</h2>
+                    <p className="text-sm text-pt-muted flex items-center gap-1.5 mt-1">
                       <Clock size={16} weight="duotone" />
                       Due: {assignment.dueDate}
                     </p>
                   </div>
                   {submission && (
-                    <span className="inline-flex items-center gap-1 text-sm font-semibold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full">
+                    <span className="inline-flex items-center gap-1 text-sm font-semibold student-badge-live px-3 py-1 rounded-full">
                       <CheckCircle size={16} weight="duotone" />
                       Submitted
                     </span>
                   )}
                 </div>
 
-                <p className="text-muted mb-4">{assignment.description}</p>
+                <p className="text-pt-muted mb-4 leading-relaxed">{assignment.description}</p>
 
                 {submission ? (
-                  <div className="rounded-xl bg-surface p-4 space-y-2">
-                    <p className="text-sm font-semibold">Your submission:</p>
-                    <p className="text-sm">{submission.content}</p>
+                  <div className="rounded-xl bg-pt-muted border border-pt-subtle p-4 space-y-2">
+                    <p className="text-sm font-semibold text-pt">Your submission:</p>
+                    <p className="text-sm text-pt-secondary">{submission.content}</p>
                     {submission.feedback && (
                       <p className="text-sm text-primary mt-2">
                         <strong>Trainer feedback:</strong> {submission.feedback}
@@ -142,13 +142,13 @@ export default function StudentAssignmentsPage() {
                 ) : isOpen ? (
                   <div className="space-y-3">
                     <div>
-                      <Label className="text-base">Your Answer</Label>
+                      <Label className="text-base text-pt">Your Answer</Label>
                       <textarea
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
                         rows={5}
                         placeholder="Write your assignment answer here..."
-                        className="mt-2 w-full rounded-xl border border-border bg-background px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary/30"
+                        className="mt-2 w-full rounded-xl border border-pt bg-pt-surface px-4 py-3 text-base text-pt focus:outline-none focus:ring-2 focus:ring-primary/30"
                       />
                     </div>
                     <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">

@@ -13,14 +13,14 @@ export function StudentModuleEnrollmentsCard({
   if (enrollments.length === 0) return null;
 
   return (
-    <div className="rounded-2xl border border-border bg-background p-5 sm:p-6 mb-8 shadow-sm space-y-4">
+    <div className="portal-card rounded-2xl p-5 sm:p-6 mb-0 space-y-4">
       <div className="flex items-start gap-3">
         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
           <Key size={22} weight="duotone" />
         </div>
         <div>
-          <h2 className="text-lg font-bold">Your Module Logins</h2>
-          <p className="text-sm text-muted">
+          <h2 className="text-lg font-bold text-pt">Your Module Logins</h2>
+          <p className="text-sm text-pt-muted">
             You registered for {enrollments.length} module{enrollments.length === 1 ? "" : "s"}.
             Each module has its own portal password below.
           </p>
@@ -34,18 +34,18 @@ export function StudentModuleEnrollmentsCard({
             className={cn(
               "rounded-xl border p-4 space-y-3",
               entry.canJoinLiveClasses
-                ? "border-primary/30 bg-primary/5"
-                : "border-border bg-surface/40"
+                ? "portal-tone-emerald"
+                : "portal-tone-indigo"
             )}
           >
             <div className="flex flex-wrap items-center gap-2">
-              <p className="font-semibold">{entry.moduleName}</p>
+              <p className="font-semibold text-pt">{entry.moduleName}</p>
               {entry.canJoinLiveClasses ? (
-                <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-800">
+                <span className="student-badge-live rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide">
                   Live classes open
                 </span>
               ) : (
-                <span className="rounded-full bg-indigo-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-indigo-800">
+                <span className="student-badge-pending rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide">
                   Starts later
                 </span>
               )}
@@ -53,17 +53,17 @@ export function StudentModuleEnrollmentsCard({
 
             <div className="grid gap-2 text-sm">
               <p>
-                <span className="text-muted">Login ID:</span>{" "}
-                <span className="font-mono font-medium">{entry.loginId}</span>
+                <span className="text-pt-muted">Login ID:</span>{" "}
+                <span className="font-mono font-medium text-pt">{entry.loginId}</span>
               </p>
               <p>
-                <span className="text-muted">Password:</span>{" "}
-                <span className="font-mono font-medium">
+                <span className="text-pt-muted">Password:</span>{" "}
+                <span className="font-mono font-medium text-pt">
                   {entry.password ?? "Ask admin to resend from Portal Logins"}
                 </span>
               </p>
               <p>
-                <span className="text-muted">Portal:</span>{" "}
+                <span className="text-pt-muted">Portal:</span>{" "}
                 <a href={entry.loginUrl} className="text-primary underline break-all">
                   {entry.loginUrl}
                 </a>
