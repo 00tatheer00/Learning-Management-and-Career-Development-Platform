@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 interface StudentRecordingsContentProps {
   programSlug: string;
   recordings: ClassRecordingRecord[];
+  adminView?: boolean;
 }
 
 function statusStyles(status: ClassSlot["status"]) {
@@ -57,6 +58,7 @@ function statusStyles(status: ClassSlot["status"]) {
 export function StudentRecordingsContent({
   programSlug,
   recordings,
+  adminView = false,
 }: StudentRecordingsContentProps) {
   const progress = getClassProgress(programSlug);
   const category = getProgramCategory(programSlug);
@@ -235,21 +237,23 @@ export function StudentRecordingsContent({
         </div>
       )}
 
-      <div className="flex flex-wrap gap-3">
-        <Link
-          href="/student/classes"
-          className="inline-flex items-center gap-2 rounded-xl border border-pt px-4 py-2.5 text-sm font-semibold text-pt hover:bg-surface transition-colors"
-        >
-          <VideoCamera size={16} weight="duotone" />
-          Join live class
-        </Link>
-        {progress.completedCount > 0 && (
-          <div className="inline-flex items-center gap-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 px-4 py-2.5 text-sm font-semibold text-emerald-800 dark:text-emerald-200">
-            <CheckCircle size={16} weight="fill" />
-            {progress.completedCount} class{progress.completedCount === 1 ? "" : "es"} completed
-          </div>
-        )}
-      </div>
+      {!adminView && (
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="/student/classes"
+            className="inline-flex items-center gap-2 rounded-xl border border-pt px-4 py-2.5 text-sm font-semibold text-pt hover:bg-surface transition-colors"
+          >
+            <VideoCamera size={16} weight="duotone" />
+            Join live class
+          </Link>
+          {progress.completedCount > 0 && (
+            <div className="inline-flex items-center gap-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 px-4 py-2.5 text-sm font-semibold text-emerald-800 dark:text-emerald-200">
+              <CheckCircle size={16} weight="fill" />
+              {progress.completedCount} class{progress.completedCount === 1 ? "" : "es"} completed
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
