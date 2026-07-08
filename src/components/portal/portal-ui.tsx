@@ -186,13 +186,13 @@ export function QuickActionCard({
       href={href}
       className={cn(
         portalPressable,
-        "group flex items-center portal-card rounded-2xl transition-all duration-250 hover:border-primary/30 hover:shadow-pt-md hover:-translate-y-0.5",
+        "group flex items-center portal-card rounded-2xl transition-all duration-300 hover:border-primary/30 hover:shadow-pt-md hover:-translate-y-1",
         compact ? "gap-3 p-3" : "gap-3.5 p-4"
       )}
     >
       <div
         className={cn(
-          "flex shrink-0 items-center justify-center rounded-xl text-white shadow-sm",
+          "flex shrink-0 items-center justify-center rounded-xl text-white shadow-sm transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3",
           compact ? "h-9 w-9" : "h-10 w-10",
           color ? color : cn("bg-gradient-to-br", gradient)
         )}

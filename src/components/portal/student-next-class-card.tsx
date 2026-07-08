@@ -72,19 +72,24 @@ export function StudentNextClassCard({
       className={cn(
         "portal-card rounded-2xl p-5 sm:p-6",
         isLive || countdown?.isSoon
-          ? "portal-tone-emerald ring-1 ring-[#5a6b62]/25"
+          ? "portal-tone-emerald ring-1 ring-[#1f6b45]/20"
           : "portal-tone-sky"
       )}
     >
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
         <div className="flex-1 min-w-0">
           <p className="text-xs font-bold text-primary uppercase tracking-[0.14em] mb-2 flex items-center gap-2 flex-wrap">
-            <VideoCamera size={18} weight="duotone" />
+            <VideoCamera
+              size={18}
+              weight="duotone"
+              className={cn(isLive && "student-pulse-soft rounded-full")}
+            />
             {isLive ? "Live Class Now" : "Next Live Class"}
             <span
               className={cn(
                 "text-[10px] font-bold uppercase rounded-full px-2.5 py-0.5 normal-case tracking-normal",
-                lifecycle.badgeClassName
+                lifecycle.badgeClassName,
+                isLive && "student-pulse-soft"
               )}
             >
               {lifecycle.badgeLabel}
