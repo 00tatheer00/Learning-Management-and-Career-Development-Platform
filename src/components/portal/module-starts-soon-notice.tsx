@@ -18,12 +18,12 @@ export function ModuleStartsSoonNotice({
   return (
     <div
       className={cn(
-        "portal-card rounded-2xl portal-tone-indigo border-dashed",
+        "portal-card rounded-2xl border border-pt border-dashed",
         compact ? "p-4" : "p-5 sm:p-6"
       )}
     >
       <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-[#1a365d] dark:bg-[#1a365d]/40 dark:text-[#c9a84c]">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#c9a84c]/10 text-[#c9a84c] border border-[#c9a84c]/25">
           <CalendarBlank size={22} weight="duotone" />
         </span>
         <div>

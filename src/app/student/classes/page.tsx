@@ -38,7 +38,7 @@ export default async function StudentClassesPage() {
         <ModuleStartsSoonNotice programSlug={programSlug} studentModule={user.level} />
       )}
 
-      <PortalSurfaceCard className="p-4 sm:p-5 portal-tone-sky">
+      <PortalSurfaceCard className="p-4 sm:p-5 border border-pt">
         <p className="font-semibold text-pt">{classSchedule.headline}</p>
         <p className="text-sm text-pt-muted mt-1">
           {classSchedule.daysLabel} · {classSchedule.subline}

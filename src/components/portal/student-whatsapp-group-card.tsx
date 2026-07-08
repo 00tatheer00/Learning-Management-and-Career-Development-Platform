@@ -1,4 +1,4 @@
-import { WhatsappLogo, ChatsCircle } from "@phosphor-icons/react/ssr";
+import { WhatsappLogo } from "@phosphor-icons/react/ssr";
 import { Button } from "@/components/ui/button";
 import {
   STUDENT_WHATSAPP_GROUP_NAME,
@@ -21,7 +21,7 @@ export function StudentWhatsAppGroupCard({
   return (
     <div
       className={cn(
-        "portal-card rounded-2xl portal-tone-emerald border border-blue-100/60",
+        "portal-card rounded-2xl border border-pt",
         isBanner ? "p-5 sm:p-6" : "p-6 sm:p-10 text-center max-w-xl mx-auto",
         className
       )}
@@ -33,14 +33,14 @@ export function StudentWhatsAppGroupCard({
         )}
       >
         <div className={cn("flex gap-4", isBanner ? "items-start sm:items-center" : "flex-col items-center")}>
-          <div className="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#1f6b45] text-white shadow-sm">
-            <WhatsappLogo size={isBanner ? 28 : 40} weight="fill" />
+          <div className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#c9a84c]/10 text-[#c9a84c] border border-[#c9a84c]/25">
+            <WhatsappLogo size={isBanner ? 26 : 36} weight="fill" />
           </div>
           <div className={cn(!isBanner && "text-center")}>
-            <h2 className={cn("font-bold", isBanner ? "text-lg sm:text-xl" : "text-2xl mb-3")}>
+            <h2 className={cn("font-semibold text-pt", isBanner ? "text-base sm:text-lg" : "text-2xl mb-3")}>
               {STUDENT_UR.whatsappCard.joinTitle(STUDENT_WHATSAPP_GROUP_NAME)}
             </h2>
-            <p className={cn("text-pt-muted leading-relaxed", isBanner ? "text-sm sm:text-base mt-1" : "mb-6")}>
+            <p className={cn("text-pt-muted leading-relaxed text-sm", isBanner ? "mt-1" : "mb-6")}>
               {isBanner ? STUDENT_UR.whatsappCard.bannerDesc : STUDENT_UR.whatsappCard.pageDesc}
             </p>
           </div>
@@ -49,13 +49,13 @@ export function StudentWhatsAppGroupCard({
         <Button
           size="lg"
           className={cn(
-            "h-14 text-base bg-[#1f6b45] hover:bg-[#185636] text-white shrink-0",
+            "h-12 bg-[#c9a84c] hover:bg-[#dbb85a] text-[#0a0a0b] font-semibold shrink-0 border-0",
             isBanner ? "w-full sm:w-auto" : "w-full"
           )}
           asChild
         >
           <a href={STUDENT_WHATSAPP_GROUP_URL} target="_blank" rel="noopener noreferrer">
-            <WhatsappLogo size={22} weight="fill" />
+            <WhatsappLogo size={20} weight="fill" />
             {STUDENT_UR.whatsappCard.joinButton}
           </a>
         </Button>
@@ -63,16 +63,15 @@ export function StudentWhatsAppGroupCard({
 
       {!isBanner && (
         <>
-          <div className="space-y-3 text-left mb-8 mt-8">
+          <ul className="space-y-2.5 text-left mb-8 mt-8 text-sm text-pt-muted">
             {STUDENT_UR.whatsappCard.bullets.map((item) => (
-              <div key={item} className="flex items-start gap-3 text-sm">
-                <ChatsCircle size={20} weight="duotone" className="text-[#1f6b45] shrink-0 mt-0.5" />
+              <li key={item} className="flex items-start gap-2.5">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#c9a84c]" />
                 {item}
-              </div>
+              </li>
             ))}
-          </div>
-
-          <p className="text-xs text-pt-muted">{STUDENT_UR.whatsappCard.footer}</p>
+          </ul>
+          <p className="text-xs text-pt-faint">{STUDENT_UR.whatsappCard.footer}</p>
         </>
       )}
     </div>

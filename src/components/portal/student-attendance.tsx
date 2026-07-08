@@ -29,14 +29,14 @@ export async function StudentAttendanceProgressCard({
 
   const barTone =
     percentage >= 80
-      ? "from-[#1f6b45] to-[#144d31]"
+      ? "from-[#c9a84c] to-[#8a6d28]"
       : percentage >= 50
-        ? "from-[#c9a84c] to-[#8a6d28]"
-        : "from-rose-600 to-rose-800";
+        ? "from-[#71717a] to-[#52525b]"
+        : "from-rose-700 to-rose-900";
 
   return (
-    <div className="rounded-2xl border border-pt overflow-hidden shadow-sm bg-gradient-to-br from-background to-surface/50">
-      <div className="px-5 py-4 border-b border-pt bg-gradient-to-r from-slate-800 to-slate-700 text-white">
+    <div className="rounded-2xl border border-pt overflow-hidden portal-card">
+      <div className="px-5 py-4 border-b border-pt bg-gradient-to-r from-[#141416] to-[#0a0a0b] text-white">
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-widest text-white/75">
@@ -87,9 +87,9 @@ function StatPill({
   tone: "emerald" | "amber" | "rose";
 }) {
   const tones = {
-    emerald: "text-[#1f6b45] bg-[#1f6b45]/10 border-[#1f6b45]/20",
-    amber: "text-[#8a6d28] bg-[#c9a84c]/15 border-[#c9a84c]/30",
-    rose: "text-rose-800 bg-rose-50 border-rose-200",
+    emerald: "text-[#dbb85a] bg-[#c9a84c]/10 border-[#c9a84c]/25",
+    amber: "text-[#a1a1aa] bg-pt-muted border-pt",
+    rose: "text-rose-300 bg-rose-950/30 border-rose-800/40",
   };
 
   return (
@@ -126,10 +126,10 @@ export async function StudentAttendancePageContent() {
   const percentage = stats.percentage;
   const barTone =
     percentage >= 80
-      ? "from-[#1f6b45] to-[#144d31]"
+      ? "from-[#c9a84c] to-[#8a6d28]"
       : percentage >= 50
-        ? "from-[#c9a84c] to-[#8a6d28]"
-        : "from-rose-600 to-rose-800";
+        ? "from-[#71717a] to-[#52525b]"
+        : "from-rose-700 to-rose-900";
 
   return (
     <div className="space-y-4">

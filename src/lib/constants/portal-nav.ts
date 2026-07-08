@@ -109,8 +109,28 @@ export const PORTAL_LABELS: Record<UserRole, string> = {
 };
 
 export const PORTAL_COLORS: Record<UserRole, string> = {
-  student: "from-[#1a365d] to-[#0b1b33]",
+  student: "from-[#0a0a0b] to-[#18181b]",
   trainer: "from-blue-500 to-indigo-500",
   admin: "from-slate-700 to-slate-900",
   admin_readonly: "from-violet-600 to-indigo-900",
 };
+
+export const STUDENT_PAGE_TITLES: Record<string, string> = {
+  "/student/dashboard": "Home",
+  "/student/course": "My Course",
+  "/student/classes": "Live Classes",
+  "/student/recordings": "Recordings",
+  "/student/assignments": "Assignments",
+  "/student/attendance": "Attendance",
+  "/student/trainer": "My Trainer",
+  "/student/whatsapp": "WhatsApp",
+  "/student/profile": "Profile",
+};
+
+export function getStudentPageTitle(pathname: string): string {
+  if (STUDENT_PAGE_TITLES[pathname]) return STUDENT_PAGE_TITLES[pathname];
+  const nested = Object.entries(STUDENT_PAGE_TITLES)
+    .filter(([path]) => path !== "/student/dashboard" && pathname.startsWith(`${path}/`))
+    .sort((a, b) => b[0].length - a[0].length)[0];
+  return nested?.[1] ?? "Portal";
+}

@@ -22,7 +22,7 @@ export function ProgramCategoryBadge({
       className={cn(
         "inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider",
         variant === "onDark"
-          ? "border-white/30 bg-white/15 text-white"
+          ? "border-[#c9a84c]/35 bg-[#c9a84c]/10 text-[#dbb85a]"
           : category.badgeClass,
         className
       )}

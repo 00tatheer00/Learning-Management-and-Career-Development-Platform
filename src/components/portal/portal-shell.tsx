@@ -12,13 +12,13 @@ import {
   SidebarSimple,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
-import { PORTAL_LABELS, PORTAL_NAV_GROUPS } from "@/lib/constants/portal-nav";
+import { PORTAL_LABELS, PORTAL_NAV_GROUPS, getStudentPageTitle } from "@/lib/constants/portal-nav";
+import { getProgramCategory } from "@/lib/constants/program-categories";
 import { ProgramCategoryBadge } from "@/components/portal/program-category-badge";
 import { SiteLogo } from "@/components/shared/site-logo";
 import { PortalAvatar } from "@/components/portal/portal-avatar";
 import { SITE_CONFIG } from "@/lib/constants";
 import { StudentPortalWelcome } from "@/components/portal/student-portal-welcome";
-import { StudentModuleStartBanner } from "@/components/portal/student-module-start-banner";
 import { StudentSingleSessionGuard } from "@/components/portal/student-single-session-guard";
 import {
   AdminNotificationsBell,
@@ -61,8 +61,9 @@ interface PortalShellProps {
 }
 
 export function PortalShell({ user, children }: PortalShellProps) {
+  const defaultTheme = user.role === "student" ? "dark" : "light";
   return (
-    <PortalThemeProvider>
+    <PortalThemeProvider defaultTheme={defaultTheme}>
       <PortalShellInner user={user}>{children}</PortalShellInner>
     </PortalThemeProvider>
   );
@@ -80,7 +81,7 @@ function PortalShellInner({ user, children }: PortalShellProps) {
   const headerTitle = isAdmin
     ? getAdminDisplayName(user.name, user.role)
     : user.role === "student"
-      ? user.name.split(" ")[0]
+      ? getStudentPageTitle(pathname)
       : user.name;
 
   useEffect(() => {
@@ -121,7 +122,7 @@ function PortalShellInner({ user, children }: PortalShellProps) {
       <aside
         className={cn(
           "hidden lg:flex flex-col fixed inset-y-0 left-0 z-40 bg-pt-surface border-r border-pt transition-[width] duration-300 ease-in-out",
-          user.role === "student" && "border-pt-subtle shadow-pt",
+          isStudent && "student-sidebar border-pt-subtle",
           sidebarCollapsed ? "w-[4.5rem]" : "w-[17rem]"
         )}
       >
@@ -164,7 +165,7 @@ function PortalShellInner({ user, children }: PortalShellProps) {
       >
         <header className={cn(
           "shrink-0 sticky top-0 z-30 border-b border-pt bg-pt-header backdrop-blur-xl px-4 sm:px-6 h-14 flex items-center justify-between gap-4",
-          user.role === "student" && "border-pt-subtle"
+          isStudent && "border-pt-subtle student-topbar"
         )}>
           <div className="flex items-center gap-3 min-w-0">
             <button
@@ -176,18 +177,11 @@ function PortalShellInner({ user, children }: PortalShellProps) {
               <List size={22} weight="bold" />
             </button>
             <div className="min-w-0">
-              <p className="text-[10px] text-pt-faint uppercase tracking-[0.14em] font-semibold">
+              <p className="text-[10px] text-pt-faint uppercase tracking-[0.16em] font-medium">
                 {PORTAL_LABELS[user.role]}
               </p>
-              <p className="font-semibold text-sm sm:text-base truncate text-pt">
-                {user.role === "student" ? (
-                  <>
-                    <span className="text-pt-muted font-normal">Welcome, </span>
-                    {headerTitle}
-                  </>
-                ) : (
-                  headerTitle
-                )}
+              <p className="font-semibold text-sm sm:text-base truncate text-pt tracking-tight">
+                {headerTitle}
               </p>
             </div>
           </div>
@@ -199,26 +193,31 @@ function PortalShellInner({ user, children }: PortalShellProps) {
             )}
             {isAdmin && <AdminNotificationsBell />}
             <PortalThemeToggle />
-            <Button variant="outline" size="sm" asChild className="h-8 text-xs border-pt px-2 sm:px-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              asChild
+              className={cn("h-8 text-xs px-2 sm:px-3", isStudent && "text-pt-muted hover:text-[#c9a84c]")}
+            >
               <Link href="/" title="Back to website">
                 <House size={15} weight="duotone" />
                 <span className="sr-only sm:not-sr-only sm:ml-1">{websiteLabel}</span>
               </Link>
             </Button>
-            <Button variant="ghost" size="sm" onClick={handleLogout} className="h-8 text-xs">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleLogout}
+              className={cn("h-8 text-xs", isStudent ? "text-pt-muted hover:text-pt" : "")}
+            >
               <SignOut size={16} weight="bold" />
               <span className="hidden sm:inline">{logoutLabel}</span>
             </Button>
           </div>
         </header>
 
-        <main id="main-content" className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-6">
-          <div className={cn(user.role === "student" && "student-portal-content mx-auto max-w-6xl w-full")}>
-            {user.role === "student" && pathname === "/student/dashboard" && (
-              <div className="mb-5">
-                <StudentModuleStartBanner programSlug={user.programSlug} />
-              </div>
-            )}
+        <main id="main-content" className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8">
+          <div className={cn(isStudent && "student-portal-content mx-auto max-w-5xl w-full")}>
             {children}
           </div>
         </main>
@@ -322,7 +321,10 @@ function SidebarContent({
         </div>
 
         {!collapsed && (
-          <div className="mt-3 flex items-center gap-2.5 rounded-xl border border-pt-subtle bg-pt-muted px-2.5 py-2">
+          <div className={cn(
+            "mt-3 flex items-center gap-2.5 rounded-xl border px-2.5 py-2",
+            isStudent ? "border-pt-subtle bg-pt-muted/60" : "border-pt-subtle bg-pt-muted"
+          )}>
             <PortalAvatar
               name={user.name}
               avatarUrl={user.avatarUrl}
@@ -332,8 +334,13 @@ function SidebarContent({
             <div className="min-w-0 flex-1">
               <p className="font-semibold truncate text-xs text-pt">{displayName}</p>
               <p className="text-[10px] truncate text-pt-faint">{user.email}</p>
-              {!isAdmin && user.programSlug && (user.role === "student" || user.role === "trainer") && (
+              {!isAdmin && user.programSlug && (user.role === "student" || user.role === "trainer") && !isStudent && (
                 <ProgramCategoryBadge programSlug={user.programSlug} className="mt-0.5" />
+              )}
+              {isStudent && user.programSlug && (
+                <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wider text-[#c9a84c]/80 truncate">
+                  {getProgramCategory(user.programSlug)?.shortLabel ?? "Student"}
+                </p>
               )}
             </div>
           </div>

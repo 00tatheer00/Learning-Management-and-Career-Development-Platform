@@ -24,7 +24,7 @@ export function PortalPageHeader({
   return (
     <div className={cn("mb-6 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4", className)}>
       <div className="min-w-0">
-        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-pt-faint">{eyebrow}</p>
+        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#c9a84c]/80">{eyebrow}</p>
         <h1 className="text-2xl sm:text-3xl font-bold text-pt tracking-tight mt-1">{title}</h1>
         {description && (
           <p className="text-sm text-pt-muted mt-2 max-w-2xl leading-relaxed">{description}</p>
@@ -71,27 +71,27 @@ const accentStyles = {
   orange: {
     wrap: "portal-stat-accent-orange border",
     text: "portal-stat-text-orange",
-    icon: "bg-[#c9a84c] text-[#0b1b33]",
+    icon: "bg-[#c9a84c] text-[#0a0a0b]",
   },
   green: {
     wrap: "portal-stat-accent-green border",
     text: "portal-stat-text-green",
-    icon: "bg-[#1f6b45] text-white",
+    icon: "bg-pt-muted text-[#c9a84c] border border-pt",
   },
   blue: {
     wrap: "portal-stat-accent-blue border",
     text: "portal-stat-text-blue",
-    icon: "bg-[#1a365d] text-white",
+    icon: "bg-pt-muted text-pt-secondary border border-pt",
   },
   sky: {
     wrap: "portal-stat-accent-sky border",
     text: "portal-stat-text-sky",
-    icon: "bg-[#3b5b91] text-white",
+    icon: "bg-pt-muted text-pt-secondary border border-pt",
   },
   slate: {
     wrap: "portal-stat-accent-slate border",
     text: "portal-stat-text-slate",
-    icon: "bg-slate-700 text-white",
+    icon: "bg-pt-muted text-pt-muted border border-pt",
   },
 };
 
@@ -177,7 +177,7 @@ export function QuickActionCard({
   description,
   href,
   icon,
-  gradient = "from-[#1a365d] to-[#0b1b33]",
+  gradient = "from-[#141416] to-[#0a0a0b]",
   color,
   compact = false,
 }: QuickActionCardProps) {
@@ -202,7 +202,7 @@ export function QuickActionCard({
       <div className="min-w-0 flex-1">
         <p
           className={cn(
-            "font-semibold text-pt group-hover:text-primary transition-colors truncate",
+            "font-semibold text-pt group-hover:text-[#c9a84c] transition-colors truncate",
             compact ? "text-xs" : "text-sm"
           )}
         >

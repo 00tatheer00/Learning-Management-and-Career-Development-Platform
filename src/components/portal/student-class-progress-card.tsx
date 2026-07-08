@@ -22,11 +22,7 @@ export async function StudentClassProgressCard({ programSlug }: StudentClassProg
   );
 
   return (
-    <div
-      className={cn(
-        "rounded-2xl border border-pt overflow-hidden shadow-sm bg-gradient-to-br from-background to-surface/50"
-      )}
-    >
+    <div className="rounded-2xl border border-pt overflow-hidden portal-card">
       <div
         className={cn(
           "px-5 py-4 text-white bg-gradient-to-r",

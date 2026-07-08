@@ -1,0 +1,254 @@
+/* ── Student portal — Obsidian Black + Champagne Gold ── */
+.portal-shell[data-portal-role="student"] {
+  --primary: #c9a84c;
+  --primary-foreground: #0a0a0b;
+  --primary-glow: rgba(201, 168, 76, 0.14);
+  --accent: #dbb85a;
+  --ring: #c9a84c;
+}
+
+.portal-shell[data-portal-role="student"][data-portal-theme="light"] {
+  --pt-bg: #f0eeea;
+  --pt-surface: #faf9f7;
+  --pt-muted: #e8e6e1;
+  --pt-elevated: #ffffff;
+  --pt-border: rgba(10, 10, 11, 0.08);
+  --pt-border-subtle: rgba(10, 10, 11, 0.04);
+  --pt-text: #0a0a0b;
+  --pt-text-secondary: #27272a;
+  --pt-text-muted: #52525b;
+  --pt-text-faint: #a1a1aa;
+  --pt-nav-hover: rgba(201, 168, 76, 0.06);
+  --pt-nav-active-bg: rgba(201, 168, 76, 0.1);
+  --pt-nav-active-text: #8a6d28;
+  --pt-header-bg: rgba(250, 249, 247, 0.92);
+  --pt-shadow: 0 1px 2px rgba(10, 10, 11, 0.04);
+  --pt-shadow-md: 0 20px 50px -24px rgba(10, 10, 11, 0.16);
+  --pt-progress-track: #e4e4e7;
+  --background: var(--pt-bg);
+  --foreground: var(--pt-text);
+  --card: var(--pt-surface);
+  --card-border: var(--pt-border);
+  --secondary: var(--pt-muted);
+  --border: var(--pt-border);
+  --surface: var(--pt-muted);
+  --surface-muted: var(--pt-border-subtle);
+  --muted-foreground: var(--pt-text-muted);
+  background:
+    radial-gradient(ellipse 60% 40% at 0% -5%, rgba(201, 168, 76, 0.08), transparent 55%),
+    var(--pt-bg);
+}
+
+.portal-shell[data-portal-role="student"][data-portal-theme="dark"] {
+  --primary: #c9a84c;
+  --primary-foreground: #0a0a0b;
+  --primary-glow: rgba(201, 168, 76, 0.16);
+  --accent: #dbb85a;
+  --ring: #c9a84c;
+  --pt-bg: #0a0a0b;
+  --pt-surface: #111114;
+  --pt-muted: #18181b;
+  --pt-elevated: #1c1c21;
+  --pt-border: rgba(255, 255, 255, 0.07);
+  --pt-border-subtle: rgba(255, 255, 255, 0.04);
+  --pt-text: #fafafa;
+  --pt-text-secondary: #d4d4d8;
+  --pt-text-muted: #a1a1aa;
+  --pt-text-faint: #71717a;
+  --pt-nav-hover: rgba(255, 255, 255, 0.04);
+  --pt-nav-active-bg: rgba(201, 168, 76, 0.1);
+  --pt-nav-active-text: #dbb85a;
+  --pt-header-bg: rgba(10, 10, 11, 0.92);
+  --pt-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --pt-shadow-md: 0 24px 64px -20px rgba(0, 0, 0, 0.65);
+  --pt-progress-track: rgba(255, 255, 255, 0.06);
+  background:
+    radial-gradient(ellipse 50% 35% at 100% 0%, rgba(201, 168, 76, 0.06), transparent 50%),
+    radial-gradient(ellipse 40% 30% at 0% 100%, rgba(255, 255, 255, 0.02), transparent 45%),
+    var(--pt-bg);
+}
+
+.portal-shell[data-portal-role="student"] .student-sidebar {
+  background: var(--pt-bg);
+  border-right-color: var(--pt-border-subtle);
+}
+
+.portal-shell[data-portal-role="student"] .student-topbar {
+  background: var(--pt-header-bg);
+}
+
+.portal-shell[data-portal-role="student"] .student-portal-content {
+  animation: student-fade-in 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes student-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.portal-shell[data-portal-role="student"] .portal-nav-link-active {
+  box-shadow: inset 2px 0 0 0 var(--pt-nav-active-text);
+  color: var(--pt-nav-active-text);
+  font-weight: 600;
+  background: var(--pt-nav-active-bg);
+}
+
+.portal-shell[data-portal-role="student"] .portal-card {
+  border-radius: 1.125rem;
+  background: var(--pt-surface);
+  border-color: var(--pt-border);
+  transition: box-shadow 0.25s ease, border-color 0.2s ease;
+}
+
+.portal-shell[data-portal-role="student"] .portal-card:hover {
+  box-shadow: var(--pt-shadow-md);
+  border-color: color-mix(in srgb, var(--primary) 35%, var(--pt-border));
+}
+
+.student-hero-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.5rem;
+  border: 1px solid rgba(201, 168, 76, 0.18);
+  box-shadow:
+    0 32px 80px -32px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  color: #fafafa;
+  background: linear-gradient(160deg, #141416 0%, #0a0a0b 55%, #080809 100%);
+}
+
+.student-hero-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 50% 55% at 100% 0%, rgba(201, 168, 76, 0.14), transparent 60%);
+  pointer-events: none;
+}
+
+.student-hero-card::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: linear-gradient(180deg, #dbb85a, #8a6d28);
+  pointer-events: none;
+}
+
+.student-hero-status {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.student-badge-live {
+  background: rgba(201, 168, 76, 0.12);
+  border: 1px solid rgba(201, 168, 76, 0.35);
+  color: #dbb85a;
+}
+
+.portal-shell[data-portal-theme="light"] .student-badge-live {
+  background: rgba(201, 168, 76, 0.12);
+  border-color: rgba(138, 109, 40, 0.35);
+  color: #8a6d28;
+}
+
+.student-badge-pending {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #a1a1aa;
+}
+
+.portal-shell[data-portal-theme="light"] .student-badge-pending {
+  background: rgba(10, 10, 11, 0.04);
+  border-color: rgba(10, 10, 11, 0.1);
+  color: #52525b;
+}
+
+.portal-shell[data-portal-role="student"] .portal-tone-amber,
+.portal-shell[data-portal-role="student"] .portal-tone-emerald,
+.portal-shell[data-portal-role="student"] .portal-tone-indigo,
+.portal-shell[data-portal-role="student"] .portal-tone-sky {
+  border-color: color-mix(in srgb, var(--primary) 22%, var(--pt-border));
+  background: var(--pt-surface);
+}
+
+.portal-shell[data-portal-role="student"] .portal-stat-accent-orange {
+  background: color-mix(in srgb, var(--primary) 8%, var(--pt-surface));
+  border-color: color-mix(in srgb, var(--primary) 25%, var(--pt-border));
+}
+.portal-shell[data-portal-role="student"] .portal-stat-accent-green,
+.portal-shell[data-portal-role="student"] .portal-stat-accent-blue,
+.portal-shell[data-portal-role="student"] .portal-stat-accent-slate {
+  background: var(--pt-muted);
+  border-color: var(--pt-border);
+}
+.portal-shell[data-portal-role="student"] .portal-stat-text-orange { color: var(--accent); }
+.portal-shell[data-portal-role="student"] .portal-stat-text-green,
+.portal-shell[data-portal-role="student"] .portal-stat-text-blue { color: var(--pt-text-secondary); }
+.portal-shell[data-portal-role="student"] .portal-stat-text-slate { color: var(--pt-text-muted); }
+
+.student-hero-orb {
+  position: absolute;
+  border-radius: 9999px;
+  pointer-events: none;
+  filter: blur(48px);
+  opacity: 0.4;
+  z-index: 0;
+}
+
+.student-hero-orb-a {
+  width: 200px;
+  height: 200px;
+  top: -40px;
+  right: -20px;
+  background: rgba(201, 168, 76, 0.25);
+}
+
+.student-cta-glow {
+  position: relative;
+  overflow: hidden;
+}
+
+.student-cta-glow::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 25%, rgba(255, 255, 255, 0.28) 50%, transparent 75%);
+  transform: translateX(-120%);
+  animation: student-shimmer 4s ease-in-out infinite;
+}
+
+@keyframes student-shimmer {
+  0%,
+  60% {
+    transform: translateX(-120%);
+  }
+  85%,
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+.student-help-fab {
+  background: #111114;
+  color: #dbb85a;
+  border: 1px solid rgba(201, 168, 76, 0.45);
+  box-shadow: 0 12px 40px -8px rgba(0, 0, 0, 0.55);
+}
+
+.student-help-fab:hover {
+  background: #18181b;
+  border-color: rgba(219, 184, 90, 0.65);
+  color: #f0dfb0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .student-cta-glow::after {
+    animation: none !important;
+  }
+}

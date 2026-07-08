@@ -46,9 +46,9 @@ export default async function StudentProfilePage() {
       </PortalPageHeader>
 
       <PortalSurfaceCard className="overflow-hidden max-w-2xl p-0">
-        <div className={cn("p-6 sm:p-8 text-white bg-gradient-to-br", gradient)}>
+        <div className={cn("p-6 sm:p-8 text-white bg-gradient-to-br border-b border-[#c9a84c]/20", gradient)}>
           <div className="flex items-center gap-4">
-            <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-2xl font-bold border border-white/25">
+            <div className="h-16 w-16 rounded-2xl bg-[#c9a84c]/15 backdrop-blur flex items-center justify-center text-2xl font-bold border border-[#c9a84c]/30 text-[#dbb85a]">
               {user.name
                 .split(" ")
                 .map((n) => n[0])
@@ -65,7 +65,7 @@ export default async function StudentProfilePage() {
         <div className="divide-y divide-pt-subtle">
           {fields.map(({ icon: Icon, label, value }) => (
             <div key={label} className="flex items-center gap-4 px-5 sm:px-6 py-4">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#c9a84c]/10 text-[#c9a84c]">
                 <Icon size={20} weight="duotone" />
               </div>
               <div>

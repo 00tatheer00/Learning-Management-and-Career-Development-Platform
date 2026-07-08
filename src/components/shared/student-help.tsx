@@ -4,19 +4,26 @@ import Link from "next/link";
 import { WhatsappLogo, Question } from "@phosphor-icons/react";
 import { HELP_CONFIG, SIMPLE_STEPS } from "@/lib/constants/help";
 import { cn } from "@/lib/utils";
+import { usePathname } from "next/navigation";
 
 interface HelpWhatsAppProps {
   className?: string;
 }
 
 export function HelpWhatsApp({ className }: HelpWhatsAppProps) {
+  const pathname = usePathname();
+  const isStudentPortal = pathname?.startsWith("/student");
+
   return (
     <a
       href={HELP_CONFIG.whatsappUrl}
       target="_blank"
       rel="noopener noreferrer"
       className={cn(
-        "fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full bg-[#1f6b45] px-4 py-3.5 text-white font-semibold shadow-lg shadow-[#1f6b45]/25 cursor-pointer hover:bg-[#185636] transition-colors",
+        "fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full px-4 py-3.5 font-semibold transition-colors cursor-pointer",
+        isStudentPortal
+          ? "student-help-fab"
+          : "bg-[#1f6b45] text-white shadow-lg shadow-[#1f6b45]/25 hover:bg-[#185636]",
         className
       )}
       aria-label={`Get help on WhatsApp — ${HELP_CONFIG.whatsappDisplay}`}
@@ -59,7 +66,7 @@ export function SimpleStepsBanner({ className }: SimpleStepsBannerProps) {
       </ol>
       <p className="mt-4 text-sm text-muted flex items-start gap-2">
         <Question size={18} weight="duotone" className="text-primary shrink-0 mt-0.5" />
-        Stuck? Tap the green{" "}
+        Stuck? Tap the{" "}
         <strong className="text-foreground">Need Help?</strong> button anytime, or{" "}
         <Link href="/contact" className="text-primary font-medium underline">
           contact us

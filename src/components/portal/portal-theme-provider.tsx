@@ -23,17 +23,23 @@ interface PortalThemeContextValue {
 
 const PortalThemeContext = createContext<PortalThemeContextValue | null>(null);
 
-export function PortalThemeProvider({ children }: { children: React.ReactNode }) {
+export function PortalThemeProvider({
+  children,
+  defaultTheme = "light",
+}: {
+  children: React.ReactNode;
+  defaultTheme?: PortalThemeMode;
+}) {
   const [theme, setThemeState] = useState<PortalThemeMode>(() => {
-    if (typeof window === "undefined") return "light";
+    if (typeof window === "undefined") return defaultTheme;
     const init = document.documentElement.dataset.portalThemeInit;
     if (init === "dark" || init === "light") return init;
-    return getStoredPortalTheme();
+    return getStoredPortalTheme(defaultTheme);
   });
 
   useLayoutEffect(() => {
-    setThemeState(getStoredPortalTheme());
-  }, []);
+    setThemeState(getStoredPortalTheme(defaultTheme));
+  }, [defaultTheme]);
 
   const setTheme = useCallback((mode: PortalThemeMode) => {
     setThemeState(mode);

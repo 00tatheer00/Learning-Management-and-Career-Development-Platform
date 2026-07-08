@@ -9,6 +9,7 @@ import { createMetadata } from "@/lib/seo/metadata";
 import { SITE_CONFIG } from "@/lib/constants";
 import { PORTAL_THEME_STORAGE_KEY } from "@/lib/constants/portal-theme";
 import "./globals.css";
+import "./student-portal-theme.css";
 
 const inter = Inter({
   variable: "--font-inter",
