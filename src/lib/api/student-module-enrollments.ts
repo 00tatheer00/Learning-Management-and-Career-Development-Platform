@@ -7,6 +7,7 @@ import {
   isFirstModuleStudent,
 } from "@/lib/modules/student-module-access";
 import { getPortalLoginUrl } from "@/lib/site-url";
+import { isDemoPortalStudent } from "@/lib/constants/demo-student";
 
 export interface StudentModuleEnrollmentView {
   enrollmentId: string;
@@ -21,6 +22,17 @@ export interface StudentModuleEnrollmentView {
 }
 
 export async function getStudentModuleEnrollmentViews(
+  email: string,
+  programSlug: string
+): Promise<StudentModuleEnrollmentView[]> {
+  const views = await loadStudentModuleEnrollmentViews(email, programSlug);
+  if (!isDemoPortalStudent(email)) {
+    return views;
+  }
+  return buildDemoModuleEnrollmentViews(email, programSlug, views);
+}
+
+async function loadStudentModuleEnrollmentViews(
   email: string,
   programSlug: string
 ): Promise<StudentModuleEnrollmentView[]> {
@@ -62,17 +74,53 @@ export async function getStudentModuleEnrollmentViews(
     password: decryptPortalPassword(enrollment.portalPasswordEnc),
     loginUrl,
     approvedAt: enrollment.reviewedAt?.toISOString() ?? null,
-    canJoinLiveClasses: isFirstModuleStudent(programSlug, enrollment.level),
+    canJoinLiveClasses: isDemoPortalStudent(email)
+      ? true
+      : isFirstModuleStudent(programSlug, enrollment.level),
   }));
+}
+
+function buildDemoModuleEnrollmentViews(
+  email: string,
+  programSlug: string,
+  existing: StudentModuleEnrollmentView[]
+): StudentModuleEnrollmentView[] {
+  const loginUrl = getPortalLoginUrl();
+  const courseTitle = getProgramBySlug(programSlug)?.title ?? programSlug;
+  const loginId = email.trim().toLowerCase();
+  const password = existing.find((view) => view.password)?.password ?? null;
+  const byModule = new Map(existing.map((view) => [view.moduleName, view]));
+
+  return getProgramModuleNames(programSlug).map((moduleName, index) => {
+    const current = byModule.get(moduleName);
+    if (current) {
+      return { ...current, canJoinLiveClasses: true };
+    }
+
+    return {
+      enrollmentId: `demo-${programSlug}-${index}`,
+      moduleName,
+      programSlug,
+      courseTitle,
+      loginId,
+      password,
+      loginUrl,
+      approvedAt: null,
+      canJoinLiveClasses: true,
+    };
+  });
 }
 
 export { verifyStudentLoginPassword } from "@/lib/auth/student-login-password";
 
 export function studentHasLiveClassAccess(
   programSlug: string,
-  moduleViews: StudentModuleEnrollmentView[]
+  moduleViews: StudentModuleEnrollmentView[],
+  email?: string | null
 ): boolean {
+  if (isDemoPortalStudent(email)) return true;
+
   return moduleViews.some((view) =>
-    canAccessModuleOneClasses(programSlug, view.moduleName, moduleViews.map((v) => v.moduleName))
+    canAccessModuleOneClasses(programSlug, view.moduleName, moduleViews.map((v) => v.moduleName), email)
   );
 }

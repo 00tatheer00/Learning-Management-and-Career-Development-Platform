@@ -1,4 +1,5 @@
 import { getProgramBySlug } from "@/lib/data/programs";
+import { isDemoPortalStudent } from "@/lib/constants/demo-student";
 
 export function getFirstModuleName(programSlug: string): string | null {
   return getProgramBySlug(programSlug)?.modules[0]?.name ?? null;
@@ -41,8 +42,11 @@ export function isFirstModuleStudent(programSlug: string, level?: string | null)
 export function canAccessModuleOneClasses(
   programSlug: string,
   level?: string | null,
-  approvedLevels?: string[]
+  approvedLevels?: string[],
+  email?: string | null
 ): boolean {
+  if (isDemoPortalStudent(email)) return true;
+
   const activeLevel = approvedLevels?.length
     ? resolveActiveStudentModule(programSlug, level, approvedLevels)
     : level;

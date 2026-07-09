@@ -47,7 +47,7 @@ export default async function StudentDashboardPage() {
     ? await getStudentModuleEnrollmentViews(user.email, programSlug)
     : [];
   const nextSession = findNextUpcomingSession(sessions, programSlug);
-  const canJoinLive = studentHasLiveClassAccess(programSlug, moduleEnrollments);
+  const canJoinLive = studentHasLiveClassAccess(programSlug, moduleEnrollments, user.email);
 
   const classDates = sessions.map((s) => s.date);
   const reminders: {
@@ -154,6 +154,7 @@ export default async function StudentDashboardPage() {
                   programSlug={programSlug}
                   studentId={user.id}
                   studentLevel={user.level}
+                  studentEmail={user.email}
                 />
               </StudentStaggerItem>
               <StudentStaggerItem>

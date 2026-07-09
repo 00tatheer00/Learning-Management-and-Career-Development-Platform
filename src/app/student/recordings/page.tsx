@@ -16,7 +16,7 @@ export default async function StudentRecordingsPage() {
   const moduleEnrollments = user.email
     ? await getStudentModuleEnrollmentViews(user.email, programSlug)
     : [];
-  const canAccess = studentHasLiveClassAccess(programSlug, moduleEnrollments);
+  const canAccess = studentHasLiveClassAccess(programSlug, moduleEnrollments, user.email);
   const recordings = canAccess ? await getClassRecordings(programSlug) : [];
 
   return (

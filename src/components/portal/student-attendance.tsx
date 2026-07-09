@@ -14,14 +14,16 @@ interface StudentAttendanceProgressCardProps {
   programSlug: string;
   studentId: string;
   studentLevel?: string | null;
+  studentEmail?: string | null;
 }
 
 export async function StudentAttendanceProgressCard({
   programSlug,
   studentId,
   studentLevel,
+  studentEmail,
 }: StudentAttendanceProgressCardProps) {
-  const canTrack = canAccessModuleOneClasses(programSlug, studentLevel);
+  const canTrack = canAccessModuleOneClasses(programSlug, studentLevel, undefined, studentEmail);
   if (!canTrack) return null;
 
   const stats = await getStudentAttendanceSummary(studentId, programSlug);
@@ -108,7 +110,7 @@ export async function StudentAttendancePageContent() {
   if (!user) return null;
 
   const programSlug = user.programSlug ?? "web-development";
-  const canTrack = canAccessModuleOneClasses(programSlug, user.level);
+  const canTrack = canAccessModuleOneClasses(programSlug, user.level, undefined, user.email);
 
   if (!canTrack) {
     return (

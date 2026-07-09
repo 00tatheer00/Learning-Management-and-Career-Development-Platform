@@ -3,11 +3,16 @@ import {
   getProgramModuleNames,
   resolveActiveStudentModule,
 } from "@/lib/modules/student-module-access";
+import { isDemoPortalStudent } from "@/lib/constants/demo-student";
 
 export async function getApprovedEnrollmentLevels(
   email: string,
   programSlug: string
 ): Promise<string[]> {
+  if (isDemoPortalStudent(email)) {
+    return getProgramModuleNames(programSlug);
+  }
+
   const rows = await prisma.enrollment.findMany({
     where: {
       email: email.trim().toLowerCase(),

@@ -1,6 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import { buildLiveSessionTimestamps } from "../src/lib/sessions/live-session-datetime";
 import { hashPassword } from "../src/lib/auth/password";
+import { encryptPortalPassword } from "../src/lib/auth/portal-password-vault";
+import { getProgramModuleNames } from "../src/lib/modules/student-module-access";
 import { getDatabaseUrl } from "../src/lib/database-url";
 
 const prisma = new PrismaClient({
@@ -71,6 +73,59 @@ const DEFAULT_USERS = [
   },
 ];
 
+const DEMO_STUDENT_EMAIL = "student@eest.com";
+
+async function upsertDemoStudentEnrollments(studentPassword: string) {
+  const modules = getProgramModuleNames("web-development");
+  if (modules.length === 0) return;
+
+  let portalPasswordEnc: string | undefined;
+  try {
+    portalPasswordEnc = encryptPortalPassword(studentPassword);
+  } catch {
+    portalPasswordEnc = undefined;
+  }
+
+  const reviewedAt = new Date();
+
+  for (const [index, level] of modules.entries()) {
+    const id = `enrollment-demo-web-${index + 1}`;
+    await prisma.enrollment.upsert({
+      where: { id },
+      create: {
+        id,
+        fullName: "Demo Student",
+        fatherName: "Demo Father",
+        institution: "EEST",
+        classSemester: "N/A",
+        cnic: "4210112345671",
+        email: DEMO_STUDENT_EMAIL,
+        whatsapp: "03001234567",
+        fieldOfStudy: "Computer Science",
+        program: "web-development",
+        level,
+        batch: "Batch 1",
+        learningMode: "online",
+        hasLaptop: "yes",
+        internetAvailable: "yes",
+        confirmInfoCorrect: true,
+        agreeToPolicies: true,
+        portalPasswordEnc,
+        status: "approved",
+        reviewedAt,
+        reviewedBy: "admin-1",
+      },
+      update: {
+        level,
+        status: "approved",
+        reviewedAt,
+        reviewedBy: "admin-1",
+        ...(portalPasswordEnc ? { portalPasswordEnc } : {}),
+      },
+    });
+  }
+}
+
 const DEFAULT_MATERIALS: Array<{
   id: string;
   programSlug: string;
@@ -133,6 +188,11 @@ async function main() {
     await upsertUser(user);
   }
 
+  const demoStudent = DEFAULT_USERS.find((user) => user.email === DEMO_STUDENT_EMAIL);
+  if (demoStudent && "password" in demoStudent) {
+    await upsertDemoStudentEnrollments(demoStudent.password);
+  }
+
   await prisma.assignmentSubmission.deleteMany({});
   await prisma.assignment.deleteMany({});
   await prisma.courseMaterial.deleteMany({});
@@ -193,7 +253,7 @@ async function main() {
     });
   }
 
-  console.log("Seed complete: users upserted; course content cleared.");
+  console.log("Seed complete: users and demo enrollments upserted; course content cleared.");
 }
 
 main()

@@ -20,7 +20,7 @@ export default async function StudentClassesPage() {
     : [];
   const sessions = sortLiveSessionsForDisplay(await getLiveSessionsPreview(programSlug));
   const classSchedule = getStudentClassSchedule(programSlug);
-  const canJoinLive = studentHasLiveClassAccess(programSlug, moduleEnrollments);
+  const canJoinLive = studentHasLiveClassAccess(programSlug, moduleEnrollments, user.email);
 
   return (
     <div className="space-y-6">

@@ -35,7 +35,7 @@ export async function GET(
     });
   }
 
-  if (!canAccessModuleOneClasses(session.programSlug, user.level)) {
+  if (!canAccessModuleOneClasses(session.programSlug, user.level, undefined, user.email)) {
     return NextResponse.json(
       createApiResponse(false, {
         message: STUDENT_UR.joinClass.moduleNotStarted,

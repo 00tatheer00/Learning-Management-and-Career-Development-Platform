@@ -163,7 +163,7 @@ async function loadAttendanceContext(programSlug: string) {
     }),
     prisma.user.findMany({
       where: { role: "student", programSlug, isActive: true },
-      select: { id: true, name: true, level: true, programSlug: true },
+      select: { id: true, name: true, level: true, programSlug: true, email: true },
     }),
     prisma.classAttendance.findMany({
       where: { programSlug },
@@ -190,7 +190,7 @@ export async function getStudentAttendanceSummary(studentId: string, programSlug
     }),
     prisma.user.findUnique({
       where: { id: studentId },
-      select: { level: true },
+      select: { level: true, email: true },
     }),
   ]);
 
@@ -198,6 +198,7 @@ export async function getStudentAttendanceSummary(studentId: string, programSlug
     studentId,
     programSlug,
     studentLevel: student?.level,
+    studentEmail: student?.email,
     sessions: sessions as AttendanceSessionRef[],
     records: records.map(mapAttendanceRecord),
   });

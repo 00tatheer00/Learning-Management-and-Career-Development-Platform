@@ -20,6 +20,7 @@ export interface AttendanceStudentRef {
   name: string;
   level?: string | null;
   programSlug?: string | null;
+  email?: string | null;
 }
 
 export interface AttendanceRecordRef {
@@ -180,7 +181,7 @@ export function getEligibleStudents(
   return students.filter(
     (student) =>
       student.programSlug === programSlug &&
-      canAccessModuleOneClasses(programSlug, student.level)
+      canAccessModuleOneClasses(programSlug, student.level, undefined, student.email)
   );
 }
 
@@ -204,12 +205,18 @@ export function computeStudentAttendanceStats(input: {
   studentId: string;
   programSlug: string;
   studentLevel?: string | null;
+  studentEmail?: string | null;
   sessions: AttendanceSessionRef[];
   records: AttendanceRecordRef[];
   now?: Date;
 }): StudentAttendanceStats {
   const now = input.now ?? new Date();
-  const eligible = canAccessModuleOneClasses(input.programSlug, input.studentLevel);
+  const eligible = canAccessModuleOneClasses(
+    input.programSlug,
+    input.studentLevel,
+    undefined,
+    input.studentEmail
+  );
   const pastSessions = filterTrackedPastSessions(
     input.sessions.filter((session) => session.programSlug === input.programSlug),
     now
@@ -250,7 +257,10 @@ export function computeStudentAttendanceStats(input: {
       status: record.status,
       joinedAt: record.joinedAt,
     })),
-    days: computeStudentDayRows(input),
+    days: computeStudentDayRows({
+      ...input,
+      studentEmail: input.studentEmail,
+    }),
   };
 }
 
@@ -258,11 +268,21 @@ export function computeStudentDayRows(input: {
   programSlug: string;
   studentId: string;
   studentLevel?: string | null;
+  studentEmail?: string | null;
   sessions: AttendanceSessionRef[];
   records: AttendanceRecordRef[];
   now?: Date;
 }): StudentDayAttendanceRow[] {
-  if (!canAccessModuleOneClasses(input.programSlug, input.studentLevel)) return [];
+  if (
+    !canAccessModuleOneClasses(
+      input.programSlug,
+      input.studentLevel,
+      undefined,
+      input.studentEmail
+    )
+  ) {
+    return [];
+  }
 
   const now = input.now ?? new Date();
   const lookup = buildAttendanceLookup(input.records);
@@ -481,7 +501,12 @@ export function computeModuleRows(input: {
 
   return groups.map((group) => {
     const studentRows: ModuleStudentAttendance[] = group.students.map((student) => {
-      const eligible = canAccessModuleOneClasses(input.programSlug, student.level);
+      const eligible = canAccessModuleOneClasses(
+        input.programSlug,
+        student.level,
+        undefined,
+        student.email
+      );
       const studentRecords = input.records.filter(
         (record) => record.studentId === student.id && isAttendanceTrackedDate(record.sessionDate)
       );
@@ -577,7 +602,12 @@ export function computeAttendanceMatrix(input: {
     .sort((a, b) => a.name.localeCompare(b.name));
 
   const students: AttendanceMatrixStudent[] = programStudents.map((student) => {
-    const eligible = canAccessModuleOneClasses(input.programSlug, student.level);
+    const eligible = canAccessModuleOneClasses(
+      input.programSlug,
+      student.level,
+      undefined,
+      student.email
+    );
     const cells: Record<string, AttendanceCellStatus> = {};
     let attended = 0;
 

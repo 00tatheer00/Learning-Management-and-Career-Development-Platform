@@ -38,6 +38,15 @@ describe("student module access", () => {
     ).toBe(false);
   });
 
+  it("grants demo portal student access to all module classes", () => {
+    expect(
+      canAccessModuleOneClasses("web-development", "Backend + Database", ["Backend + Database"], "student@eest.com")
+    ).toBe(true);
+    expect(
+      canAccessModuleOneClasses("web-development", "React", undefined, "student@eest.com")
+    ).toBe(true);
+  });
+
   it("identifies app module 1", () => {
     expect(getFirstModuleName("app-development")).toBe("Dart & OOP");
     expect(isFirstModuleStudent("app-development", "Dart & OOP")).toBe(true);
