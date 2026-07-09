@@ -21,48 +21,65 @@ export function StudentWhatsAppGroupCard({
   return (
     <div
       className={cn(
-        "portal-card rounded-2xl border border-pt h-full",
+        "portal-card rounded-2xl border border-pt h-full flex flex-col",
         isBanner ? "p-5 sm:p-6" : "p-6 sm:p-10 text-center max-w-xl mx-auto",
         className
       )}
     >
-      <div
-        className={cn(
-          "flex gap-4",
-          isBanner ? "flex-col sm:flex-row sm:items-center sm:justify-between" : "flex-col items-center"
-        )}
-      >
-        <div className={cn("flex gap-4", isBanner ? "items-start sm:items-center" : "flex-col items-center")}>
-          <div className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20">
-            <WhatsappLogo size={isBanner ? 26 : 36} weight="fill" />
-          </div>
-          <div className={cn(!isBanner && "text-center")}>
-            <h2 className={cn("font-semibold text-pt", isBanner ? "text-base sm:text-lg" : "text-2xl mb-3")}>
-              {STUDENT_UR.whatsappCard.joinTitle(STUDENT_WHATSAPP_GROUP_NAME)}
-            </h2>
-            <p className={cn("text-pt-muted leading-relaxed text-sm", isBanner ? "mt-1" : "mb-6")}>
-              {isBanner ? STUDENT_UR.whatsappCard.bannerDesc : STUDENT_UR.whatsappCard.pageDesc}
-            </p>
-          </div>
-        </div>
-
-        <Button
-          size="lg"
-          className={cn(
-            "student-whatsapp-btn h-12 font-semibold shrink-0 border-0 shadow-md shadow-primary/20",
-            isBanner ? "w-full sm:w-auto" : "w-full"
-          )}
-          asChild
-        >
-          <a href={STUDENT_WHATSAPP_GROUP_URL} target="_blank" rel="noopener noreferrer">
-            <WhatsappLogo size={20} weight="fill" />
-            {STUDENT_UR.whatsappCard.joinButton}
-          </a>
-        </Button>
-      </div>
-
-      {!isBanner && (
+      {isBanner ? (
         <>
+          <div className="flex gap-4 items-start flex-1 min-w-0">
+            <div className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20">
+              <WhatsappLogo size={26} weight="fill" />
+            </div>
+            <div className="min-w-0">
+              <h2 className="font-semibold text-pt text-base sm:text-lg">
+                {STUDENT_UR.whatsappCard.joinTitle(STUDENT_WHATSAPP_GROUP_NAME)}
+              </h2>
+              <p className="text-pt-muted leading-relaxed text-sm mt-1">
+                {STUDENT_UR.whatsappCard.bannerDesc}
+              </p>
+            </div>
+          </div>
+
+          <Button
+            size="lg"
+            className="student-whatsapp-btn mt-5 w-full h-12 font-semibold border-0 shadow-md shadow-primary/20"
+            asChild
+          >
+            <a href={STUDENT_WHATSAPP_GROUP_URL} target="_blank" rel="noopener noreferrer">
+              <WhatsappLogo size={20} weight="fill" />
+              {STUDENT_UR.whatsappCard.joinButton}
+            </a>
+          </Button>
+        </>
+      ) : (
+        <>
+          <div className="flex flex-col items-center gap-4">
+            <div className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20">
+              <WhatsappLogo size={36} weight="fill" />
+            </div>
+            <div className="text-center">
+              <h2 className="font-semibold text-pt text-2xl mb-3">
+                {STUDENT_UR.whatsappCard.joinTitle(STUDENT_WHATSAPP_GROUP_NAME)}
+              </h2>
+              <p className="text-pt-muted leading-relaxed text-sm mb-6">
+                {STUDENT_UR.whatsappCard.pageDesc}
+              </p>
+            </div>
+          </div>
+
+          <Button
+            size="lg"
+            className="student-whatsapp-btn w-full h-12 font-semibold border-0 shadow-md shadow-primary/20"
+            asChild
+          >
+            <a href={STUDENT_WHATSAPP_GROUP_URL} target="_blank" rel="noopener noreferrer">
+              <WhatsappLogo size={20} weight="fill" />
+              {STUDENT_UR.whatsappCard.joinButton}
+            </a>
+          </Button>
+
           <ul className="space-y-2.5 text-left mb-8 mt-8 text-sm text-pt-muted">
             {STUDENT_UR.whatsappCard.bullets.map((item) => (
               <li key={item} className="flex items-start gap-2.5">
