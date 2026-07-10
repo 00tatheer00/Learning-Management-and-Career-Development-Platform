@@ -12,8 +12,28 @@ import { StudentWelcomeCelebration } from "@/components/portal/student-welcome-c
 import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
 import type { PendingPortalWelcome } from "@/lib/api/student-portal-welcome";
 
-const JOINED_KEY = "eest-whatsapp-group-joined";
-const DEFERRED_KEY = "eest-whatsapp-group-deferred";
+/** Legacy global key — still honored for existing browsers */
+const LEGACY_JOINED_KEY = "eest-whatsapp-group-joined";
+
+function joinedKey(studentId: string) {
+  return `eest-wa-joined-${studentId}`;
+}
+
+function dismissedKey(studentId: string) {
+  return `eest-wa-dismissed-${studentId}`;
+}
+
+function hasSeenWhatsAppGroupPrompt(studentId: string): boolean {
+  try {
+    return (
+      localStorage.getItem(joinedKey(studentId)) === "true" ||
+      localStorage.getItem(dismissedKey(studentId)) === "true" ||
+      localStorage.getItem(LEGACY_JOINED_KEY) === "true"
+    );
+  } catch {
+    return false;
+  }
+}
 
 interface StudentPortalWelcomeProps {
   studentId: string;
@@ -36,15 +56,8 @@ export function StudentPortalWelcome({ studentId, studentName }: StudentPortalWe
         return;
       }
 
-      if (localStorage.getItem(JOINED_KEY) === "true") {
-        setPhase("done");
-        return;
-      }
-      if (sessionStorage.getItem(DEFERRED_KEY) === "true") {
-        setPhase("done");
-        return;
-      }
-      setPhase("whatsapp");
+      // Returning login — never show WhatsApp group modal again here.
+      setPhase("done");
     } catch {
       setPhase("done");
     }
@@ -67,17 +80,9 @@ export function StudentPortalWelcome({ studentId, studentName }: StudentPortalWe
       }
     }
 
-    try {
-      if (localStorage.getItem(JOINED_KEY) === "true") {
-        setPhase("done");
-        return;
-      }
-      if (sessionStorage.getItem(DEFERRED_KEY) === "true") {
-        setPhase("done");
-        return;
-      }
-    } catch {
-      // ignore storage errors
+    if (hasSeenWhatsAppGroupPrompt(studentId)) {
+      setPhase("done");
+      return;
     }
 
     setPhase("whatsapp");
@@ -97,19 +102,26 @@ export function StudentPortalWelcome({ studentId, studentName }: StudentPortalWe
   }
 
   if (phase === "whatsapp") {
-    return <StudentWhatsAppGroupPrompt onClose={() => setPhase("done")} />;
+    return (
+      <StudentWhatsAppGroupPrompt studentId={studentId} onClose={() => setPhase("done")} />
+    );
   }
 
   return null;
 }
 
-function StudentWhatsAppGroupPrompt({ onClose }: { onClose: () => void }) {
+function StudentWhatsAppGroupPrompt({
+  studentId,
+  onClose,
+}: {
+  studentId: string;
+  onClose: () => void;
+}) {
   const [open, setOpen] = useState(true);
 
   const handleJoin = () => {
     try {
-      localStorage.setItem(JOINED_KEY, "true");
-      sessionStorage.removeItem(DEFERRED_KEY);
+      localStorage.setItem(joinedKey(studentId), "true");
     } catch {
       // ignore storage errors
     }
@@ -120,7 +132,7 @@ function StudentWhatsAppGroupPrompt({ onClose }: { onClose: () => void }) {
 
   const handleLater = () => {
     try {
-      sessionStorage.setItem(DEFERRED_KEY, "true");
+      localStorage.setItem(dismissedKey(studentId), "true");
     } catch {
       // ignore storage errors
     }
@@ -165,13 +177,4 @@ function StudentWhatsAppGroupPrompt({ onClose }: { onClose: () => void }) {
       </div>
     </Modal>
   );
-}
-
-/** Call after a successful student login so welcome flow shows again this session. */
-export function resetWhatsAppGroupPromptForLogin() {
-  try {
-    sessionStorage.removeItem(DEFERRED_KEY);
-  } catch {
-    // ignore storage errors
-  }
 }

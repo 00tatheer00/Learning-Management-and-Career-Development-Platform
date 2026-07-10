@@ -1,12 +1,13 @@
 import {
   OFFICIAL_WHATSAPP_NUMBER,
+  BUSINESS_WHATSAPP_DISPLAY,
   OFFICIAL_HELP_MESSAGE,
   getOfficialWhatsAppUrl,
 } from "@/lib/constants/contact";
 
 export const HELP_CONFIG = {
   whatsappNumber: OFFICIAL_WHATSAPP_NUMBER,
-  whatsappDisplay: "0337-4005515",
+  whatsappDisplay: BUSINESS_WHATSAPP_DISPLAY,
   whatsappMessage: OFFICIAL_HELP_MESSAGE,
   get whatsappUrl() {
     return getOfficialWhatsAppUrl(this.whatsappMessage);

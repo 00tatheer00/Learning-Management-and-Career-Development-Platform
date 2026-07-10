@@ -1,6 +1,6 @@
 import {
-  OFFICIAL_PHONE_DISPLAY,
   OFFICIAL_WHATSAPP_NUMBER,
+  BUSINESS_WHATSAPP_DISPLAY,
 } from "@/lib/constants/contact";
 
 export const SITE_CONFIG = {
@@ -12,7 +12,7 @@ export const SITE_CONFIG = {
   url: "https://school.emergingedge.tech",
   logo: "/eest-logo.png",
   email: "eeschooltech@gmail.com",
-  phone: OFFICIAL_PHONE_DISPLAY,
+  phone: BUSINESS_WHATSAPP_DISPLAY,
   whatsapp: OFFICIAL_WHATSAPP_NUMBER,
   address: "Global Campus — Online & Hybrid",
   social: {
