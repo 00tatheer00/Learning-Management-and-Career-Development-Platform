@@ -66,6 +66,24 @@ Use Meta’s official API — not third-party QR bridges. Setup overview:
 
 Docs: [WhatsApp Cloud API Get Started](https://developers.facebook.com/docs/whatsapp/cloud-api/get-started)
 
+### Message templates (approve / reject)
+
+Approve and reject notifications use **Meta templates** (no password or portal link in WhatsApp — safer and works outside the 24h window).
+
+1. Meta Business Manager → **WhatsApp Manager** → **Message templates** → **Create template**
+2. Create these two **Utility** templates in **English** with **exact names**:
+
+| Template name | Body (use `{{1}}`, `{{2}}`, … for variables) |
+|---------------|-----------------------------------------------|
+| `eest_registration_approved` | See `META_TEMPLATE_SUBMISSIONS` in `src/lib/whatsapp/cloud-api/templates.ts` |
+| `eest_registration_rejected` | Same file |
+
+3. Submit for Meta review (usually 24–48h)
+4. After approval, Tatheer can **Approve** registrations — student gets congrats + instruction to WhatsApp **+92 321 5919502** with message **`Portal login`**
+5. Komal replies from **Admin → WhatsApp** with username/password (only after student messages — 24h window)
+
+Optional env overrides if Meta names differ: `WHATSAPP_TEMPLATE_APPROVED`, `WHATSAPP_TEMPLATE_REJECTED`.
+
 ---
 
 ## 3. Upstash Redis (optional, recommended for rate limiting)
@@ -107,7 +125,7 @@ openssl rand -base64 32
 | `WHATSAPP_API_VERSION` | No | Graph version, default `v21.0` |
 | `PORTAL_PASSWORD_SECRET` | Yes (production) | Encrypts stored portal passwords (use a value different from `NEXTAUTH_SECRET`) |
 
-When admin approves a student, the platform sends a designed congratulations email and WhatsApp message with portal login URL and credentials.
+When admin approves a student, the platform sends a congratulations **email** (with login details) and a **WhatsApp template** (no password — student must message the business number for credentials via the inbox).
 
 ---
 

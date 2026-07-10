@@ -17,7 +17,7 @@ import { Modal } from "@/components/ui/modal";
 import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
 import { getProgramCategory } from "@/lib/constants/program-categories";
 import { getProgramBySlug } from "@/lib/data/programs";
-import { buildApprovalWhatsAppMessage } from "@/lib/notifications/approval-templates";
+import { buildStudentLoginWhatsAppMessage } from "@/lib/notifications/approval-templates";
 import { cn, formatAppliedDateTime } from "@/lib/utils";
 import { copyToClipboard } from "@/lib/utils/clipboard";
 import { PORTAL_VIEWPORT_PANEL } from "@/lib/constants/portal-layout";
@@ -164,7 +164,7 @@ export function AdminCredentialsPanel() {
     if (!password) return;
 
     const programLevel = getProgramBySlug(row.programSlug)?.level ?? "—";
-    const message = buildApprovalWhatsAppMessage({
+    const message = buildStudentLoginWhatsAppMessage({
       studentName: row.name,
       email: row.email,
       password,
@@ -565,6 +565,7 @@ export function AdminCredentialsPanel() {
                     variant="secondary"
                     className="h-8 text-xs"
                     disabled={loadingId === row.id}
+                    title="After student messages +92 321 5919502 with Portal login"
                     onClick={() => void handleResendWhatsApp(row)}
                   >
                     WhatsApp
@@ -738,7 +739,7 @@ export function AdminCredentialsPanel() {
                             <>
                               <button
                                 type="button"
-                                title="Send login on WhatsApp"
+                                title="Send login via WhatsApp (student must message +92 321 5919502 first)"
                                 disabled={!row.hasStoredPassword || loadingId === row.id}
                                 onClick={() => void handleResendWhatsApp(row)}
                                 className="rounded border border-[#25D366]/40 bg-[#25D366]/10 p-1.5 text-[#128C7E] hover:bg-[#25D366]/20 disabled:opacity-40"
@@ -873,7 +874,7 @@ export function AdminCredentialsPanel() {
                 onClick={() =>
                   void copyText(
                     "WhatsApp message",
-                    buildApprovalWhatsAppMessage({
+                    buildStudentLoginWhatsAppMessage({
                       studentName: credentialModal.name,
                       email: credentialModal.loginId,
                       password: credentialModal.password,

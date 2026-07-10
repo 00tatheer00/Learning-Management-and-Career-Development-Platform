@@ -1,5 +1,12 @@
 export const OFFICIAL_WHATSAPP_NUMBER = "03374005515";
 
+/** Meta Cloud API business inbox — students message here for portal login */
+export const BUSINESS_WHATSAPP_NUMBER = "03215919502";
+export const BUSINESS_WHATSAPP_DISPLAY = "+92 321 5919502";
+
+/** Exact phrase students should send to request portal credentials */
+export const PORTAL_LOGIN_REQUEST_PHRASE = "Portal login";
+
 export const FOUNDER_LINKEDIN_URL = "https://linkedin.com/in/tatheer-hussain";
 export const FOUNDER_LINKEDIN_DISPLAY = "linkedin.com/in/tatheer-hussain";
 

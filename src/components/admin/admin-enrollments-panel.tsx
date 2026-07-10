@@ -996,7 +996,7 @@ export function AdminEnrollmentsPanel() {
                   }}
                 >
                   <ArrowCounterClockwise size={16} />
-                  {resendLoading ? "Sending..." : "Resend WhatsApp"}
+                  {resendLoading ? "Sending..." : "Send login (WhatsApp)"}
                 </Button>
               )}
               <Button

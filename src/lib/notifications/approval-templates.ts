@@ -1,8 +1,9 @@
 import { SITE_CONFIG } from "@/lib/constants";
 import {
+  BUSINESS_WHATSAPP_DISPLAY,
+  PORTAL_LOGIN_REQUEST_PHRASE,
   STUDENT_WHATSAPP_GROUP_NAME,
   STUDENT_WHATSAPP_GROUP_URL,
-  FOUNDER_LINKEDIN_DISPLAY,
 } from "@/lib/constants/contact";
 
 interface ApprovalEmailParams {
@@ -111,7 +112,71 @@ export function buildApprovalEmailHtml({
 </html>`;
 }
 
-export function buildApprovalWhatsAppMessage({
+export interface StudentLoginWhatsAppParams {
+  studentName: string;
+  email: string;
+  password: string;
+  courseName: string;
+  module: string;
+  level: string;
+  loginUrl: string;
+}
+
+export interface ApprovalTemplateParams {
+  firstName: string;
+  courseName: string;
+  module: string;
+}
+
+export interface RejectionTemplateParams {
+  fullName: string;
+  courseName: string;
+  reason: string;
+}
+
+export function buildApprovalTemplatePreview({
+  firstName,
+  courseName,
+  module,
+}: ApprovalTemplateParams): string {
+  return [
+    `[Approved] Hello ${firstName},`,
+    "",
+    "Congratulations! Your registration at Emerging Edge School of Technology has been approved.",
+    "",
+    `Course: ${courseName}`,
+    `Module: ${module}`,
+    "",
+    `To receive portal login details, WhatsApp ${BUSINESS_WHATSAPP_DISPLAY} with: ${PORTAL_LOGIN_REQUEST_PHRASE}`,
+    "",
+    "EEST Team",
+  ].join("\n");
+}
+
+export function buildRejectionTemplatePreview({
+  fullName,
+  courseName,
+  reason,
+}: RejectionTemplateParams): string {
+  return [
+    `[Rejected] Hello ${fullName},`,
+    "",
+    "Thank you for applying to Emerging Edge School of Technology.",
+    "",
+    `Course: ${courseName}`,
+    "",
+    "Unfortunately your registration could not be approved at this time.",
+    "",
+    `Reason: ${reason}`,
+    "",
+    `Questions? WhatsApp ${BUSINESS_WHATSAPP_DISPLAY}`,
+    "",
+    "EEST Team",
+  ].join("\n");
+}
+
+/** Manual paste for Komal — only after student opened the 24h chat window. */
+export function buildStudentLoginWhatsAppMessage({
   studentName,
   email,
   password,
@@ -119,31 +184,31 @@ export function buildApprovalWhatsAppMessage({
   module,
   level,
   loginUrl,
-}: ApprovalEmailParams & { module: string; level: string }): string {
+}: StudentLoginWhatsAppParams): string {
   const firstName = studentName.split(" ")[0];
 
   return [
-    `Congratulations ${firstName}!`,
+    `Assalam o Alaikum ${firstName}!`,
     "",
-    "Your registration at Emerging Edge School of Technology has been approved.",
+    "Your EEST student portal login details:",
+    "",
+    `Login ID: ${email}`,
+    `Password: ${password}`,
+    `Portal: ${loginUrl}`,
     "",
     `Course: ${courseName}`,
     `Module: ${module}`,
     `Level: ${level}`,
     "",
-    "Portal Login",
-    `Email: ${email}`,
-    `Password: ${password}`,
-    `Link: ${loginUrl}`,
-    "",
-    "Log in to the portal — the WhatsApp group link is inside your student dashboard.",
-    "",
-    `Follow: ${FOUNDER_LINKEDIN_DISPLAY}`,
+    "Keep these private. Change your password after first login if you wish.",
     "",
     "Welcome to your batch!",
     "— EEST Team",
   ].join("\n");
 }
+
+/** @deprecated Use buildStudentLoginWhatsAppMessage — kept for imports during transition */
+export const buildApprovalWhatsAppMessage = buildStudentLoginWhatsAppMessage;
 
 export function buildApprovalEmailText({
   studentName,

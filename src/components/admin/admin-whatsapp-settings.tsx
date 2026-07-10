@@ -174,6 +174,15 @@ export function AdminWhatsAppSettings() {
       </p>
 
       <p className="mt-2 text-xs text-muted leading-relaxed">
+        <strong>Approve / reject:</strong> Requires Meta templates{" "}
+        <code className="bg-surface px-1 rounded">eest_registration_approved</code> and{" "}
+        <code className="bg-surface px-1 rounded">eest_registration_rejected</code> (see{" "}
+        <code className="bg-surface px-1 rounded">DEPLOYMENT.md</code>). No password in WhatsApp —
+        student messages <strong>Portal login</strong> to +92 321 5919502; Komal sends creds from
+        the inbox.
+      </p>
+
+      <p className="mt-2 text-xs text-muted leading-relaxed">
         <strong>No message on phone?</strong> Meta dev mode only delivers to{" "}
         <strong>test recipient numbers</strong> you add in Meta → WhatsApp → API Setup. Test uses
         the official <code className="bg-surface px-1 rounded">hello_world</code> template. Or first

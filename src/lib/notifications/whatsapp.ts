@@ -1,7 +1,13 @@
 import {
   sendWhatsAppOutbound,
+  sendWhatsAppApprovalTemplateOutbound,
+  sendWhatsAppRejectionTemplateOutbound,
   type WhatsAppPurpose,
 } from "@/lib/whatsapp/outbound";
+import type {
+  ApprovalTemplateParams,
+  RejectionTemplateParams,
+} from "@/lib/notifications/approval-templates";
 import { getCloudPhoneNumberStatus } from "@/lib/whatsapp/cloud-api/status";
 import { isWhatsAppCloudConfigured } from "@/lib/whatsapp/config";
 
@@ -32,16 +38,24 @@ export async function getWhatsAppConnectionStatus(): Promise<{
 
 export async function sendApprovalWhatsApp(
   phone: string,
-  message: string
+  input: { params: ApprovalTemplateParams; loggedBody: string }
 ): Promise<{ sent: boolean; error?: string }> {
-  return sendWhatsAppMessage(phone, message, "approval");
+  return sendWhatsAppApprovalTemplateOutbound({
+    phone,
+    params: input.params,
+    loggedBody: input.loggedBody,
+  });
 }
 
 export async function sendRejectionWhatsApp(
   phone: string,
-  message: string
+  input: { params: RejectionTemplateParams; loggedBody: string }
 ): Promise<{ sent: boolean; error?: string }> {
-  return sendWhatsAppMessage(phone, message, "rejection");
+  return sendWhatsAppRejectionTemplateOutbound({
+    phone,
+    params: input.params,
+    loggedBody: input.loggedBody,
+  });
 }
 
 export async function sendLoginResendWhatsApp(

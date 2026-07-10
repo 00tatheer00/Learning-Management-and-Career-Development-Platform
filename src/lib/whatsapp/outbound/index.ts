@@ -1,7 +1,18 @@
 import { isWhatsAppCloudConfigured } from "@/lib/whatsapp/config";
 import { sendCloudHelloWorldTestMessage, sendCloudTextMessage } from "@/lib/whatsapp/cloud-api/send";
+import {
+  sendCloudRegistrationApprovedTemplate,
+  sendCloudRegistrationRejectedTemplate,
+} from "@/lib/whatsapp/cloud-api/templates";
 import { recordOutboundWhatsAppMessage } from "@/lib/whatsapp/crm/outbound";
 import { formatWhatsAppWaId } from "@/lib/whatsapp/phone";
+import type {
+  ApprovalTemplateParams,
+  RejectionTemplateParams,
+} from "@/lib/notifications/approval-templates";
+import { BUSINESS_WHATSAPP_DISPLAY } from "@/lib/constants/contact";
+
+export type { ApprovalTemplateParams, RejectionTemplateParams };
 
 export type WhatsAppPurpose =
   | "approval"
@@ -82,4 +93,80 @@ export async function sendWhatsAppOutbound(input: {
   }
 
   return result;
+}
+
+export async function sendWhatsAppApprovalTemplateOutbound(input: {
+  phone: string;
+  params: ApprovalTemplateParams;
+  loggedBody: string;
+}): Promise<{ sent: boolean; error?: string; wamid?: string; messageId?: string }> {
+  if (!isWhatsAppCloudConfigured()) {
+    return { sent: false, error: "WhatsApp Cloud API is not configured on the server" };
+  }
+
+  const waId = formatWhatsAppWaId(input.phone);
+  if (!waId) {
+    return {
+      sent: false,
+      error: `Invalid WhatsApp number "${input.phone}". Use 03XXXXXXXXX format.`,
+    };
+  }
+
+  const result = await sendCloudRegistrationApprovedTemplate({
+    to: waId,
+    firstName: input.params.firstName,
+    courseName: input.params.courseName,
+    module: input.params.module,
+    businessWhatsAppDisplay: BUSINESS_WHATSAPP_DISPLAY,
+  });
+
+  if (!result.sent) return result;
+
+  const logged = await recordOutboundWhatsAppMessage({
+    phone: input.phone,
+    waId,
+    body: input.loggedBody,
+    wamid: result.wamid,
+    purpose: "approval",
+  });
+
+  return { ...result, messageId: logged?.messageId };
+}
+
+export async function sendWhatsAppRejectionTemplateOutbound(input: {
+  phone: string;
+  params: RejectionTemplateParams;
+  loggedBody: string;
+}): Promise<{ sent: boolean; error?: string; wamid?: string; messageId?: string }> {
+  if (!isWhatsAppCloudConfigured()) {
+    return { sent: false, error: "WhatsApp Cloud API is not configured on the server" };
+  }
+
+  const waId = formatWhatsAppWaId(input.phone);
+  if (!waId) {
+    return {
+      sent: false,
+      error: `Invalid WhatsApp number "${input.phone}". Use 03XXXXXXXXX format.`,
+    };
+  }
+
+  const result = await sendCloudRegistrationRejectedTemplate({
+    to: waId,
+    fullName: input.params.fullName,
+    courseName: input.params.courseName,
+    reason: input.params.reason,
+    businessWhatsAppDisplay: BUSINESS_WHATSAPP_DISPLAY,
+  });
+
+  if (!result.sent) return result;
+
+  const logged = await recordOutboundWhatsAppMessage({
+    phone: input.phone,
+    waId,
+    body: input.loggedBody,
+    wamid: result.wamid,
+    purpose: "rejection",
+  });
+
+  return { ...result, messageId: logged?.messageId };
 }

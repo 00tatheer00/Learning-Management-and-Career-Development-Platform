@@ -1,7 +1,9 @@
 import { getProgramBySlug } from "@/lib/data/programs";
-import { buildApprovalWhatsAppMessage } from "@/lib/notifications/approval-templates";
+import {
+  buildApprovalTemplatePreview,
+  type ApprovalTemplateParams,
+} from "@/lib/notifications/approval-templates";
 import { sendApprovalWhatsApp } from "@/lib/notifications/whatsapp";
-import { getPortalLoginUrl } from "@/lib/site-url";
 
 interface EnrollmentNotificationRecord {
   fullName: string;
@@ -16,23 +18,25 @@ export async function sendApprovalWelcomeNotifications(
   enrollment: EnrollmentNotificationRecord
 ): Promise<{ whatsappSent: boolean; warnings: string[] }> {
   const warnings: string[] = [];
-  const loginUrl = getPortalLoginUrl();
   const courseName = getProgramBySlug(enrollment.program)?.title ?? enrollment.program;
-  const programLevel = getProgramBySlug(enrollment.program)?.level ?? "—";
+  const firstName = enrollment.fullName.split(" ")[0] ?? enrollment.fullName;
 
-  const whatsappMessage = buildApprovalWhatsAppMessage({
-    studentName: enrollment.fullName,
-    email: enrollment.email,
-    password: enrollment.password,
+  const params: ApprovalTemplateParams = {
+    firstName,
     courseName,
     module: enrollment.level,
-    level: programLevel,
-    loginUrl,
+  };
+
+  const whatsappResult = await sendApprovalWhatsApp(enrollment.whatsapp, {
+    params,
+    loggedBody: buildApprovalTemplatePreview(params),
   });
 
-  const whatsappResult = await sendApprovalWhatsApp(enrollment.whatsapp, whatsappMessage);
   if (!whatsappResult.sent) {
-    warnings.push(whatsappResult.error ?? "WhatsApp not sent");
+    warnings.push(
+      whatsappResult.error ??
+        "Approval WhatsApp template not sent — create eest_registration_approved in Meta first."
+    );
   }
 
   return {

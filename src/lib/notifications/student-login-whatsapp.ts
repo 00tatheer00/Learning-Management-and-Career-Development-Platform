@@ -1,11 +1,22 @@
 import { getProgramBySlug } from "@/lib/data/programs";
-import { buildApprovalWhatsAppMessage } from "@/lib/notifications/approval-templates";
+import { buildStudentLoginWhatsAppMessage } from "@/lib/notifications/approval-templates";
 import { sendLoginResendWhatsApp } from "@/lib/notifications/whatsapp";
 import {
   getEnrollmentPortalPasswordForWhatsApp,
   getStudentPortalPasswordForWhatsApp,
 } from "@/lib/api/admin-portal-password";
+import {
+  findConversationByPhone,
+  getWhatsAppConversationMessagingWindow,
+} from "@/lib/api/whatsapp-crm";
+import {
+  BUSINESS_WHATSAPP_DISPLAY,
+  PORTAL_LOGIN_REQUEST_PHRASE,
+} from "@/lib/constants/contact";
 import { getPortalLoginUrl } from "@/lib/site-url";
+
+const LOGIN_WINDOW_CLOSED =
+  `Student ne abhi business number par message nahi kiya. Pehle unse ${BUSINESS_WHATSAPP_DISPLAY} par "${PORTAL_LOGIN_REQUEST_PHRASE}" likh kar message karwao, phir Admin → WhatsApp se login bhejo.`;
 
 export async function sendStudentLoginWhatsApp(input: {
   fullName: string;
@@ -15,10 +26,20 @@ export async function sendStudentLoginWhatsApp(input: {
   level: string;
   password: string;
 }): Promise<{ sent: boolean; error?: string }> {
+  const conversation = await findConversationByPhone(input.whatsapp);
+  if (!conversation) {
+    return { sent: false, error: LOGIN_WINDOW_CLOSED };
+  }
+
+  const window = await getWhatsAppConversationMessagingWindow(conversation.id);
+  if (!window.canSendFreeText) {
+    return { sent: false, error: LOGIN_WINDOW_CLOSED };
+  }
+
   const loginUrl = getPortalLoginUrl();
   const courseName = getProgramBySlug(input.program)?.title ?? input.program;
   const programLevel = getProgramBySlug(input.program)?.level ?? "—";
-  const message = buildApprovalWhatsAppMessage({
+  const message = buildStudentLoginWhatsAppMessage({
     studentName: input.fullName,
     email: input.email,
     password: input.password,
