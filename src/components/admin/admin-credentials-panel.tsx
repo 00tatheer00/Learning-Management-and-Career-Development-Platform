@@ -19,7 +19,6 @@ import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
 import { getProgramCategory } from "@/lib/constants/program-categories";
 import { getProgramBySlug } from "@/lib/data/programs";
 import { buildStudentLoginWhatsAppMessage } from "@/lib/notifications/approval-templates";
-import { isDemoPortalStudent } from "@/lib/constants/demo-student";
 import { cn, formatAppliedDateTime } from "@/lib/utils";
 import { copyToClipboard } from "@/lib/utils/clipboard";
 import { PORTAL_VIEWPORT_PANEL } from "@/lib/constants/portal-layout";
@@ -572,9 +571,16 @@ export function AdminCredentialsPanel() {
                 !row.hasLoggedIn && "bg-red-50/40"
               )}
             >
-              <OpenStudentProfileButton target={{ enrollmentId: row.id }} className="font-semibold text-sm">
-                {row.name}
-              </OpenStudentProfileButton>
+              <div className="flex items-center gap-2 flex-wrap">
+                <OpenStudentProfileButton target={{ enrollmentId: row.id }} className="font-semibold text-sm">
+                  {row.name}
+                </OpenStudentProfileButton>
+                {row.isDemo && (
+                  <span className="rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-violet-800">
+                    Demo
+                  </span>
+                )}
+              </div>
               <p className="text-xs text-muted">{row.course} · {row.module}</p>
               <p className="text-xs font-mono truncate">{row.email}</p>
               <p className="text-xs text-muted">
@@ -584,7 +590,7 @@ export function AdminCredentialsPanel() {
               <div className="flex flex-wrap gap-2 pt-1">
                 <AdminStudentProfileButton target={{ enrollmentId: row.id }} compact />
                 {canWrite && row.hasStoredPassword && (
-                  isDemoPortalStudent(row.email) ? (
+                  row.isDemo ? (
                     <Button
                       size="sm"
                       variant="secondary"
@@ -651,12 +657,19 @@ export function AdminCredentialsPanel() {
                       )}
                     >
                       <td className="px-3 py-2.5">
-                        <OpenStudentProfileButton
-                          target={{ enrollmentId: row.id }}
-                          className="font-medium text-sm hover:underline"
-                        >
-                          {row.name}
-                        </OpenStudentProfileButton>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <OpenStudentProfileButton
+                            target={{ enrollmentId: row.id }}
+                            className="font-medium text-sm hover:underline"
+                          >
+                            {row.name}
+                          </OpenStudentProfileButton>
+                          {row.isDemo && (
+                            <span className="rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-violet-800">
+                              Demo
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="px-3 py-2.5">
                         <div className="flex items-center gap-1">
@@ -775,7 +788,7 @@ export function AdminCredentialsPanel() {
                           </button>
                           {canWrite && (
                             <>
-                              {isDemoPortalStudent(row.email) ? (
+                              {row.isDemo ? (
                                 <button
                                   type="button"
                                   title="Email login details to student"

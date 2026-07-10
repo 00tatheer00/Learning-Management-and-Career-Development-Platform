@@ -12,3 +12,17 @@ export function isDemoPortalStudent(email?: string | null): boolean {
     normalized === LEGACY_DEMO_PORTAL_STUDENT_EMAIL
   );
 }
+
+export function isDemoEnrollment(row: {
+  email?: string | null;
+  id?: string | null;
+}): boolean {
+  if (row.id?.startsWith("enrollment-demo-")) return true;
+  return isDemoPortalStudent(row.email);
+}
+
+export function excludeDemoEnrollments<T extends { email?: string | null; id?: string | null }>(
+  rows: T[]
+): T[] {
+  return rows.filter((row) => !isDemoEnrollment(row));
+}

@@ -1,5 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import { getUserByEmail, updateUser } from "@/lib/auth/users";
+import {
+  DEMO_STUDENT_USER_ID,
+  ensureDemoStudentForPortalLogins,
+  isPrimaryDemoEnrollment,
+} from "@/lib/api/demo-student-credentials";
+import { isDemoEnrollment } from "@/lib/constants/demo-student";
 import { getProgramBySlug } from "@/lib/data/programs";
 import { getPortalLoginUrl } from "@/lib/site-url";
 
@@ -22,9 +28,12 @@ export interface AdminCredentialRow {
   lastLoginAt: string | null;
   approvedAt: string | null;
   loginUrl: string;
+  isDemo: boolean;
 }
 
 export async function getAdminCredentialRows(): Promise<AdminCredentialRow[]> {
+  await ensureDemoStudentForPortalLogins();
+
   const loginUrl = getPortalLoginUrl();
   const enrollments = await prisma.enrollment.findMany({
     where: { status: "approved" },
@@ -33,7 +42,12 @@ export async function getAdminCredentialRows(): Promise<AdminCredentialRow[]> {
 
   if (enrollments.length === 0) return [];
 
-  const emails = [...new Set(enrollments.map((entry) => entry.email.toLowerCase()))];
+  const displayEnrollments = enrollments.filter((enrollment) => {
+    if (!isDemoEnrollment(enrollment)) return true;
+    return isPrimaryDemoEnrollment(enrollment);
+  });
+
+  const emails = [...new Set(displayEnrollments.map((entry) => entry.email.toLowerCase()))];
   const students = await prisma.user.findMany({
     where: { role: "student", email: { in: emails } },
   });
@@ -41,30 +55,33 @@ export async function getAdminCredentialRows(): Promise<AdminCredentialRow[]> {
 
   const rows: AdminCredentialRow[] = [];
 
-  for (const enrollment of enrollments) {
+  for (const enrollment of displayEnrollments) {
+    const demo = isDemoEnrollment(enrollment);
     const student = studentByEmail.get(enrollment.email.toLowerCase());
-    if (!student) continue;
+
+    if (!student && !demo) continue;
 
     const programSlug = enrollment.program;
     const course = getProgramBySlug(programSlug)?.title ?? programSlug;
 
     rows.push({
       id: enrollment.id,
-      studentId: student.id,
-      name: enrollment.fullName || student.name,
-      email: student.email,
-      whatsapp: student.phone ?? enrollment.whatsapp ?? "—",
+      studentId: student?.id ?? DEMO_STUDENT_USER_ID,
+      name: enrollment.fullName || student?.name || "Demo Student",
+      email: student?.email ?? enrollment.email,
+      whatsapp: student?.phone ?? enrollment.whatsapp ?? "—",
       course,
       programSlug,
-      module: enrollment.level,
+      module: demo ? "All modules (demo)" : enrollment.level,
       batch: enrollment.batch ?? "—",
       password: null,
       hasStoredPassword: Boolean(enrollment.portalPasswordEnc),
-      hasLoggedIn: Boolean(student.firstLoginAt),
-      firstLoginAt: student.firstLoginAt?.toISOString() ?? null,
-      lastLoginAt: student.lastLoginAt?.toISOString() ?? null,
-      approvedAt: enrollment.reviewedAt?.toISOString() ?? student.createdAt.toISOString(),
+      hasLoggedIn: Boolean(student?.firstLoginAt),
+      firstLoginAt: student?.firstLoginAt?.toISOString() ?? null,
+      lastLoginAt: student?.lastLoginAt?.toISOString() ?? null,
+      approvedAt: enrollment.reviewedAt?.toISOString() ?? student?.createdAt.toISOString() ?? null,
       loginUrl,
+      isDemo: demo,
     });
   }
 

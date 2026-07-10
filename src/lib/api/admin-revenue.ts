@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
+import { excludeDemoEnrollments, isDemoPortalStudent } from "@/lib/constants/demo-student";
 import { REVENUE_SPLIT, revenueFromStudents } from "@/lib/constants/revenue-split";
 import { getProgramCategory } from "@/lib/constants/program-categories";
 import { getProgramBySlug } from "@/lib/data/programs";
@@ -69,15 +70,16 @@ export async function getAdminRevenueStats(): Promise<AdminRevenueStats> {
   const [approved, activeStudents] = await Promise.all([
     prisma.enrollment.findMany({
       where: { status: "approved" },
-      select: { program: true, createdAt: true, reviewedAt: true },
+      select: { id: true, program: true, createdAt: true, reviewedAt: true, email: true },
     }),
     prisma.user.findMany({
       where: { role: "student", isActive: true },
-      select: { programSlug: true },
+      select: { programSlug: true, email: true },
     }),
   ]);
 
-  const dated = approved.map((row) => ({
+  const paidApproved = excludeDemoEnrollments(approved);
+  const dated = paidApproved.map((row) => ({
     program: row.program,
     at: row.reviewedAt ?? row.createdAt,
   }));
@@ -100,7 +102,8 @@ export async function getAdminRevenueStats(): Promise<AdminRevenueStats> {
     const trainer = trainers.find((t) => t.id === category?.primaryTrainerSeedId);
 
     const uniqueStudents = activeStudents.filter(
-      (student) => student.programSlug === programSlug
+      (student) =>
+        student.programSlug === programSlug && !isDemoPortalStudent(student.email)
     ).length;
 
     return {

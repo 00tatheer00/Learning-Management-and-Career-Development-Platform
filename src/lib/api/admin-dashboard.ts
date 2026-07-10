@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { getAdminProgramStats } from "@/lib/api/admin-program-stats";
 import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
+import { excludeDemoEnrollments } from "@/lib/constants/demo-student";
 import { revenueFromStudents } from "@/lib/constants/revenue-split";
 
 export interface AdminDashboardData {
@@ -111,7 +112,11 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   const firstTimeRegistrations =
     programStats.approvedRegistrations - programStats.returningRegistrations;
 
-  const revenue = revenueFromStudents(programStats.approvedRegistrations);
+  const approvedForRevenue = await prisma.enrollment.findMany({
+    where: { status: "approved" },
+    select: { id: true, email: true },
+  });
+  const revenue = revenueFromStudents(excludeDemoEnrollments(approvedForRevenue).length);
 
   return {
     pendingEnrollments: programStats.pendingEnrollments,
