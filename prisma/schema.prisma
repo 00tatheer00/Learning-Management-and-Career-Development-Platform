@@ -176,6 +176,10 @@ model ClassAttendance {
   sessionTime String
   joinedAt    DateTime @default(now())
   status      String
+  /// portal_join | manual
+  markSource  String?
+  markedBy    String?
+  adminNote   String?
 
   session LiveSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   student User        @relation("StudentAttendance", fields: [studentId], references: [id], onDelete: Cascade)

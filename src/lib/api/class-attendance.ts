@@ -50,6 +50,8 @@ export interface SessionAttendanceDetail {
     module: string | null;
     status: AttendanceCellStatus;
     joinedAt: string | null;
+    markSource: string | null;
+    markedBy: string | null;
   }>;
 }
 
@@ -140,10 +142,109 @@ export async function recordClassJoin(input: {
       sessionTime: input.sessionTime,
       joinedAt,
       status,
+      markSource: "portal_join",
     },
   });
 
   return { status, isNew: true };
+}
+
+export async function manualSetStudentAttendance(input: {
+  sessionId: string;
+  studentId: string;
+  status: "present" | "late" | "absent";
+  markedBy: string;
+  adminNote?: string;
+}): Promise<{ ok: boolean; error?: string }> {
+  const session = await prisma.liveSession.findUnique({
+    where: { id: input.sessionId },
+    select: {
+      id: true,
+      programSlug: true,
+      date: true,
+      time: true,
+      trainerId: true,
+    },
+  });
+
+  if (!session) {
+    return { ok: false, error: "Class session not found." };
+  }
+
+  const student = await prisma.user.findFirst({
+    where: { id: input.studentId, role: "student", isActive: true },
+    select: { id: true, name: true, programSlug: true },
+  });
+
+  if (!student) {
+    return { ok: false, error: "Student not found." };
+  }
+
+  if (student.programSlug !== session.programSlug) {
+    return { ok: false, error: "Student is not in this course." };
+  }
+
+  if (input.status === "absent") {
+    await prisma.classAttendance.deleteMany({
+      where: {
+        sessionId: input.sessionId,
+        studentId: input.studentId,
+      },
+    });
+    return { ok: true };
+  }
+
+  const joinedAt = new Date();
+  const note = input.adminNote?.trim() || null;
+
+  await prisma.classAttendance.upsert({
+    where: {
+      sessionId_studentId: {
+        sessionId: input.sessionId,
+        studentId: input.studentId,
+      },
+    },
+    create: {
+      id: crypto.randomUUID(),
+      sessionId: input.sessionId,
+      studentId: input.studentId,
+      studentName: student.name,
+      programSlug: session.programSlug,
+      sessionDate: session.date,
+      sessionTime: session.time,
+      joinedAt,
+      status: input.status,
+      markSource: "manual",
+      markedBy: input.markedBy,
+      adminNote: note,
+    },
+    update: {
+      studentName: student.name,
+      status: input.status,
+      joinedAt,
+      markSource: "manual",
+      markedBy: input.markedBy,
+      adminNote: note,
+    },
+  });
+
+  return { ok: true };
+}
+
+export async function assertTrainerOwnsSession(
+  sessionId: string,
+  trainerId: string
+): Promise<{ ok: true; programSlug: string } | { ok: false; error: string }> {
+  const session = await prisma.liveSession.findFirst({
+    where: { id: sessionId, trainerId },
+    select: { programSlug: true },
+  });
+
+  if (!session) {
+    return { ok: false, error: "You can only manage attendance for your own classes." };
+  }
+
+  return { ok: true, programSlug: session.programSlug };
 }
 
 export interface AttendanceReportRow {
@@ -397,6 +498,8 @@ export async function getSessionAttendanceDetail(
       module: student.level ?? null,
       status: (record?.status ?? "absent") as AttendanceCellStatus,
       joinedAt: record?.joinedAt.toISOString() ?? null,
+      markSource: record?.markSource ?? null,
+      markedBy: record?.markedBy ?? null,
     };
   });
 

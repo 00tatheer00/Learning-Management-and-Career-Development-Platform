@@ -21,6 +21,7 @@ import { getProgramCategory } from "@/lib/constants/program-categories";
 import { ATTENDANCE_GOAL_PERCENT } from "@/lib/constants/attendance";
 import { formatAppliedDateTime } from "@/lib/utils";
 import { cn } from "@/lib/utils";
+import { toast } from "@/lib/ui/toast";
 import { PORTAL_VIEWPORT_PANEL } from "@/lib/constants/portal-layout";
 import { lateThresholdDescription, ATTENDANCE_TRACKING_START_DATE } from "@/lib/constants/attendance";
 import type {
@@ -120,6 +121,7 @@ export function AttendanceDashboard({
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const [sessionDetail, setSessionDetail] = useState<SessionAttendanceDetail | null>(null);
   const [sessionDetailLoading, setSessionDetailLoading] = useState(false);
+  const [markingStudentId, setMarkingStudentId] = useState<string | null>(null);
 
   const apiUrl = useMemo(
     () =>
@@ -154,16 +156,66 @@ export function AttendanceDashboard({
       setSelectedSessionId(sessionId);
       setSessionDetailLoading(true);
       try {
-        const params = new URLSearchParams({ programSlug: programFilter });
-        if (batch !== "all") params.set("batch", batch);
-        const res = await fetch(`/api/admin/attendance/sessions/${sessionId}?${params}`);
+        const params = new URLSearchParams();
+        if (mode === "admin") {
+          params.set("programSlug", programFilter);
+          if (batch !== "all") params.set("batch", batch);
+        } else if (batch !== "all") {
+          params.set("batch", batch);
+        }
+
+        const base =
+          mode === "admin"
+            ? `/api/admin/attendance/sessions/${sessionId}`
+            : `/api/trainer/attendance/sessions/${sessionId}`;
+        const query = params.toString();
+        const res = await fetch(query ? `${base}?${query}` : base, { cache: "no-store" });
         const json = await res.json();
         if (json.success) setSessionDetail(json.data as SessionAttendanceDetail);
       } finally {
         setSessionDetailLoading(false);
       }
     },
-    [programFilter, batch]
+    [mode, programFilter, batch]
+  );
+
+  const markStudentAttendance = useCallback(
+    async (
+      sessionId: string,
+      studentId: string,
+      status: "present" | "late" | "absent"
+    ) => {
+      setMarkingStudentId(studentId);
+      try {
+        const res = await fetch(
+          mode === "admin"
+            ? "/api/admin/attendance/manual"
+            : `/api/trainer/attendance/sessions/${sessionId}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(
+              mode === "admin"
+                ? { sessionId, studentId, status }
+                : { studentId, status }
+            ),
+          }
+        );
+        const json = await res.json();
+        if (json.success) {
+          toast.success(json.message ?? "Attendance updated.");
+          await loadSessionDetail(sessionId);
+          void load();
+        } else {
+          toast.error(json.error ?? json.message ?? "Could not update attendance.");
+        }
+      } catch {
+        toast.error("Could not update attendance.");
+      } finally {
+        setMarkingStudentId(null);
+      }
+    },
+    [mode, loadSessionDetail, load]
   );
 
   const filteredRows = useMemo(() => {
@@ -305,13 +357,13 @@ export function AttendanceDashboard({
               preClassAlerts={data.preClassAlerts}
               lowAttendanceStudents={data.lowAttendanceStudents}
               mode={mode}
-              onSessionClick={mode === "admin" ? loadSessionDetail : undefined}
+              onSessionClick={loadSessionDetail}
             />
           )}
           {tab === "days" && (
             <DaysTab
               days={data.days}
-              onSessionClick={mode === "admin" ? loadSessionDetail : undefined}
+              onSessionClick={loadSessionDetail}
             />
           )}
           {tab === "modules" && (
@@ -342,6 +394,10 @@ export function AttendanceDashboard({
         <SessionDetailModal
           loading={sessionDetailLoading}
           detail={sessionDetail}
+          markingStudentId={markingStudentId}
+          onMark={(studentId, status) =>
+            void markStudentAttendance(selectedSessionId, studentId, status)
+          }
           onClose={() => {
             setSelectedSessionId(null);
             setSessionDetail(null);
@@ -563,22 +619,31 @@ function DaysTab({
 function SessionDetailModal({
   detail,
   loading,
+  markingStudentId,
+  onMark,
   onClose,
 }: {
   detail: SessionAttendanceDetail | null;
   loading: boolean;
+  markingStudentId: string | null;
+  onMark: (studentId: string, status: "present" | "late" | "absent") => void;
   onClose: () => void;
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 p-4">
-      <div className="w-full max-w-2xl max-h-[85vh] overflow-hidden rounded-2xl border border-border bg-background shadow-xl flex flex-col">
+      <div className="w-full max-w-3xl max-h-[85vh] overflow-hidden rounded-2xl border border-border bg-background shadow-xl flex flex-col">
         <div className="px-4 py-3 border-b border-border flex items-center justify-between gap-3">
           <div>
             <p className="font-bold">{detail?.title ?? "Session attendance"}</p>
             {detail && (
-              <p className="text-xs text-muted mt-0.5">
-                {detail.date} · {detail.time} · {detail.joinedCount}/{detail.eligibleCount} joined
-              </p>
+              <>
+                <p className="text-xs text-muted mt-0.5">
+                  {detail.date} · {detail.time} · {detail.joinedCount}/{detail.eligibleCount} joined
+                </p>
+                <p className="text-xs text-primary mt-1">
+                  If a student could not join from the portal, mark attendance manually below.
+                </p>
+              </>
             )}
           </div>
           <Button variant="outline" size="sm" onClick={onClose}>
@@ -597,24 +662,100 @@ function SessionDetailModal({
                   <th className="py-2 text-left text-xs font-semibold">Student</th>
                   <th className="py-2 text-left text-xs font-semibold">Batch</th>
                   <th className="py-2 text-left text-xs font-semibold">Status</th>
+                  <th className="py-2 text-left text-xs font-semibold">Mark manually</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {detail.students.map((student) => (
-                  <tr key={student.studentId}>
-                    <td className="py-2.5 font-medium">{student.studentName}</td>
-                    <td className="py-2.5 text-muted">{student.batch ?? "—"}</td>
-                    <td className="py-2.5">
-                      <CellBadge status={student.status} />
-                    </td>
-                  </tr>
-                ))}
+                {detail.students.map((student) => {
+                  const isMarking = markingStudentId === student.studentId;
+                  return (
+                    <tr key={student.studentId}>
+                      <td className="py-2.5 font-medium">
+                        {student.studentName}
+                        {student.markSource === "manual" && student.markedBy && (
+                          <p className="text-[10px] font-normal text-muted mt-0.5">
+                            Manual by {student.markedBy}
+                          </p>
+                        )}
+                      </td>
+                      <td className="py-2.5 text-muted">{student.batch ?? "—"}</td>
+                      <td className="py-2.5">
+                        <CellBadge status={student.status} />
+                      </td>
+                      <td className="py-2.5">
+                        <div className="flex flex-wrap gap-1">
+                          <MarkButton
+                            label="Present"
+                            tone="emerald"
+                            disabled={isMarking}
+                            active={student.status === "present"}
+                            onClick={() => onMark(student.studentId, "present")}
+                          />
+                          <MarkButton
+                            label="Late"
+                            tone="amber"
+                            disabled={isMarking}
+                            active={student.status === "late"}
+                            onClick={() => onMark(student.studentId, "late")}
+                          />
+                          <MarkButton
+                            label="Missed"
+                            tone="rose"
+                            disabled={isMarking}
+                            active={student.status === "absent"}
+                            onClick={() => onMark(student.studentId, "absent")}
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           )}
         </div>
       </div>
     </div>
+  );
+}
+
+function MarkButton({
+  label,
+  tone,
+  disabled,
+  active,
+  onClick,
+}: {
+  label: string;
+  tone: "emerald" | "amber" | "rose";
+  disabled?: boolean;
+  active?: boolean;
+  onClick: () => void;
+}) {
+  const tones = {
+    emerald: active
+      ? "bg-emerald-600 text-white border-emerald-700"
+      : "bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100",
+    amber: active
+      ? "bg-amber-500 text-white border-amber-600"
+      : "bg-amber-50 text-amber-900 border-amber-200 hover:bg-amber-100",
+    rose: active
+      ? "bg-rose-600 text-white border-rose-700"
+      : "bg-rose-50 text-rose-800 border-rose-200 hover:bg-rose-100",
+  };
+
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onClick}
+      className={cn(
+        "rounded-lg border px-2 py-1 text-[10px] font-bold uppercase tracking-wide disabled:opacity-50",
+        tones[tone]
+      )}
+    >
+      {label}
+    </button>
   );
 }
 
