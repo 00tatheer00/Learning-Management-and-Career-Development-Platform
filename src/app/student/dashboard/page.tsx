@@ -9,6 +9,7 @@ import { StudentNextClassCard } from "@/components/portal/student-next-class-car
 import { StudentModuleRoadmap } from "@/components/portal/student-module-roadmap";
 import { StudentClassProgressCard } from "@/components/portal/student-class-progress-card";
 import { StudentAttendanceProgressCard } from "@/components/portal/student-attendance";
+import { StudentAttendanceMissedAlert } from "@/components/portal/student-attendance-alert";
 import { StudentDashboardHero } from "@/components/portal/student-dashboard-hero";
 import { StudentFeatureCards } from "@/components/portal/student-feature-cards";
 import { StudentUpcomingLessonsTable } from "@/components/portal/student-upcoming-lessons-table";
@@ -108,6 +109,17 @@ export default async function StudentDashboardPage() {
         moduleName={user.level}
         canJoinLive={canJoinLive}
       />
+
+      {canJoinLive && (
+        <StudentReveal delay={0.04}>
+          <StudentAttendanceMissedAlert
+            programSlug={programSlug}
+            studentId={user.id}
+            studentLevel={user.level}
+            studentEmail={user.email}
+          />
+        </StudentReveal>
+      )}
 
       <StudentReveal delay={0.05}>
         <StudentFeatureCards

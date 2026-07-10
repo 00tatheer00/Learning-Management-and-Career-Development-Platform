@@ -4,6 +4,11 @@ import { groupStudentsByModule } from "@/lib/trainer/group-students-by-module";
 import { parseSessionDateTime } from "@/lib/sessions/live-session-datetime";
 import { formatYmdInPakistan, getTodayYmdInPakistan } from "@/lib/utils/pakistan-time";
 import { isAttendanceTrackedDate } from "@/lib/constants/attendance";
+import {
+  computeAttendanceStreak,
+  computeConsecutiveMissed,
+  getAttendanceGoalMessage,
+} from "@/lib/api/attendance-insights";
 
 export type AttendanceCellStatus = "present" | "late" | "absent" | "upcoming" | "untracked";
 
@@ -21,6 +26,7 @@ export interface AttendanceStudentRef {
   level?: string | null;
   programSlug?: string | null;
   email?: string | null;
+  batch?: string | null;
 }
 
 export interface AttendanceRecordRef {
@@ -40,6 +46,11 @@ export interface StudentAttendanceStats {
   missed: number;
   totalExpected: number;
   percentage: number;
+  streak: number;
+  consecutiveMissed: number;
+  goalPercent: number;
+  onTrack: boolean;
+  goalMessage: string;
   records: Array<{
     sessionId: string;
     sessionTitle: string;
@@ -241,6 +252,11 @@ export function computeStudentAttendanceStats(input: {
   const missed = eligible ? Math.max(0, totalExpected - attended) : 0;
   const percentage =
     eligible && totalExpected > 0 ? Math.round((attended / totalExpected) * 100) : 0;
+  const days = computeStudentDayRows({
+    ...input,
+    studentEmail: input.studentEmail,
+  });
+  const goal = getAttendanceGoalMessage(Math.min(100, percentage));
 
   return {
     attended,
@@ -249,6 +265,11 @@ export function computeStudentAttendanceStats(input: {
     missed,
     totalExpected,
     percentage: Math.min(100, percentage),
+    streak: computeAttendanceStreak(days),
+    consecutiveMissed: computeConsecutiveMissed(days),
+    goalPercent: goal.goalPercent,
+    onTrack: goal.onTrack,
+    goalMessage: goal.message,
     records: studentRecords.map((record) => ({
       sessionId: record.sessionId,
       sessionTitle: getSessionTitle(record.sessionId, input.sessions),
@@ -257,10 +278,7 @@ export function computeStudentAttendanceStats(input: {
       status: record.status,
       joinedAt: record.joinedAt,
     })),
-    days: computeStudentDayRows({
-      ...input,
-      studentEmail: input.studentEmail,
-    }),
+    days,
   };
 }
 

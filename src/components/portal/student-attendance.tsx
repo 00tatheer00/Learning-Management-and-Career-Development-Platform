@@ -1,14 +1,20 @@
 import Link from "next/link";
-import { CalendarBlank, CheckCircle, Clock, ListChecks, XCircle } from "@phosphor-icons/react/ssr";
+import { CalendarBlank, CheckCircle, Clock, ListChecks, Target, XCircle } from "@phosphor-icons/react/ssr";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getStudentAttendanceSummary } from "@/lib/api/class-attendance";
+import { getLiveSessionsPreview } from "@/lib/api/portal-data";
 import type { AttendanceCellStatus } from "@/lib/api/attendance-analytics";
+import { getAttendanceStatusMeta } from "@/lib/api/attendance-insights";
 import { canAccessModuleOneClasses } from "@/lib/modules/student-module-access";
 import { ModuleStartsSoonNotice } from "@/components/portal/module-starts-soon-notice";
+import { AttendanceStreakBadge, StudentAttendanceMissedAlert } from "@/components/portal/student-attendance-alert";
 import { PortalPageHeader, PortalSurfaceCard } from "@/components/portal/portal-ui";
 import { formatAppliedDateTime } from "@/lib/utils";
+import { findNextUpcomingSession } from "@/lib/utils/session-datetime";
+import { parseSessionDateTime } from "@/lib/sessions/join-window";
+import { formatHoursUntilClass } from "@/lib/api/attendance-insights";
 import { cn } from "@/lib/utils";
-import { lateThresholdDescription, ATTENDANCE_TRACKING_START_DATE } from "@/lib/constants/attendance";
+import { lateThresholdDescription, ATTENDANCE_TRACKING_START_DATE, ATTENDANCE_GOAL_PERCENT } from "@/lib/constants/attendance";
 
 interface StudentAttendanceProgressCardProps {
   programSlug: string;
@@ -30,7 +36,7 @@ export async function StudentAttendanceProgressCard({
   const percentage = stats.percentage;
 
   const barTone =
-    percentage >= 80
+    percentage >= ATTENDANCE_GOAL_PERCENT
       ? "from-primary to-[#1873cc]"
       : percentage >= 50
         ? "from-[#71717a] to-[#52525b]"
@@ -41,9 +47,12 @@ export async function StudentAttendanceProgressCard({
       <div className="px-5 py-4 border-b border-pt bg-gradient-to-r from-[#1a4d8f] to-[#1e90ff] text-white">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-white/75">
-              My Attendance
-            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-white/75">
+                My Attendance
+              </p>
+              <AttendanceStreakBadge streak={stats.streak} />
+            </div>
             <p className="text-2xl font-bold mt-0.5">{percentage}%</p>
           </div>
           <Link
@@ -65,6 +74,15 @@ export async function StudentAttendanceProgressCard({
         </div>
         <p className="mt-2 text-xs text-pt-muted">
           {stats.attended} of {stats.totalExpected} classes attended
+        </p>
+        <p
+          className={cn(
+            "mt-2 inline-flex items-center gap-1.5 text-xs font-semibold rounded-lg px-2.5 py-1.5",
+            stats.onTrack ? "bg-emerald-50 text-emerald-800" : "bg-amber-50 text-amber-900"
+          )}
+        >
+          <Target size={14} weight="duotone" />
+          {stats.goalMessage}
         </p>
 
         <div className="mt-4 grid grid-cols-3 gap-2">
@@ -125,9 +143,19 @@ export async function StudentAttendancePageContent() {
   }
 
   const stats = await getStudentAttendanceSummary(user.id, programSlug);
+  const sessions = await getLiveSessionsPreview(programSlug);
+  const nextSession = findNextUpcomingSession(sessions, programSlug);
+  const nextSessionAt = nextSession
+    ? parseSessionDateTime(nextSession.date, nextSession.time)
+    : null;
+  const nextClassReminder =
+    nextSessionAt != null
+      ? formatHoursUntilClass(nextSessionAt.getTime(), Date.now())
+      : null;
+
   const percentage = stats.percentage;
   const barTone =
-    percentage >= 80
+    percentage >= ATTENDANCE_GOAL_PERCENT
       ? "from-primary to-[#1873cc]"
       : percentage >= 50
         ? "from-[#71717a] to-[#52525b]"
@@ -140,8 +168,30 @@ export async function StudentAttendancePageContent() {
         description={`Recorded when you join class from the portal (from ${ATTENDANCE_TRACKING_START_DATE}). Present on time, ${lateThresholdDescription()}.`}
       />
 
+      <StudentAttendanceMissedAlert
+        programSlug={programSlug}
+        studentId={user.id}
+        studentLevel={user.level}
+        studentEmail={user.email}
+      />
+
+      {nextSession && nextClassReminder && (
+        <PortalSurfaceCard className="p-4 border-primary/20 bg-primary/5">
+          <p className="text-sm font-semibold text-pt flex items-center gap-2">
+            <CalendarBlank size={18} weight="duotone" className="text-primary" />
+            Next class: {nextSession.title}
+          </p>
+          <p className="text-xs text-pt-muted mt-1">
+            {nextClassReminder} · {nextSession.date} at {nextSession.time}
+          </p>
+        </PortalSurfaceCard>
+      )}
+
       <PortalSurfaceCard className="p-5 sm:p-6">
-        <p className="text-xs font-bold uppercase tracking-widest text-pt-faint">Overall</p>
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="text-xs font-bold uppercase tracking-widest text-pt-faint">Overall</p>
+          <AttendanceStreakBadge streak={stats.streak} />
+        </div>
         <p className="text-4xl font-bold text-pt mt-1">{percentage}%</p>
         <div className="mt-4 h-4 rounded-full bg-slate-200 overflow-hidden">
           <div
@@ -151,6 +201,15 @@ export async function StudentAttendancePageContent() {
         </div>
         <p className="mt-2 text-sm text-pt-muted">
           {stats.attended} attended · {stats.missed} missed · {stats.totalExpected} total classes
+        </p>
+        <p
+          className={cn(
+            "mt-3 inline-flex items-center gap-1.5 text-sm font-semibold rounded-xl px-3 py-2",
+            stats.onTrack ? "bg-emerald-50 text-emerald-800 border border-emerald-200" : "bg-amber-50 text-amber-900 border border-amber-200"
+          )}
+        >
+          <Target size={16} weight="duotone" />
+          {stats.goalMessage}
         </p>
 
         <div className="mt-5 grid grid-cols-3 gap-2">
@@ -197,6 +256,9 @@ export async function StudentAttendancePageContent() {
                       <div>
                         <p className="font-medium text-pt">{session.title}</p>
                         <p className="text-xs text-pt-muted">{session.time}</p>
+                        <p className="text-[11px] text-pt-muted mt-0.5">
+                          {getAttendanceStatusMeta(session.status).description}
+                        </p>
                         {session.joinedAt && (
                           <p className="text-xs text-pt-muted mt-0.5">
                             Joined {formatAppliedDateTime(session.joinedAt)}
@@ -265,29 +327,25 @@ function DayStatusBadge({
   status: AttendanceCellStatus;
   compact?: boolean;
 }) {
+  const meta = getAttendanceStatusMeta(status);
   const config = {
     present: {
-      label: "Present",
       icon: <CheckCircle size={compact ? 12 : 14} weight="fill" />,
       className: "bg-emerald-600 text-white",
     },
     late: {
-      label: "Late",
       icon: <Clock size={compact ? 12 : 14} weight="fill" />,
       className: "bg-amber-500 text-white",
     },
     absent: {
-      label: "Absent",
       icon: <XCircle size={compact ? 12 : 14} weight="fill" />,
       className: "bg-rose-600 text-white",
     },
     upcoming: {
-      label: "Upcoming",
       icon: <CalendarBlank size={compact ? 12 : 14} weight="duotone" />,
       className: "bg-sky-600 text-white",
     },
     untracked: {
-      label: "Not tracked",
       icon: <CalendarBlank size={compact ? 12 : 14} weight="duotone" />,
       className: "bg-slate-500 text-white",
     },
@@ -300,9 +358,10 @@ function DayStatusBadge({
         compact ? "px-2 py-0.5 text-[10px]" : "px-2.5 py-1 text-xs",
         config.className
       )}
+      title={meta.description}
     >
       {config.icon}
-      {config.label}
+      {meta.label}
     </span>
   );
 }

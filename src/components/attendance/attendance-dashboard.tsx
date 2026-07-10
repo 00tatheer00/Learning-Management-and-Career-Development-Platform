@@ -6,15 +6,19 @@ import {
   ChartPie,
   CheckCircle,
   Clock,
+  DownloadSimple,
   GraduationCap,
   MagnifyingGlass,
   Users,
+  WarningCircle,
   XCircle,
 } from "@phosphor-icons/react";
 import { PortalPageHeader } from "@/components/portal/portal-ui";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
 import { getProgramCategory } from "@/lib/constants/program-categories";
+import { ATTENDANCE_GOAL_PERCENT } from "@/lib/constants/attendance";
 import { formatAppliedDateTime } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { PORTAL_VIEWPORT_PANEL } from "@/lib/constants/portal-layout";
@@ -25,7 +29,13 @@ import type {
   ModuleAttendanceRow,
   SessionAttendanceRow,
 } from "@/lib/api/attendance-analytics";
-import type { AttendanceReportRow } from "@/lib/api/class-attendance";
+import type {
+  AttendanceReportRow,
+  AttendanceRecordsPage,
+  LowAttendanceStudent,
+  PreClassAttendanceAlert,
+  SessionAttendanceDetail,
+} from "@/lib/api/class-attendance";
 
 type AttendanceTab = "overview" | "days" | "modules" | "sessions" | "records";
 
@@ -46,7 +56,10 @@ interface AttendanceAnalytics {
       cells: Record<string, "present" | "late" | "absent" | "upcoming" | "untracked">;
     }>;
   };
-  rows: AttendanceReportRow[];
+  records: AttendanceRecordsPage;
+  batches: string[];
+  preClassAlerts: PreClassAttendanceAlert[];
+  lowAttendanceStudents: LowAttendanceStudent[];
 }
 
 interface AttendanceDashboardProps {
@@ -63,6 +76,31 @@ const TABS: Array<{ id: AttendanceTab; label: string; icon: typeof ChartPie }> =
   { id: "records", label: "All Records", icon: CheckCircle },
 ];
 
+function buildApiUrl(
+  mode: "admin" | "trainer",
+  filters: {
+    programFilter: string;
+    dateFrom: string;
+    dateTo: string;
+    batch: string;
+    lowAttendance: boolean;
+    recordsPage: number;
+  }
+) {
+  const params = new URLSearchParams();
+  if (mode === "admin") params.set("programSlug", filters.programFilter);
+  if (filters.dateFrom) params.set("dateFrom", filters.dateFrom);
+  if (filters.dateTo) params.set("dateTo", filters.dateTo);
+  if (filters.batch && filters.batch !== "all") params.set("batch", filters.batch);
+  if (filters.lowAttendance) params.set("lowAttendance", "1");
+  params.set("page", String(filters.recordsPage));
+  params.set("pageSize", "25");
+
+  const base =
+    mode === "admin" ? "/api/admin/attendance/analytics" : "/api/trainer/attendance";
+  return `${base}?${params.toString()}`;
+}
+
 export function AttendanceDashboard({
   mode,
   title = "Attendance Management",
@@ -70,15 +108,31 @@ export function AttendanceDashboard({
 }: AttendanceDashboardProps) {
   const [tab, setTab] = useState<AttendanceTab>("overview");
   const [programFilter, setProgramFilter] = useState("web-development");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const [batch, setBatch] = useState("all");
+  const [lowAttendance, setLowAttendance] = useState(false);
+  const [recordsPage, setRecordsPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<AttendanceAnalytics | null>(null);
   const [search, setSearch] = useState("");
   const [expandedModule, setExpandedModule] = useState<string | null>(null);
+  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
+  const [sessionDetail, setSessionDetail] = useState<SessionAttendanceDetail | null>(null);
+  const [sessionDetailLoading, setSessionDetailLoading] = useState(false);
 
-  const apiUrl =
-    mode === "admin"
-      ? `/api/admin/attendance/analytics?programSlug=${programFilter}`
-      : "/api/trainer/attendance";
+  const apiUrl = useMemo(
+    () =>
+      buildApiUrl(mode, {
+        programFilter,
+        dateFrom,
+        dateTo,
+        batch,
+        lowAttendance,
+        recordsPage,
+      }),
+    [mode, programFilter, dateFrom, dateTo, batch, lowAttendance, recordsPage]
+  );
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -95,8 +149,25 @@ export function AttendanceDashboard({
     void load();
   }, [load]);
 
+  const loadSessionDetail = useCallback(
+    async (sessionId: string) => {
+      setSelectedSessionId(sessionId);
+      setSessionDetailLoading(true);
+      try {
+        const params = new URLSearchParams({ programSlug: programFilter });
+        if (batch !== "all") params.set("batch", batch);
+        const res = await fetch(`/api/admin/attendance/sessions/${sessionId}?${params}`);
+        const json = await res.json();
+        if (json.success) setSessionDetail(json.data as SessionAttendanceDetail);
+      } finally {
+        setSessionDetailLoading(false);
+      }
+    },
+    [programFilter, batch]
+  );
+
   const filteredRows = useMemo(() => {
-    const rows = data?.rows ?? [];
+    const rows = data?.records.rows ?? [];
     const query = search.trim().toLowerCase();
     if (!query) return rows;
     return rows.filter((row) =>
@@ -105,7 +176,15 @@ export function AttendanceDashboard({
         .toLowerCase()
         .includes(query)
     );
-  }, [data?.rows, search]);
+  }, [data?.records.rows, search]);
+
+  const exportUrl = useMemo(() => {
+    const params = new URLSearchParams({ programSlug: programFilter });
+    if (dateFrom) params.set("dateFrom", dateFrom);
+    if (dateTo) params.set("dateTo", dateTo);
+    if (batch !== "all") params.set("batch", batch);
+    return `/api/admin/attendance/export?${params.toString()}`;
+  }, [programFilter, dateFrom, dateTo, batch]);
 
   const overview = data?.overview;
 
@@ -119,12 +198,73 @@ export function AttendanceDashboard({
             <FilterPill
               key={slug}
               active={programFilter === slug}
-              onClick={() => setProgramFilter(slug)}
+              onClick={() => {
+                setProgramFilter(slug);
+                setRecordsPage(1);
+              }}
               label={getProgramCategory(slug)?.shortLabel ?? slug}
             />
           ))}
         </div>
       )}
+
+      <div className="shrink-0 flex flex-wrap items-end gap-2 rounded-2xl border border-border bg-background p-3">
+        <FilterField label="From">
+          <Input
+            type="date"
+            value={dateFrom}
+            onChange={(e) => {
+              setDateFrom(e.target.value);
+              setRecordsPage(1);
+            }}
+            className="h-9"
+          />
+        </FilterField>
+        <FilterField label="To">
+          <Input
+            type="date"
+            value={dateTo}
+            onChange={(e) => {
+              setDateTo(e.target.value);
+              setRecordsPage(1);
+            }}
+            className="h-9"
+          />
+        </FilterField>
+        <FilterField label="Batch">
+          <select
+            value={batch}
+            onChange={(e) => {
+              setBatch(e.target.value);
+              setRecordsPage(1);
+            }}
+            className="h-9 rounded-md border border-border bg-background px-3 text-sm"
+          >
+            <option value="all">All batches</option>
+            {(data?.batches ?? []).map((item) => (
+              <option key={item} value={item}>
+                {item}
+              </option>
+            ))}
+          </select>
+        </FilterField>
+        <FilterPill
+          active={lowAttendance}
+          onClick={() => {
+            setLowAttendance((current) => !current);
+            setRecordsPage(1);
+          }}
+          label={`< ${ATTENDANCE_GOAL_PERCENT}% only`}
+        />
+        {mode === "admin" && (
+          <Button variant="outline" size="sm" asChild className="ml-auto">
+            <a href={exportUrl}>
+              <DownloadSimple size={16} className="mr-1.5" />
+              Export CSV
+            </a>
+          </Button>
+        )}
+      </div>
 
       <div className="shrink-0 flex gap-1 overflow-x-auto pb-1">
         {TABS.map((item) => {
@@ -159,9 +299,21 @@ export function AttendanceDashboard({
       ) : (
         <>
           {tab === "overview" && overview && (
-            <OverviewTab overview={overview} sessions={data.sessions.filter((s) => s.isPast)} />
+            <OverviewTab
+              overview={overview}
+              sessions={data.sessions.filter((s) => s.isPast)}
+              preClassAlerts={data.preClassAlerts}
+              lowAttendanceStudents={data.lowAttendanceStudents}
+              mode={mode}
+              onSessionClick={mode === "admin" ? loadSessionDetail : undefined}
+            />
           )}
-          {tab === "days" && <DaysTab days={data.days} />}
+          {tab === "days" && (
+            <DaysTab
+              days={data.days}
+              onSessionClick={mode === "admin" ? loadSessionDetail : undefined}
+            />
+          )}
           {tab === "modules" && (
             <ModulesTab
               modules={data.modules}
@@ -173,9 +325,28 @@ export function AttendanceDashboard({
           )}
           {tab === "sessions" && <SessionsMatrixTab matrix={data.matrix} />}
           {tab === "records" && (
-            <RecordsTab rows={filteredRows} search={search} onSearch={setSearch} />
+            <RecordsTab
+              rows={filteredRows}
+              search={search}
+              onSearch={setSearch}
+              page={data.records.page}
+              totalPages={data.records.totalPages}
+              total={data.records.total}
+              onPageChange={setRecordsPage}
+            />
           )}
         </>
+      )}
+
+      {selectedSessionId && (
+        <SessionDetailModal
+          loading={sessionDetailLoading}
+          detail={sessionDetail}
+          onClose={() => {
+            setSelectedSessionId(null);
+            setSessionDetail(null);
+          }}
+        />
       )}
     </div>
   );
@@ -184,12 +355,76 @@ export function AttendanceDashboard({
 function OverviewTab({
   overview,
   sessions,
+  preClassAlerts,
+  lowAttendanceStudents,
+  mode,
+  onSessionClick,
 }: {
   overview: AttendanceOverview;
   sessions: SessionAttendanceRow[];
+  preClassAlerts: PreClassAttendanceAlert[];
+  lowAttendanceStudents: LowAttendanceStudent[];
+  mode: "admin" | "trainer";
+  onSessionClick?: (sessionId: string) => void;
 }) {
   return (
     <div className="flex-1 min-h-0 overflow-auto space-y-4">
+      {preClassAlerts.length > 0 && (
+        <div className="space-y-2">
+          {preClassAlerts.map((alert) => (
+            <div
+              key={alert.sessionId}
+              className="rounded-2xl border border-sky-200 bg-sky-50 p-4 flex flex-wrap items-center justify-between gap-3"
+            >
+              <div>
+                <p className="text-sm font-bold text-sky-900">
+                  {alert.phase === "live" ? "Class live now" : "Class starting soon"} · {alert.title}
+                </p>
+                <p className="text-xs text-sky-800 mt-0.5">
+                  {alert.date} · {alert.time}
+                </p>
+              </div>
+              <p className="text-sm font-semibold text-sky-900">
+                {alert.joinedCount} joined · {alert.eligibleCount} eligible
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {lowAttendanceStudents.length > 0 && (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 overflow-hidden">
+          <div className="px-4 py-3 border-b border-amber-200 flex items-center gap-2">
+            <WarningCircle size={18} weight="fill" className="text-amber-700" />
+            <p className="text-sm font-bold text-amber-900">
+              {mode === "trainer" ? "Weekly digest" : "Students below goal"} · under {ATTENDANCE_GOAL_PERCENT}%
+            </p>
+          </div>
+          <ul className="divide-y divide-amber-100">
+            {lowAttendanceStudents.map((student) => (
+              <li
+                key={student.studentId}
+                className="px-4 py-3 flex flex-wrap items-center justify-between gap-2 text-sm"
+              >
+                <div>
+                  <p className="font-semibold text-amber-950">{student.studentName}</p>
+                  <p className="text-xs text-amber-800">
+                    {student.module}
+                    {student.batch ? ` · ${student.batch}` : ""}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="font-bold text-rose-700">{student.rate}%</p>
+                  <p className="text-xs text-amber-800">
+                    {student.attended} attended · {student.missed} missed
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
         <MetricCard
           label="Attendance Rate"
@@ -233,9 +468,14 @@ function OverviewTab({
           </div>
           <div className="divide-y divide-border">
             {sessions.slice(0, 6).map((session) => (
-              <div
+              <button
                 key={session.sessionId}
-                className="flex flex-wrap items-center justify-between gap-3 px-4 py-3"
+                type="button"
+                onClick={() => onSessionClick?.(session.sessionId)}
+                className={cn(
+                  "w-full text-left flex flex-wrap items-center justify-between gap-3 px-4 py-3",
+                  onSessionClick && "hover:bg-surface/50 cursor-pointer"
+                )}
               >
                 <div>
                   <p className="font-semibold text-sm">{session.title}</p>
@@ -249,7 +489,7 @@ function OverviewTab({
                   <MiniStat label="Absent" value={session.absent} tone="rose" />
                   <RatePill rate={session.rate} />
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         </div>
@@ -258,7 +498,13 @@ function OverviewTab({
   );
 }
 
-function DaysTab({ days }: { days: DayAttendanceRow[] }) {
+function DaysTab({
+  days,
+  onSessionClick,
+}: {
+  days: DayAttendanceRow[];
+  onSessionClick?: (sessionId: string) => void;
+}) {
   if (days.length === 0) {
     return <EmptyState message="No class days recorded yet." />;
   }
@@ -286,9 +532,14 @@ function DaysTab({ days }: { days: DayAttendanceRow[] }) {
           </div>
           <div className="px-4 pb-4 space-y-2">
             {day.sessions.map((session) => (
-              <div
+              <button
                 key={session.sessionId}
-                className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border px-3 py-2.5"
+                type="button"
+                onClick={() => onSessionClick?.(session.sessionId)}
+                className={cn(
+                  "w-full text-left flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border px-3 py-2.5",
+                  onSessionClick && "hover:bg-surface/50 cursor-pointer"
+                )}
               >
                 <div>
                   <p className="text-sm font-semibold">{session.title}</p>
@@ -300,11 +551,69 @@ function DaysTab({ days }: { days: DayAttendanceRow[] }) {
                   <span className="text-rose-700 font-semibold">{session.absent} A</span>
                   <RatePill rate={session.rate} />
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         </div>
       ))}
+    </div>
+  );
+}
+
+function SessionDetailModal({
+  detail,
+  loading,
+  onClose,
+}: {
+  detail: SessionAttendanceDetail | null;
+  loading: boolean;
+  onClose: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 p-4">
+      <div className="w-full max-w-2xl max-h-[85vh] overflow-hidden rounded-2xl border border-border bg-background shadow-xl flex flex-col">
+        <div className="px-4 py-3 border-b border-border flex items-center justify-between gap-3">
+          <div>
+            <p className="font-bold">{detail?.title ?? "Session attendance"}</p>
+            {detail && (
+              <p className="text-xs text-muted mt-0.5">
+                {detail.date} · {detail.time} · {detail.joinedCount}/{detail.eligibleCount} joined
+              </p>
+            )}
+          </div>
+          <Button variant="outline" size="sm" onClick={onClose}>
+            Close
+          </Button>
+        </div>
+        <div className="flex-1 overflow-auto p-4">
+          {loading ? (
+            <p className="text-sm text-muted py-8 text-center">Loading session...</p>
+          ) : !detail ? (
+            <p className="text-sm text-muted py-8 text-center">Could not load session.</p>
+          ) : (
+            <table className="w-full text-sm">
+              <thead className="border-b border-border">
+                <tr>
+                  <th className="py-2 text-left text-xs font-semibold">Student</th>
+                  <th className="py-2 text-left text-xs font-semibold">Batch</th>
+                  <th className="py-2 text-left text-xs font-semibold">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {detail.students.map((student) => (
+                  <tr key={student.studentId}>
+                    <td className="py-2.5 font-medium">{student.studentName}</td>
+                    <td className="py-2.5 text-muted">{student.batch ?? "—"}</td>
+                    <td className="py-2.5">
+                      <CellBadge status={student.status} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
@@ -457,10 +766,18 @@ function RecordsTab({
   rows,
   search,
   onSearch,
+  page,
+  totalPages,
+  total,
+  onPageChange,
 }: {
   rows: AttendanceReportRow[];
   search: string;
   onSearch: (value: string) => void;
+  page: number;
+  totalPages: number;
+  total: number;
+  onPageChange: (page: number) => void;
 }) {
   return (
     <div className="flex-1 min-h-0 flex flex-col gap-3">
@@ -515,7 +832,44 @@ function RecordsTab({
           </tbody>
         </table>
       </div>
+
+      <div className="shrink-0 flex items-center justify-between gap-3 text-sm">
+        <p className="text-muted">
+          {total} record{total === 1 ? "" : "s"}
+          {search.trim() ? " (filtered on this page)" : ""}
+        </p>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={page <= 1}
+            onClick={() => onPageChange(page - 1)}
+          >
+            Previous
+          </Button>
+          <span className="text-xs text-muted">
+            Page {page} of {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={page >= totalPages}
+            onClick={() => onPageChange(page + 1)}
+          >
+            Next
+          </Button>
+        </div>
+      </div>
     </div>
+  );
+}
+
+function FilterField({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <label className="flex flex-col gap-1 text-xs font-semibold text-muted min-w-[140px]">
+      {label}
+      {children}
+    </label>
   );
 }
 
@@ -584,7 +938,7 @@ function RatePill({
   compact?: boolean;
 }) {
   const tone =
-    rate >= 80 ? "emerald" : rate >= 50 ? "amber" : rate > 0 ? "rose" : "slate";
+    rate >= ATTENDANCE_GOAL_PERCENT ? "emerald" : rate >= 50 ? "amber" : rate > 0 ? "rose" : "slate";
 
   const classes = {
     emerald: inverted ? "bg-white/20 text-white" : "bg-emerald-100 text-emerald-800",
@@ -632,7 +986,7 @@ function StatusBadge({ status }: { status: "present" | "late" }) {
     <span
       className={cn(
         "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold",
-        isPresent ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"
+        isPresent ? "bg-emerald-600 text-white" : "bg-amber-500 text-white"
       )}
     >
       {isPresent ? <CheckCircle size={14} weight="fill" /> : <Clock size={14} weight="fill" />}
