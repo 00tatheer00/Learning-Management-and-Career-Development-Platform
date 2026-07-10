@@ -10,7 +10,7 @@ Educational platform with a public marketing site and role-based portals for **s
 - **Tailwind CSS v4**
 - **Cloudinary** (payment screenshots)
 - **Resend** (email, optional)
-- **UltraMsg** (WhatsApp, optional)
+- **Meta WhatsApp Cloud API** (student notifications + admin inbox)
 - **Vitest** (automated tests)
 
 ## Getting Started

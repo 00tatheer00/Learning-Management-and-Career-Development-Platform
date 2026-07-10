@@ -2,6 +2,7 @@ export type PortalSound =
   | "adminNewRegistration"
   | "adminApprove"
   | "adminReject"
+  | "adminWhatsApp"
   | "studentWelcome";
 
 let audioContext: AudioContext | null = null;
@@ -104,6 +105,13 @@ export function playPortalSound(sound: PortalSound) {
       playSequence([
         { freq: 440, start: 0, duration: 0.2, volume: 0.24, type: "square" },
         { freq: 311.13, start: 0.16, duration: 0.35, volume: 0.2, type: "triangle" },
+      ]);
+      break;
+    case "adminWhatsApp":
+      playSequence([
+        { freq: 659.25, start: 0, duration: 0.1, volume: 0.22 },
+        { freq: 880, start: 0.08, duration: 0.14, volume: 0.24, type: "triangle" },
+        { freq: 1046.5, start: 0.18, duration: 0.22, volume: 0.2, type: "triangle" },
       ]);
       break;
     case "studentWelcome":

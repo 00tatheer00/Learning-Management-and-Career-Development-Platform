@@ -15,7 +15,7 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https://res.cloudinary.com https://images.unsplash.com",
       "font-src 'self' data:",
-      "connect-src 'self' https://api.ultramsg.com https://res.cloudinary.com https://8x8.vc wss://8x8.vc https://meet.jit.si wss://meet.jit.si",
+      "connect-src 'self' https://graph.facebook.com https://res.cloudinary.com https://8x8.vc wss://8x8.vc https://meet.jit.si wss://meet.jit.si",
       "frame-src 'self' https://meet.google.com https://meet.jit.si https://8x8.vc",
       "media-src 'self' blob: https://8x8.vc https://meet.jit.si",
     ].join("; "),

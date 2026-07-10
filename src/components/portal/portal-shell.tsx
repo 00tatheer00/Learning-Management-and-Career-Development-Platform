@@ -29,6 +29,7 @@ import {
   AdminRevenueSidebarCard,
 } from "@/components/admin/admin-revenue-side-panel";
 import { useAdminAlertsOptional } from "@/components/admin/admin-alerts-provider";
+import { useAdminWhatsAppInboxOptional } from "@/components/admin/admin-whatsapp-inbox-provider";
 import { isAdminRole } from "@/lib/auth/admin-roles";
 import {
   PortalThemeProvider,
@@ -254,12 +255,15 @@ function SidebarContent({
   onToggleCollapse?: () => void;
 }) {
   const adminAlerts = useAdminAlertsOptional();
+  const whatsAppInbox = useAdminWhatsAppInboxOptional();
   const enrollmentBadgeCount =
     adminAlerts && isAdminRole(user.role)
       ? adminAlerts.unreadCount > 0
         ? adminAlerts.unreadCount
         : adminAlerts.pendingCount
       : 0;
+  const whatsAppBadgeCount =
+    whatsAppInbox && isAdminRole(user.role) ? whatsAppInbox.totalUnread : 0;
 
   const isAdmin = isAdminRole(user.role);
   const isStudent = user.role === "student";
@@ -387,6 +391,14 @@ function SidebarContent({
                 const Icon = item.icon;
                 const showEnrollmentBadge =
                   item.href === "/admin/enrollments" && enrollmentBadgeCount > 0;
+                const showWhatsAppBadge =
+                  item.href === "/admin/communication" && whatsAppBadgeCount > 0;
+                const navBadgeCount = showEnrollmentBadge
+                  ? enrollmentBadgeCount
+                  : showWhatsAppBadge
+                    ? whatsAppBadgeCount
+                    : 0;
+                const showNavBadge = navBadgeCount > 0;
 
                 return (
                   <Link
@@ -412,10 +424,10 @@ function SidebarContent({
                     {!collapsed && (
                       <>
                         <span className="flex-1 min-w-0 truncate">{item.label}</span>
-                        {showEnrollmentBadge && <AdminNavBadge count={enrollmentBadgeCount} />}
+                        {showNavBadge && <AdminNavBadge count={navBadgeCount} />}
                       </>
                     )}
-                    {collapsed && showEnrollmentBadge && (
+                    {collapsed && showNavBadge && (
                       <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-red-500 ring-2 ring-[var(--pt-surface)]" />
                     )}
                   </Link>

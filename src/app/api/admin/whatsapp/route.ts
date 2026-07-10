@@ -7,26 +7,28 @@ import {
   isNextResponse,
 } from "@/lib/auth/admin-access";
 import { createApiResponse } from "@/lib/api/enrollment";
-import { getUltraMsgInstanceStatus } from "@/lib/notifications/whatsapp";
+import {
+  getWhatsAppConnectionStatus,
+  sendWhatsAppMessage,
+} from "@/lib/notifications/whatsapp";
 import {
   resendEnrollmentLoginWhatsApp,
   resendStudentLoginWhatsApp,
 } from "@/lib/notifications/student-login-whatsapp";
 
-const WHATSAPP_TEST_DISABLED_MESSAGE =
-  "Test messages are disabled. Use Resend Login or approve a student to verify WhatsApp.";
-
 export async function GET(request: Request) {
   const user = await getAdminUser(request);
   if (!user) return unauthorizedAdminResponse();
 
-  const status = await getUltraMsgInstanceStatus();
+  const status = await getWhatsAppConnectionStatus();
   return NextResponse.json(createApiResponse(true, { data: status }));
 }
 
 const postSchema = z.discriminatedUnion("action", [
   z.object({
     action: z.literal("test"),
+    phone: z.string().optional(),
+    message: z.string().optional(),
   }),
   z.object({
     action: z.literal("resendLogin"),
@@ -49,10 +51,48 @@ export async function POST(request: Request) {
   }
 
   if (parsed.data.action === "test") {
-    const status = await getUltraMsgInstanceStatus();
+    const status = await getWhatsAppConnectionStatus();
+    if (!status.connected) {
+      return NextResponse.json(
+        createApiResponse(false, {
+          message: status.error ?? "WhatsApp is not connected",
+          data: { status },
+        }),
+        { status: 400 }
+      );
+    }
+
+    const phone = parsed.data.phone?.trim() || user.phone?.trim();
+    if (!phone) {
+      return NextResponse.json(
+        createApiResponse(false, {
+          message: "Provide a test phone number or add phone to your admin account.",
+          data: { status },
+        }),
+        { status: 400 }
+      );
+    }
+
+    const result = await sendWhatsAppMessage(
+      phone,
+      parsed.data.message?.trim() ||
+        "EEST portal test — WhatsApp Cloud API is connected and working.",
+      "test"
+    );
+
+    if (!result.sent) {
+      return NextResponse.json(
+        createApiResponse(false, {
+          message: result.error ?? "Test message failed",
+          data: { status },
+        }),
+        { status: 400 }
+      );
+    }
+
     return NextResponse.json(
-      createApiResponse(false, {
-        message: WHATSAPP_TEST_DISABLED_MESSAGE,
+      createApiResponse(true, {
+        message: "Test message sent",
         data: { status },
       })
     );

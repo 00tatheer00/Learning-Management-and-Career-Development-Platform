@@ -40,13 +40,31 @@ Stack: **Vercel** (frontend + API) · **MongoDB Atlas** (database) · **NextAuth
 
 ---
 
-## 2c. UltraMsg (approval WhatsApp)
+## 2c. Meta WhatsApp Cloud API (official)
 
-1. Create account at [ultramsg.com](https://ultramsg.com)
-2. Create an instance → copy **Instance ID** and **Token**
-3. Scan QR in UltraMsg dashboard to link your WhatsApp number
-4. Set `ULTRAMSG_INSTANCE_ID` and `ULTRAMSG_TOKEN` in env vars
-5. API docs: [Send chat message](https://docs.ultramsg.com/api/post/messages/chat)
+Use Meta’s official API — not third-party QR bridges. Setup overview:
+
+1. Go to [developers.facebook.com](https://developers.facebook.com/) → **My Apps** → **Create App** → type **Business**
+2. Add product **WhatsApp** → follow **API Setup**
+3. Link a **Meta Business Account** and add / verify your business phone number
+4. Copy credentials into Vercel (see table below)
+5. **Webhooks** → Callback URL: `https://school.emergingedge.tech/api/webhooks/whatsapp`
+6. **Verify token**: same string as `WHATSAPP_WEBHOOK_VERIFY_TOKEN` (you choose this — any random secret)
+7. Subscribe to fields: `messages` (and optionally `message_template_status_update`)
+8. Run `npm run db:push` after deploy so CRM tables exist
+
+### Where each env var comes from
+
+| Variable | Where to get it |
+|----------|-----------------|
+| `WHATSAPP_ACCESS_TOKEN` | Meta App → **WhatsApp** → **API Setup** → **Temporary access token** (dev) or **System User** permanent token (production). [Permanent token guide](https://developers.facebook.com/docs/whatsapp/business-management-api/get-started#system-user-access-tokens) |
+| `WHATSAPP_PHONE_NUMBER_ID` | Same **API Setup** page → **Phone number ID** (numeric, not the +92 number) |
+| `WHATSAPP_BUSINESS_ACCOUNT_ID` | Same page → **WhatsApp Business Account ID** (WABA ID). Optional in code but useful for templates later |
+| `WHATSAPP_WEBHOOK_VERIFY_TOKEN` | **You create this** — any random string (e.g. `openssl rand -hex 16`). Enter the same value in Meta webhook settings and Vercel |
+| `WHATSAPP_APP_SECRET` | Meta App → **App settings** → **Basic** → **App secret** → Show |
+| `WHATSAPP_API_VERSION` | Use `v21.0` (or latest from [Graph API changelog](https://developers.facebook.com/docs/graph-api/changelog)). Default in code is `v21.0` |
+
+Docs: [WhatsApp Cloud API Get Started](https://developers.facebook.com/docs/whatsapp/cloud-api/get-started)
 
 ---
 
@@ -81,8 +99,12 @@ openssl rand -base64 32
 | `RESEND_API_KEY` | Yes (approval emails) | [resend.com](https://resend.com) API key |
 | `EMAIL_FROM` | Yes (approval emails) | Verified sender: `EEST <noreply@emergingedge.tech>` |
 | `EMAIL_REPLY_TO` | No | Reply address, e.g. `eeschooltech@gmail.com` |
-| `ULTRAMSG_INSTANCE_ID` | Yes (approval WhatsApp) | UltraMsg instance ID, e.g. `instance181496` |
-| `ULTRAMSG_TOKEN` | Yes (approval WhatsApp) | UltraMsg API token |
+| `WHATSAPP_ACCESS_TOKEN` | Yes (WhatsApp) | Meta Graph API token — see §2c |
+| `WHATSAPP_PHONE_NUMBER_ID` | Yes (WhatsApp) | Phone number ID from Meta API Setup |
+| `WHATSAPP_BUSINESS_ACCOUNT_ID` | No | WABA ID — recommended for templates |
+| `WHATSAPP_WEBHOOK_VERIFY_TOKEN` | Yes (WhatsApp) | Random secret you choose for webhook verify |
+| `WHATSAPP_APP_SECRET` | Yes (WhatsApp) | Meta App secret (webhook signature verify) |
+| `WHATSAPP_API_VERSION` | No | Graph version, default `v21.0` |
 | `PORTAL_PASSWORD_SECRET` | Yes (production) | Encrypts stored portal passwords (use a value different from `NEXTAUTH_SECRET`) |
 
 When admin approves a student, the platform sends a designed congratulations email and WhatsApp message with portal login URL and credentials.

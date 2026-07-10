@@ -37,7 +37,7 @@ export async function bulkResendLoginWhatsApp(options: {
       errors.push(`${row.name}: ${result.error ?? "Failed"}`);
     }
 
-    // Avoid UltraMsg rate limits.
+    // Pace bulk sends to stay within Meta rate limits.
     await new Promise((resolve) => setTimeout(resolve, 800));
   }
 
