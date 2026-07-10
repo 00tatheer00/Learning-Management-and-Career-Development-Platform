@@ -18,7 +18,7 @@ function stripWrappingQuotes(value: string): string {
 }
 
 function normalizeEmailFrom(raw: string): string {
-  let from = stripWrappingQuotes(raw);
+  const from = stripWrappingQuotes(raw);
 
   if (PLAIN_EMAIL.test(from) || NAMED_EMAIL.test(from)) {
     return from;
