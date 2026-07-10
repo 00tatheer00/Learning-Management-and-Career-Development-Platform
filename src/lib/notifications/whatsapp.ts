@@ -76,7 +76,7 @@ export async function sendWhatsAppMessage(
   phone: string,
   message: string,
   purpose?: WhatsAppPurpose
-): Promise<{ sent: boolean; error?: string }> {
+): Promise<{ sent: boolean; error?: string; wamid?: string }> {
   if (!isWhatsAppCloudConfigured()) {
     return {
       sent: false,

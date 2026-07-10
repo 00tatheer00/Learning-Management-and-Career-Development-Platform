@@ -172,6 +172,14 @@ export function AdminWhatsAppSettings() {
         <code className="bg-surface px-1 rounded">WHATSAPP_APP_SECRET</code>. See{" "}
         <code className="bg-surface px-1 rounded">DEPLOYMENT.md</code> for setup steps.
       </p>
+
+      <p className="mt-2 text-xs text-muted leading-relaxed">
+        <strong>No message on phone?</strong> Meta dev mode only delivers to{" "}
+        <strong>test recipient numbers</strong> you add in Meta → WhatsApp → API Setup. Test uses
+        the official <code className="bg-surface px-1 rounded">hello_world</code> template. Or first
+        send a WhatsApp message <em>to</em> your business number (+92 321 5919502), then free-text
+        replies work for 24 hours.
+      </p>
     </div>
   );
 }

@@ -43,11 +43,17 @@ export async function graphWhatsAppFetch<T>(
   }
 
   if (!response.ok) {
+    const metaError = data.error;
+    const detail = metaError?.message ?? `Graph API request failed (${response.status})`;
+    const code =
+      metaError?.code !== undefined
+        ? ` (#${metaError.code}${metaError.error_subcode ? `/${metaError.error_subcode}` : ""})`
+        : "";
     return {
       ok: false,
       status: response.status,
       data: data as T,
-      error: data.error?.message ?? `Graph API request failed (${response.status})`,
+      error: `${detail}${code}`,
     };
   }
 

@@ -73,12 +73,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const result = await sendWhatsAppMessage(
-      phone,
-      parsed.data.message?.trim() ||
-        "EEST portal test — WhatsApp Cloud API is connected and working.",
-      "test"
-    );
+    const result = await sendWhatsAppMessage(phone, "hello_world test", "test");
 
     if (!result.sent) {
       return NextResponse.json(
@@ -92,8 +87,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json(
       createApiResponse(true, {
-        message: "Test message sent",
-        data: { status },
+        message:
+          "Test template sent via Meta (hello_world). Check WhatsApp on the number you entered. If nothing arrives, add that number under Meta → WhatsApp → API Setup → test recipients.",
+        data: { status, wamid: result.wamid, phone },
       })
     );
   }

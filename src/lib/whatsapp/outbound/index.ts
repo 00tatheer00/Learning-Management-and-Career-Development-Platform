@@ -1,5 +1,5 @@
 import { isWhatsAppCloudConfigured } from "@/lib/whatsapp/config";
-import { sendCloudTextMessage } from "@/lib/whatsapp/cloud-api/send";
+import { sendCloudHelloWorldTestMessage, sendCloudTextMessage } from "@/lib/whatsapp/cloud-api/send";
 import { recordOutboundWhatsAppMessage } from "@/lib/whatsapp/crm/outbound";
 import { formatWhatsAppWaId } from "@/lib/whatsapp/phone";
 
@@ -55,16 +55,24 @@ export async function sendWhatsAppOutbound(input: {
     };
   }
 
-  const result = await sendCloudTextMessage({ to: waId, body: input.body });
+  const isTest = input.purpose === "test";
+  const result = isTest
+    ? await sendCloudHelloWorldTestMessage({ to: waId })
+    : await sendCloudTextMessage({ to: waId, body: input.body });
+
   if (!result.sent) {
     return result;
   }
+
+  const loggedBody = isTest
+    ? "[hello_world template] EEST portal WhatsApp test"
+    : input.body;
 
   if (!input.skipCrmLog) {
     const logged = await recordOutboundWhatsAppMessage({
       phone: input.phone,
       waId,
-      body: input.body,
+      body: loggedBody,
       wamid: result.wamid,
       purpose: input.purpose,
       sentByAgentId: input.agentId ?? null,

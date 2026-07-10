@@ -44,3 +44,41 @@ export async function sendCloudTextMessage(input: {
 
   return { sent: true, wamid };
 }
+
+/** Pre-approved Meta template — works outside the 24h window (best for connection tests). */
+export async function sendCloudHelloWorldTestMessage(input: {
+  to: string;
+}): Promise<{ sent: boolean; wamid?: string; error?: string }> {
+  const config = getWhatsAppCloudConfig();
+  if (!config) {
+    return { sent: false, error: "WhatsApp Cloud API is not configured" };
+  }
+
+  const result = await graphWhatsAppFetch<CloudSendResponse>(
+    `/${config.phoneNumberId}/messages`,
+    {
+      method: "POST",
+      body: JSON.stringify({
+        messaging_product: "whatsapp",
+        recipient_type: "individual",
+        to: input.to.replace(/\D/g, ""),
+        type: "template",
+        template: {
+          name: "hello_world",
+          language: { code: "en_US" },
+        },
+      }),
+    }
+  );
+
+  if (!result.ok) {
+    return { sent: false, error: result.error ?? "Failed to send test template" };
+  }
+
+  const wamid = result.data.messages?.[0]?.id;
+  if (!wamid) {
+    return { sent: false, error: "Meta accepted the request but returned no message id" };
+  }
+
+  return { sent: true, wamid };
+}
