@@ -1,6 +1,10 @@
 import type { WhatsAppConversationStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { formatWhatsAppWaId } from "@/lib/whatsapp/phone";
+import { formatWhatsAppWaId, formatWhatsAppNumberE164 } from "@/lib/whatsapp/phone";
+import {
+  findOrCreateWhatsAppContact,
+  findOrCreateWhatsAppConversation,
+} from "@/lib/whatsapp/crm/contacts";
 
 export interface WhatsAppConversationRow {
   id: string;
@@ -28,6 +32,7 @@ export interface WhatsAppMessageRow {
   type: string;
   body: string | null;
   status: string;
+  statusError: string | null;
   purpose: string | null;
   sentByAgentName: string | null;
   createdAt: string;
@@ -136,6 +141,7 @@ export async function getWhatsAppConversationMessages(
       type: row.type,
       body: row.body,
       status: row.status,
+      statusError: row.statusError,
       purpose: row.purpose,
       sentByAgentName: row.sentByAgentName,
       createdAt: row.createdAt.toISOString(),
@@ -218,4 +224,29 @@ export async function findConversationByPhone(phone: string) {
   });
 
   return contact?.conversations[0] ?? null;
+}
+
+export async function startWhatsAppConversationByPhone(input: {
+  phone: string;
+  displayName?: string | null;
+}): Promise<WhatsAppConversationRow | null> {
+  const phoneE164 = formatWhatsAppNumberE164(input.phone);
+  const waId = formatWhatsAppWaId(input.phone);
+  if (!waId || !phoneE164) return null;
+
+  const contact = await findOrCreateWhatsAppContact({
+    waId,
+    profileName: input.displayName ?? null,
+  });
+
+  const conversation = await findOrCreateWhatsAppConversation(contact.id);
+
+  if (conversation.status === "archived") {
+    await prisma.whatsAppConversation.update({
+      where: { id: conversation.id },
+      data: { status: "open", updatedAt: new Date() },
+    });
+  }
+
+  return getWhatsAppConversationDetail(conversation.id);
 }

@@ -7,18 +7,25 @@ import {
   ChatsCircle,
   MagnifyingGlass,
   PaperPlaneTilt,
+  PencilSimpleLine,
   UserCircle,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Modal } from "@/components/ui/modal";
 import { PortalPageHeader } from "@/components/portal/portal-ui";
 import { cn, formatAppliedDateTime } from "@/lib/utils";
 import { toast } from "@/lib/ui/toast";
 import { useAdminPermissions } from "@/components/admin/admin-permissions";
 import { useAdminWhatsAppInbox } from "@/components/admin/admin-whatsapp-inbox-provider";
+import {
+  WhatsAppMessageTicks,
+} from "@/components/admin/whatsapp-message-ticks";
 import type { WhatsAppConversationRow, WhatsAppMessageRow } from "@/lib/api/whatsapp-crm";
 
 type StatusFilter = "open" | "archived" | "all";
+
+const THREAD_POLL_MS = 3_000;
 
 function contactLabel(contact: WhatsAppConversationRow["contact"]) {
   return contact.displayName ?? contact.profileName ?? contact.phoneE164;
@@ -35,6 +42,11 @@ export function AdminWhatsAppInbox() {
   const [sending, setSending] = useState(false);
   const [reply, setReply] = useState("");
   const [mobileShowThread, setMobileShowThread] = useState(false);
+  const [newChatOpen, setNewChatOpen] = useState(false);
+  const [newPhone, setNewPhone] = useState("");
+  const [newName, setNewName] = useState("");
+  const [newMessage, setNewMessage] = useState("");
+  const [newChatSending, setNewChatSending] = useState(false);
   const threadEndRef = useRef<HTMLDivElement | null>(null);
 
   const filtered = useMemo(() => {
@@ -56,29 +68,37 @@ export function AdminWhatsAppInbox() {
     [conversations, selectedId]
   );
 
-  const loadThread = useCallback(async (conversationId: string) => {
-    setLoadingThread(true);
+  const loadThread = useCallback(async (conversationId: string, silent = false) => {
+    if (!silent) setLoadingThread(true);
     try {
       const res = await fetch(`/api/admin/whatsapp/conversations/${conversationId}`, {
         cache: "no-store",
       });
       const json = await res.json();
       if (!json.success) {
-        toast.error("Could not load conversation", json.error ?? json.message);
+        if (!silent) toast.error("Could not load conversation", json.error ?? json.message);
         return;
       }
       setMessages(json.data?.messages ?? []);
       void refreshConversations();
     } catch {
-      toast.error("Could not load conversation");
+      if (!silent) toast.error("Could not load conversation");
     } finally {
-      setLoadingThread(false);
+      if (!silent) setLoadingThread(false);
     }
   }, [refreshConversations]);
 
   useEffect(() => {
     if (!selectedId) return;
     void loadThread(selectedId);
+  }, [selectedId, loadThread]);
+
+  useEffect(() => {
+    if (!selectedId) return;
+    const interval = window.setInterval(() => {
+      void loadThread(selectedId, true);
+    }, THREAD_POLL_MS);
+    return () => window.clearInterval(interval);
   }, [selectedId, loadThread]);
 
   useEffect(() => {
@@ -100,12 +120,49 @@ export function AdminWhatsAppInbox() {
         return;
       }
       setReply("");
-      await loadThread(selectedId);
+      await loadThread(selectedId, true);
       void refreshConversations();
     } catch {
       toast.error("Send failed");
     } finally {
       setSending(false);
+    }
+  };
+
+  const startNewChat = async () => {
+    if (!canWrite || !newPhone.trim() || !newMessage.trim()) return;
+    setNewChatSending(true);
+    try {
+      const res = await fetch("/api/admin/whatsapp/conversations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          phone: newPhone.trim(),
+          body: newMessage.trim(),
+          name: newName.trim() || undefined,
+        }),
+      });
+      const json = await res.json();
+      if (!json.success) {
+        toast.error("Could not send", json.error ?? json.message);
+        return;
+      }
+      toast.success("Message sent");
+      setNewChatOpen(false);
+      setNewPhone("");
+      setNewName("");
+      setNewMessage("");
+      const conversationId = json.data?.conversation?.id as string | undefined;
+      if (conversationId) {
+        setSelectedId(conversationId);
+        setMobileShowThread(true);
+        await loadThread(conversationId);
+      }
+      void refreshConversations();
+    } catch {
+      toast.error("Could not send");
+    } finally {
+      setNewChatSending(false);
     }
   };
 
@@ -135,8 +192,15 @@ export function AdminWhatsAppInbox() {
     <div>
       <PortalPageHeader
         title="WhatsApp Inbox"
-        description="Reply to students and leads from the official Meta WhatsApp Cloud API."
-      />
+        description="Chat with anyone on your business number. Incoming replies appear here in real time."
+      >
+        {canWrite && (
+          <Button type="button" className="gap-2" onClick={() => setNewChatOpen(true)}>
+            <PencilSimpleLine size={18} weight="bold" />
+            New message
+          </Button>
+        )}
+      </PortalPageHeader>
 
       <div className="rounded-2xl border border-border bg-background overflow-hidden min-h-[70vh] flex flex-col lg:flex-row">
         <aside
@@ -181,7 +245,8 @@ export function AdminWhatsAppInbox() {
           <div className="flex-1 overflow-y-auto">
             {filtered.length === 0 ? (
               <p className="p-6 text-sm text-muted text-center">
-                No conversations yet. Messages will appear here when students reply on WhatsApp.
+                No chats yet. Tap <strong>New message</strong> to text someone, or wait for them to
+                message your business number.
               </p>
             ) : (
               filtered.map((item) => {
@@ -236,10 +301,17 @@ export function AdminWhatsAppInbox() {
           {!selected ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center p-8 text-muted">
               <ChatsCircle size={48} weight="duotone" className="text-emerald-600 mb-3" />
-              <p className="font-medium text-foreground">Select a conversation</p>
+              <p className="font-medium text-foreground">Select a chat or start a new one</p>
               <p className="text-sm mt-1 max-w-sm">
-                Inbound WhatsApp messages appear here in real time. Reply within the 24-hour window.
+                Use <strong>New message</strong> to text any number. When they reply on WhatsApp,
+                the chat updates here automatically.
               </p>
+              {canWrite && (
+                <Button type="button" className="mt-4 gap-2" onClick={() => setNewChatOpen(true)}>
+                  <PencilSimpleLine size={18} weight="bold" />
+                  New message
+                </Button>
+              )}
             </div>
           ) : (
             <>
@@ -293,15 +365,27 @@ export function AdminWhatsAppInbox() {
                           )}
                         >
                           <p className="whitespace-pre-wrap break-words">{msg.body}</p>
-                          <p
+                          <div
                             className={cn(
-                              "text-[10px] mt-1",
+                              "flex items-center justify-end gap-1 text-[10px] mt-1",
                               outbound ? "text-primary-foreground/70" : "text-muted"
                             )}
                           >
-                            {formatAppliedDateTime(msg.createdAt)}
-                            {outbound && msg.sentByAgentName ? ` · ${msg.sentByAgentName}` : ""}
-                          </p>
+                            <span>
+                              {formatAppliedDateTime(msg.createdAt)}
+                              {outbound && msg.sentByAgentName ? ` · ${msg.sentByAgentName}` : ""}
+                            </span>
+                            {outbound && (
+                              <WhatsAppMessageTicks
+                                status={msg.status}
+                                readAt={msg.readAt}
+                                deliveredAt={msg.deliveredAt}
+                              />
+                            )}
+                          </div>
+                          {outbound && msg.status === "failed" && msg.statusError && (
+                            <p className="text-[10px] text-red-200 mt-1">{msg.statusError}</p>
+                          )}
                         </div>
                       </div>
                     );
@@ -315,7 +399,7 @@ export function AdminWhatsAppInbox() {
                   <Input
                     value={reply}
                     onChange={(e) => setReply(e.target.value)}
-                    placeholder="Type a reply..."
+                    placeholder="Type a message..."
                     onKeyDown={(e) => {
                       if (e.key === "Enter" && !e.shiftKey) {
                         e.preventDefault();
@@ -342,6 +426,46 @@ export function AdminWhatsAppInbox() {
           )}
         </section>
       </div>
+
+      <Modal open={newChatOpen} onClose={() => setNewChatOpen(false)} title="New WhatsApp message">
+        <div className="space-y-3">
+          <p className="text-sm text-muted">
+            Text any number from your business WhatsApp. If they have not messaged you in the last 24
+            hours, Meta may block free-text — ask them to message you first, then reply freely.
+          </p>
+          <Input
+            value={newPhone}
+            onChange={(e) => setNewPhone(e.target.value)}
+            placeholder="Phone — 03XXXXXXXXX"
+          />
+          <Input
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            placeholder="Name (optional)"
+          />
+          <textarea
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            placeholder="Your message..."
+            rows={4}
+            className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/30"
+          />
+          <div className="flex justify-end gap-2">
+            <Button type="button" variant="secondary" onClick={() => setNewChatOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              disabled={newChatSending || !newPhone.trim() || !newMessage.trim()}
+              onClick={() => void startNewChat()}
+              className="gap-2"
+            >
+              <PaperPlaneTilt size={18} weight="fill" />
+              {newChatSending ? "Sending..." : "Send"}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }
