@@ -9,6 +9,7 @@ import {
   MagnifyingGlass,
   ArrowClockwise,
   ChatsCircle,
+  EnvelopeSimple,
   PencilSimple,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
 import { getProgramCategory } from "@/lib/constants/program-categories";
 import { getProgramBySlug } from "@/lib/data/programs";
 import { buildStudentLoginWhatsAppMessage } from "@/lib/notifications/approval-templates";
+import { isDemoPortalStudent } from "@/lib/constants/demo-student";
 import { cn, formatAppliedDateTime } from "@/lib/utils";
 import { copyToClipboard } from "@/lib/utils/clipboard";
 import { PORTAL_VIEWPORT_PANEL } from "@/lib/constants/portal-layout";
@@ -202,6 +204,28 @@ export function AdminCredentialsPanel() {
       }
     } catch {
       toast.error("WhatsApp send failed");
+    } finally {
+      setLoadingId(null);
+    }
+  };
+
+  const handleSendLoginEmail = async (row: AdminCredentialRow) => {
+    setLoadingId(row.id);
+    try {
+      const res = await fetch("/api/admin/credentials", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "sendLoginEmail", enrollmentId: row.id }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        toast.success(json.message ?? "Login email sent.");
+      } else {
+        toast.error(json.error ?? json.message ?? "Email send failed");
+      }
+    } catch {
+      toast.error("Email send failed");
     } finally {
       setLoadingId(null);
     }
@@ -560,16 +584,30 @@ export function AdminCredentialsPanel() {
               <div className="flex flex-wrap gap-2 pt-1">
                 <AdminStudentProfileButton target={{ enrollmentId: row.id }} compact />
                 {canWrite && row.hasStoredPassword && (
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    className="h-8 text-xs"
-                    disabled={loadingId === row.id}
-                    title="After student messages +92 321 5919502 with Portal login"
-                    onClick={() => void handleResendWhatsApp(row)}
-                  >
-                    WhatsApp
-                  </Button>
+                  isDemoPortalStudent(row.email) ? (
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      className="h-8 text-xs gap-1"
+                      disabled={loadingId === row.id}
+                      title="Email login details"
+                      onClick={() => void handleSendLoginEmail(row)}
+                    >
+                      <EnvelopeSimple size={14} weight="fill" />
+                      Email
+                    </Button>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      className="h-8 text-xs"
+                      disabled={loadingId === row.id}
+                      title="After student messages +92 321 5919502 with Portal login"
+                      onClick={() => void handleResendWhatsApp(row)}
+                    >
+                      WhatsApp
+                    </Button>
+                  )
                 )}
               </div>
             </div>
@@ -737,15 +775,27 @@ export function AdminCredentialsPanel() {
                           </button>
                           {canWrite && (
                             <>
-                              <button
-                                type="button"
-                                title="Send login via WhatsApp (student must message +92 321 5919502 first)"
-                                disabled={!row.hasStoredPassword || loadingId === row.id}
-                                onClick={() => void handleResendWhatsApp(row)}
-                                className="rounded border border-[#25D366]/40 bg-[#25D366]/10 p-1.5 text-[#128C7E] hover:bg-[#25D366]/20 disabled:opacity-40"
-                              >
-                                <ChatsCircle size={14} weight="fill" />
-                              </button>
+                              {isDemoPortalStudent(row.email) ? (
+                                <button
+                                  type="button"
+                                  title="Email login details to student"
+                                  disabled={!row.hasStoredPassword || loadingId === row.id}
+                                  onClick={() => void handleSendLoginEmail(row)}
+                                  className="rounded border border-sky-300/60 bg-sky-50 p-1.5 text-sky-700 hover:bg-sky-100 disabled:opacity-40"
+                                >
+                                  <EnvelopeSimple size={14} weight="fill" />
+                                </button>
+                              ) : (
+                                <button
+                                  type="button"
+                                  title="Send login via WhatsApp (student must message +92 321 5919502 first)"
+                                  disabled={!row.hasStoredPassword || loadingId === row.id}
+                                  onClick={() => void handleResendWhatsApp(row)}
+                                  className="rounded border border-[#25D366]/40 bg-[#25D366]/10 p-1.5 text-[#128C7E] hover:bg-[#25D366]/20 disabled:opacity-40"
+                                >
+                                  <ChatsCircle size={14} weight="fill" />
+                                </button>
+                              )}
                               <button
                                 type="button"
                                 title="Repair all module logins for this student"

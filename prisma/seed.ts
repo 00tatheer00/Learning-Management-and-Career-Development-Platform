@@ -61,7 +61,7 @@ const DEFAULT_USERS = [
   },
   {
     id: "student-1",
-    email: "student@eest.com",
+    email: "tatheerabidi00@gmail.com",
     password: seedPassword("SEED_STUDENT_PASSWORD", "student123"),
     role: "student" as const,
     name: "Demo Student",
@@ -73,7 +73,7 @@ const DEFAULT_USERS = [
   },
 ];
 
-const DEMO_STUDENT_EMAIL = "student@eest.com";
+const DEMO_STUDENT_EMAIL = "tatheerabidi00@gmail.com";
 
 async function upsertDemoStudentEnrollments(studentPassword: string) {
   const modules = getProgramModuleNames("web-development");
@@ -183,10 +183,30 @@ async function upsertUser(user: (typeof DEFAULT_USERS)[number]) {
   });
 }
 
+async function migrateLegacyDemoStudentEmail() {
+  const oldEmail = "student@eest.com";
+  const newEmail = DEMO_STUDENT_EMAIL;
+
+  const oldUser = await prisma.user.findUnique({ where: { email: oldEmail } });
+  const newUser = await prisma.user.findUnique({ where: { email: newEmail } });
+  if (!oldUser || newUser) return;
+
+  await prisma.user.update({
+    where: { id: oldUser.id },
+    data: { email: newEmail },
+  });
+  await prisma.enrollment.updateMany({
+    where: { email: oldEmail },
+    data: { email: newEmail },
+  });
+}
+
 async function main() {
   for (const user of DEFAULT_USERS) {
     await upsertUser(user);
   }
+
+  await migrateLegacyDemoStudentEmail();
 
   const demoStudent = DEFAULT_USERS.find((user) => user.email === DEMO_STUDENT_EMAIL);
   if (demoStudent && "password" in demoStudent) {

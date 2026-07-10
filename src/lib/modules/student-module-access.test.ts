@@ -40,10 +40,10 @@ describe("student module access", () => {
 
   it("grants demo portal student access to all module classes", () => {
     expect(
-      canAccessModuleOneClasses("web-development", "Backend + Database", ["Backend + Database"], "student@eest.com")
+      canAccessModuleOneClasses("web-development", "Backend + Database", ["Backend + Database"], "tatheerabidi00@gmail.com")
     ).toBe(true);
     expect(
-      canAccessModuleOneClasses("web-development", "React", undefined, "student@eest.com")
+      canAccessModuleOneClasses("web-development", "React", undefined, "tatheerabidi00@gmail.com")
     ).toBe(true);
   });
 

@@ -15,6 +15,10 @@ import { generateMissingPortalPasswords } from "@/lib/api/admin-credentials-bulk
 import { syncStudentLoginHashesFromVault } from "@/lib/api/admin-credentials-sync";
 import { repairStudentLoginPasswords } from "@/lib/auth/student-login-password";
 import { revealEnrollmentPortalPassword, revealStudentPortalPassword } from "@/lib/api/admin-portal-password";
+import {
+  resendEnrollmentLoginEmail,
+  resendStudentLoginEmail,
+} from "@/lib/notifications/student-login-email";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -105,6 +109,11 @@ const postSchema = z.discriminatedUnion("action", [
     studentId: z.string().optional(),
   }),
   z.object({
+    action: z.literal("sendLoginEmail"),
+    enrollmentId: z.string().optional(),
+    studentId: z.string().optional(),
+  }),
+  z.object({
     action: z.literal("bulkResendLogin"),
     studentIds: z.array(z.string()).optional(),
     neverLoggedInOnly: z.boolean().optional(),
@@ -156,6 +165,27 @@ export async function POST(request: Request) {
       }),
       { status: 403 }
     );
+  }
+
+  if (parsed.data.action === "sendLoginEmail") {
+    if (!parsed.data.enrollmentId && !parsed.data.studentId) {
+      return NextResponse.json(
+        createApiResponse(false, { message: "Provide enrollmentId or studentId." }),
+        { status: 400 }
+      );
+    }
+
+    const result = parsed.data.enrollmentId
+      ? await resendEnrollmentLoginEmail(parsed.data.enrollmentId)
+      : await resendStudentLoginEmail(parsed.data.studentId!);
+
+    if (!result.success) {
+      return NextResponse.json(createApiResponse(false, { error: result.error ?? "Send failed" }), {
+        status: 400,
+      });
+    }
+
+    return NextResponse.json(createApiResponse(true, { message: result.message }));
   }
 
   if (parsed.data.action === "syncLoginHashes") {
