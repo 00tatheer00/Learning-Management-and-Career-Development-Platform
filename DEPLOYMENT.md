@@ -68,7 +68,7 @@ Docs: [WhatsApp Cloud API Get Started](https://developers.facebook.com/docs/what
 
 ### Message templates (approve / reject)
 
-Approve and reject notifications use **Meta templates** (no password or portal link in WhatsApp — safer and works outside the 24h window).
+Approve and reject notifications use **Meta templates** (no password in WhatsApp — login credentials go by email).
 
 1. Meta Business Manager → **WhatsApp Manager** → **Message templates** → **Create template**
 2. Create these two **Utility** templates in **English** with **exact names**:
@@ -79,8 +79,7 @@ Approve and reject notifications use **Meta templates** (no password or portal l
 | `eest_registration_rejected` | Same file |
 
 3. Submit for Meta review (usually 24–48h)
-4. After approval, Tatheer can **Approve** registrations — student gets congrats + instruction to WhatsApp **+92 321 5919502** with message **`Portal login`**
-5. Komal replies from **Admin → WhatsApp** with username/password (only after student messages — 24h window)
+4. After approval, Tatheer **Approve** karega — student ko WhatsApp par congrats + **email par login details** (username/password)
 
 Optional env overrides if Meta names differ: `WHATSAPP_TEMPLATE_APPROVED`, `WHATSAPP_TEMPLATE_REJECTED`.
 

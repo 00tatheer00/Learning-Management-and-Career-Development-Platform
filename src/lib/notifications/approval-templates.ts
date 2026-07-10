@@ -1,7 +1,6 @@
 import { SITE_CONFIG } from "@/lib/constants";
 import {
   BUSINESS_WHATSAPP_DISPLAY,
-  PORTAL_LOGIN_REQUEST_PHRASE,
   STUDENT_WHATSAPP_GROUP_NAME,
   STUDENT_WHATSAPP_GROUP_URL,
 } from "@/lib/constants/contact";
@@ -126,6 +125,7 @@ export interface ApprovalTemplateParams {
   firstName: string;
   courseName: string;
   module: string;
+  portalLoginUrl: string;
 }
 
 export interface RejectionTemplateParams {
@@ -138,6 +138,7 @@ export function buildApprovalTemplatePreview({
   firstName,
   courseName,
   module,
+  portalLoginUrl,
 }: ApprovalTemplateParams): string {
   return [
     `[Approved] Hello ${firstName},`,
@@ -147,7 +148,8 @@ export function buildApprovalTemplatePreview({
     `Course: ${courseName}`,
     `Module: ${module}`,
     "",
-    `To receive portal login details, WhatsApp ${BUSINESS_WHATSAPP_DISPLAY} with: ${PORTAL_LOGIN_REQUEST_PHRASE}`,
+    "Login details sent to your registered email — check inbox and spam, then log in:",
+    portalLoginUrl,
     "",
     "EEST Team",
   ].join("\n");

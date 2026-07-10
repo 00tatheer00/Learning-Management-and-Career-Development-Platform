@@ -7,17 +7,18 @@ import {
 import { META_TEMPLATE_SUBMISSIONS } from "@/lib/whatsapp/cloud-api/templates";
 
 describe("approval WhatsApp templates", () => {
-  it("builds approval preview without password or portal link", () => {
+  it("builds approval preview with email instruction and portal link", () => {
     const preview = buildApprovalTemplatePreview({
       firstName: "Ahmed",
       courseName: "Web Development",
       module: "Beginner",
+      portalLoginUrl: "https://school.emergingedge.tech/login",
     });
 
     expect(preview).toContain("Ahmed");
-    expect(preview).toContain("Portal login");
+    expect(preview).toContain("registered email");
+    expect(preview).toContain("https://school.emergingedge.tech/login");
     expect(preview).not.toContain("Password:");
-    expect(preview).not.toMatch(/https?:\/\//);
   });
 
   it("builds rejection preview with reason", () => {

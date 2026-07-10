@@ -176,10 +176,8 @@ export function AdminWhatsAppSettings() {
       <p className="mt-2 text-xs text-muted leading-relaxed">
         <strong>Approve / reject:</strong> Requires Meta templates{" "}
         <code className="bg-surface px-1 rounded">eest_registration_approved</code> and{" "}
-        <code className="bg-surface px-1 rounded">eest_registration_rejected</code> (see{" "}
-        <code className="bg-surface px-1 rounded">DEPLOYMENT.md</code>). No password in WhatsApp —
-        student messages <strong>Portal login</strong> to +92 321 5919502; Komal sends creds from
-        the inbox.
+        <code className="bg-surface px-1 rounded">eest_registration_rejected</code>. Approval
+        WhatsApp tells students to check email for login; credentials go by email only.
       </p>
 
       <p className="mt-2 text-xs text-muted leading-relaxed">
