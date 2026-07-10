@@ -13,6 +13,15 @@ export const toast = {
   warning(message: string, description?: string) {
     sonnerToast.warning(message, description ? { description } : undefined);
   },
+  whatsapp(message: string, description?: string) {
+    sonnerToast.success(message, {
+      description,
+      icon: "💬",
+      classNames: {
+        toast: "wa-toast",
+      },
+    });
+  },
   promise<T>(
     promise: Promise<T>,
     messages: { loading: string; success: string; error: string }

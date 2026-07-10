@@ -8,18 +8,26 @@ import {
   MagnifyingGlass,
   PaperPlaneTilt,
   PencilSimpleLine,
+  Plus,
+  CircleNotch,
   UserCircle,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
-import { PortalPageHeader } from "@/components/portal/portal-ui";
-import { cn, formatAppliedDateTime } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { toast } from "@/lib/ui/toast";
 import { useAdminPermissions } from "@/components/admin/admin-permissions";
 import { useAdminWhatsAppInbox } from "@/components/admin/admin-whatsapp-inbox-provider";
-import { WhatsAppMessageTicks } from "@/components/admin/whatsapp-message-ticks";
-import { formatWhatsAppDeliveryError } from "@/lib/whatsapp/messaging-window";
+import {
+  WhatsAppMessageBubble,
+  type DisplayMessage,
+} from "@/components/admin/whatsapp-inbox/message-bubble";
+import {
+  avatarColor,
+  formatWaListTime,
+  getInitials,
+  groupMessagesByDay,
+} from "@/components/admin/whatsapp-inbox/utils";
 import type { WhatsAppConversationRow, WhatsAppMessageRow } from "@/lib/api/whatsapp-crm";
 
 type StatusFilter = "open" | "archived" | "all";
@@ -30,13 +38,30 @@ function contactLabel(contact: WhatsAppConversationRow["contact"]) {
   return contact.displayName ?? contact.profileName ?? contact.phoneE164;
 }
 
+function WaAvatar({ name, seed, size = "md" }: { name: string; seed: string; size?: "sm" | "md" | "lg" }) {
+  const dim = size === "lg" ? "h-10 w-10 text-sm" : size === "sm" ? "h-9 w-9 text-xs" : "h-12 w-12 text-sm";
+  return (
+    <div
+      className={cn(
+        "rounded-full flex items-center justify-center font-semibold text-white shrink-0",
+        avatarColor(seed),
+        dim
+      )}
+    >
+      {getInitials(name)}
+    </div>
+  );
+}
+
 export function AdminWhatsAppInbox() {
   const { canWrite } = useAdminPermissions();
-  const { conversations, refreshConversations } = useAdminWhatsAppInbox();
+  const { conversations, refreshConversations, totalUnread, setActiveConversationId } =
+    useAdminWhatsAppInbox();
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("open");
   const [search, setSearch] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [messages, setMessages] = useState<WhatsAppMessageRow[]>([]);
+  const [optimisticMessages, setOptimisticMessages] = useState<DisplayMessage[]>([]);
   const [loadingThread, setLoadingThread] = useState(false);
   const [sending, setSending] = useState(false);
   const [reply, setReply] = useState("");
@@ -50,6 +75,7 @@ export function AdminWhatsAppInbox() {
   const [canSendFreeText, setCanSendFreeText] = useState(true);
   const [sendingTemplate, setSendingTemplate] = useState(false);
   const threadEndRef = useRef<HTMLDivElement | null>(null);
+  const replyRef = useRef<HTMLTextAreaElement | null>(null);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -70,6 +96,15 @@ export function AdminWhatsAppInbox() {
     [conversations, selectedId]
   );
 
+  const displayMessages = useMemo(() => {
+    const merged: DisplayMessage[] = [...messages, ...optimisticMessages];
+    return merged.sort(
+      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
+  }, [messages, optimisticMessages]);
+
+  const messageGroups = useMemo(() => groupMessagesByDay(displayMessages), [displayMessages]);
+
   const loadThread = useCallback(async (conversationId: string, silent = false) => {
     if (!silent) setLoadingThread(true);
     try {
@@ -78,18 +113,24 @@ export function AdminWhatsAppInbox() {
       });
       const json = await res.json();
       if (!json.success) {
-        if (!silent) toast.error("Could not load conversation", json.error ?? json.message);
+        if (!silent) toast.error("Chat load nahi hui", json.error ?? json.message);
         return;
       }
       setMessages(json.data?.messages ?? []);
+      setOptimisticMessages([]);
       setCanSendFreeText(json.data?.messagingWindow?.canSendFreeText ?? false);
       void refreshConversations();
     } catch {
-      if (!silent) toast.error("Could not load conversation");
+      if (!silent) toast.error("Chat load nahi hui", "Internet ya server check karein");
     } finally {
       if (!silent) setLoadingThread(false);
     }
   }, [refreshConversations]);
+
+  useEffect(() => {
+    setActiveConversationId(selectedId);
+    return () => setActiveConversationId(null);
+  }, [selectedId, setActiveConversationId]);
 
   useEffect(() => {
     if (!selectedId) return;
@@ -98,37 +139,61 @@ export function AdminWhatsAppInbox() {
 
   useEffect(() => {
     if (!selectedId) return;
-    const interval = window.setInterval(() => {
-      void loadThread(selectedId, true);
-    }, THREAD_POLL_MS);
+    const interval = window.setInterval(() => void loadThread(selectedId, true), THREAD_POLL_MS);
     return () => window.clearInterval(interval);
   }, [selectedId, loadThread]);
 
   useEffect(() => {
     threadEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, loadingThread]);
+  }, [displayMessages, loadingThread]);
 
   const sendReply = async () => {
-    if (!selectedId || !reply.trim() || !canWrite) return;
+    if (!selectedId || !reply.trim() || !canWrite || !canSendFreeText) return;
+    const body = reply.trim();
+    const tempId = `opt-${Date.now()}`;
+    const optimistic: DisplayMessage = {
+      id: tempId,
+      direction: "outbound",
+      type: "text",
+      body,
+      status: "pending",
+      statusError: null,
+      purpose: "agent_reply",
+      sentByAgentName: null,
+      createdAt: new Date().toISOString(),
+      deliveredAt: null,
+      readAt: null,
+      mediaMimeType: null,
+      mediaFilename: null,
+      optimistic: true,
+    };
+    setOptimisticMessages((prev) => [...prev, optimistic]);
+    setReply("");
     setSending(true);
+
     try {
       const res = await fetch(`/api/admin/whatsapp/conversations/${selectedId}/messages`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "text", body: reply.trim() }),
+        body: JSON.stringify({ type: "text", body }),
       });
       const json = await res.json();
       if (!json.success) {
-        toast.error("Send failed", json.error ?? json.message);
+        setOptimisticMessages((prev) => prev.filter((m) => m.id !== tempId));
+        setReply(body);
+        toast.error("Message nahi gaya", json.error ?? json.message);
         return;
       }
-      setReply("");
+      toast.whatsapp("Message bhej diya ✓");
       await loadThread(selectedId, true);
       void refreshConversations();
     } catch {
-      toast.error("Send failed");
+      setOptimisticMessages((prev) => prev.filter((m) => m.id !== tempId));
+      setReply(body);
+      toast.error("Message nahi gaya", "Dobara try karein");
     } finally {
       setSending(false);
+      replyRef.current?.focus();
     }
   };
 
@@ -143,14 +208,14 @@ export function AdminWhatsAppInbox() {
       });
       const json = await res.json();
       if (!json.success) {
-        toast.error("Template failed", json.error ?? json.message);
+        toast.error("Template fail", json.error ?? json.message);
         return;
       }
-      toast.success("Template sent — jab wo reply karein, free text chalega 24h tak");
+      toast.whatsapp("Template bhej di ✓", "Jab reply aaye, 24h normal chat chalegi");
       await loadThread(selectedId, true);
       void refreshConversations();
     } catch {
-      toast.error("Template failed");
+      toast.error("Template fail");
     } finally {
       setSendingTemplate(false);
     }
@@ -173,10 +238,13 @@ export function AdminWhatsAppInbox() {
       });
       const json = await res.json();
       if (!json.success) {
-        toast.error("Could not send", json.error ?? json.message);
+        toast.error("Chat start nahi hui", json.error ?? json.message);
         return;
       }
-      toast.success("Message sent");
+      toast.whatsapp(
+        newChatUseTemplate ? "Template bhej di ✓" : "Message bhej diya ✓",
+        newChatUseTemplate ? "Reply ka wait karein" : undefined
+      );
       setNewChatOpen(false);
       setNewPhone("");
       setNewName("");
@@ -189,7 +257,7 @@ export function AdminWhatsAppInbox() {
       }
       void refreshConversations();
     } catch {
-      toast.error("Could not send");
+      toast.error("Chat start nahi hui");
     } finally {
       setNewChatSending(false);
     }
@@ -205,64 +273,91 @@ export function AdminWhatsAppInbox() {
       });
       const json = await res.json();
       if (!json.success) {
-        toast.error("Could not archive", json.error ?? json.message);
+        toast.error("Archive fail", json.error ?? json.message);
         return;
       }
-      toast.success("Conversation archived");
+      toast.info("Chat archived");
       setSelectedId(null);
       setMobileShowThread(false);
       void refreshConversations();
     } catch {
-      toast.error("Could not archive");
+      toast.error("Archive fail");
     }
   };
 
   return (
-    <div>
-      <PortalPageHeader
-        title="WhatsApp Inbox"
-        description="Chat with anyone on your business number. Incoming replies appear here in real time."
-      >
+    <div className="wa-inbox-shell">
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-bold text-[#111b21] flex items-center gap-2">
+            <ChatsCircle size={26} weight="duotone" className="text-[#008069]" />
+            WhatsApp
+            {totalUnread > 0 && (
+              <span className="wa-unread-badge rounded-full px-2 flex items-center justify-center font-bold">
+                {totalUnread}
+              </span>
+            )}
+          </h1>
+          <p className="text-sm text-[#667781] mt-0.5">EE School of Technology · Business inbox</p>
+        </div>
         {canWrite && (
-          <Button type="button" className="gap-2" onClick={() => setNewChatOpen(true)}>
+          <button
+            type="button"
+            onClick={() => setNewChatOpen(true)}
+            className="wa-new-chat-btn hidden sm:inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold"
+          >
             <PencilSimpleLine size={18} weight="bold" />
-            New message
-          </Button>
+            New chat
+          </button>
         )}
-      </PortalPageHeader>
+      </div>
 
-      <div className="rounded-2xl border border-border bg-background overflow-hidden min-h-[70vh] flex flex-col lg:flex-row">
+      <div className="rounded-lg overflow-hidden border border-[#e9edef] shadow-lg min-h-[75vh] max-h-[calc(100vh-140px)] flex flex-col lg:flex-row bg-white">
+        {/* ── Chat list ── */}
         <aside
           className={cn(
-            "border-b lg:border-b-0 lg:border-r border-border flex flex-col",
-            "w-full lg:w-[340px] shrink-0",
+            "flex flex-col w-full lg:w-[380px] shrink-0 border-[#e9edef] bg-white",
+            "lg:border-r",
             mobileShowThread && "hidden lg:flex"
           )}
         >
-          <div className="p-3 border-b border-border space-y-2">
+          <div className="wa-sidebar-header px-3 pt-3 pb-2 space-y-2">
+            <div className="flex items-center justify-between gap-2 px-1">
+              <span className="text-sm font-semibold text-[#008069]">Chats</span>
+              {canWrite && (
+                <button
+                  type="button"
+                  onClick={() => setNewChatOpen(true)}
+                  className="sm:hidden wa-new-chat-btn h-9 w-9 rounded-full flex items-center justify-center"
+                  aria-label="New chat"
+                >
+                  <Plus size={20} weight="bold" />
+                </button>
+              )}
+            </div>
             <div className="relative">
               <MagnifyingGlass
-                size={18}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+                size={16}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8696a0]"
               />
-              <Input
+              <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search name or number..."
-                className="pl-9"
+                placeholder="Search or start new chat"
+                className="w-full rounded-lg bg-[#f0f2f5] pl-9 pr-3 py-2 text-sm text-[#111b21] placeholder:text-[#8696a0] outline-none focus:ring-1 focus:ring-[#008069]/40"
               />
             </div>
-            <div className="flex gap-1">
+            <div className="flex gap-1 px-0.5">
               {(["open", "archived", "all"] as const).map((filter) => (
                 <button
                   key={filter}
                   type="button"
                   onClick={() => setStatusFilter(filter)}
                   className={cn(
-                    "rounded-lg px-2.5 py-1 text-xs font-medium capitalize",
+                    "rounded-full px-3 py-1 text-xs font-medium capitalize transition-colors",
                     statusFilter === filter
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-surface text-muted hover:text-foreground"
+                      ? "bg-[#008069] text-white"
+                      : "text-[#667781] hover:bg-[#f0f2f5]"
                   )}
                 >
                   {filter}
@@ -273,13 +368,15 @@ export function AdminWhatsAppInbox() {
 
           <div className="flex-1 overflow-y-auto">
             {filtered.length === 0 ? (
-              <p className="p-6 text-sm text-muted text-center">
-                No chats yet. Tap <strong>New message</strong> to text someone, or wait for them to
-                message your business number.
-              </p>
+              <div className="p-8 text-center">
+                <UserCircle size={48} className="wa-empty-icon mx-auto mb-2" weight="duotone" />
+                <p className="text-sm text-[#667781]">No chats yet</p>
+                <p className="text-xs text-[#8696a0] mt-1">New chat se message karein</p>
+              </div>
             ) : (
               filtered.map((item) => {
                 const active = item.id === selectedId;
+                const label = contactLabel(item.contact);
                 return (
                   <button
                     key={item.id}
@@ -289,29 +386,29 @@ export function AdminWhatsAppInbox() {
                       setMobileShowThread(true);
                     }}
                     className={cn(
-                      "w-full text-left px-3 py-3 border-b border-border/60 hover:bg-surface/80",
-                      active && "bg-primary/5"
+                      "w-full text-left px-3 py-3 border-b border-[#f0f2f5] wa-list-item transition-colors",
+                      active && "wa-list-item-active"
                     )}
                   >
-                    <div className="flex items-start gap-2">
-                      <div className="mt-0.5 h-9 w-9 rounded-full bg-emerald-500/10 text-emerald-700 flex items-center justify-center shrink-0">
-                        <UserCircle size={22} weight="duotone" />
-                      </div>
+                    <div className="flex items-center gap-3">
+                      <WaAvatar name={label} seed={item.contact.waId} />
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between gap-2">
-                          <p className="font-semibold text-sm truncate">
-                            {contactLabel(item.contact)}
+                        <div className="flex items-baseline justify-between gap-2">
+                          <p className="font-medium text-[15px] text-[#111b21] truncate">{label}</p>
+                          <span className="text-[11px] text-[#667781] shrink-0">
+                            {formatWaListTime(item.lastMessageAt)}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between gap-2 mt-0.5">
+                          <p className="text-[13px] text-[#667781] truncate">
+                            {item.lastMessagePreview ?? item.contact.phoneE164}
                           </p>
                           {item.unreadCount > 0 && (
-                            <span className="shrink-0 rounded-full bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 min-w-[18px] text-center">
+                            <span className="wa-unread-badge rounded-full px-1.5 flex items-center justify-center font-bold shrink-0">
                               {item.unreadCount}
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-muted truncate">{item.contact.phoneE164}</p>
-                        <p className="text-xs text-muted truncate mt-0.5">
-                          {item.lastMessagePreview ?? "No messages"}
-                        </p>
                       </div>
                     </div>
                   </button>
@@ -321,163 +418,155 @@ export function AdminWhatsAppInbox() {
           </div>
         </aside>
 
+        {/* ── Thread ── */}
         <section
           className={cn(
-            "flex-1 flex flex-col min-h-[50vh]",
+            "flex-1 flex flex-col min-h-[420px] bg-[#efeae2]",
             !mobileShowThread && "hidden lg:flex"
           )}
         >
           {!selected ? (
-            <div className="flex-1 flex flex-col items-center justify-center text-center p-8 text-muted">
-              <ChatsCircle size={48} weight="duotone" className="text-emerald-600 mb-3" />
-              <p className="font-medium text-foreground">Select a chat or start a new one</p>
-              <p className="text-sm mt-1 max-w-sm">
-                Use <strong>New message</strong> to text any number. When they reply on WhatsApp,
-                the chat updates here automatically.
-              </p>
-              {canWrite && (
-                <Button type="button" className="mt-4 gap-2" onClick={() => setNewChatOpen(true)}>
-                  <PencilSimpleLine size={18} weight="bold" />
-                  New message
-                </Button>
-              )}
+            <div className="flex-1 flex flex-col items-center justify-center text-center p-8 wa-chat-wallpaper">
+              <div className="bg-white/80 backdrop-blur rounded-2xl px-8 py-10 shadow-sm max-w-sm">
+                <ChatsCircle size={56} weight="duotone" className="text-[#008069] mx-auto mb-4" />
+                <p className="font-semibold text-[#111b21] text-lg">EEST WhatsApp Web</p>
+                <p className="text-sm text-[#667781] mt-2 leading-relaxed">
+                  Send and receive messages from your business number. Select a chat or start a new
+                  one.
+                </p>
+                {canWrite && (
+                  <button
+                    type="button"
+                    onClick={() => setNewChatOpen(true)}
+                    className="wa-new-chat-btn mt-5 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold"
+                  >
+                    <PencilSimpleLine size={18} weight="bold" />
+                    New chat
+                  </button>
+                )}
+              </div>
             </div>
           ) : (
             <>
-              <div className="px-4 py-3 border-b border-border flex items-center gap-2">
-                <Button
+              <div className="wa-chat-header px-3 py-2.5 flex items-center gap-3 shrink-0">
+                <button
                   type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="lg:hidden"
+                  className="lg:hidden p-2 -ml-1 text-[#008069]"
                   onClick={() => setMobileShowThread(false)}
+                  aria-label="Back"
                 >
-                  <ArrowLeft size={18} />
-                </Button>
+                  <ArrowLeft size={22} weight="bold" />
+                </button>
+                <WaAvatar name={contactLabel(selected.contact)} seed={selected.contact.waId} size="sm" />
                 <div className="min-w-0 flex-1">
-                  <p className="font-semibold truncate">{contactLabel(selected.contact)}</p>
-                  <p className="text-xs text-muted">{selected.contact.phoneE164}</p>
+                  <p className="font-medium text-[16px] text-[#111b21] truncate leading-tight">
+                    {contactLabel(selected.contact)}
+                  </p>
+                  <p className="text-xs text-[#667781] truncate">{selected.contact.phoneE164}</p>
                 </div>
                 {canWrite && (
-                  <Button
+                  <button
                     type="button"
-                    variant="secondary"
-                    size="sm"
-                    className="gap-1.5"
                     onClick={() => void archiveConversation()}
+                    className="p-2 rounded-full text-[#54656f] hover:bg-[#f0f2f5]"
+                    title="Archive"
                   >
-                    <Archive size={16} />
-                    Archive
-                  </Button>
+                    <Archive size={20} />
+                  </button>
                 )}
               </div>
 
               {!canSendFreeText && (
-                <div className="mx-4 mt-3 rounded-xl border border-amber-300/60 bg-amber-50 px-3 py-2.5 text-xs text-amber-950">
-                  <strong>Meta 24-hour rule:</strong> is number ne recently aapko message nahi kiya —
-                  free text deliver nahi hoga (red ! wala error).{" "}
-                  <strong>Send template</strong> use karo, ya unse{" "}
-                  <strong>+92 321 5919502</strong> par pehle message karwao — phir 24h reply freely.
+                <div className="wa-warning-banner mx-3 mt-2 rounded-lg px-3 py-2 text-xs leading-relaxed shrink-0">
+                  <strong>24-hour window closed.</strong> Free text blocked —{" "}
+                  <button
+                    type="button"
+                    className="underline font-semibold"
+                    onClick={() => void sendTemplate()}
+                    disabled={sendingTemplate}
+                  >
+                    Send template
+                  </button>{" "}
+                  or ask them to message +92 321 5919502 first.
                 </div>
               )}
 
-              <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-surface/40">
+              <div className="flex-1 overflow-y-auto px-4 md:px-8 py-3 space-y-1 wa-chat-wallpaper">
                 {loadingThread ? (
-                  <p className="text-sm text-muted text-center py-8">Loading messages...</p>
-                ) : messages.length === 0 ? (
-                  <p className="text-sm text-muted text-center py-8">No messages in this thread.</p>
+                  <div className="flex justify-center py-12">
+                    <CircleNotch size={28} className="animate-spin text-[#008069]" />
+                  </div>
+                ) : displayMessages.length === 0 ? (
+                  <p className="text-sm text-[#667781] text-center py-12">
+                    No messages yet. Say hello 👋
+                  </p>
                 ) : (
-                  messages.map((msg) => {
-                    const outbound = msg.direction === "outbound";
-                    return (
-                      <div
-                        key={msg.id}
-                        className={cn("flex", outbound ? "justify-end" : "justify-start")}
-                      >
-                        <div
-                          className={cn(
-                            "max-w-[85%] rounded-2xl px-3 py-2 text-sm shadow-sm",
-                            outbound
-                              ? "bg-primary text-primary-foreground rounded-br-md"
-                              : "bg-background border border-border rounded-bl-md"
-                          )}
-                        >
-                          <p className="whitespace-pre-wrap break-words">{msg.body}</p>
-                          <div
-                            className={cn(
-                              "flex items-center justify-end gap-1 text-[10px] mt-1",
-                              outbound ? "text-primary-foreground/70" : "text-muted"
-                            )}
-                          >
-                            <span>
-                              {formatAppliedDateTime(msg.createdAt)}
-                              {outbound && msg.sentByAgentName ? ` · ${msg.sentByAgentName}` : ""}
-                            </span>
-                            {outbound && (
-                              <WhatsAppMessageTicks
-                                status={msg.status}
-                                readAt={msg.readAt}
-                                deliveredAt={msg.deliveredAt}
-                              />
-                            )}
-                          </div>
-                          {outbound && msg.status === "failed" && msg.statusError && (
-                            <p className="text-[10px] text-red-200 mt-1 font-medium">
-                              {formatWhatsAppDeliveryError(msg.statusError)}
-                            </p>
-                          )}
-                        </div>
+                  messageGroups.map((group) => (
+                    <div key={group.label} className="space-y-1">
+                      <div className="flex justify-center my-3 sticky top-1 z-10">
+                        <span className="wa-day-pill text-[12.5px] font-medium px-3 py-1 rounded-lg">
+                          {group.label}
+                        </span>
                       </div>
-                    );
-                  })
+                      {group.messages.map((msg) => (
+                        <WhatsAppMessageBubble key={msg.id} message={msg} />
+                      ))}
+                    </div>
+                  ))
                 )}
                 <div ref={threadEndRef} />
               </div>
 
               {canWrite ? (
-                <div className="p-3 border-t border-border space-y-2">
+                <div className="wa-compose-bar px-3 py-2 shrink-0">
                   {!canSendFreeText && (
-                    <Button
+                    <button
                       type="button"
-                      variant="secondary"
-                      className="w-full gap-2"
                       disabled={sendingTemplate}
                       onClick={() => void sendTemplate()}
+                      className="w-full mb-2 rounded-lg bg-white border border-[#d1d7db] text-[#008069] text-sm font-medium py-2 hover:bg-[#f5f6f6] disabled:opacity-50"
                     >
-                      {sendingTemplate ? "Sending template..." : "Send template (Hello World)"}
-                    </Button>
+                      {sendingTemplate ? "Sending template…" : "📋 Send Hello World template"}
+                    </button>
                   )}
-                  <div className="flex gap-2">
-                    <Input
-                      value={reply}
-                      onChange={(e) => setReply(e.target.value)}
-                      placeholder={
-                        canSendFreeText
-                          ? "Type a message..."
-                          : "Free text blocked — use template above first"
-                      }
-                      disabled={!canSendFreeText}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && !e.shiftKey) {
-                          e.preventDefault();
-                          void sendReply();
+                  <div className="flex items-end gap-2">
+                    <div className="wa-input-pill flex-1 flex items-end min-h-[42px] px-3 py-2">
+                      <textarea
+                        ref={replyRef}
+                        value={reply}
+                        onChange={(e) => setReply(e.target.value)}
+                        placeholder={
+                          canSendFreeText ? "Type a message" : "Template required first…"
                         }
-                      }}
-                    />
-                    <Button
+                        disabled={!canSendFreeText || sending}
+                        rows={1}
+                        className="flex-1 resize-none bg-transparent text-[15px] text-[#111b21] placeholder:text-[#8696a0] outline-none max-h-32 leading-5"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && !e.shiftKey) {
+                            e.preventDefault();
+                            void sendReply();
+                          }
+                        }}
+                      />
+                    </div>
+                    <button
                       type="button"
                       disabled={sending || !reply.trim() || !canSendFreeText}
                       onClick={() => void sendReply()}
-                      className="gap-1.5 shrink-0"
+                      className="wa-send-btn h-[42px] w-[42px] rounded-full flex items-center justify-center shrink-0 transition-colors"
+                      aria-label="Send"
                     >
-                      <PaperPlaneTilt size={18} weight="fill" />
-                      {sending ? "..." : "Send"}
-                    </Button>
+                      {sending ? (
+                        <CircleNotch size={20} className="animate-spin" />
+                      ) : (
+                        <PaperPlaneTilt size={20} weight="fill" />
+                      )}
+                    </button>
                   </div>
                 </div>
               ) : (
-                <p className="p-3 text-xs text-muted border-t border-border">
-                  Read-only — you can view messages but not reply.
+                <p className="p-3 text-xs text-[#667781] bg-[#f0f2f5] text-center shrink-0">
+                  Read-only mode
                 </p>
               )}
             </>
@@ -485,53 +574,63 @@ export function AdminWhatsAppInbox() {
         </section>
       </div>
 
-      <Modal open={newChatOpen} onClose={() => setNewChatOpen(false)} title="New WhatsApp message">
-        <div className="space-y-3">
-          <p className="text-sm text-muted">
-            <strong>Naye number par pehli message?</strong> Meta free text allow nahi karta —{" "}
-            <strong>Template message</strong> use karo (Hello World). Jab wo reply kare, 24 hours
-            tak normal chat kar sakte ho.
+      <Modal open={newChatOpen} onClose={() => setNewChatOpen(false)} title="New chat">
+        <div className="space-y-4 wa-modal-accent -mt-2 pt-4">
+          <p className="text-sm text-[#667781] leading-relaxed">
+            Naye number par pehli message ke liye Meta template use karein. Reply ke baad 24 hours
+            normal chat.
           </p>
-          <label className="flex items-center gap-2 text-sm">
+          <label className="flex items-start gap-3 text-sm text-[#111b21] cursor-pointer">
             <input
               type="checkbox"
+              className="mt-1 accent-[#008069]"
               checked={newChatUseTemplate}
               onChange={(e) => setNewChatUseTemplate(e.target.checked)}
             />
-            Send as Meta template (recommended for new numbers)
+            <span>
+              <strong>Send template</strong> (Hello World) — recommended for new numbers
+            </span>
           </label>
-          <Input
+          <input
             value={newPhone}
             onChange={(e) => setNewPhone(e.target.value)}
             placeholder="Phone — 03XXXXXXXXX"
+            className="w-full rounded-lg border border-[#e9edef] px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#008069]/30"
           />
-          <Input
+          <input
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
-            placeholder="Name (optional)"
+            placeholder="Contact name (optional)"
+            className="w-full rounded-lg border border-[#e9edef] px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#008069]/30"
           />
           {!newChatUseTemplate && (
             <textarea
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Your message..."
+              placeholder="Your message…"
               rows={4}
-              className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="w-full rounded-lg border border-[#e9edef] px-3 py-2.5 text-sm resize-none outline-none focus:ring-2 focus:ring-[#008069]/30"
             />
           )}
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-end gap-2 pt-1">
             <Button type="button" variant="secondary" onClick={() => setNewChatOpen(false)}>
               Cancel
             </Button>
-            <Button
+            <button
               type="button"
-              disabled={newChatSending || !newPhone.trim() || (!newChatUseTemplate && !newMessage.trim())}
+              disabled={
+                newChatSending || !newPhone.trim() || (!newChatUseTemplate && !newMessage.trim())
+              }
               onClick={() => void startNewChat()}
-              className="gap-2"
+              className="wa-new-chat-btn inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50"
             >
-              <PaperPlaneTilt size={18} weight="fill" />
-              {newChatSending ? "Sending..." : newChatUseTemplate ? "Send template" : "Send"}
-            </Button>
+              {newChatSending ? (
+                <CircleNotch size={18} className="animate-spin" />
+              ) : (
+                <PaperPlaneTilt size={18} weight="fill" />
+              )}
+              {newChatSending ? "Sending…" : newChatUseTemplate ? "Send template" : "Send message"}
+            </button>
           </div>
         </div>
       </Modal>

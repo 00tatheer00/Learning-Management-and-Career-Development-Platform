@@ -24,6 +24,7 @@ interface AdminWhatsAppInboxContextValue {
   totalUnread: number;
   conversations: WhatsAppConversationRow[];
   refreshConversations: () => Promise<void>;
+  setActiveConversationId: (id: string | null) => void;
 }
 
 const AdminWhatsAppInboxContext = createContext<AdminWhatsAppInboxContextValue | null>(null);
@@ -32,6 +33,7 @@ export function AdminWhatsAppInboxProvider({ children }: { children: ReactNode }
   const pathname = usePathname();
   const [totalUnread, setTotalUnread] = useState(0);
   const [conversations, setConversations] = useState<WhatsAppConversationRow[]>([]);
+  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const knownUnreadRef = useRef<Map<string, number>>(new Map());
   const initializedRef = useRef(false);
   const eventSourceRef = useRef<EventSource | null>(null);
@@ -54,9 +56,10 @@ export function AdminWhatsAppInboxProvider({ children }: { children: ReactNode }
         const prevUnread = knownUnreadRef.current.get(item.id) ?? 0;
         if (item.unreadCount > prevUnread) {
           const name = item.contact.displayName ?? item.contact.profileName ?? item.contact.phoneE164;
-          if (!onInboxPage) {
+          const isViewingThisChat = onInboxPage && item.id === activeConversationId;
+          if (!isViewingThisChat) {
             playPortalSound("adminWhatsApp");
-            toast.info("New WhatsApp message", `${name}: ${item.lastMessagePreview ?? "Message"}`);
+            toast.whatsapp("Naya WhatsApp message", `${name}: ${item.lastMessagePreview ?? "Message"}`);
             if (document.hidden) {
               notifyAdminWhatsAppMessage(name, item.lastMessagePreview ?? "New message");
             }
@@ -66,7 +69,7 @@ export function AdminWhatsAppInboxProvider({ children }: { children: ReactNode }
 
       knownUnreadRef.current = new Map(items.map((item) => [item.id, item.unreadCount]));
     },
-    [pathname]
+    [activeConversationId, pathname]
   );
 
   const refreshConversations = useCallback(async () => {
@@ -150,7 +153,7 @@ export function AdminWhatsAppInboxProvider({ children }: { children: ReactNode }
 
   return (
     <AdminWhatsAppInboxContext.Provider
-      value={{ totalUnread, conversations, refreshConversations }}
+      value={{ totalUnread, conversations, refreshConversations, setActiveConversationId }}
     >
       {children}
     </AdminWhatsAppInboxContext.Provider>

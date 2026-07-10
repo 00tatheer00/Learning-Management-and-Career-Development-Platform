@@ -57,7 +57,7 @@ export function AdminWhatsAppSettings() {
       });
       const json = await res.json();
       if (json.success) {
-        toast.success(json.message ?? "Test sent");
+        toast.whatsapp(json.message ?? "Test template sent ✓", "Check the phone for Hello World");
         if (json.data?.status) setStatus(json.data.status);
       } else {
         toast.error("WhatsApp test failed", json.message ?? json.error ?? "Unknown error");

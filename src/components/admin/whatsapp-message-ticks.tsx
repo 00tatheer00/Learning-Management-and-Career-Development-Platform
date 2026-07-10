@@ -20,11 +20,13 @@ export function WhatsAppMessageTicks({
   readAt,
   deliveredAt,
   className,
+  variant = "default",
 }: {
   status: WhatsAppMessageRow["status"];
   readAt?: string | null;
   deliveredAt?: string | null;
   className?: string;
+  variant?: "default" | "wa";
 }) {
   const isRead = status === "read" || Boolean(readAt);
   const isDelivered = status === "delivered" || Boolean(deliveredAt) || isRead;
@@ -34,7 +36,11 @@ export function WhatsAppMessageTicks({
   if (isFailed) {
     return (
       <span
-        className={cn("inline-flex items-center text-red-300 text-[10px] font-bold", className)}
+        className={cn(
+          "inline-flex items-center text-[10px] font-bold",
+          variant === "wa" ? "text-[#ea0038]" : "text-red-300",
+          className
+        )}
         title="Failed to deliver"
       >
         !
@@ -42,7 +48,14 @@ export function WhatsAppMessageTicks({
     );
   }
 
-  const color = isRead ? "text-sky-300" : "text-primary-foreground/55";
+  const color =
+    variant === "wa"
+      ? isRead
+        ? "text-[#53bdeb]"
+        : "text-[#8696a0]"
+      : isRead
+        ? "text-sky-300"
+        : "text-primary-foreground/55";
 
   return (
     <span className={cn("inline-flex items-center -space-x-1.5 ml-1", color, className)}>
