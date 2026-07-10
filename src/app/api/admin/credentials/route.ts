@@ -27,24 +27,35 @@ export async function GET(request: Request) {
   const user = await getAdminUser(request);
   if (!user) return unauthorizedAdminResponse();
 
-  const rows = await getAdminCredentialRows();
-  const missingCount = rows.filter((row) => !row.hasStoredPassword).length;
-  const neverLoggedInCount = rows.filter((row) => !row.hasLoggedIn).length;
+  try {
+    const rows = await getAdminCredentialRows();
+    const missingCount = rows.filter((row) => !row.hasStoredPassword).length;
+    const neverLoggedInCount = rows.filter((row) => !row.hasLoggedIn).length;
 
-  return NextResponse.json(
-    createApiResponse(true, {
-      data: {
-        rows,
-        meta: {
-          total: rows.length,
-          saved: rows.length - missingCount,
-          missing: missingCount,
-          loggedIn: rows.length - neverLoggedInCount,
-          neverLoggedIn: neverLoggedInCount,
+    return NextResponse.json(
+      createApiResponse(true, {
+        data: {
+          rows,
+          meta: {
+            total: rows.length,
+            saved: rows.length - missingCount,
+            missing: missingCount,
+            loggedIn: rows.length - neverLoggedInCount,
+            neverLoggedIn: neverLoggedInCount,
+          },
         },
-      },
-    })
-  );
+      })
+    );
+  } catch (error) {
+    console.error("[credentials] GET failed:", error);
+    return NextResponse.json(
+      createApiResponse(false, {
+        error: "Could not load portal logins",
+        message: error instanceof Error ? error.message : "Server error",
+      }),
+      { status: 500 }
+    );
+  }
 }
 
 const patchSchema = z.object({

@@ -32,7 +32,7 @@ export interface AdminCredentialRow {
 }
 
 export async function getAdminCredentialRows(): Promise<AdminCredentialRow[]> {
-  await ensureDemoStudentForPortalLogins();
+  const demoUserId = await ensureDemoStudentForPortalLogins();
 
   const loginUrl = getPortalLoginUrl();
   const enrollments = await prisma.enrollment.findMany({
@@ -66,7 +66,7 @@ export async function getAdminCredentialRows(): Promise<AdminCredentialRow[]> {
 
     rows.push({
       id: enrollment.id,
-      studentId: student?.id ?? DEMO_STUDENT_USER_ID,
+      studentId: student?.id ?? demoUserId ?? DEMO_STUDENT_USER_ID,
       name: enrollment.fullName || student?.name || "Demo Student",
       email: student?.email ?? enrollment.email,
       whatsapp: student?.phone ?? enrollment.whatsapp ?? "—",
