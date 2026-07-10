@@ -5,6 +5,7 @@ import {
   findOrCreateWhatsAppContact,
   findOrCreateWhatsAppConversation,
 } from "@/lib/whatsapp/crm/contacts";
+import { isWithinWhatsAppMessagingWindow } from "@/lib/whatsapp/messaging-window";
 
 export interface WhatsAppConversationRow {
   id: string;
@@ -115,6 +116,24 @@ export async function getWhatsAppConversationDetail(
   });
   if (!row) return null;
   return mapConversation(row);
+}
+
+export async function getWhatsAppConversationMessagingWindow(conversationId: string): Promise<{
+  lastInboundAt: string | null;
+  canSendFreeText: boolean;
+}> {
+  const lastInbound = await prisma.whatsAppMessage.findFirst({
+    where: { conversationId, direction: "inbound" },
+    orderBy: { createdAt: "desc" },
+    select: { createdAt: true },
+  });
+
+  const lastInboundAt = lastInbound?.createdAt ?? null;
+
+  return {
+    lastInboundAt: lastInboundAt?.toISOString() ?? null,
+    canSendFreeText: isWithinWhatsAppMessagingWindow(lastInboundAt),
+  };
 }
 
 export async function getWhatsAppConversationMessages(

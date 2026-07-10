@@ -10,6 +10,7 @@ import { createApiResponse } from "@/lib/api/enrollment";
 import {
   getWhatsAppConversationDetail,
   getWhatsAppConversationMessages,
+  getWhatsAppConversationMessagingWindow,
   markWhatsAppConversationRead,
   updateWhatsAppConversation,
 } from "@/lib/api/whatsapp-crm";
@@ -32,12 +33,17 @@ export async function GET(
   const { searchParams } = new URL(request.url);
   const before = searchParams.get("before") ?? undefined;
   const messages = await getWhatsAppConversationMessages(id, { before });
+  const messagingWindow = await getWhatsAppConversationMessagingWindow(id);
 
   await markWhatsAppConversationRead(id);
 
   return NextResponse.json(
     createApiResponse(true, {
-      data: { conversation: { ...conversation, unreadCount: 0 }, messages },
+      data: {
+        conversation: { ...conversation, unreadCount: 0 },
+        messages,
+        messagingWindow,
+      },
     })
   );
 }

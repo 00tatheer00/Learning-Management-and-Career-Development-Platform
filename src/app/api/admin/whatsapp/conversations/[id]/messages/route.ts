@@ -5,14 +5,27 @@ import {
   isNextResponse,
 } from "@/lib/auth/admin-access";
 import { createApiResponse } from "@/lib/api/enrollment";
-import { getWhatsAppConversationDetail } from "@/lib/api/whatsapp-crm";
+import {
+  getWhatsAppConversationDetail,
+  getWhatsAppConversationMessagingWindow,
+} from "@/lib/api/whatsapp-crm";
 import { recordAgentReply } from "@/lib/whatsapp/crm/outbound";
-import { sendCloudTextMessage } from "@/lib/whatsapp/cloud-api/send";
+import { sendCloudHelloWorldTestMessage, sendCloudTextMessage } from "@/lib/whatsapp/cloud-api/send";
 import { prisma } from "@/lib/prisma";
 
-const postSchema = z.object({
-  body: z.string().trim().min(1).max(4096),
-});
+const postSchema = z.discriminatedUnion("type", [
+  z.object({
+    type: z.literal("text"),
+    body: z.string().trim().min(1).max(4096),
+  }),
+  z.object({
+    type: z.literal("template"),
+    templateName: z.enum(["hello_world"]),
+  }),
+]);
+
+const FREE_TEXT_BLOCKED =
+  "Meta 24-hour rule: is number ne recently message nahi kiya. Pehle unse +92 321 5919502 par WhatsApp message karwao, ya 'Send template' button use karo.";
 
 export async function POST(
   request: Request,
@@ -45,10 +58,21 @@ export async function POST(
     );
   }
 
-  const sendResult = await sendCloudTextMessage({
-    to: conversation.contact.waId,
-    body: parsed.data.body,
-  });
+  const window = await getWhatsAppConversationMessagingWindow(id);
+
+  if (parsed.data.type === "text" && !window.canSendFreeText) {
+    return NextResponse.json(createApiResponse(false, { error: FREE_TEXT_BLOCKED }), {
+      status: 400,
+    });
+  }
+
+  const sendResult =
+    parsed.data.type === "template"
+      ? await sendCloudHelloWorldTestMessage({ to: conversation.contact.waId })
+      : await sendCloudTextMessage({
+          to: conversation.contact.waId,
+          body: parsed.data.body,
+        });
 
   if (!sendResult.sent) {
     return NextResponse.json(
@@ -57,9 +81,14 @@ export async function POST(
     );
   }
 
+  const messageBody =
+    parsed.data.type === "template"
+      ? "[hello_world template] Hello! Welcome to EEST — reply here to start chatting."
+      : parsed.data.body;
+
   const { messageId } = await recordAgentReply({
     conversationId: id,
-    body: parsed.data.body,
+    body: messageBody,
     wamid: sendResult.wamid,
     agentId: user.id,
     agentName: user.name,

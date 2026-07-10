@@ -10,9 +10,13 @@ import { createApiResponse } from "@/lib/api/enrollment";
 import {
   listWhatsAppConversations,
   startWhatsAppConversationByPhone,
+  getWhatsAppConversationMessagingWindow,
 } from "@/lib/api/whatsapp-crm";
 import { recordAgentReply } from "@/lib/whatsapp/crm/outbound";
-import { sendCloudTextMessage } from "@/lib/whatsapp/cloud-api/send";
+import { sendCloudHelloWorldTestMessage, sendCloudTextMessage } from "@/lib/whatsapp/cloud-api/send";
+
+const FREE_TEXT_BLOCKED =
+  "Meta 24-hour rule: pehle customer ko business number par message karwana hoga, ya template bhejo.";
 
 export async function GET(request: Request) {
   const user = await getAdminUser(request);
@@ -28,8 +32,9 @@ export async function GET(request: Request) {
 
 const postSchema = z.object({
   phone: z.string().trim().min(10).max(20),
-  body: z.string().trim().min(1).max(4096),
+  body: z.string().trim().min(1).max(4096).optional(),
   name: z.string().trim().max(120).optional(),
+  sendTemplate: z.boolean().optional(),
 });
 
 /** Start (or open) a conversation and send the first message to any number. */
@@ -66,26 +71,46 @@ export async function POST(request: Request) {
     });
   }
 
-  const sendResult = await sendCloudTextMessage({
-    to: conversation.contact.waId,
-    body: parsed.data.body,
-  });
+  if (!parsed.data.sendTemplate && !parsed.data.body?.trim()) {
+    return NextResponse.json(
+      createApiResponse(false, { message: "Provide a message or use sendTemplate." }),
+      { status: 400 }
+    );
+  }
+
+  const messagingWindow = await getWhatsAppConversationMessagingWindow(conversation.id);
+  const useTemplate = parsed.data.sendTemplate === true;
+
+  if (!useTemplate && !messagingWindow.canSendFreeText) {
+    return NextResponse.json(createApiResponse(false, { error: FREE_TEXT_BLOCKED }), {
+      status: 400,
+    });
+  }
+
+  const sendResult = useTemplate
+    ? await sendCloudHelloWorldTestMessage({ to: conversation.contact.waId })
+    : await sendCloudTextMessage({
+        to: conversation.contact.waId,
+        body: parsed.data.body!.trim(),
+      });
 
   if (!sendResult.sent) {
     return NextResponse.json(
       createApiResponse(false, {
-        error:
-          sendResult.error ??
-          "Failed to send. If they have not messaged you in 24 hours, ask them to message your business number first or use an approved template.",
+        error: sendResult.error ?? "Failed to send message",
         data: { conversation },
       }),
       { status: 400 }
     );
   }
 
+  const messageBody = useTemplate
+    ? "[hello_world template] Hello! Welcome to EEST — reply here to start chatting."
+    : parsed.data.body!.trim();
+
   const { messageId } = await recordAgentReply({
     conversationId: conversation.id,
-    body: parsed.data.body,
+    body: messageBody,
     wamid: sendResult.wamid,
     agentId: user.id,
     agentName: user.name,

@@ -18,9 +18,8 @@ import { cn, formatAppliedDateTime } from "@/lib/utils";
 import { toast } from "@/lib/ui/toast";
 import { useAdminPermissions } from "@/components/admin/admin-permissions";
 import { useAdminWhatsAppInbox } from "@/components/admin/admin-whatsapp-inbox-provider";
-import {
-  WhatsAppMessageTicks,
-} from "@/components/admin/whatsapp-message-ticks";
+import { WhatsAppMessageTicks } from "@/components/admin/whatsapp-message-ticks";
+import { formatWhatsAppDeliveryError } from "@/lib/whatsapp/messaging-window";
 import type { WhatsAppConversationRow, WhatsAppMessageRow } from "@/lib/api/whatsapp-crm";
 
 type StatusFilter = "open" | "archived" | "all";
@@ -47,6 +46,9 @@ export function AdminWhatsAppInbox() {
   const [newName, setNewName] = useState("");
   const [newMessage, setNewMessage] = useState("");
   const [newChatSending, setNewChatSending] = useState(false);
+  const [newChatUseTemplate, setNewChatUseTemplate] = useState(true);
+  const [canSendFreeText, setCanSendFreeText] = useState(true);
+  const [sendingTemplate, setSendingTemplate] = useState(false);
   const threadEndRef = useRef<HTMLDivElement | null>(null);
 
   const filtered = useMemo(() => {
@@ -80,6 +82,7 @@ export function AdminWhatsAppInbox() {
         return;
       }
       setMessages(json.data?.messages ?? []);
+      setCanSendFreeText(json.data?.messagingWindow?.canSendFreeText ?? false);
       void refreshConversations();
     } catch {
       if (!silent) toast.error("Could not load conversation");
@@ -112,7 +115,7 @@ export function AdminWhatsAppInbox() {
       const res = await fetch(`/api/admin/whatsapp/conversations/${selectedId}/messages`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ body: reply.trim() }),
+        body: JSON.stringify({ type: "text", body: reply.trim() }),
       });
       const json = await res.json();
       if (!json.success) {
@@ -129,8 +132,33 @@ export function AdminWhatsAppInbox() {
     }
   };
 
+  const sendTemplate = async () => {
+    if (!selectedId || !canWrite) return;
+    setSendingTemplate(true);
+    try {
+      const res = await fetch(`/api/admin/whatsapp/conversations/${selectedId}/messages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "template", templateName: "hello_world" }),
+      });
+      const json = await res.json();
+      if (!json.success) {
+        toast.error("Template failed", json.error ?? json.message);
+        return;
+      }
+      toast.success("Template sent — jab wo reply karein, free text chalega 24h tak");
+      await loadThread(selectedId, true);
+      void refreshConversations();
+    } catch {
+      toast.error("Template failed");
+    } finally {
+      setSendingTemplate(false);
+    }
+  };
+
   const startNewChat = async () => {
-    if (!canWrite || !newPhone.trim() || !newMessage.trim()) return;
+    if (!canWrite || !newPhone.trim()) return;
+    if (!newChatUseTemplate && !newMessage.trim()) return;
     setNewChatSending(true);
     try {
       const res = await fetch("/api/admin/whatsapp/conversations", {
@@ -138,8 +166,9 @@ export function AdminWhatsAppInbox() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           phone: newPhone.trim(),
-          body: newMessage.trim(),
+          body: newChatUseTemplate ? undefined : newMessage.trim(),
           name: newName.trim() || undefined,
+          sendTemplate: newChatUseTemplate,
         }),
       });
       const json = await res.json();
@@ -343,6 +372,15 @@ export function AdminWhatsAppInbox() {
                 )}
               </div>
 
+              {!canSendFreeText && (
+                <div className="mx-4 mt-3 rounded-xl border border-amber-300/60 bg-amber-50 px-3 py-2.5 text-xs text-amber-950">
+                  <strong>Meta 24-hour rule:</strong> is number ne recently aapko message nahi kiya —
+                  free text deliver nahi hoga (red ! wala error).{" "}
+                  <strong>Send template</strong> use karo, ya unse{" "}
+                  <strong>+92 321 5919502</strong> par pehle message karwao — phir 24h reply freely.
+                </div>
+              )}
+
               <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-surface/40">
                 {loadingThread ? (
                   <p className="text-sm text-muted text-center py-8">Loading messages...</p>
@@ -384,7 +422,9 @@ export function AdminWhatsAppInbox() {
                             )}
                           </div>
                           {outbound && msg.status === "failed" && msg.statusError && (
-                            <p className="text-[10px] text-red-200 mt-1">{msg.statusError}</p>
+                            <p className="text-[10px] text-red-200 mt-1 font-medium">
+                              {formatWhatsAppDeliveryError(msg.statusError)}
+                            </p>
                           )}
                         </div>
                       </div>
@@ -395,27 +435,45 @@ export function AdminWhatsAppInbox() {
               </div>
 
               {canWrite ? (
-                <div className="p-3 border-t border-border flex gap-2">
-                  <Input
-                    value={reply}
-                    onChange={(e) => setReply(e.target.value)}
-                    placeholder="Type a message..."
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && !e.shiftKey) {
-                        e.preventDefault();
-                        void sendReply();
+                <div className="p-3 border-t border-border space-y-2">
+                  {!canSendFreeText && (
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      className="w-full gap-2"
+                      disabled={sendingTemplate}
+                      onClick={() => void sendTemplate()}
+                    >
+                      {sendingTemplate ? "Sending template..." : "Send template (Hello World)"}
+                    </Button>
+                  )}
+                  <div className="flex gap-2">
+                    <Input
+                      value={reply}
+                      onChange={(e) => setReply(e.target.value)}
+                      placeholder={
+                        canSendFreeText
+                          ? "Type a message..."
+                          : "Free text blocked — use template above first"
                       }
-                    }}
-                  />
-                  <Button
-                    type="button"
-                    disabled={sending || !reply.trim()}
-                    onClick={() => void sendReply()}
-                    className="gap-1.5 shrink-0"
-                  >
-                    <PaperPlaneTilt size={18} weight="fill" />
-                    {sending ? "..." : "Send"}
-                  </Button>
+                      disabled={!canSendFreeText}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                          e.preventDefault();
+                          void sendReply();
+                        }
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      disabled={sending || !reply.trim() || !canSendFreeText}
+                      onClick={() => void sendReply()}
+                      className="gap-1.5 shrink-0"
+                    >
+                      <PaperPlaneTilt size={18} weight="fill" />
+                      {sending ? "..." : "Send"}
+                    </Button>
+                  </div>
                 </div>
               ) : (
                 <p className="p-3 text-xs text-muted border-t border-border">
@@ -430,9 +488,18 @@ export function AdminWhatsAppInbox() {
       <Modal open={newChatOpen} onClose={() => setNewChatOpen(false)} title="New WhatsApp message">
         <div className="space-y-3">
           <p className="text-sm text-muted">
-            Text any number from your business WhatsApp. If they have not messaged you in the last 24
-            hours, Meta may block free-text — ask them to message you first, then reply freely.
+            <strong>Naye number par pehli message?</strong> Meta free text allow nahi karta —{" "}
+            <strong>Template message</strong> use karo (Hello World). Jab wo reply kare, 24 hours
+            tak normal chat kar sakte ho.
           </p>
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={newChatUseTemplate}
+              onChange={(e) => setNewChatUseTemplate(e.target.checked)}
+            />
+            Send as Meta template (recommended for new numbers)
+          </label>
           <Input
             value={newPhone}
             onChange={(e) => setNewPhone(e.target.value)}
@@ -443,25 +510,27 @@ export function AdminWhatsAppInbox() {
             onChange={(e) => setNewName(e.target.value)}
             placeholder="Name (optional)"
           />
-          <textarea
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Your message..."
-            rows={4}
-            className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/30"
-          />
+          {!newChatUseTemplate && (
+            <textarea
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              placeholder="Your message..."
+              rows={4}
+              className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/30"
+            />
+          )}
           <div className="flex justify-end gap-2">
             <Button type="button" variant="secondary" onClick={() => setNewChatOpen(false)}>
               Cancel
             </Button>
             <Button
               type="button"
-              disabled={newChatSending || !newPhone.trim() || !newMessage.trim()}
+              disabled={newChatSending || !newPhone.trim() || (!newChatUseTemplate && !newMessage.trim())}
               onClick={() => void startNewChat()}
               className="gap-2"
             >
               <PaperPlaneTilt size={18} weight="fill" />
-              {newChatSending ? "Sending..." : "Send"}
+              {newChatSending ? "Sending..." : newChatUseTemplate ? "Send template" : "Send"}
             </Button>
           </div>
         </div>
