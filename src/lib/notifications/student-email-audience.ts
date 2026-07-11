@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { DEMO_PORTAL_STUDENT_EMAIL } from "@/lib/constants/demo-student";
 import { canStudentAccessModuleContent } from "@/lib/modules/student-module-content";
+import { DEMO_STUDENT_PROGRAM_SLUGS } from "@/lib/student-portal/program-scope";
 
 export interface StudentEmailRecipient {
   id: string;
@@ -60,13 +61,54 @@ export async function getEligibleStudentEmailRecipients(input: {
     })
   );
 
-  return resolveStudentEmailRecipients(
-    eligible.map((student) => ({
-      id: student.id,
-      email: student.email,
-      name: student.name,
-    }))
+  let recipients = eligible.map((student) => ({
+    id: student.id,
+    email: student.email,
+    name: student.name,
+  }));
+
+  if (
+    !isStudentEmailDemoOnly() &&
+    (DEMO_STUDENT_PROGRAM_SLUGS as readonly string[]).includes(input.programSlug)
+  ) {
+    recipients = await appendDemoStudentIfMissing(recipients, input);
+  }
+
+  return resolveStudentEmailRecipients(recipients);
+}
+
+async function appendDemoStudentIfMissing(
+  recipients: StudentEmailRecipient[],
+  input: { programSlug: string; moduleLevel?: string | null }
+): Promise<StudentEmailRecipient[]> {
+  const demo = await getDemoStudentRecipient();
+  const demoEmail = demo.email.trim().toLowerCase();
+  if (recipients.some((row) => row.email.trim().toLowerCase() === demoEmail)) {
+    return recipients;
+  }
+
+  const demoUser = await prisma.user.findUnique({
+    where: { email: demoEmail },
+    select: { id: true, email: true, name: true, level: true, isActive: true },
+  });
+  if (!demoUser?.isActive) return recipients;
+
+  const canReceive = canStudentAccessModuleContent(
+    input.programSlug,
+    demoUser.level,
+    input.moduleLevel,
+    { email: demoUser.email }
   );
+  if (!canReceive) return recipients;
+
+  return [
+    ...recipients,
+    {
+      id: demoUser.id,
+      email: demoUser.email,
+      name: demoUser.name,
+    },
+  ];
 }
 
 export async function getDemoStudentRecipient(): Promise<StudentEmailRecipient> {
