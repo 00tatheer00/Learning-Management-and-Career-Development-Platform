@@ -1,3 +1,5 @@
+import "server-only";
+
 import Link from "next/link";
 import { CheckCircle, Clock, FilmStrip, PlayCircle } from "@phosphor-icons/react/ssr";
 import { getClassRecordings } from "@/lib/api/class-recordings";

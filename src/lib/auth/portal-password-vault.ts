@@ -1,3 +1,5 @@
+import "server-only";
+
 import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from "crypto";
 import { prisma } from "@/lib/prisma";
 

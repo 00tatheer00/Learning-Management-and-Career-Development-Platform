@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import {
   MODULE_CONTENT_LOCKED_MESSAGE,
   MODULE_CONTENT_LOCKED_SHORT,
-} from "@/lib/modules/student-module-content";
+} from "@/lib/modules/module-content-messages";
 
 interface ModuleContentLockedNoticeProps {
   studentModule?: string | null;

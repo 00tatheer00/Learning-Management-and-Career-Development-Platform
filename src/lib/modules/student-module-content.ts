@@ -3,12 +3,12 @@ import {
   getFirstModuleName,
   resolveActiveStudentModule,
 } from "@/lib/modules/student-module-access";
+import {
+  MODULE_CONTENT_LOCKED_MESSAGE,
+  MODULE_CONTENT_LOCKED_SHORT,
+} from "@/lib/modules/module-content-messages";
 
-export const MODULE_CONTENT_LOCKED_MESSAGE =
-  "This content is for another module. You will only see lessons, classes, and assignments for your registered module.";
-
-export const MODULE_CONTENT_LOCKED_SHORT =
-  "Available when your module batch starts — we will notify you on WhatsApp.";
+export { MODULE_CONTENT_LOCKED_MESSAGE, MODULE_CONTENT_LOCKED_SHORT };
 
 export interface StudentModuleContentContext {
   programSlug: string;

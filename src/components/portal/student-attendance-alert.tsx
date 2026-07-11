@@ -1,3 +1,5 @@
+import "server-only";
+
 import Link from "next/link";
 import { WarningCircle, Flame } from "@phosphor-icons/react/ssr";
 import { getStudentAttendanceSummary } from "@/lib/api/class-attendance";

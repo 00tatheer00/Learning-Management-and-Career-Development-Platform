@@ -1,3 +1,5 @@
+import "server-only";
+
 import { prisma } from "@/lib/prisma";
 import { getAssignments } from "@/lib/api/portal-data";
 import { parseSessionDateTime } from "@/lib/sessions/join-window";

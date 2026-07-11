@@ -1,3 +1,5 @@
+import "server-only";
+
 import { prisma } from "@/lib/prisma";
 import { getProgramBySlug } from "@/lib/data/programs";
 import type { EnrollmentStatus } from "@/types/portal";

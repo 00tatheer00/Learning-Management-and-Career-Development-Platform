@@ -1,3 +1,5 @@
+import "server-only";
+
 import Link from "next/link";
 import { CalendarBlank, CheckCircle, Clock, ListChecks, Target, XCircle } from "@phosphor-icons/react/ssr";
 import { getCurrentUser } from "@/lib/auth/session";

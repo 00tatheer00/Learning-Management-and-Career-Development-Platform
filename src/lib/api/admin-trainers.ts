@@ -1,3 +1,5 @@
+import "server-only";
+
 import { prisma } from "@/lib/prisma";
 import { getTrainerDesignation, getTrainerCourseTitle } from "@/lib/auth/trainer-scope";
 import { getStaticTrainerByKey } from "@/lib/data/trainer-profiles";

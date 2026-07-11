@@ -1,3 +1,5 @@
+import "server-only";
+
 import { prisma } from "@/lib/prisma";
 import { canStudentAccessModuleContent } from "@/lib/modules/student-module-content";
 import { isDemoPortalStudent } from "@/lib/constants/demo-student";
