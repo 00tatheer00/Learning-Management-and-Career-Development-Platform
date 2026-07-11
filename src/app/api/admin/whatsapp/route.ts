@@ -15,6 +15,7 @@ import {
   resendEnrollmentLoginWhatsApp,
   resendStudentLoginWhatsApp,
 } from "@/lib/notifications/student-login-whatsapp";
+import { resendEnrollmentApprovalWhatsApp } from "@/lib/notifications/approval-info-whatsapp";
 
 export async function GET(request: Request) {
   const user = await getAdminUser(request);
@@ -34,6 +35,10 @@ const postSchema = z.discriminatedUnion("action", [
     action: z.literal("resendLogin"),
     enrollmentId: z.string().optional(),
     studentId: z.string().optional(),
+  }),
+  z.object({
+    action: z.literal("resendApprovalInfo"),
+    enrollmentId: z.string(),
   }),
 ]);
 
@@ -92,6 +97,16 @@ export async function POST(request: Request) {
         data: { status, wamid: result.wamid, phone },
       })
     );
+  }
+
+  if (parsed.data.action === "resendApprovalInfo") {
+    const result = await resendEnrollmentApprovalWhatsApp(parsed.data.enrollmentId);
+    if (!result.success) {
+      return NextResponse.json(createApiResponse(false, { error: result.error ?? "Send failed" }), {
+        status: 400,
+      });
+    }
+    return NextResponse.json(createApiResponse(true, { message: result.message }));
   }
 
   if (!parsed.data.enrollmentId && !parsed.data.studentId) {

@@ -134,8 +134,8 @@ export function AdminWhatsAppSettings() {
         </div>
       )}
 
-      <div className="mt-4 flex flex-wrap gap-2 items-end">
-        <Button type="button" variant="secondary" className="gap-2" asChild>
+      <div className="mt-4 flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:items-end">
+        <Button type="button" variant="secondary" className="gap-2 w-full sm:w-auto" asChild>
           <a
             href="https://developers.facebook.com/apps/"
             target="_blank"
@@ -151,9 +151,9 @@ export function AdminWhatsAppSettings() {
               value={testPhone}
               onChange={(e) => setTestPhone(e.target.value)}
               placeholder="03XXXXXXXXX (optional)"
-              className="max-w-[180px]"
+              className="w-full sm:max-w-[180px]"
             />
-            <Button type="button" className="gap-2" disabled={testing} onClick={() => void sendTest()}>
+            <Button type="button" className="gap-2 w-full sm:w-auto" disabled={testing} onClick={() => void sendTest()}>
               <ChatsCircle size={18} weight="duotone" />
               {testing ? "Sending..." : "Send Test"}
             </Button>

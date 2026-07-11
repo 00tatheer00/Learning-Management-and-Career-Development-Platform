@@ -14,6 +14,7 @@ import {
   Copy,
   ChatsCircle,
   ArrowCounterClockwise,
+  EnvelopeSimple,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -70,11 +71,14 @@ export function AdminEnrollmentsPanel() {
     loginId: string;
     password: string;
     loginUrl: string;
+    enrollmentId: string;
     studentId?: string;
+    emailSent?: boolean;
+    emailError?: string;
     whatsappSent?: boolean;
     whatsappError?: string;
   } | null>(null);
-  const [resendLoading, setResendLoading] = useState(false);
+  const [resendLoading, setResendLoading] = useState<"email" | "whatsapp" | null>(null);
   const [zoomScreenshot, setZoomScreenshot] = useState<{ url: string; caption: string } | null>(
     null
   );
@@ -207,6 +211,8 @@ export function AdminEnrollmentsPanel() {
           loginUrl: string;
         };
         notification?: {
+          emailSent?: boolean;
+          emailError?: string;
           whatsappSent?: boolean;
           whatsappError?: string;
           studentId?: string;
@@ -226,10 +232,27 @@ export function AdminEnrollmentsPanel() {
       }
 
       playPortalSound(status === "approved" ? "adminApprove" : "adminReject");
-      if (status === "approved" && data.notification?.whatsappSent) {
-        toast.success("Approved", data.message ?? "WhatsApp sent to student.");
-      } else if (status === "approved" && data.notification?.whatsappSent === false) {
-        toast.error("Approved but WhatsApp failed", data.notification.whatsappError ?? data.message);
+      if (status === "approved") {
+        const emailSent = data.notification?.emailSent;
+        const whatsappSent = data.notification?.whatsappSent;
+        if (emailSent && whatsappSent) {
+          toast.success("Approved", "Login email sent + WhatsApp info delivered.");
+        } else if (emailSent && !whatsappSent) {
+          toast.warning(
+            "Approved — WhatsApp failed",
+            data.notification?.whatsappError ?? "Login credentials were emailed to the student."
+          );
+        } else if (!emailSent && whatsappSent) {
+          toast.warning(
+            "Approved — email failed",
+            data.notification?.emailError ?? "WhatsApp info was sent; resend login email from the modal."
+          );
+        } else {
+          toast.error(
+            "Approved but notifications failed",
+            data.message ?? "Share login manually from Portal Logins."
+          );
+        }
       } else {
         toast.success(data.message ?? "Updated successfully.");
       }
@@ -241,7 +264,10 @@ export function AdminEnrollmentsPanel() {
           loginId: data.credentials.loginId,
           password: data.credentials.password,
           loginUrl: data.credentials.loginUrl,
+          enrollmentId: id,
           studentId: data.notification?.studentId,
+          emailSent: data.notification?.emailSent,
+          emailError: data.notification?.emailError,
           whatsappSent: data.notification?.whatsappSent,
           whatsappError: data.notification?.whatsappError,
         });
@@ -778,7 +804,7 @@ export function AdminEnrollmentsPanel() {
         <p className="text-sm text-muted">
           Approve <strong>{pendingSelectedCount}</strong> pending registration
           {pendingSelectedCount === 1 ? "" : "s"}? Each student gets a portal account, password
-          saved under Portal Logins, and WhatsApp notification sent.
+          saved under Portal Logins, login credentials by email, and an info message on WhatsApp.
         </p>
         <p className="mt-3 text-sm rounded-xl portal-callout-amber px-3 py-2">
           Review payment screenshots first — especially returning students with a 2nd application.
@@ -810,7 +836,8 @@ export function AdminEnrollmentsPanel() {
           <>
             <p className="text-sm text-muted">
               Approve <strong>{pendingAction.name}</strong> and create their student account?
-              Login details will be saved in Portal Logins and sent on WhatsApp.
+              Login credentials will be emailed to their registered address, and a WhatsApp info
+              message will tell them to check email and visit the portal.
             </p>
             <div className="mt-6 flex justify-end gap-3">
               <Button variant="secondary" onClick={() => setPendingAction(null)}>
@@ -926,16 +953,31 @@ export function AdminEnrollmentsPanel() {
             <div
               className={cn(
                 "mt-4 rounded-xl p-4 text-sm",
-                approvedCredentials.whatsappSent
-                  ? "portal-callout-success"
-                  : "portal-callout-error"
+                approvedCredentials.emailSent ? "portal-callout-success" : "portal-callout-error"
+              )}
+            >
+              <p className="font-semibold flex items-center gap-2">
+                <EnvelopeSimple size={18} weight="duotone" />
+                {approvedCredentials.emailSent
+                  ? "Login credentials emailed to student"
+                  : "Login email failed to send"}
+              </p>
+              {!approvedCredentials.emailSent && approvedCredentials.emailError && (
+                <p className="mt-1 text-xs opacity-90">{approvedCredentials.emailError}</p>
+              )}
+            </div>
+
+            <div
+              className={cn(
+                "mt-3 rounded-xl p-4 text-sm",
+                approvedCredentials.whatsappSent ? "portal-callout-success" : "portal-callout-amber"
               )}
             >
               <p className="font-semibold flex items-center gap-2">
                 <ChatsCircle size={18} weight="duotone" />
                 {approvedCredentials.whatsappSent
-                  ? "WhatsApp sent to student"
-                  : "WhatsApp failed to send"}
+                  ? "WhatsApp info message sent"
+                  : "WhatsApp info message not sent"}
               </p>
               {!approvedCredentials.whatsappSent && approvedCredentials.whatsappError && (
                 <p className="mt-1 text-xs opacity-90">{approvedCredentials.whatsappError}</p>
@@ -959,26 +1001,64 @@ export function AdminEnrollmentsPanel() {
               </p>
             </div>
             <div className="mt-6 flex flex-wrap justify-end gap-3">
-              {!approvedCredentials.whatsappSent && approvedCredentials.studentId && (
+              {!approvedCredentials.emailSent && (
                 <Button
                   variant="secondary"
                   className="gap-2"
-                  disabled={resendLoading}
+                  disabled={resendLoading !== null}
                   onClick={async () => {
-                    if (!approvedCredentials.studentId) return;
-                    setResendLoading(true);
+                    setResendLoading("email");
+                    try {
+                      const res = await fetch("/api/admin/credentials", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          action: "sendLoginEmail",
+                          enrollmentId: approvedCredentials.enrollmentId,
+                        }),
+                      });
+                      const json = await res.json();
+                      if (json.success) {
+                        toast.success(json.message ?? "Login email sent.");
+                        setApprovedCredentials((current) =>
+                          current
+                            ? { ...current, emailSent: true, emailError: undefined }
+                            : current
+                        );
+                        void load();
+                      } else {
+                        toast.error(json.error ?? json.message ?? "Email resend failed");
+                      }
+                    } catch {
+                      toast.error("Email resend failed");
+                    } finally {
+                      setResendLoading(null);
+                    }
+                  }}
+                >
+                  <ArrowCounterClockwise size={16} />
+                  {resendLoading === "email" ? "Sending..." : "Resend login (Email)"}
+                </Button>
+              )}
+              {!approvedCredentials.whatsappSent && (
+                <Button
+                  variant="secondary"
+                  className="gap-2"
+                  disabled={resendLoading !== null}
+                  onClick={async () => {
+                    setResendLoading("whatsapp");
                     try {
                       const res = await fetch("/api/admin/whatsapp", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
-                          action: "resendLogin",
-                          studentId: approvedCredentials.studentId,
+                          action: "resendApprovalInfo",
+                          enrollmentId: approvedCredentials.enrollmentId,
                         }),
                       });
                       const json = await res.json();
                       if (json.success) {
-                        toast.success(json.message ?? "WhatsApp resent.");
+                        toast.success(json.message ?? "WhatsApp info resent.");
                         setApprovedCredentials((current) =>
                           current
                             ? { ...current, whatsappSent: true, whatsappError: undefined }
@@ -991,12 +1071,12 @@ export function AdminEnrollmentsPanel() {
                     } catch {
                       toast.error("Resend failed");
                     } finally {
-                      setResendLoading(false);
+                      setResendLoading(null);
                     }
                   }}
                 >
                   <ArrowCounterClockwise size={16} />
-                  {resendLoading ? "Sending..." : "Send login (WhatsApp)"}
+                  {resendLoading === "whatsapp" ? "Sending..." : "Resend info (WhatsApp)"}
                 </Button>
               )}
               <Button

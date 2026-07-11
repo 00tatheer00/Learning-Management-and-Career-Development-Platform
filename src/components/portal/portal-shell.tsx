@@ -77,6 +77,7 @@ function PortalShellInner({ user, children }: PortalShellProps) {
   const { theme } = usePortalTheme();
   const isStudent = user.role === "student";
   const isAdmin = isAdminRole(user.role);
+  const isWhatsAppInbox = pathname === "/admin/communication";
   const logoutLabel = "Logout";
   const websiteLabel = "Website";
   const headerTitle = isAdmin
@@ -224,8 +225,21 @@ function PortalShellInner({ user, children }: PortalShellProps) {
           </div>
         </header>
 
-        <main id="main-content" className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8">
-          <div className={cn(isStudent && "student-portal-content relative z-[1] mx-auto max-w-7xl w-full")}>
+        <main
+          id="main-content"
+          className={cn(
+            "flex-1 min-h-0 overflow-x-hidden",
+            isWhatsAppInbox
+              ? "overflow-hidden p-0 lg:p-8"
+              : "overflow-y-auto p-4 sm:p-6 lg:p-8"
+          )}
+        >
+          <div
+            className={cn(
+              isStudent && "student-portal-content relative z-[1] mx-auto max-w-7xl w-full",
+              isWhatsAppInbox && "h-full flex flex-col min-h-0 w-full max-lg:max-w-none"
+            )}
+          >
             {children}
           </div>
         </main>

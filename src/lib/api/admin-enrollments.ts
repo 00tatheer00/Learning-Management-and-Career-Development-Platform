@@ -17,6 +17,8 @@ export interface AdminEnrollmentRow extends Omit<EnrollmentRecord, "paymentScree
   isReturningApplicant: boolean;
   previousApplications: ApplicantApplicationSummary[];
   duplicateMatch: DuplicateMatchInfo | null;
+  approvalEmailSent?: boolean | null;
+  approvalEmailError?: string | null;
   approvalWhatsAppSent?: boolean | null;
   approvalWhatsAppError?: string | null;
   hasPaymentScreenshot: boolean;
@@ -65,6 +67,8 @@ export async function getAdminEnrollmentRows(): Promise<AdminEnrollmentRow[]> {
       reviewedAt: record.reviewedAt?.toISOString(),
       reviewedBy: record.reviewedBy ?? undefined,
       adminNotes: record.adminNotes ?? undefined,
+      approvalEmailSent: record.approvalEmailSent,
+      approvalEmailError: record.approvalEmailError ?? undefined,
       approvalWhatsAppSent: record.approvalWhatsAppSent,
       approvalWhatsAppError: record.approvalWhatsAppError ?? undefined,
       createdAt: record.createdAt.toISOString(),

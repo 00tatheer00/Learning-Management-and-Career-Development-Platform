@@ -72,14 +72,14 @@ export function AdminRecordingsPanel() {
         </div>
       ) : (
         <>
-          <div className="mb-6 flex flex-wrap gap-2">
+          <div className="mb-6 flex gap-2 overflow-x-auto scrollbar-none pb-0.5 -mx-1 px-1">
             {programs.map((program) => (
               <button
                 key={program.programSlug}
                 type="button"
                 onClick={() => setActiveSlug(program.programSlug)}
                 className={cn(
-                  "rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors",
+                  "rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors shrink-0 whitespace-nowrap",
                   activeSlug === program.programSlug
                     ? "border-primary bg-primary text-primary-foreground shadow-sm"
                     : "border-pt bg-background text-pt hover:bg-surface"

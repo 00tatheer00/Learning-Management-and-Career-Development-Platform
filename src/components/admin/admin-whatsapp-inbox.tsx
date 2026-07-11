@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 import { cn } from "@/lib/utils";
+import { WA_INBOX_VIEWPORT } from "@/lib/constants/portal-layout";
 import { toast } from "@/lib/ui/toast";
 import { useAdminPermissions } from "@/components/admin/admin-permissions";
 import { useAdminWhatsAppInbox } from "@/components/admin/admin-whatsapp-inbox-provider";
@@ -33,6 +34,11 @@ import type { WhatsAppConversationRow, WhatsAppMessageRow } from "@/lib/api/what
 type StatusFilter = "open" | "archived" | "all";
 
 const THREAD_POLL_MS = 3_000;
+
+function isMobileInboxViewport() {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(max-width: 1023px)").matches;
+}
 
 function contactLabel(contact: WhatsAppConversationRow["contact"]) {
   return contact.displayName ?? contact.profileName ?? contact.phoneE164;
@@ -76,6 +82,26 @@ export function AdminWhatsAppInbox() {
   const [sendingTemplate, setSendingTemplate] = useState(false);
   const threadEndRef = useRef<HTMLDivElement | null>(null);
   const replyRef = useRef<HTMLTextAreaElement | null>(null);
+  const pushedThreadHistoryRef = useRef(false);
+
+  const openThread = useCallback((conversationId: string) => {
+    setSelectedId(conversationId);
+    setMobileShowThread(true);
+    if (isMobileInboxViewport() && !pushedThreadHistoryRef.current) {
+      window.history.pushState({ waInboxThread: true }, "");
+      pushedThreadHistoryRef.current = true;
+    }
+  }, []);
+
+  const closeThread = useCallback(() => {
+    setMobileShowThread(false);
+    if (pushedThreadHistoryRef.current) {
+      pushedThreadHistoryRef.current = false;
+      if (window.history.state?.waInboxThread) {
+        window.history.back();
+      }
+    }
+  }, []);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -146,6 +172,15 @@ export function AdminWhatsAppInbox() {
   useEffect(() => {
     threadEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [displayMessages, loadingThread]);
+
+  useEffect(() => {
+    const onPopState = () => {
+      pushedThreadHistoryRef.current = false;
+      setMobileShowThread(false);
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
 
   const sendReply = async () => {
     if (!selectedId || !reply.trim() || !canWrite || !canSendFreeText) return;
@@ -251,8 +286,7 @@ export function AdminWhatsAppInbox() {
       setNewMessage("");
       const conversationId = json.data?.conversation?.id as string | undefined;
       if (conversationId) {
-        setSelectedId(conversationId);
-        setMobileShowThread(true);
+        openThread(conversationId);
         await loadThread(conversationId);
       }
       void refreshConversations();
@@ -278,7 +312,7 @@ export function AdminWhatsAppInbox() {
       }
       toast.info("Chat archived");
       setSelectedId(null);
-      setMobileShowThread(false);
+      closeThread();
       void refreshConversations();
     } catch {
       toast.error("Archive fail");
@@ -286,25 +320,33 @@ export function AdminWhatsAppInbox() {
   };
 
   return (
-    <div className="wa-inbox-shell">
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-bold text-[#111b21] flex items-center gap-2">
-            <ChatsCircle size={26} weight="duotone" className="text-[#008069]" />
-            WhatsApp
+    <div className={cn("wa-inbox-shell", WA_INBOX_VIEWPORT)}>
+      <div
+        className={cn(
+          "shrink-0 flex items-center justify-between gap-3",
+          "px-3 pt-2 pb-2 sm:px-0 sm:pt-0 sm:pb-4",
+          mobileShowThread && "max-lg:hidden"
+        )}
+      >
+        <div className="min-w-0">
+          <h1 className="text-lg sm:text-xl font-bold text-[#111b21] flex items-center gap-2">
+            <ChatsCircle size={24} weight="duotone" className="text-[#008069] shrink-0" />
+            <span className="truncate">WhatsApp</span>
             {totalUnread > 0 && (
-              <span className="wa-unread-badge rounded-full px-2 flex items-center justify-center font-bold">
+              <span className="wa-unread-badge rounded-full px-2 flex items-center justify-center font-bold shrink-0">
                 {totalUnread}
               </span>
             )}
           </h1>
-          <p className="text-sm text-[#667781] mt-0.5">EE School of Technology · Business inbox</p>
+          <p className="text-xs sm:text-sm text-[#667781] mt-0.5 truncate hidden sm:block">
+            EE School of Technology · Business inbox
+          </p>
         </div>
         {canWrite && (
           <button
             type="button"
             onClick={() => setNewChatOpen(true)}
-            className="wa-new-chat-btn hidden sm:inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold"
+            className="wa-new-chat-btn hidden sm:inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold shrink-0"
           >
             <PencilSimpleLine size={18} weight="bold" />
             New chat
@@ -312,23 +354,29 @@ export function AdminWhatsAppInbox() {
         )}
       </div>
 
-      <div className="rounded-lg overflow-hidden border border-[#e9edef] shadow-lg min-h-[75vh] max-h-[calc(100vh-140px)] flex flex-col lg:flex-row bg-white">
+      <div
+        className={cn(
+          "flex flex-1 min-h-0 flex-col lg:flex-row overflow-hidden bg-white",
+          "max-lg:rounded-none max-lg:border-0 max-lg:shadow-none",
+          "lg:rounded-lg lg:border lg:border-[#e9edef] lg:shadow-lg lg:min-h-[520px] lg:max-h-[calc(100dvh-3.5rem-6rem)]"
+        )}
+      >
         {/* ── Chat list ── */}
         <aside
           className={cn(
-            "flex flex-col w-full lg:w-[380px] shrink-0 border-[#e9edef] bg-white",
+            "flex flex-col w-full lg:w-[min(380px,38%)] xl:w-[380px] shrink-0 border-[#e9edef] bg-white min-h-0",
             "lg:border-r",
-            mobileShowThread && "hidden lg:flex"
+            mobileShowThread && "max-lg:hidden"
           )}
         >
-          <div className="wa-sidebar-header px-3 pt-3 pb-2 space-y-2">
-            <div className="flex items-center justify-between gap-2 px-1">
+          <div className="wa-sidebar-header px-3 pt-2 pb-2 space-y-2 shrink-0">
+            <div className="flex items-center justify-between gap-2 px-0.5">
               <span className="text-sm font-semibold text-[#008069]">Chats</span>
               {canWrite && (
                 <button
                   type="button"
                   onClick={() => setNewChatOpen(true)}
-                  className="sm:hidden wa-new-chat-btn h-9 w-9 rounded-full flex items-center justify-center"
+                  className="sm:hidden wa-new-chat-btn h-9 w-9 rounded-full flex items-center justify-center shrink-0"
                   aria-label="New chat"
                 >
                   <Plus size={20} weight="bold" />
@@ -344,17 +392,17 @@ export function AdminWhatsAppInbox() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search or start new chat"
-                className="w-full rounded-lg bg-[#f0f2f5] pl-9 pr-3 py-2 text-sm text-[#111b21] placeholder:text-[#8696a0] outline-none focus:ring-1 focus:ring-[#008069]/40"
+                className="w-full rounded-lg bg-[#f0f2f5] pl-9 pr-3 py-2.5 text-base sm:text-sm text-[#111b21] placeholder:text-[#8696a0] outline-none focus:ring-1 focus:ring-[#008069]/40"
               />
             </div>
-            <div className="flex gap-1 px-0.5">
+            <div className="flex gap-1 overflow-x-auto scrollbar-none -mx-1 px-1 pb-0.5">
               {(["open", "archived", "all"] as const).map((filter) => (
                 <button
                   key={filter}
                   type="button"
                   onClick={() => setStatusFilter(filter)}
                   className={cn(
-                    "rounded-full px-3 py-1 text-xs font-medium capitalize transition-colors",
+                    "rounded-full px-3 py-1.5 text-xs font-medium capitalize transition-colors shrink-0",
                     statusFilter === filter
                       ? "bg-[#008069] text-white"
                       : "text-[#667781] hover:bg-[#f0f2f5]"
@@ -366,7 +414,7 @@ export function AdminWhatsAppInbox() {
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain wa-scroll-touch">
             {filtered.length === 0 ? (
               <div className="p-8 text-center">
                 <UserCircle size={48} className="wa-empty-icon mx-auto mb-2" weight="duotone" />
@@ -381,12 +429,9 @@ export function AdminWhatsAppInbox() {
                   <button
                     key={item.id}
                     type="button"
-                    onClick={() => {
-                      setSelectedId(item.id);
-                      setMobileShowThread(true);
-                    }}
+                    onClick={() => openThread(item.id)}
                     className={cn(
-                      "w-full text-left px-3 py-3 border-b border-[#f0f2f5] wa-list-item transition-colors",
+                      "w-full text-left px-3 py-3.5 border-b border-[#f0f2f5] wa-list-item transition-colors active:bg-[#f0f2f5]",
                       active && "wa-list-item-active"
                     )}
                   >
@@ -421,12 +466,12 @@ export function AdminWhatsAppInbox() {
         {/* ── Thread ── */}
         <section
           className={cn(
-            "flex-1 flex flex-col min-h-[420px] bg-[#efeae2]",
-            !mobileShowThread && "hidden lg:flex"
+            "flex-1 flex flex-col min-h-0 bg-[#efeae2]",
+            !mobileShowThread && "max-lg:hidden"
           )}
         >
           {!selected ? (
-            <div className="flex-1 flex flex-col items-center justify-center text-center p-8 wa-chat-wallpaper">
+            <div className="flex-1 flex flex-col items-center justify-center text-center p-6 sm:p-8 wa-chat-wallpaper min-h-0">
               <div className="bg-white/80 backdrop-blur rounded-2xl px-8 py-10 shadow-sm max-w-sm">
                 <ChatsCircle size={56} weight="duotone" className="text-[#008069] mx-auto mb-4" />
                 <p className="font-semibold text-[#111b21] text-lg">EEST WhatsApp Web</p>
@@ -448,12 +493,12 @@ export function AdminWhatsAppInbox() {
             </div>
           ) : (
             <>
-              <div className="wa-chat-header px-3 py-2.5 flex items-center gap-3 shrink-0">
+              <div className="wa-chat-header px-2 sm:px-3 py-2 flex items-center gap-2 sm:gap-3 shrink-0 min-h-[56px]">
                 <button
                   type="button"
-                  className="lg:hidden p-2 -ml-1 text-[#008069]"
-                  onClick={() => setMobileShowThread(false)}
-                  aria-label="Back"
+                  className="lg:hidden p-2.5 -ml-0.5 text-[#008069] rounded-full active:bg-[#f0f2f5]"
+                  onClick={closeThread}
+                  aria-label="Back to chats"
                 >
                   <ArrowLeft size={22} weight="bold" />
                 </button>
@@ -477,21 +522,25 @@ export function AdminWhatsAppInbox() {
               </div>
 
               {!canSendFreeText && (
-                <div className="wa-warning-banner mx-3 mt-2 rounded-lg px-3 py-2 text-xs leading-relaxed shrink-0">
-                  <strong>24-hour window closed.</strong> Free text blocked —{" "}
-                  <button
-                    type="button"
-                    className="underline font-semibold"
-                    onClick={() => void sendTemplate()}
-                    disabled={sendingTemplate}
-                  >
-                    Send template
-                  </button>{" "}
-                  or ask them to message +92 321 5919502 first.
+                <div className="wa-warning-banner mx-2 sm:mx-3 mt-2 rounded-lg px-3 py-2.5 text-xs leading-relaxed shrink-0">
+                  <p>
+                    <strong>24-hour window closed.</strong> Free text blocked.
+                  </p>
+                  <p className="mt-1.5 flex flex-wrap items-center gap-x-1 gap-y-1">
+                    <button
+                      type="button"
+                      className="underline font-semibold"
+                      onClick={() => void sendTemplate()}
+                      disabled={sendingTemplate}
+                    >
+                      Send template
+                    </button>
+                    <span>or ask them to message +92 321 5919502 first.</span>
+                  </p>
                 </div>
               )}
 
-              <div className="flex-1 overflow-y-auto px-4 md:px-8 py-3 space-y-1 wa-chat-wallpaper">
+              <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-3 sm:px-4 md:px-8 py-2 sm:py-3 space-y-1 wa-chat-wallpaper wa-scroll-touch">
                 {loadingThread ? (
                   <div className="flex justify-center py-12">
                     <CircleNotch size={28} className="animate-spin text-[#008069]" />
@@ -518,7 +567,7 @@ export function AdminWhatsAppInbox() {
               </div>
 
               {canWrite ? (
-                <div className="wa-compose-bar px-3 py-2 shrink-0">
+                <div className="wa-compose-bar px-2 sm:px-3 py-2 shrink-0 wa-compose-safe">
                   {!canSendFreeText && (
                     <button
                       type="button"
@@ -540,7 +589,7 @@ export function AdminWhatsAppInbox() {
                         }
                         disabled={!canSendFreeText || sending}
                         rows={1}
-                        className="flex-1 resize-none bg-transparent text-[15px] text-[#111b21] placeholder:text-[#8696a0] outline-none max-h-32 leading-5"
+                        className="flex-1 resize-none bg-transparent text-base sm:text-[15px] text-[#111b21] placeholder:text-[#8696a0] outline-none max-h-32 leading-5"
                         onKeyDown={(e) => {
                           if (e.key === "Enter" && !e.shiftKey) {
                             e.preventDefault();
@@ -574,7 +623,7 @@ export function AdminWhatsAppInbox() {
         </section>
       </div>
 
-      <Modal open={newChatOpen} onClose={() => setNewChatOpen(false)} title="New chat">
+      <Modal open={newChatOpen} onClose={() => setNewChatOpen(false)} title="New chat" mobileSheet>
         <div className="space-y-4 wa-modal-accent -mt-2 pt-4">
           <p className="text-sm text-[#667781] leading-relaxed">
             Naye number par pehli message ke liye Meta template use karein. Reply ke baad 24 hours

@@ -30,6 +30,8 @@ export async function approveEnrollmentAndCreateAccount(
   error?: string;
   credentials?: { loginId: string; password: string; loginUrl: string };
   studentId?: string;
+  emailSent?: boolean;
+  emailError?: string;
   whatsappSent?: boolean;
   whatsappError?: string;
   passwordSaved?: boolean;
@@ -60,7 +62,6 @@ export async function approveEnrollmentAndCreateAccount(
 
   const user = await getUserByEmail(enrollment.email);
   const plainPassword = generateStudentPassword();
-  const isNewStudent = !user;
 
   const avatarInitials = enrollment.fullName
     .split(" ")
@@ -119,7 +120,7 @@ export async function approveEnrollmentAndCreateAccount(
     studentId: student.id,
     enrollmentId,
     plainPassword,
-    syncAccountHash: isNewStudent,
+    syncAccountHash: true,
   });
   const passwordSaved = passwordIssue.ok;
   if (!passwordSaved) {
@@ -138,15 +139,21 @@ export async function approveEnrollmentAndCreateAccount(
     password: plainPassword,
   });
 
+  const emailError = notifications.emailSent
+    ? null
+    : (notifications.warnings.find((w) => w.toLowerCase().includes("email")) ??
+        "Approval email not sent");
+
   const whatsappError = notifications.whatsappSent
     ? null
     : (notifications.warnings.find((w) => w.toLowerCase().includes("whatsapp")) ??
-        notifications.warnings[0] ??
-        "WhatsApp not sent");
+        "WhatsApp info message not sent");
 
   await prisma.enrollment.update({
     where: { id: enrollmentId },
     data: {
+      approvalEmailSent: notifications.emailSent,
+      approvalEmailError: emailError,
       approvalWhatsAppSent: notifications.whatsappSent,
       approvalWhatsAppError: whatsappError,
     },
@@ -164,6 +171,8 @@ export async function approveEnrollmentAndCreateAccount(
     enrollment,
     message,
     studentId: student?.id,
+    emailSent: notifications.emailSent,
+    emailError: emailError ?? undefined,
     whatsappSent: notifications.whatsappSent,
     whatsappError: whatsappError ?? undefined,
     passwordSaved,

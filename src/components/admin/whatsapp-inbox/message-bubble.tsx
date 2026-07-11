@@ -16,7 +16,7 @@ export function WhatsAppMessageBubble({ message }: { message: DisplayMessage }) 
     <div className={cn("flex wa-animate-in", outbound ? "justify-end" : "justify-start")}>
       <div
         className={cn(
-          "relative max-w-[min(85%,420px)] px-2.5 pt-1.5 pb-1 shadow-sm wa-message-bubble",
+          "relative max-w-[min(88%,420px)] sm:max-w-[min(85%,420px)] px-2.5 pt-1.5 pb-1 shadow-sm wa-message-bubble",
           outbound ? "wa-bubble-out" : "wa-bubble-in"
         )}
       >

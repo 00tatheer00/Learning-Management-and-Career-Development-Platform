@@ -10,9 +10,11 @@ interface ModalProps {
   title: string;
   children: React.ReactNode;
   className?: string;
+  /** Bottom sheet on small screens (better for mobile chat flows). */
+  mobileSheet?: boolean;
 }
 
-export function Modal({ open, onClose, title, children, className }: ModalProps) {
+export function Modal({ open, onClose, title, children, className, mobileSheet }: ModalProps) {
   useEffect(() => {
     if (!open) return;
     const onKeyDown = (event: KeyboardEvent) => {
@@ -29,7 +31,12 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div
+      className={cn(
+        "fixed inset-0 z-50 flex p-4",
+        mobileSheet ? "items-end sm:items-center justify-center" : "items-center justify-center"
+      )}
+    >
       <button
         type="button"
         aria-label="Close dialog"
@@ -42,6 +49,8 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
         aria-labelledby="modal-title"
         className={cn(
           "relative z-10 flex w-full max-w-lg max-h-[calc(100dvh-2rem)] flex-col rounded-2xl border border-border bg-background p-6 shadow-xl overflow-y-auto overscroll-contain",
+          mobileSheet &&
+            "max-sm:max-h-[min(92dvh,calc(100dvh-env(safe-area-inset-bottom)))] max-sm:rounded-b-none max-sm:rounded-t-2xl max-sm:pb-[max(1.25rem,env(safe-area-inset-bottom))] max-sm:pt-4 max-sm:px-4",
           className
         )}
       >

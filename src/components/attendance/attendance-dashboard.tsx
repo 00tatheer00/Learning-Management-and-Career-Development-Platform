@@ -857,7 +857,7 @@ function SessionsMatrixTab({
   }
 
   return (
-    <div className="flex-1 min-h-0 overflow-auto rounded-2xl border border-border bg-background shadow-sm">
+    <div className="flex-1 min-h-0 overflow-auto portal-table-scroll rounded-2xl border border-border bg-background shadow-sm">
       <table className="min-w-[900px] w-full text-xs">
         <thead className="sticky top-0 z-10 bg-surface border-b border-border">
           <tr>

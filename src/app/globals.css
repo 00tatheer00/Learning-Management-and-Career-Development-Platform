@@ -872,3 +872,46 @@ body {
   background: radial-gradient(circle at 0 0, transparent 8px, var(--wa-bubble-in) 8px);
 }
 
+.wa-scroll-touch {
+  -webkit-overflow-scrolling: touch;
+}
+
+.wa-compose-safe {
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
+}
+
+@media (max-width: 1023px) {
+  .wa-inbox-shell {
+    touch-action: manipulation;
+  }
+
+  .wa-list-item {
+    min-height: 72px;
+  }
+
+  .wa-chat-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+  }
+
+  .wa-compose-bar {
+    position: sticky;
+    bottom: 0;
+    z-index: 20;
+  }
+}
+
+@media (max-width: 639px) {
+  .wa-message-bubble {
+    max-width: min(88vw, 420px);
+  }
+}
+
+/* Horizontal scroll wrapper for wide portal tables on small screens */
+.portal-table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+

@@ -97,6 +97,8 @@ model Enrollment {
   reviewedAt                DateTime?
   reviewedBy                String?
   adminNotes                String?
+  approvalEmailSent         Boolean?
+  approvalEmailError        String?
   approvalWhatsAppSent      Boolean?
   approvalWhatsAppError     String?
   portalWelcomeShownAt      DateTime?
