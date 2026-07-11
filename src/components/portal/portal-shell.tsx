@@ -20,6 +20,8 @@ import { PortalAvatar } from "@/components/portal/portal-avatar";
 import { SITE_CONFIG } from "@/lib/constants";
 import { StudentPortalWelcome } from "@/components/portal/student-portal-welcome";
 import { StudentSingleSessionGuard } from "@/components/portal/student-single-session-guard";
+import { StudentPortalBadgesProvider } from "@/components/portal/student-portal-badges-provider";
+import { useStudentPortalBadgesOptional } from "@/components/portal/student-portal-badges-provider";
 import {
   AdminNotificationsBell,
   AdminNavBadge,
@@ -63,9 +65,17 @@ interface PortalShellProps {
 
 export function PortalShell({ user, children }: PortalShellProps) {
   const defaultTheme: "light" | "dark" = user.role === "student" ? "light" : "light";
+  const inner = (
+    <PortalShellInner user={user}>{children}</PortalShellInner>
+  );
+
   return (
     <PortalThemeProvider defaultTheme={defaultTheme}>
-      <PortalShellInner user={user}>{children}</PortalShellInner>
+      {user.role === "student" ? (
+        <StudentPortalBadgesProvider>{inner}</StudentPortalBadgesProvider>
+      ) : (
+        inner
+      )}
     </PortalThemeProvider>
   );
 }
@@ -270,6 +280,7 @@ function SidebarContent({
 }) {
   const adminAlerts = useAdminAlertsOptional();
   const whatsAppInbox = useAdminWhatsAppInboxOptional();
+  const studentBadges = useStudentPortalBadgesOptional();
   const enrollmentBadgeCount =
     adminAlerts && isAdminRole(user.role)
       ? adminAlerts.unreadCount > 0
@@ -407,11 +418,19 @@ function SidebarContent({
                   item.href === "/admin/enrollments" && enrollmentBadgeCount > 0;
                 const showWhatsAppBadge =
                   item.href === "/admin/communication" && whatsAppBadgeCount > 0;
+                const showAssignmentsBadge =
+                  isStudent && item.href === "/student/assignments" && (studentBadges?.assignments ?? 0) > 0;
+                const showClassesBadge =
+                  isStudent && item.href === "/student/classes" && (studentBadges?.classes ?? 0) > 0;
                 const navBadgeCount = showEnrollmentBadge
                   ? enrollmentBadgeCount
                   : showWhatsAppBadge
                     ? whatsAppBadgeCount
-                    : 0;
+                    : showAssignmentsBadge
+                      ? studentBadges?.assignments ?? 0
+                      : showClassesBadge
+                        ? studentBadges?.classes ?? 0
+                        : 0;
                 const showNavBadge = navBadgeCount > 0;
 
                 return (

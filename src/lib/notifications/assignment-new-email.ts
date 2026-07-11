@@ -1,6 +1,5 @@
 import { getProgramBySlug } from "@/lib/data/programs";
 import { resolveContentModuleLevel } from "@/lib/modules/student-module-content";
-import { getPortalLoginUrl } from "@/lib/site-url";
 import type { Assignment } from "@/types/portal";
 import {
   buildNewAssignmentEmailHtml,
@@ -20,13 +19,11 @@ export async function sendNewAssignmentEmail(
     dueDate: string;
   }
 ): Promise<{ sent: boolean; error?: string }> {
-  const assignmentsUrl = `${getPortalLoginUrl()}/student/assignments`;
-
   return sendStudentNotificationEmail({
     to,
     subject: `New assignment: ${params.assignmentTitle}`,
-    html: buildNewAssignmentEmailHtml({ ...params, assignmentsUrl }),
-    text: buildNewAssignmentEmailText({ ...params, assignmentsUrl }),
+    html: buildNewAssignmentEmailHtml(params),
+    text: buildNewAssignmentEmailText(params),
   });
 }
 

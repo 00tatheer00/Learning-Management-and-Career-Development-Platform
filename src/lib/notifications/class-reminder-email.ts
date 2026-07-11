@@ -1,6 +1,5 @@
 import { getProgramBySlug } from "@/lib/data/programs";
 import { resolveContentModuleLevel } from "@/lib/modules/student-module-content";
-import { getPortalLoginUrl } from "@/lib/site-url";
 import {
   buildClassReminderEmailHtml,
   buildClassReminderEmailText,
@@ -39,6 +38,5 @@ export function buildClassReminderParams(input: {
     classDate: input.classDate,
     classTime: input.classTime,
     trainerName: input.trainerName,
-    joinUrl: `${getPortalLoginUrl()}/student/classes`,
   };
 }

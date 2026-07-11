@@ -60,10 +60,12 @@ model User {
   imagePosition   String?
   isActive        Boolean  @default(true)
   activeSessionId String?
-  firstLoginAt    DateTime?
-  lastLoginAt     DateTime?
-  lastActiveAt    DateTime?
-  createdAt       DateTime @default(now())
+  firstLoginAt        DateTime?
+  lastLoginAt         DateTime?
+  lastActiveAt        DateTime?
+  assignmentsSeenAt   DateTime?
+  classesSeenAt       DateTime?
+  createdAt           DateTime @default(now())
 
   submissions AssignmentSubmission[] @relation("StudentSubmissions")
   attendance  ClassAttendance[]        @relation("StudentAttendance")
@@ -160,6 +162,7 @@ model LiveSession {
   trainerId    String
   trainerName  String
   notes        String?
+  createdAt    DateTime  @default(now())
 
   attendances ClassAttendance[]
 }

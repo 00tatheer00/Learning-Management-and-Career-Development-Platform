@@ -32,7 +32,7 @@ function firstName(fullName: string): string {
 }
 
 export function buildClassReminderEmailHtml(params: ClassReminderEmailParams): string {
-  const joinUrl = params.joinUrl ?? `${getPortalLoginUrl()}/student/classes`;
+  const loginUrl = params.joinUrl ?? getPortalLoginUrl();
   const name = firstName(params.studentName);
 
   const bodyHtml = `
@@ -48,9 +48,9 @@ export function buildClassReminderEmailHtml(params: ClassReminderEmailParams): s
       { label: "Trainer", value: params.trainerName },
     ])}
     <p style="margin:0;font-size:14px;line-height:1.6;color:#4b5563;">
-      The <strong>Join Class</strong> button opens 10 minutes before the scheduled time. Keep your portal login ready.
+      Login to the student portal, open <strong>Live Classes</strong>, and tap <strong>Join Class</strong> when the button appears (10 minutes before start).
     </p>
-    ${emailButton(joinUrl, "Open Live Classes", "#2563eb")}
+    ${emailButton(loginUrl, "Login to Portal", "#2563eb")}
   `;
 
   return wrapStudentEmailHtml({
@@ -63,7 +63,7 @@ export function buildClassReminderEmailHtml(params: ClassReminderEmailParams): s
 }
 
 export function buildClassReminderEmailText(params: ClassReminderEmailParams): string {
-  const joinUrl = params.joinUrl ?? `${getPortalLoginUrl()}/student/classes`;
+  const loginUrl = params.joinUrl ?? getPortalLoginUrl();
   const name = firstName(params.studentName);
 
   return [
@@ -78,14 +78,15 @@ export function buildClassReminderEmailText(params: ClassReminderEmailParams): s
     `Time: ${params.classTime}`,
     `Trainer: ${params.trainerName}`,
     "",
-    `Open Live Classes: ${joinUrl}`,
+    "Login to the student portal and open Live Classes to join.",
+    `Portal login: ${loginUrl}`,
     "",
     "— EEST Team",
   ].join("\n");
 }
 
 export function buildNewAssignmentEmailHtml(params: NewAssignmentEmailParams): string {
-  const assignmentsUrl = params.assignmentsUrl ?? `${getPortalLoginUrl()}/student/assignments`;
+  const loginUrl = params.assignmentsUrl ?? getPortalLoginUrl();
   const name = firstName(params.studentName);
 
   const bodyHtml = `
@@ -107,9 +108,9 @@ export function buildNewAssignmentEmailHtml(params: NewAssignmentEmailParams): s
       </tr>
     </table>
     <p style="margin:0;font-size:14px;line-height:1.6;color:#4b5563;">
-      Open the portal, read the task carefully, and submit your answer before the due date.
+      Login to the student portal and open <strong>Assignments</strong> to read the full task and submit your work.
     </p>
-    ${emailButton(assignmentsUrl, "View Assignment", "#ea580c")}
+    ${emailButton(loginUrl, "Login to Portal", "#ea580c")}
   `;
 
   return wrapStudentEmailHtml({
@@ -122,7 +123,7 @@ export function buildNewAssignmentEmailHtml(params: NewAssignmentEmailParams): s
 }
 
 export function buildNewAssignmentEmailText(params: NewAssignmentEmailParams): string {
-  const assignmentsUrl = params.assignmentsUrl ?? `${getPortalLoginUrl()}/student/assignments`;
+  const loginUrl = params.assignmentsUrl ?? getPortalLoginUrl();
   const name = firstName(params.studentName);
 
   return [
@@ -138,7 +139,8 @@ export function buildNewAssignmentEmailText(params: NewAssignmentEmailParams): s
     "Instructions:",
     params.description,
     "",
-    `Open assignments: ${assignmentsUrl}`,
+    "Login to the student portal and open Assignments to submit.",
+    `Portal login: ${loginUrl}`,
     "",
     "— EEST Team",
   ].join("\n");

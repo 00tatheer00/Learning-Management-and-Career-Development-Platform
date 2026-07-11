@@ -13,6 +13,7 @@ import {
   filterByStudentModule,
   getStudentModuleContentContext,
 } from "@/lib/modules/student-module-content";
+import { StudentMarkSectionSeen } from "@/components/portal/student-mark-section-seen";
 
 export default async function StudentClassesPage() {
   const user = await getCurrentUser();
@@ -38,6 +39,7 @@ export default async function StudentClassesPage() {
 
   return (
     <div className="space-y-6">
+      <StudentMarkSectionSeen section="classes" />
       <PortalPageHeader
         eyebrow="Live learning"
         title="Live Classes"

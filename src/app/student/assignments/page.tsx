@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { PortalPageHeader, EmptyState } from "@/components/portal/portal-ui";
 import { toast } from "@/lib/ui/toast";
 import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
+import { StudentMarkSectionSeen } from "@/components/portal/student-mark-section-seen";
 
 interface Assignment {
   id: string;
@@ -83,6 +84,7 @@ export default function StudentAssignmentsPage() {
 
   return (
     <div className="space-y-6">
+      <StudentMarkSectionSeen section="assignments" />
       <PortalPageHeader
         eyebrow="Homework"
         title="Assignments"
