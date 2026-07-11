@@ -1,7 +1,9 @@
 import { runClassReminders } from "@/lib/automation/class-reminders";
+import { ensureScheduledLiveSessions } from "@/lib/sessions/ensure-scheduled-sessions";
 
 export interface AutomationRunSummary {
   ranAt: string;
+  scheduledSessions: { created: number; skipped: number };
   classReminders: { thirtyMin: number };
   neverLoggedIn: { studentNudges: number; adminDigestSent: boolean };
   assignmentDueReminders: number;
@@ -12,10 +14,12 @@ export interface AutomationRunSummary {
 
 /** Student emails: class reminders (30 min). WhatsApp: approve/reject only. */
 export async function runAllAutomations(now = new Date()): Promise<AutomationRunSummary> {
+  const scheduledSessions = await ensureScheduledLiveSessions(now);
   const classReminders = await runClassReminders(now);
 
   return {
     ranAt: now.toISOString(),
+    scheduledSessions,
     classReminders,
     neverLoggedIn: { studentNudges: 0, adminDigestSent: false },
     assignmentDueReminders: 0,
