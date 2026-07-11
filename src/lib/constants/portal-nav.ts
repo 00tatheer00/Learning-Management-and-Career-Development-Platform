@@ -16,6 +16,7 @@ import {
   ListChecks,
   FilmStrip,
   ShareNetwork,
+  Certificate,
 } from "@phosphor-icons/react";
 
 import type { UserRole } from "@/types/portal";
@@ -35,6 +36,7 @@ export const PORTAL_NAV: Record<UserRole, PortalNavItem[]> = {
     { href: "/student/recordings", label: "Recordings", icon: FilmStrip, description: "Rewatch past classes" },
     { href: "/student/assignments", label: "Assignments", icon: ClipboardText, description: "Homework & tasks" },
     { href: "/student/attendance", label: "Attendance", icon: ListChecks, description: "Your attendance %" },
+    { href: "/student/certificates", label: "Certificates", icon: Certificate, description: "Module certificates" },
     { href: "/student/trainer", label: "My Trainer", icon: ChalkboardTeacher, description: "Your instructor" },
     { href: "/student/whatsapp", label: "WhatsApp", icon: ChatsCircle, description: "Class group chat" },
     { href: "/student/profile", label: "Profile", icon: UserCircle, description: "Account & logins" },
@@ -124,6 +126,7 @@ export const STUDENT_PAGE_TITLES: Record<string, string> = {
   "/student/recordings": "Recordings",
   "/student/assignments": "Assignments",
   "/student/attendance": "Attendance",
+  "/student/certificates": "Certificates",
   "/student/trainer": "My Trainer",
   "/student/whatsapp": "WhatsApp",
   "/student/profile": "Profile",
