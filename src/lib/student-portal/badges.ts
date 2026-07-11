@@ -6,6 +6,10 @@ import {
   getStudentModuleContentContext,
 } from "@/lib/modules/student-module-content";
 import type { PortalUser } from "@/types/portal";
+import {
+  fetchMergedByProgram,
+  getStudentPortalProgramSlugs,
+} from "@/lib/student-portal/program-scope";
 
 export interface StudentPortalBadgeCounts {
   assignments: number;
@@ -43,22 +47,26 @@ export async function getStudentPortalBadgeCounts(
   user: Pick<PortalUser, "id" | "email" | "programSlug" | "level">
 ): Promise<StudentPortalBadgeCounts> {
   try {
-    const programSlug = user.programSlug ?? "web-development";
+    const programSlugs = getStudentPortalProgramSlugs(user);
     const context = await getStudentModuleContentContext(user);
     const [assignmentsSeenAt, classesSeenAt, allAssignments, allSessions] = await Promise.all([
       getSeenAt(user.id, "assignments"),
       getSeenAt(user.id, "classes"),
-      getAssignments(programSlug),
-      prisma.liveSession.findMany({
-        where: { programSlug },
-        select: {
-          id: true,
-          level: true,
-          date: true,
-          time: true,
-          startsAt: true,
-        },
-      }),
+      fetchMergedByProgram(programSlugs, getAssignments),
+      Promise.all(
+        programSlugs.map((programSlug) =>
+          prisma.liveSession.findMany({
+            where: { programSlug },
+            select: {
+              id: true,
+              level: true,
+              date: true,
+              time: true,
+              startsAt: true,
+            },
+          })
+        )
+      ).then((groups) => groups.flat()),
     ]);
 
     const assignments = filterByStudentModule(allAssignments, context, (item) => item.level);

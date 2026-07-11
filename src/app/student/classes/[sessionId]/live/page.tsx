@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { getLiveSessionById } from "@/lib/api/portal-data";
 import { PortalLiveRoom } from "@/components/portal/portal-live-room";
 import { isPortalRoomSession } from "@/lib/portal-video/config";
+import { canStudentAccessProgram } from "@/lib/student-portal/program-scope";
 
 export default async function StudentLiveClassPage({
   params,
@@ -21,7 +22,7 @@ export default async function StudentLiveClassPage({
     redirect("/student/classes");
   }
 
-  if (session.programSlug !== user.programSlug) {
+  if (!canStudentAccessProgram(user, session.programSlug)) {
     redirect("/student/classes");
   }
 

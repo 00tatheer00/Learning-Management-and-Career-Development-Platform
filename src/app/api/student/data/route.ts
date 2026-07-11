@@ -6,6 +6,10 @@ import {
   filterByStudentModule,
   getStudentModuleContentContext,
 } from "@/lib/modules/student-module-content";
+import {
+  fetchMergedByProgram,
+  getStudentPortalProgramSlugs,
+} from "@/lib/student-portal/program-scope";
 
 export async function GET() {
   const user = await getCurrentUser();
@@ -14,8 +18,9 @@ export async function GET() {
   }
 
   const context = await getStudentModuleContentContext(user);
+  const programSlugs = getStudentPortalProgramSlugs(user);
   const [allAssignments, submissions] = await Promise.all([
-    getAssignments(user.programSlug),
+    fetchMergedByProgram(programSlugs, getAssignments),
     getSubmissions(user.id),
   ]);
 

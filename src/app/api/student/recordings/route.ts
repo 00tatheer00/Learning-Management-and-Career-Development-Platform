@@ -9,6 +9,10 @@ import {
   studentHasModuleLiveContent,
 } from "@/lib/modules/student-module-content";
 import { getLiveSessionsPreview } from "@/lib/api/portal-data";
+import {
+  fetchMergedByProgram,
+  getStudentPortalProgramSlugs,
+} from "@/lib/student-portal/program-scope";
 
 export async function GET() {
   const user = await getCurrentUser();
@@ -17,8 +21,9 @@ export async function GET() {
   }
 
   const context = await getStudentModuleContentContext(user);
-  const programSlug = context.programSlug;
-  const sessions = await getLiveSessionsPreview(programSlug);
+  const programSlugs = getStudentPortalProgramSlugs(user);
+  const primaryProgramSlug = context.programSlug;
+  const sessions = await fetchMergedByProgram(programSlugs, getLiveSessionsPreview);
   const canAccess = studentHasModuleLiveContent(context, sessions);
 
   if (!canAccess) {
@@ -26,25 +31,22 @@ export async function GET() {
       createApiResponse(true, {
         data: {
           recordings: [],
-          progress: getClassProgress(programSlug),
-          programSlug,
+          progress: getClassProgress(primaryProgramSlug),
+          programSlug: primaryProgramSlug,
         },
       })
     );
   }
 
-  const [allRecordings, progress] = await Promise.all([
-    getClassRecordings(programSlug),
-    Promise.resolve(getClassProgress(programSlug)),
-  ]);
+  const allRecordings = await fetchMergedByProgram(programSlugs, getClassRecordings);
   const recordings = filterByStudentModule(allRecordings, context, (item) => item.level);
 
   return NextResponse.json(
     createApiResponse(true, {
       data: {
         recordings,
-        progress,
-        programSlug,
+        progress: getClassProgress(primaryProgramSlug),
+        programSlug: primaryProgramSlug,
       },
     })
   );

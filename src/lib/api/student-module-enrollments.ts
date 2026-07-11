@@ -13,6 +13,7 @@ import {
 } from "@/lib/modules/student-module-content";
 import { getPortalLoginUrl } from "@/lib/site-url";
 import { isDemoPortalStudent } from "@/lib/constants/demo-student";
+import { DEMO_STUDENT_PROGRAM_SLUGS } from "@/lib/student-portal/program-scope";
 
 export interface StudentModuleEnrollmentView {
   enrollmentId: string;
@@ -30,11 +31,16 @@ export async function getStudentModuleEnrollmentViews(
   email: string,
   programSlug: string
 ): Promise<StudentModuleEnrollmentView[]> {
-  const views = await loadStudentModuleEnrollmentViews(email, programSlug);
-  if (!isDemoPortalStudent(email)) {
-    return views;
+  if (isDemoPortalStudent(email)) {
+    const merged: StudentModuleEnrollmentView[] = [];
+    for (const slug of DEMO_STUDENT_PROGRAM_SLUGS) {
+      const loaded = await loadStudentModuleEnrollmentViews(email, slug);
+      merged.push(...buildDemoModuleEnrollmentViews(email, slug, loaded));
+    }
+    return merged;
   }
-  return buildDemoModuleEnrollmentViews(email, programSlug, views);
+
+  return loadStudentModuleEnrollmentViews(email, programSlug);
 }
 
 async function loadStudentModuleEnrollmentViews(

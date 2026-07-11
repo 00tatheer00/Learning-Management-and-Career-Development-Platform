@@ -24,6 +24,10 @@ import {
   getStudentModuleEnrollmentViews,
   studentHasLiveClassAccess,
 } from "@/lib/api/student-module-enrollments";
+import {
+  fetchMergedByProgram,
+  getStudentPortalProgramSlugs,
+} from "@/lib/student-portal/program-scope";
 
 function formatDashboardDate() {
   return new Date().toLocaleDateString("en-GB", {
@@ -38,23 +42,24 @@ export default async function StudentDashboardPage() {
   const user = await getCurrentUser();
   if (!user) return null;
 
-  const programSlug = user.programSlug ?? "web-development";
+  const programSlugs = getStudentPortalProgramSlugs(user);
+  const primaryProgramSlug = user.programSlug ?? "web-development";
   const moduleContext = await getStudentModuleContentContext(user);
   const [allMaterials, allAssignments, allSessions] = await Promise.all([
-    getMaterials(programSlug),
-    getAssignments(programSlug),
-    getLiveSessionsPreview(programSlug),
+    fetchMergedByProgram(programSlugs, getMaterials),
+    fetchMergedByProgram(programSlugs, getAssignments),
+    fetchMergedByProgram(programSlugs, getLiveSessionsPreview),
   ]);
   const materials = filterByStudentModule(allMaterials, moduleContext, (item) => item.level);
   const assignments = filterByStudentModule(allAssignments, moduleContext, (item) => item.level);
   const sessions = filterByStudentModule(allSessions, moduleContext, (session) => session.level);
   const enrolledModules = moduleContext.approvedLevels;
   const moduleEnrollments = user.email
-    ? await getStudentModuleEnrollmentViews(user.email, programSlug)
+    ? await getStudentModuleEnrollmentViews(user.email, primaryProgramSlug)
     : [];
-  const nextSession = findNextUpcomingSession(sessions, programSlug);
+  const nextSession = findNextUpcomingSession(sessions, primaryProgramSlug);
   const canJoinLive = studentHasLiveClassAccess(
-    programSlug,
+    primaryProgramSlug,
     moduleEnrollments,
     user.email,
     allSessions,
@@ -116,7 +121,7 @@ export default async function StudentDashboardPage() {
 
       <StudentDashboardHero
         name={user.name}
-        programSlug={programSlug}
+        programSlug={primaryProgramSlug}
         moduleName={user.level}
         canJoinLive={canJoinLive}
       />
@@ -124,7 +129,7 @@ export default async function StudentDashboardPage() {
       {canJoinLive && (
         <StudentReveal delay={0.04}>
           <StudentAttendanceMissedAlert
-            programSlug={programSlug}
+            programSlug={primaryProgramSlug}
             studentId={user.id}
             studentLevel={user.level}
             studentEmail={user.email}
@@ -149,7 +154,7 @@ export default async function StudentDashboardPage() {
               <StudentNextClassCard
                 session={nextSession}
                 canJoinLive={canJoinLive}
-                programSlug={programSlug}
+                programSlug={nextSession.programSlug ?? primaryProgramSlug}
                 studentModule={user.level}
               />
             ) : (
@@ -174,21 +179,21 @@ export default async function StudentDashboardPage() {
             <StudentStagger className="grid gap-4 sm:grid-cols-2" delay={0.12} stagger={0.08}>
               <StudentStaggerItem>
                 <StudentAttendanceProgressCard
-                  programSlug={programSlug}
+                  programSlug={primaryProgramSlug}
                   studentId={user.id}
                   studentLevel={user.level}
                   studentEmail={user.email}
                 />
               </StudentStaggerItem>
               <StudentStaggerItem>
-                <StudentClassProgressCard programSlug={programSlug} />
+                <StudentClassProgressCard programSlug={primaryProgramSlug} />
               </StudentStaggerItem>
             </StudentStagger>
           )}
 
           <StudentReveal delay={0.14}>
             <StudentModuleRoadmap
-              programSlug={programSlug}
+              programSlug={primaryProgramSlug}
               currentModule={user.level}
               enrolledModules={enrolledModules}
             />
@@ -196,7 +201,7 @@ export default async function StudentDashboardPage() {
 
           <StudentReveal delay={0.16}>
             <div className="grid gap-4 sm:grid-cols-2">
-              <StudentTrainerCard programSlug={programSlug} trainerId={user.trainerId} />
+              <StudentTrainerCard programSlug={primaryProgramSlug} trainerId={user.trainerId} />
               <StudentWhatsAppGroupCard variant="banner" />
             </div>
           </StudentReveal>
@@ -219,7 +224,7 @@ export default async function StudentDashboardPage() {
               name={user.name}
               avatarUrl={user.avatarUrl}
               avatarInitials={user.avatarInitials}
-              programSlug={programSlug}
+              programSlug={primaryProgramSlug}
               moduleName={user.level}
               classDates={classDates}
               reminders={reminders}

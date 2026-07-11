@@ -41,8 +41,9 @@ export async function POST(request: Request) {
       studentName: user.name,
       content: parsed.data.content,
     },
-    user.programSlug,
-    user.level
+    user.programSlug ?? "web-development",
+    user.level,
+    user.email
   );
 
   if (!result.submission) {

@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { canStudentAccessModuleContent } from "@/lib/modules/student-module-content";
+import { isDemoPortalStudent } from "@/lib/constants/demo-student";
 import { getSessionRoomName, generateRoomPassword } from "@/lib/portal-video/config";
 import { sessionHasJoinLink } from "@/lib/sessions/meet-link";
 import {
@@ -237,7 +238,8 @@ export async function getSubmissions(studentId?: string): Promise<AssignmentSubm
 export async function createSubmission(
   data: Omit<AssignmentSubmission, "id" | "submittedAt" | "status">,
   studentProgramSlug: string,
-  studentLevel?: string | null
+  studentLevel?: string | null,
+  studentEmail?: string | null
 ): Promise<{ submission?: AssignmentSubmission; error?: string }> {
   const assignment = await prisma.assignment.findUnique({
     where: { id: data.assignmentId },
@@ -248,11 +250,18 @@ export async function createSubmission(
     return { error: "Assignment not found" };
   }
 
-  if (assignment.programSlug !== studentProgramSlug) {
+  if (
+    assignment.programSlug !== studentProgramSlug &&
+    !isDemoPortalStudent(studentEmail)
+  ) {
     return { error: "This assignment is not for your program" };
   }
 
-  if (!canStudentAccessModuleContent(studentProgramSlug, studentLevel, assignment.level)) {
+  if (
+    !canStudentAccessModuleContent(assignment.programSlug, studentLevel, assignment.level, {
+      email: studentEmail,
+    })
+  ) {
     return { error: "This assignment is not for your module" };
   }
 

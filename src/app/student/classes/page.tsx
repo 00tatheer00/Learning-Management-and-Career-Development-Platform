@@ -14,23 +14,32 @@ import {
   getStudentModuleContentContext,
 } from "@/lib/modules/student-module-content";
 import { StudentMarkSectionSeen } from "@/components/portal/student-mark-section-seen";
+import { isDemoPortalStudent } from "@/lib/constants/demo-student";
+import {
+  DEMO_STUDENT_PROGRAM_SLUGS,
+  fetchMergedByProgram,
+  getStudentPortalProgramSlugs,
+} from "@/lib/student-portal/program-scope";
 
 export default async function StudentClassesPage() {
   const user = await getCurrentUser();
   if (!user) return null;
 
-  const programSlug = user.programSlug ?? "web-development";
+  const programSlugs = getStudentPortalProgramSlugs(user);
+  const primaryProgramSlug = user.programSlug ?? "web-development";
   const moduleContext = await getStudentModuleContentContext(user);
   const moduleEnrollments = user.email
-    ? await getStudentModuleEnrollmentViews(user.email, programSlug)
+    ? await getStudentModuleEnrollmentViews(user.email, primaryProgramSlug)
     : [];
-  const allSessions = await getLiveSessionsPreview(programSlug);
+  const allSessions = await fetchMergedByProgram(programSlugs, getLiveSessionsPreview);
   const sessions = sortLiveSessionsForDisplay(
     filterByStudentModule(allSessions, moduleContext, (session) => session.level)
   );
-  const classSchedule = getStudentClassSchedule(programSlug);
+  const scheduleSlugs = isDemoPortalStudent(user.email)
+    ? [...DEMO_STUDENT_PROGRAM_SLUGS]
+    : [primaryProgramSlug];
   const canJoinLive = studentHasLiveClassAccess(
-    programSlug,
+    primaryProgramSlug,
     moduleEnrollments,
     user.email,
     allSessions,
@@ -51,24 +60,32 @@ export default async function StudentClassesPage() {
       />
 
       {!canJoinLive && (
-        <ModuleStartsSoonNotice programSlug={programSlug} studentModule={user.level} />
+        <ModuleStartsSoonNotice programSlug={primaryProgramSlug} studentModule={user.level} />
       )}
 
-      <PortalSurfaceCard className="p-4 sm:p-5 border border-pt">
-        <p className="font-semibold text-pt">{classSchedule.headline}</p>
-        <p className="text-sm text-pt-muted mt-1">
-          {classSchedule.daysLabel} · {classSchedule.subline}
-        </p>
-        <p className="text-sm text-pt-muted mt-3 pt-3 border-t border-pt-subtle">
-          <strong className="text-pt">Join Class</strong> opens 10 minutes before the scheduled time
-          and closes when class ends.
-        </p>
-      </PortalSurfaceCard>
+      {scheduleSlugs.map((slug) => {
+        const classSchedule = getStudentClassSchedule(slug);
+        return (
+          <PortalSurfaceCard key={slug} className="p-4 sm:p-5 border border-pt">
+            <p className="text-xs font-semibold uppercase tracking-wider text-primary mb-1">
+              {classSchedule.programLabel}
+            </p>
+            <p className="font-semibold text-pt">{classSchedule.headline}</p>
+            <p className="text-sm text-pt-muted mt-1">
+              {classSchedule.daysLabel} · {classSchedule.subline}
+            </p>
+            <p className="text-sm text-pt-muted mt-3 pt-3 border-t border-pt-subtle">
+              <strong className="text-pt">Join Class</strong> opens 10 minutes before the scheduled
+              time and closes when class ends.
+            </p>
+          </PortalSurfaceCard>
+        );
+      })}
 
       {sessions.length === 0 ? (
         <EmptyState
           title="Class link coming soon"
-          description={`${classSchedule.startDateLabel}. ${classSchedule.daysLabel}. ${classSchedule.subline}`}
+          description="Your trainer will add the next session. Check back before class time."
         />
       ) : (
         <div className="space-y-3">
@@ -76,7 +93,7 @@ export default async function StudentClassesPage() {
             <StudentLiveSessionCard
               key={session.id}
               session={session}
-              programSlug={programSlug}
+              programSlug={session.programSlug}
               canJoinLive={canJoinLive}
             />
           ))}

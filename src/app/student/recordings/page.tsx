@@ -12,25 +12,32 @@ import {
   filterByStudentModule,
   getStudentModuleContentContext,
 } from "@/lib/modules/student-module-content";
+import {
+  fetchMergedByProgram,
+  getStudentPortalProgramSlugs,
+} from "@/lib/student-portal/program-scope";
 
 export default async function StudentRecordingsPage() {
   const user = await getCurrentUser();
   if (!user) return null;
 
-  const programSlug = user.programSlug ?? "web-development";
+  const programSlugs = getStudentPortalProgramSlugs(user);
+  const primaryProgramSlug = user.programSlug ?? "web-development";
   const moduleContext = await getStudentModuleContentContext(user);
   const moduleEnrollments = user.email
-    ? await getStudentModuleEnrollmentViews(user.email, programSlug)
+    ? await getStudentModuleEnrollmentViews(user.email, primaryProgramSlug)
     : [];
-  const allSessions = await getLiveSessionsPreview(programSlug);
+  const allSessions = await fetchMergedByProgram(programSlugs, getLiveSessionsPreview);
   const canAccess = studentHasLiveClassAccess(
-    programSlug,
+    primaryProgramSlug,
     moduleEnrollments,
     user.email,
     allSessions,
     user.level
   );
-  const allRecordings = canAccess ? await getClassRecordings(programSlug) : [];
+  const allRecordings = canAccess
+    ? await fetchMergedByProgram(programSlugs, getClassRecordings)
+    : [];
   const recordings = filterByStudentModule(allRecordings, moduleContext, (item) => item.level);
 
   return (
@@ -45,9 +52,9 @@ export default async function StudentRecordingsPage() {
         }
       />
       {!canAccess ? (
-        <ModuleStartsSoonNotice programSlug={programSlug} studentModule={user.level} />
+        <ModuleStartsSoonNotice programSlug={primaryProgramSlug} studentModule={user.level} />
       ) : (
-        <StudentRecordingsContent programSlug={programSlug} recordings={recordings} />
+        <StudentRecordingsContent programSlug={primaryProgramSlug} recordings={recordings} />
       )}
     </div>
   );

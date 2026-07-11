@@ -8,9 +8,9 @@ export interface StudentEmailRecipient {
   name: string;
 }
 
-/** When true (default), student notification emails go only to the demo inbox for testing. */
+/** When true, student notification emails go only to the demo inbox for testing. */
 export function isStudentEmailDemoOnly(): boolean {
-  return process.env.STUDENT_EMAIL_DEMO_ONLY?.trim() !== "false";
+  return process.env.STUDENT_EMAIL_DEMO_ONLY?.trim() === "true";
 }
 
 export function resolveStudentEmailRecipients(

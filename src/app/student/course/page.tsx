@@ -10,6 +10,11 @@ import {
   filterByStudentModule,
   getStudentModuleContentContext,
 } from "@/lib/modules/student-module-content";
+import { isDemoPortalStudent } from "@/lib/constants/demo-student";
+import {
+  fetchMergedByProgram,
+  getStudentPortalProgramSlugs,
+} from "@/lib/student-portal/program-scope";
 
 const typeIcons = {
   video: PlayCircle,
@@ -21,36 +26,45 @@ export default async function StudentCoursePage() {
   const user = await getCurrentUser();
   if (!user) return null;
 
-  const programSlug = user.programSlug ?? "web-development";
+  const programSlugs = getStudentPortalProgramSlugs(user);
+  const isDemo = isDemoPortalStudent(user.email);
   const moduleContext = await getStudentModuleContentContext(user);
-  const allMaterials = await getMaterials(programSlug);
+  const allMaterials = await fetchMergedByProgram(programSlugs, getMaterials);
   const materials = filterByStudentModule(allMaterials, moduleContext, (item) => item.level);
-  const program = getProgramBySlug(programSlug);
 
   return (
     <div className="space-y-8">
       <PortalPageHeader
         eyebrow="Learning"
         title="My Course"
-        description={`${program?.title ?? "Your course"} — syllabus, lessons, and practice materials`}
+        description={
+          isDemo
+            ? "Web Development + App Development — full demo access to syllabus and materials"
+            : `${getProgramBySlug(programSlugs[0] ?? "web-development")?.title ?? "Your course"} — syllabus, lessons, and practice materials`
+        }
       />
 
-      {program && program.modules.length > 0 && (
-        <PortalSurfaceCard className="p-5 sm:p-6">
-          <h2 className="text-lg font-bold text-pt mb-1">Course Syllabus</h2>
-          <p className="text-sm text-pt-muted mb-5">
-            You are on: <strong className="text-pt">{user.level ?? "—"}</strong>
-            {" · "}
-            Tap a module to explore topics
-          </p>
-          <CourseModulesSyllabus
-            program={program}
-            activeModuleName={user.level ?? undefined}
-            copyVariant="student"
-            restrictToActiveModule
-          />
-        </PortalSurfaceCard>
-      )}
+      {programSlugs.map((programSlug) => {
+        const program = getProgramBySlug(programSlug);
+        if (!program || program.modules.length === 0) return null;
+
+        return (
+          <PortalSurfaceCard key={programSlug} className="p-5 sm:p-6">
+            <h2 className="text-lg font-bold text-pt mb-1">{program.title} — Syllabus</h2>
+            <p className="text-sm text-pt-muted mb-5">
+              {isDemo ? "Demo access to all modules" : `You are on: ${user.level ?? "—"}`}
+              {" · "}
+              Tap a module to explore topics
+            </p>
+            <CourseModulesSyllabus
+              program={program}
+              activeModuleName={isDemo ? undefined : user.level ?? undefined}
+              copyVariant="student"
+              restrictToActiveModule={!isDemo}
+            />
+          </PortalSurfaceCard>
+        );
+      })}
 
       <div>
         <h2 className="text-lg font-bold text-pt mb-4">Lessons &amp; Materials</h2>
