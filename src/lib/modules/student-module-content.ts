@@ -1,10 +1,8 @@
-import { getApprovedEnrollmentLevels } from "@/lib/auth/student-module-sync";
 import { isDemoPortalStudent } from "@/lib/constants/demo-student";
 import {
   getFirstModuleName,
   resolveActiveStudentModule,
 } from "@/lib/modules/student-module-access";
-import type { PortalUser } from "@/types/portal";
 
 export const MODULE_CONTENT_LOCKED_MESSAGE =
   "This content is for another module. You will only see lessons, classes, and assignments for your registered module.";
@@ -17,22 +15,6 @@ export interface StudentModuleContentContext {
   studentLevel: string | null;
   approvedLevels: string[];
   email?: string | null;
-}
-
-export async function getStudentModuleContentContext(
-  user: Pick<PortalUser, "email" | "programSlug" | "level">
-): Promise<StudentModuleContentContext> {
-  const programSlug = user.programSlug ?? "web-development";
-  const approvedLevels = user.email
-    ? await getApprovedEnrollmentLevels(user.email, programSlug)
-    : [];
-
-  return {
-    programSlug,
-    studentLevel: user.level?.trim() || null,
-    approvedLevels,
-    email: user.email,
-  };
 }
 
 export function resolveContentModuleLevel(

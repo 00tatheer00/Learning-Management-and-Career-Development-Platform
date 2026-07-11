@@ -10,8 +10,8 @@ import {
 } from "@/lib/api/student-module-enrollments";
 import {
   filterByStudentModule,
-  getStudentModuleContentContext,
 } from "@/lib/modules/student-module-content";
+import { getStudentModuleContentContext } from "@/lib/modules/student-module-content-server";
 import {
   fetchMergedByProgram,
   getStudentPortalProgramSlugs,

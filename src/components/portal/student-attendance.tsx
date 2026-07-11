@@ -7,9 +7,9 @@ import type { AttendanceCellStatus } from "@/lib/api/attendance-analytics";
 import { getAttendanceStatusMeta } from "@/lib/api/attendance-insights";
 import {
   filterByStudentModule,
-  getStudentModuleContentContext,
   studentHasModuleLiveContent,
 } from "@/lib/modules/student-module-content";
+import { getStudentModuleContentContext } from "@/lib/modules/student-module-content-server";
 import { ModuleStartsSoonNotice } from "@/components/portal/module-starts-soon-notice";
 import { AttendanceStreakBadge, StudentAttendanceMissedAlert } from "@/components/portal/student-attendance-alert";
 import { PortalPageHeader, PortalSurfaceCard } from "@/components/portal/portal-ui";

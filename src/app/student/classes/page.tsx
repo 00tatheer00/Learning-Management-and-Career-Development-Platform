@@ -11,8 +11,8 @@ import {
 } from "@/lib/api/student-module-enrollments";
 import {
   filterByStudentModule,
-  getStudentModuleContentContext,
 } from "@/lib/modules/student-module-content";
+import { getStudentModuleContentContext } from "@/lib/modules/student-module-content-server";
 import { StudentMarkSectionSeen } from "@/components/portal/student-mark-section-seen";
 import { isDemoPortalStudent } from "@/lib/constants/demo-student";
 import {

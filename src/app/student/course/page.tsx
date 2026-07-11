@@ -8,8 +8,8 @@ import { PortalPageHeader, EmptyState, PortalSurfaceCard } from "@/components/po
 import { Button } from "@/components/ui/button";
 import {
   filterByStudentModule,
-  getStudentModuleContentContext,
 } from "@/lib/modules/student-module-content";
+import { getStudentModuleContentContext } from "@/lib/modules/student-module-content-server";
 import { isDemoPortalStudent } from "@/lib/constants/demo-student";
 import {
   fetchMergedByProgram,

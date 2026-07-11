@@ -5,9 +5,9 @@ import { getClassProgress } from "@/lib/class-schedule";
 import { createApiResponse } from "@/lib/api/enrollment";
 import {
   filterByStudentModule,
-  getStudentModuleContentContext,
   studentHasModuleLiveContent,
 } from "@/lib/modules/student-module-content";
+import { getStudentModuleContentContext } from "@/lib/modules/student-module-content-server";
 import { getLiveSessionsPreview } from "@/lib/api/portal-data";
 import {
   fetchMergedByProgram,

@@ -4,8 +4,8 @@ import { getAssignments, getSubmissions } from "@/lib/api/portal-data";
 import { createApiResponse } from "@/lib/api/enrollment";
 import {
   filterByStudentModule,
-  getStudentModuleContentContext,
 } from "@/lib/modules/student-module-content";
+import { getStudentModuleContentContext } from "@/lib/modules/student-module-content-server";
 import {
   fetchMergedByProgram,
   getStudentPortalProgramSlugs,

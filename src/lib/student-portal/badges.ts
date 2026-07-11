@@ -3,8 +3,8 @@ import { getAssignments } from "@/lib/api/portal-data";
 import { parseSessionDateTime } from "@/lib/sessions/join-window";
 import {
   filterByStudentModule,
-  getStudentModuleContentContext,
 } from "@/lib/modules/student-module-content";
+import { getStudentModuleContentContext } from "@/lib/modules/student-module-content-server";
 import type { PortalUser } from "@/types/portal";
 import {
   fetchMergedByProgram,

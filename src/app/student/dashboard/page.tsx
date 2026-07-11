@@ -18,8 +18,8 @@ import { StudentReveal, StudentStagger, StudentStaggerItem } from "@/components/
 import { findNextUpcomingSession } from "@/lib/utils/session-datetime";
 import {
   filterByStudentModule,
-  getStudentModuleContentContext,
 } from "@/lib/modules/student-module-content";
+import { getStudentModuleContentContext } from "@/lib/modules/student-module-content-server";
 import {
   getStudentModuleEnrollmentViews,
   studentHasLiveClassAccess,
