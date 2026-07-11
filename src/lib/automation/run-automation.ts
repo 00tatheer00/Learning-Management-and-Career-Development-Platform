@@ -1,6 +1,8 @@
+import { runClassReminders } from "@/lib/automation/class-reminders";
+
 export interface AutomationRunSummary {
   ranAt: string;
-  classReminders: { oneHour: number; fifteenMin: number };
+  classReminders: { thirtyMin: number };
   neverLoggedIn: { studentNudges: number; adminDigestSent: boolean };
   assignmentDueReminders: number;
   inactiveStudentAlerts: number;
@@ -8,11 +10,13 @@ export interface AutomationRunSummary {
   pendingRegistrationSla: boolean;
 }
 
-/** WhatsApp automation disabled — only manual approve/reject messages are sent. */
+/** Student emails: class reminders (30 min). WhatsApp: approve/reject only. */
 export async function runAllAutomations(now = new Date()): Promise<AutomationRunSummary> {
+  const classReminders = await runClassReminders(now);
+
   return {
     ranAt: now.toISOString(),
-    classReminders: { oneHour: 0, fifteenMin: 0 },
+    classReminders,
     neverLoggedIn: { studentNudges: 0, adminDigestSent: false },
     assignmentDueReminders: 0,
     inactiveStudentAlerts: 0,

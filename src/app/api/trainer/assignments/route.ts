@@ -5,6 +5,7 @@ import { requireTrainerProgram, resolveTrainerId } from "@/lib/auth/trainer-scop
 import { getFirstModuleName } from "@/lib/modules/student-module-access";
 import { createAssignment } from "@/lib/api/portal-data";
 import { createApiResponse } from "@/lib/api/enrollment";
+import { notifyStudentsOfNewAssignment } from "@/lib/notifications/assignment-new-email";
 
 const schema = z.object({
   title: z.string().min(2),
@@ -44,6 +45,10 @@ export async function POST(request: Request) {
       programSlug,
       level: user.level ?? getFirstModuleName(programSlug) ?? undefined,
       trainerId: resolveTrainerId(user),
+    });
+
+    void notifyStudentsOfNewAssignment(assignment).catch((error) => {
+      console.error("[trainer/assignments] assignment email failed:", error);
     });
 
     return NextResponse.json(createApiResponse(true, { data: assignment }));
