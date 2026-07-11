@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 export interface ClassRecordingRecord {
   id: string;
   programSlug: string;
+  level?: string;
   classNumber: number;
   title: string;
   driveUrl: string;
@@ -16,6 +17,7 @@ export interface ClassRecordingRecord {
 function mapRecording(record: {
   id: string;
   programSlug: string;
+  level?: string | null;
   classNumber: number;
   title: string;
   driveUrl: string;
@@ -28,6 +30,7 @@ function mapRecording(record: {
   return {
     id: record.id,
     programSlug: record.programSlug,
+    level: record.level ?? undefined,
     classNumber: record.classNumber,
     title: record.title,
     driveUrl: record.driveUrl,
@@ -49,6 +52,7 @@ export async function getClassRecordings(programSlug: string): Promise<ClassReco
 
 export async function upsertClassRecording(data: {
   programSlug: string;
+  level?: string;
   classNumber: number;
   title: string;
   driveUrl: string;
@@ -71,6 +75,7 @@ export async function upsertClassRecording(data: {
       data: {
         title: data.title,
         driveUrl: data.driveUrl,
+        level: data.level ?? null,
         trainerId: data.trainerId,
         trainerName: data.trainerName,
         notes: data.notes ?? null,
@@ -83,6 +88,7 @@ export async function upsertClassRecording(data: {
     data: {
       id: crypto.randomUUID(),
       programSlug: data.programSlug,
+      level: data.level ?? null,
       classNumber: data.classNumber,
       title: data.title,
       driveUrl: data.driveUrl,

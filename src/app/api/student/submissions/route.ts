@@ -41,7 +41,8 @@ export async function POST(request: Request) {
       studentName: user.name,
       content: parsed.data.content,
     },
-    user.programSlug
+    user.programSlug,
+    user.level
   );
 
   if (!result.submission) {

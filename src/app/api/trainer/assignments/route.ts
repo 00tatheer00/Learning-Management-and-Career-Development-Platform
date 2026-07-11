@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth/session";
 import { requireTrainerProgram, resolveTrainerId } from "@/lib/auth/trainer-scope";
+import { getFirstModuleName } from "@/lib/modules/student-module-access";
 import { createAssignment } from "@/lib/api/portal-data";
 import { createApiResponse } from "@/lib/api/enrollment";
 
@@ -41,6 +42,7 @@ export async function POST(request: Request) {
       description: parsed.data.description,
       dueDate: parsed.data.dueDate,
       programSlug,
+      level: user.level ?? getFirstModuleName(programSlug) ?? undefined,
       trainerId: resolveTrainerId(user),
     });
 

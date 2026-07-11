@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { WarningCircle, Flame } from "@phosphor-icons/react/ssr";
 import { getStudentAttendanceSummary } from "@/lib/api/class-attendance";
-import { canAccessModuleOneClasses } from "@/lib/modules/student-module-access";
+import { getLiveSessionsPreview } from "@/lib/api/portal-data";
+import { studentHasModuleLiveContent } from "@/lib/modules/student-module-content";
 import { cn } from "@/lib/utils";
 
 interface StudentAttendanceMissedAlertProps {
@@ -19,7 +20,14 @@ export async function StudentAttendanceMissedAlert({
   studentEmail,
   className,
 }: StudentAttendanceMissedAlertProps) {
-  const canTrack = canAccessModuleOneClasses(programSlug, studentLevel, undefined, studentEmail);
+  const moduleContext = {
+    programSlug,
+    studentLevel: studentLevel ?? null,
+    approvedLevels: studentLevel ? [studentLevel] : [],
+    email: studentEmail,
+  };
+  const sessions = await getLiveSessionsPreview(programSlug);
+  const canTrack = studentHasModuleLiveContent(moduleContext, sessions);
   if (!canTrack) return null;
 
   const stats = await getStudentAttendanceSummary(studentId, programSlug);

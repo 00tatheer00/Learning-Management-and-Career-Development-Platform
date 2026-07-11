@@ -5,7 +5,11 @@ import { getStudentAttendanceSummary } from "@/lib/api/class-attendance";
 import { getLiveSessionsPreview } from "@/lib/api/portal-data";
 import type { AttendanceCellStatus } from "@/lib/api/attendance-analytics";
 import { getAttendanceStatusMeta } from "@/lib/api/attendance-insights";
-import { canAccessModuleOneClasses } from "@/lib/modules/student-module-access";
+import {
+  filterByStudentModule,
+  getStudentModuleContentContext,
+  studentHasModuleLiveContent,
+} from "@/lib/modules/student-module-content";
 import { ModuleStartsSoonNotice } from "@/components/portal/module-starts-soon-notice";
 import { AttendanceStreakBadge, StudentAttendanceMissedAlert } from "@/components/portal/student-attendance-alert";
 import { PortalPageHeader, PortalSurfaceCard } from "@/components/portal/portal-ui";
@@ -29,7 +33,14 @@ export async function StudentAttendanceProgressCard({
   studentLevel,
   studentEmail,
 }: StudentAttendanceProgressCardProps) {
-  const canTrack = canAccessModuleOneClasses(programSlug, studentLevel, undefined, studentEmail);
+  const moduleContext = {
+    programSlug,
+    studentLevel: studentLevel ?? null,
+    approvedLevels: studentLevel ? [studentLevel] : [],
+    email: studentEmail,
+  };
+  const sessions = await getLiveSessionsPreview(programSlug);
+  const canTrack = studentHasModuleLiveContent(moduleContext, sessions);
   if (!canTrack) return null;
 
   const stats = await getStudentAttendanceSummary(studentId, programSlug);
@@ -128,7 +139,10 @@ export async function StudentAttendancePageContent() {
   if (!user) return null;
 
   const programSlug = user.programSlug ?? "web-development";
-  const canTrack = canAccessModuleOneClasses(programSlug, user.level, undefined, user.email);
+  const moduleContext = await getStudentModuleContentContext(user);
+  const allSessions = await getLiveSessionsPreview(programSlug);
+  const canTrack = studentHasModuleLiveContent(moduleContext, allSessions);
+  const sessions = filterByStudentModule(allSessions, moduleContext, (session) => session.level);
 
   if (!canTrack) {
     return (
@@ -143,7 +157,6 @@ export async function StudentAttendancePageContent() {
   }
 
   const stats = await getStudentAttendanceSummary(user.id, programSlug);
-  const sessions = await getLiveSessionsPreview(programSlug);
   const nextSession = findNextUpcomingSession(sessions, programSlug);
   const nextSessionAt = nextSession
     ? parseSessionDateTime(nextSession.date, nextSession.time)

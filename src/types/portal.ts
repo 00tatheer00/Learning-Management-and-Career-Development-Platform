@@ -43,6 +43,7 @@ export interface EnrollmentRecord extends EnrollmentPayload {
 export interface CourseMaterial {
   id: string;
   programSlug: string;
+  level?: string;
   title: string;
   description: string;
   type: "video" | "link" | "document";
@@ -53,6 +54,7 @@ export interface CourseMaterial {
 export interface Assignment {
   id: string;
   programSlug: string;
+  level?: string;
   title: string;
   description: string;
   dueDate: string;
@@ -75,6 +77,7 @@ export interface AssignmentSubmission {
 export interface LiveSession {
   id: string;
   programSlug: string;
+  level?: string;
   title: string;
   date: string;
   time: string;

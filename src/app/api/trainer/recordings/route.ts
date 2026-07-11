@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth/session";
 import { requireTrainerProgram, resolveTrainerId } from "@/lib/auth/trainer-scope";
+import { getFirstModuleName } from "@/lib/modules/student-module-access";
 import {
   deleteClassRecording,
   getClassRecordings,
@@ -54,6 +55,7 @@ export async function POST(request: Request) {
 
     const recording = await upsertClassRecording({
       programSlug,
+      level: user.level ?? getFirstModuleName(programSlug) ?? undefined,
       classNumber: parsed.data.classNumber,
       title: parsed.data.title,
       driveUrl: parsed.data.driveUrl,

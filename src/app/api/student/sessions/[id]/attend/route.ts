@@ -3,7 +3,7 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { getLiveSessionById } from "@/lib/api/portal-data";
 import { createApiResponse } from "@/lib/api/enrollment";
 import { recordClassJoin } from "@/lib/api/class-attendance";
-import { canAccessModuleOneClasses } from "@/lib/modules/student-module-access";
+import { canStudentAccessModuleContent } from "@/lib/modules/student-module-content";
 import { getJoinWindowState } from "@/lib/sessions/join-window";
 import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
 
@@ -34,7 +34,11 @@ export async function POST(
     });
   }
 
-  if (!canAccessModuleOneClasses(session.programSlug, user.level, undefined, user.email)) {
+  if (
+    !canStudentAccessModuleContent(session.programSlug, user.level, session.level, {
+      email: user.email,
+    })
+  ) {
     return NextResponse.json(
       createApiResponse(false, { message: STUDENT_UR.joinClass.moduleNotStarted }),
       { status: 403 }

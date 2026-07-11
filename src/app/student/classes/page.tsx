@@ -9,18 +9,32 @@ import {
   getStudentModuleEnrollmentViews,
   studentHasLiveClassAccess,
 } from "@/lib/api/student-module-enrollments";
+import {
+  filterByStudentModule,
+  getStudentModuleContentContext,
+} from "@/lib/modules/student-module-content";
 
 export default async function StudentClassesPage() {
   const user = await getCurrentUser();
   if (!user) return null;
 
   const programSlug = user.programSlug ?? "web-development";
+  const moduleContext = await getStudentModuleContentContext(user);
   const moduleEnrollments = user.email
     ? await getStudentModuleEnrollmentViews(user.email, programSlug)
     : [];
-  const sessions = sortLiveSessionsForDisplay(await getLiveSessionsPreview(programSlug));
+  const allSessions = await getLiveSessionsPreview(programSlug);
+  const sessions = sortLiveSessionsForDisplay(
+    filterByStudentModule(allSessions, moduleContext, (session) => session.level)
+  );
   const classSchedule = getStudentClassSchedule(programSlug);
-  const canJoinLive = studentHasLiveClassAccess(programSlug, moduleEnrollments, user.email);
+  const canJoinLive = studentHasLiveClassAccess(
+    programSlug,
+    moduleEnrollments,
+    user.email,
+    allSessions,
+    user.level
+  );
 
   return (
     <div className="space-y-6">
@@ -30,7 +44,7 @@ export default async function StudentClassesPage() {
         description={
           canJoinLive
             ? "Join opens 10 minutes before class. Past sessions show as Done — rewatch from Recordings."
-            : "Your module batch has not started yet. Module 1 students are in live classes now."
+            : "Live classes for your module will appear here when your batch starts."
         }
       />
 

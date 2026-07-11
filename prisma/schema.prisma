@@ -108,6 +108,7 @@ model Enrollment {
 model CourseMaterial {
   id          String       @id @map("_id")
   programSlug String
+  level       String?
   title       String
   description String
   type        MaterialType
@@ -118,6 +119,7 @@ model CourseMaterial {
 model Assignment {
   id          String   @id @map("_id")
   programSlug String
+  level       String?
   title       String
   description String
   dueDate     String
@@ -145,6 +147,7 @@ model AssignmentSubmission {
 model LiveSession {
   id           String    @id @map("_id")
   programSlug  String
+  level        String?
   title        String
   startsAt     DateTime?
   timezone     String    @default("Asia/Karachi")
@@ -192,6 +195,7 @@ model ClassAttendance {
 model ClassRecording {
   id          String   @id @map("_id")
   programSlug String
+  level       String?
   classNumber Int
   title       String
   driveUrl    String

@@ -6,6 +6,10 @@ import { getProgramBySlug } from "@/lib/data/programs";
 import { CourseModulesSyllabus } from "@/components/portal/course-modules-syllabus";
 import { PortalPageHeader, EmptyState, PortalSurfaceCard } from "@/components/portal/portal-ui";
 import { Button } from "@/components/ui/button";
+import {
+  filterByStudentModule,
+  getStudentModuleContentContext,
+} from "@/lib/modules/student-module-content";
 
 const typeIcons = {
   video: PlayCircle,
@@ -18,7 +22,9 @@ export default async function StudentCoursePage() {
   if (!user) return null;
 
   const programSlug = user.programSlug ?? "web-development";
-  const materials = await getMaterials(programSlug);
+  const moduleContext = await getStudentModuleContentContext(user);
+  const allMaterials = await getMaterials(programSlug);
+  const materials = filterByStudentModule(allMaterials, moduleContext, (item) => item.level);
   const program = getProgramBySlug(programSlug);
 
   return (
@@ -40,6 +46,8 @@ export default async function StudentCoursePage() {
           <CourseModulesSyllabus
             program={program}
             activeModuleName={user.level ?? undefined}
+            copyVariant="student"
+            restrictToActiveModule
           />
         </PortalSurfaceCard>
       )}
@@ -49,8 +57,8 @@ export default async function StudentCoursePage() {
 
         {materials.length === 0 ? (
           <EmptyState
-            title="No lessons yet"
-            description="Your trainer will add videos soon. Check WhatsApp for updates."
+            title="No lessons for your module yet"
+            description="Your trainer will add videos for your module soon. Check WhatsApp for updates."
             action={
               <Button asChild>
                 <Link href="/student/whatsapp">Open WhatsApp Group</Link>

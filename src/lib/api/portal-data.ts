@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { canStudentAccessModuleContent } from "@/lib/modules/student-module-content";
 import { getSessionRoomName, generateRoomPassword } from "@/lib/portal-video/config";
 import { sessionHasJoinLink } from "@/lib/sessions/meet-link";
 import {
@@ -173,6 +174,7 @@ export async function getMaterials(programSlug?: string): Promise<CourseMaterial
   return materials.map((m) => ({
     id: m.id,
     programSlug: m.programSlug,
+    level: m.level ?? undefined,
     title: m.title,
     description: m.description,
     type: m.type,
@@ -189,6 +191,7 @@ export async function getAssignments(programSlug?: string): Promise<Assignment[]
   return assignments.map((a) => ({
     id: a.id,
     programSlug: a.programSlug,
+    level: a.level ?? undefined,
     title: a.title,
     description: a.description,
     dueDate: a.dueDate,
@@ -204,6 +207,7 @@ export async function createAssignment(
     data: {
       id: crypto.randomUUID(),
       programSlug: data.programSlug,
+      level: data.level ?? null,
       title: data.title,
       description: data.description,
       dueDate: data.dueDate,
@@ -213,6 +217,7 @@ export async function createAssignment(
   return {
     id: assignment.id,
     programSlug: assignment.programSlug,
+    level: assignment.level ?? undefined,
     title: assignment.title,
     description: assignment.description,
     dueDate: assignment.dueDate,
@@ -231,11 +236,12 @@ export async function getSubmissions(studentId?: string): Promise<AssignmentSubm
 
 export async function createSubmission(
   data: Omit<AssignmentSubmission, "id" | "submittedAt" | "status">,
-  studentProgramSlug: string
+  studentProgramSlug: string,
+  studentLevel?: string | null
 ): Promise<{ submission?: AssignmentSubmission; error?: string }> {
   const assignment = await prisma.assignment.findUnique({
     where: { id: data.assignmentId },
-    select: { id: true, programSlug: true },
+    select: { id: true, programSlug: true, level: true },
   });
 
   if (!assignment) {
@@ -244,6 +250,10 @@ export async function createSubmission(
 
   if (assignment.programSlug !== studentProgramSlug) {
     return { error: "This assignment is not for your program" };
+  }
+
+  if (!canStudentAccessModuleContent(studentProgramSlug, studentLevel, assignment.level)) {
+    return { error: "This assignment is not for your module" };
   }
 
   const submission = await prisma.assignmentSubmission.create({
@@ -303,6 +313,7 @@ export async function getLiveSessionById(id: string): Promise<LiveSession | null
 function mapLiveSession(s: {
   id: string;
   programSlug: string;
+  level?: string | null;
   title: string;
   date: string;
   time: string;
@@ -326,6 +337,7 @@ function mapLiveSession(s: {
   return {
     id: s.id,
     programSlug: s.programSlug,
+    level: s.level ?? undefined,
     title: s.title,
     date: resolved.date,
     time: resolved.time,
@@ -357,6 +369,7 @@ export async function createLiveSession(
     data: {
       id,
       programSlug: data.programSlug,
+      level: data.level ?? null,
       title: data.title,
       startsAt: timestamps.startsAt,
       timezone: timestamps.timezone,

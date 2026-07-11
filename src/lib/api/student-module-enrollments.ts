@@ -6,6 +6,11 @@ import {
   getProgramModuleNames,
   isFirstModuleStudent,
 } from "@/lib/modules/student-module-access";
+import {
+  filterByStudentModule,
+  studentHasModuleLiveContent,
+  type StudentModuleContentContext,
+} from "@/lib/modules/student-module-content";
 import { getPortalLoginUrl } from "@/lib/site-url";
 import { isDemoPortalStudent } from "@/lib/constants/demo-student";
 
@@ -116,11 +121,24 @@ export { verifyStudentLoginPassword } from "@/lib/auth/student-login-password";
 export function studentHasLiveClassAccess(
   programSlug: string,
   moduleViews: StudentModuleEnrollmentView[],
-  email?: string | null
+  email?: string | null,
+  sessions?: Array<{ level?: string | null }>,
+  studentLevel?: string | null
 ): boolean {
   if (isDemoPortalStudent(email)) return true;
 
+  const context: StudentModuleContentContext = {
+    programSlug,
+    studentLevel: studentLevel ?? moduleViews[0]?.moduleName ?? null,
+    approvedLevels: moduleViews.map((view) => view.moduleName),
+    email,
+  };
+
+  if (sessions?.length) {
+    return studentHasModuleLiveContent(context, sessions);
+  }
+
   return moduleViews.some((view) =>
-    canAccessModuleOneClasses(programSlug, view.moduleName, moduleViews.map((v) => v.moduleName), email)
+    canAccessModuleOneClasses(programSlug, view.moduleName, context.approvedLevels, email)
   );
 }

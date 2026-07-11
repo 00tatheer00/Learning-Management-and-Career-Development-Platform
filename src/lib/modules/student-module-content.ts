@@ -1,0 +1,98 @@
+import { getApprovedEnrollmentLevels } from "@/lib/auth/student-module-sync";
+import { isDemoPortalStudent } from "@/lib/constants/demo-student";
+import {
+  getFirstModuleName,
+  resolveActiveStudentModule,
+} from "@/lib/modules/student-module-access";
+import type { PortalUser } from "@/types/portal";
+
+export const MODULE_CONTENT_LOCKED_MESSAGE =
+  "This content is for another module. You will only see lessons, classes, and assignments for your registered module.";
+
+export const MODULE_CONTENT_LOCKED_SHORT =
+  "Available when your module batch starts — we will notify you on WhatsApp.";
+
+export interface StudentModuleContentContext {
+  programSlug: string;
+  studentLevel: string | null;
+  approvedLevels: string[];
+  email?: string | null;
+}
+
+export async function getStudentModuleContentContext(
+  user: Pick<PortalUser, "email" | "programSlug" | "level">
+): Promise<StudentModuleContentContext> {
+  const programSlug = user.programSlug ?? "web-development";
+  const approvedLevels = user.email
+    ? await getApprovedEnrollmentLevels(user.email, programSlug)
+    : [];
+
+  return {
+    programSlug,
+    studentLevel: user.level?.trim() || null,
+    approvedLevels,
+    email: user.email,
+  };
+}
+
+export function resolveContentModuleLevel(
+  programSlug: string,
+  contentLevel?: string | null
+): string | null {
+  const trimmed = contentLevel?.trim();
+  if (trimmed) return trimmed;
+  return getFirstModuleName(programSlug);
+}
+
+export function getStudentActiveModule(
+  programSlug: string,
+  studentLevel?: string | null,
+  approvedLevels?: string[]
+): string | null {
+  if (approvedLevels?.length) {
+    return resolveActiveStudentModule(programSlug, studentLevel, approvedLevels);
+  }
+  return studentLevel?.trim() || null;
+}
+
+export function canStudentAccessModuleContent(
+  programSlug: string,
+  studentLevel: string | null | undefined,
+  contentLevel: string | null | undefined,
+  options?: { email?: string | null; approvedLevels?: string[] }
+): boolean {
+  if (isDemoPortalStudent(options?.email)) return true;
+
+  const activeModule = getStudentActiveModule(
+    programSlug,
+    studentLevel,
+    options?.approvedLevels
+  );
+  if (!activeModule) return false;
+
+  const resolvedContent = resolveContentModuleLevel(programSlug, contentLevel);
+  return resolvedContent === activeModule;
+}
+
+export function filterByStudentModule<T>(
+  items: T[],
+  context: StudentModuleContentContext,
+  getLevel: (item: T) => string | null | undefined
+): T[] {
+  if (isDemoPortalStudent(context.email)) return items;
+
+  return items.filter((item) =>
+    canStudentAccessModuleContent(context.programSlug, context.studentLevel, getLevel(item), {
+      email: context.email,
+      approvedLevels: context.approvedLevels,
+    })
+  );
+}
+
+export function studentHasModuleLiveContent(
+  context: StudentModuleContentContext,
+  sessions: Array<{ level?: string | null }>
+): boolean {
+  if (isDemoPortalStudent(context.email)) return true;
+  return filterByStudentModule(sessions, context, (session) => session.level).length > 0;
+}

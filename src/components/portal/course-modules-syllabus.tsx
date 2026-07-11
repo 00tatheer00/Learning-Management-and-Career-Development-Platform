@@ -5,6 +5,7 @@ import { CaretLeft, CaretRight, BookOpen, ListBullets, Certificate } from "@phos
 import { cn } from "@/lib/utils";
 import { formatModuleSchedule } from "@/lib/data/programs";
 import { MODULE_CERTIFICATE_SHORT } from "@/lib/constants/program-marketing";
+import { ModuleContentLockedNotice } from "@/components/portal/module-content-locked-notice";
 import type { Program, ProgramModule } from "@/types";
 
 type SyllabusView = "modules" | "topics";
@@ -15,6 +16,8 @@ interface CourseModulesSyllabusProps {
   /** When true, show program title header (admin multi-course view) */
   showProgramHeader?: boolean;
   copyVariant?: "student" | "default";
+  /** Student portal: block syllabus for modules they are not enrolled in */
+  restrictToActiveModule?: boolean;
   className?: string;
 }
 
@@ -23,17 +26,26 @@ export function CourseModulesSyllabus({
   activeModuleName,
   showProgramHeader = false,
   copyVariant = "default",
+  restrictToActiveModule = false,
   className,
 }: CourseModulesSyllabusProps) {
   const isStudentCopy = copyVariant === "student";
   const [view, setView] = useState<SyllabusView>("modules");
   const [selectedModule, setSelectedModule] = useState<ProgramModule | null>(null);
+  const [lockedModule, setLockedModule] = useState<ProgramModule | null>(null);
 
   const modules = program.modules.filter((mod) => (mod.topics?.length ?? 0) > 0);
 
   if (modules.length === 0) return null;
 
   const openModule = (mod: ProgramModule) => {
+    if (restrictToActiveModule && activeModuleName && mod.name !== activeModuleName) {
+      setLockedModule(mod);
+      setSelectedModule(null);
+      setView("topics");
+      return;
+    }
+    setLockedModule(null);
     setSelectedModule(mod);
     setView("topics");
   };
@@ -41,7 +53,27 @@ export function CourseModulesSyllabus({
   const backToModules = () => {
     setView("modules");
     setSelectedModule(null);
+    setLockedModule(null);
   };
+
+  if (view === "topics" && lockedModule) {
+    return (
+      <div className={cn("space-y-4", className)}>
+        <button
+          type="button"
+          onClick={backToModules}
+          className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
+        >
+          <CaretLeft size={16} />
+          Back to modules
+        </button>
+        <ModuleContentLockedNotice
+          studentModule={activeModuleName}
+          lockedModule={lockedModule.name}
+        />
+      </div>
+    );
+  }
 
   if (view === "topics" && selectedModule) {
     const moduleIndex = program.modules.findIndex((mod) => mod.name === selectedModule.name);
@@ -124,6 +156,7 @@ export function CourseModulesSyllabus({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {modules.map((mod, index) => {
           const isActive = activeModuleName === mod.name;
+          const isLocked = restrictToActiveModule && activeModuleName && !isActive;
           const topicCount = mod.topics?.length ?? 0;
 
           return (
@@ -132,10 +165,12 @@ export function CourseModulesSyllabus({
               type="button"
               onClick={() => openModule(mod)}
               className={cn(
-                "group rounded-2xl border p-5 text-left transition-all hover:border-primary hover:shadow-md",
+                "group rounded-2xl border p-5 text-left transition-all",
                 isActive
-                  ? "border-primary/40 bg-primary/5 ring-1 ring-primary/20"
-                  : "border-border bg-background"
+                  ? "border-primary/40 bg-primary/5 ring-1 ring-primary/20 hover:shadow-md"
+                  : isLocked
+                    ? "border-border bg-surface/40 opacity-90"
+                    : "border-border bg-background hover:border-primary hover:shadow-md"
               )}
             >
               <div className="flex items-start justify-between gap-3">
@@ -167,6 +202,11 @@ export function CourseModulesSyllabus({
               {isActive && (
                 <span className="mt-3 inline-block rounded-full bg-primary px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary-foreground">
                   Your current module
+                </span>
+              )}
+              {isLocked && (
+                <span className="mt-3 inline-block rounded-full bg-amber-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-800">
+                  Not your module
                 </span>
               )}
             </button>

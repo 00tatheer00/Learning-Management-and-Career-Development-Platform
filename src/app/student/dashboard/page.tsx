@@ -16,7 +16,10 @@ import { StudentUpcomingLessonsTable } from "@/components/portal/student-upcomin
 import { StudentDashboardRail } from "@/components/portal/student-dashboard-rail";
 import { StudentReveal, StudentStagger, StudentStaggerItem } from "@/components/portal/student-motion";
 import { findNextUpcomingSession } from "@/lib/utils/session-datetime";
-import { getApprovedEnrollmentLevels } from "@/lib/auth/student-module-sync";
+import {
+  filterByStudentModule,
+  getStudentModuleContentContext,
+} from "@/lib/modules/student-module-content";
 import {
   getStudentModuleEnrollmentViews,
   studentHasLiveClassAccess,
@@ -36,19 +39,27 @@ export default async function StudentDashboardPage() {
   if (!user) return null;
 
   const programSlug = user.programSlug ?? "web-development";
-  const [materials, assignments, sessions] = await Promise.all([
+  const moduleContext = await getStudentModuleContentContext(user);
+  const [allMaterials, allAssignments, allSessions] = await Promise.all([
     getMaterials(programSlug),
     getAssignments(programSlug),
     getLiveSessionsPreview(programSlug),
   ]);
-  const enrolledModules = user.email
-    ? await getApprovedEnrollmentLevels(user.email, programSlug)
-    : [];
+  const materials = filterByStudentModule(allMaterials, moduleContext, (item) => item.level);
+  const assignments = filterByStudentModule(allAssignments, moduleContext, (item) => item.level);
+  const sessions = filterByStudentModule(allSessions, moduleContext, (session) => session.level);
+  const enrolledModules = moduleContext.approvedLevels;
   const moduleEnrollments = user.email
     ? await getStudentModuleEnrollmentViews(user.email, programSlug)
     : [];
   const nextSession = findNextUpcomingSession(sessions, programSlug);
-  const canJoinLive = studentHasLiveClassAccess(programSlug, moduleEnrollments, user.email);
+  const canJoinLive = studentHasLiveClassAccess(
+    programSlug,
+    moduleEnrollments,
+    user.email,
+    allSessions,
+    user.level
+  );
 
   const classDates = sessions.map((s) => s.date);
   const reminders: {
