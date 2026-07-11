@@ -1,0 +1,45 @@
+name: Class Reminders Cron
+
+# Vercel Hobby (free) only runs crons once per day — use GitHub Actions instead.
+# Add repository secret CRON_SECRET (same value as Vercel env CRON_SECRET).
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: class-reminders-cron
+  cancel-in-progress: false
+
+jobs:
+  run-automation:
+    name: Trigger /api/cron/automation
+    runs-on: ubuntu-latest
+    env:
+      PORTAL_URL: https://school.emergingedge.tech
+    steps:
+      - name: Run class reminder automation
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$CRON_SECRET" ]; then
+            echo "::warning::CRON_SECRET is not set in GitHub repository secrets."
+            echo "Add it under Settings → Secrets → Actions (same value as Vercel CRON_SECRET)."
+            exit 0
+          fi
+
+          http_code=$(curl -sS -o /tmp/cron-response.json -w "%{http_code}" \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
+            "${PORTAL_URL}/api/cron/automation")
+
+          echo "HTTP ${http_code}"
+          cat /tmp/cron-response.json
+
+          if [ "$http_code" -lt 200 ] || [ "$http_code" -ge 300 ]; then
+            echo "::error::Automation cron failed with HTTP ${http_code}"
+            exit 1
+          fi
