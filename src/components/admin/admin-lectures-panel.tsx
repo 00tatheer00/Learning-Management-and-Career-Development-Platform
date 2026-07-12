@@ -8,6 +8,29 @@ import { cn } from "@/lib/utils";
 import { toast } from "@/lib/ui/toast";
 import { programs } from "@/lib/data/programs";
 
+interface CustomWindow extends Window {
+  tus?: unknown;
+}
+
+const loadTus = (): Promise<unknown> => {
+  return new Promise((resolve, reject) => {
+    if (typeof window === "undefined") {
+      reject(new Error("Browser only"));
+      return;
+    }
+    const win = window as unknown as CustomWindow;
+    if (win.tus) {
+      resolve(win.tus);
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://cdnjs.cloudflare.com/ajax/libs/tus-js-client/3.0.0/tus.min.js";
+    script.onload = () => resolve(win.tus);
+    script.onerror = () => reject(new Error("Failed to load tus-js-client"));
+    document.body.appendChild(script);
+  });
+};
+
 interface Lecture {
   id: string;
   title: string;
@@ -127,8 +150,8 @@ export function AdminLecturesPanel() {
     }
   };
 
-  // Form submission with progress tracking
-  const handleSubmit = (e: React.FormEvent) => {
+  // Form submission with direct client-side TUS upload
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!formTitle.trim()) {
@@ -144,55 +167,140 @@ export function AdminLecturesPanel() {
     setUploading(true);
     setUploadProgress(0);
 
-    const formData = new FormData();
-    formData.append("title", formTitle);
-    formData.append("description", formDescription);
-    formData.append("programSlug", formProgramSlug);
-    formData.append("level", formLevel);
-    formData.append("order", formOrder);
-    if (formDuration) {
-      formData.append("duration", (parseFloat(formDuration) * 60).toString()); // Save as seconds
-    }
-    if (selectedFile) {
-      formData.append("file", selectedFile);
-    }
-    if (editingLecture) {
-      formData.append("lectureId", editingLecture.id);
-    }
+    try {
+      if (selectedFile) {
+        // 1. Call prepare endpoint to create video in Bunny and get signature
+        const prepRes = await fetch("/api/admin/lectures/prepare", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ title: formTitle }),
+        });
+        const prepJson = await prepRes.json();
 
-    // Use XMLHttpRequest for tracking progress
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", "/api/admin/lectures/upload");
+        if (!prepJson.success) {
+          setUploading(false);
+          toast.error(prepJson.error ?? "Failed to prepare upload");
+          return;
+        }
 
-    xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable) {
-        const percent = Math.round((event.loaded / event.total) * 100);
-        setUploadProgress(percent);
-      }
-    };
+        const { libraryId, videoId, signature, expirationTime } = prepJson.data;
 
-    xhr.onload = () => {
-      setUploading(false);
-      try {
-        const json = JSON.parse(xhr.responseText);
+        // 2. Load tus-js-client dynamically
+        let tus;
+        try {
+          tus = await loadTus();
+        } catch (err) {
+          setUploading(false);
+          const errMessage = err instanceof Error ? err.message : "Failed to load upload manager";
+          toast.error(errMessage);
+          return;
+        }
+
+        // 3. Start TUS upload direct to Bunny Stream
+        const upload = new (tus as {
+          Upload: new (
+            file: File,
+            options: {
+              endpoint: string;
+              retryDelays: number[];
+              headers: Record<string, string>;
+              metadata: Record<string, string>;
+              onError: (error: Error) => void;
+              onProgress: (bytesUploaded: number, bytesTotal: number) => void;
+              onSuccess: () => void;
+            }
+          ) => { start: () => void };
+        }).Upload(selectedFile, {
+          endpoint: "https://video.bunnycdn.com/tusupload",
+          retryDelays: [0, 3000, 5000, 10000, 20000],
+          headers: {
+            AuthorizationSignature: signature,
+            AuthorizationExpire: expirationTime.toString(),
+            LibraryId: libraryId,
+            VideoId: videoId,
+          },
+          metadata: {
+            filename: selectedFile.name,
+            filetype: selectedFile.type,
+          },
+          onError: (error: Error) => {
+            setUploading(false);
+            toast.error(`Upload error: ${error.message}`);
+          },
+          onProgress: (bytesUploaded: number, bytesTotal: number) => {
+            const percent = Math.round((bytesUploaded / bytesTotal) * 100);
+            setUploadProgress(percent);
+          },
+          onSuccess: async () => {
+            // 4. Finalize lecture save in database
+            try {
+              const res = await fetch("/api/admin/lectures/finalize", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  title: formTitle,
+                  description: formDescription,
+                  programSlug: formProgramSlug,
+                  level: formLevel,
+                  order: formOrder,
+                  duration: formDuration ? (parseFloat(formDuration) * 60).toString() : null,
+                  bunnyVideoId: videoId,
+                  lectureId: editingLecture?.id || null,
+                }),
+              });
+              const json = await res.json();
+              setUploading(false);
+              if (json.success) {
+                toast.success(editingLecture ? "Lecture updated successfully!" : "Lecture uploaded and created successfully!");
+                setIsModalOpen(false);
+                void loadLectures();
+              } else {
+                toast.error(json.error ?? "Failed to finalize lecture");
+              }
+            } catch {
+              setUploading(false);
+              toast.error("Failed to finalize lecture");
+            }
+          },
+        });
+        upload.start();
+      } else {
+        // Editing metadata only (no file to upload)
+        const res = await fetch("/api/admin/lectures/finalize", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title: formTitle,
+            description: formDescription,
+            programSlug: formProgramSlug,
+            level: formLevel,
+            order: formOrder,
+            duration: formDuration ? (parseFloat(formDuration) * 60).toString() : null,
+            bunnyVideoId: editingLecture?.bunnyVideoId || "",
+            lectureId: editingLecture?.id || null,
+          }),
+        });
+        const json = await res.json();
+        setUploading(false);
         if (json.success) {
-          toast.success(editingLecture ? "Lecture updated successfully!" : "Lecture uploaded and created successfully!");
+          toast.success("Lecture details updated successfully!");
           setIsModalOpen(false);
           void loadLectures();
         } else {
-          toast.error(json.error ?? "Upload failed");
+          toast.error(json.error ?? "Failed to update lecture");
         }
-      } catch {
-        toast.error("Response parsing failed");
       }
-    };
-
-    xhr.onerror = () => {
+    } catch (error) {
       setUploading(false);
-      toast.error("Network error during upload");
-    };
-
-    xhr.send(formData);
+      const errMessage = error instanceof Error ? error.message : "Failed to process upload request";
+      toast.error(errMessage);
+    }
   };
 
   // Filter lectures for active course
