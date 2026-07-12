@@ -83,6 +83,16 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
     });
   }, [students, search, courseFilter, selectedCourse, selectedModule, statusFilter, browseView]);
 
+  const exportHref = useMemo(() => {
+    const params = new URLSearchParams();
+    const course = selectedCourse ?? (courseFilter !== "all" ? courseFilter : null);
+    if (course) params.set("program", course);
+    if (selectedModule && selectedModule !== "all") params.set("module", selectedModule);
+    if (statusFilter === "active") params.set("active", "1");
+    const query = params.toString();
+    return `/api/admin/students/export${query ? `?${query}` : ""}`;
+  }, [selectedCourse, courseFilter, selectedModule, statusFilter]);
+
   const runAction = async (
     id: string,
     body: Record<string, string>
@@ -389,7 +399,7 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
           </select>
         </div>
         <Button asChild variant="secondary" className="gap-2 shrink-0">
-          <a href="/api/admin/students/export" download>
+          <a href={exportHref} download>
             <DownloadSimple size={18} weight="duotone" />
             Export CSV
           </a>
