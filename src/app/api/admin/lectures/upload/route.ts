@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireAdminWrite, isNextResponse } from "@/lib/auth/admin-access";
+import { getCurrentUser } from "@/lib/auth/session";
 import { createApiResponse } from "@/lib/api/enrollment";
 import { createBunnyVideo, uploadBunnyVideo, deleteBunnyVideo } from "@/lib/bunny";
 import { prisma } from "@/lib/prisma";
@@ -9,9 +9,9 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
-  const adminOrResponse = await requireAdminWrite(request);
-  if (isNextResponse(adminOrResponse)) {
-    return adminOrResponse;
+  const user = await getCurrentUser(request);
+  if (!user || (user.role !== "admin" && user.role !== "trainer")) {
+    return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), { status: 403 });
   }
 
   try {
