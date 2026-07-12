@@ -7,29 +7,7 @@ import { PortalPageHeader } from "@/components/portal/portal-ui";
 import { cn } from "@/lib/utils";
 import { toast } from "@/lib/ui/toast";
 import { programs } from "@/lib/data/programs";
-
-interface CustomWindow extends Window {
-  tus?: unknown;
-}
-
-const loadTus = (): Promise<unknown> => {
-  return new Promise((resolve, reject) => {
-    if (typeof window === "undefined") {
-      reject(new Error("Browser only"));
-      return;
-    }
-    const win = window as unknown as CustomWindow;
-    if (win.tus) {
-      resolve(win.tus);
-      return;
-    }
-    const script = document.createElement("script");
-    script.src = "https://cdnjs.cloudflare.com/ajax/libs/tus-js-client/3.0.0/tus.min.js";
-    script.onload = () => resolve(win.tus);
-    script.onerror = () => reject(new Error("Failed to load tus-js-client"));
-    document.body.appendChild(script);
-  });
-};
+import * as tus from "tus-js-client";
 
 interface Lecture {
   id: string;
@@ -187,32 +165,8 @@ export function AdminLecturesPanel() {
 
         const { libraryId, videoId, signature, expirationTime } = prepJson.data;
 
-        // 2. Load tus-js-client dynamically
-        let tus;
-        try {
-          tus = await loadTus();
-        } catch (err) {
-          setUploading(false);
-          const errMessage = err instanceof Error ? err.message : "Failed to load upload manager";
-          toast.error(errMessage);
-          return;
-        }
-
         // 3. Start TUS upload direct to Bunny Stream
-        const upload = new (tus as {
-          Upload: new (
-            file: File,
-            options: {
-              endpoint: string;
-              retryDelays: number[];
-              headers: Record<string, string>;
-              metadata: Record<string, string>;
-              onError: (error: Error) => void;
-              onProgress: (bytesUploaded: number, bytesTotal: number) => void;
-              onSuccess: () => void;
-            }
-          ) => { start: () => void };
-        }).Upload(selectedFile, {
+        const upload = new tus.Upload(selectedFile, {
           endpoint: "https://video.bunnycdn.com/tusupload",
           retryDelays: [0, 3000, 5000, 10000, 20000],
           headers: {
