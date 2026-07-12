@@ -348,11 +348,11 @@ export function AdminLecturesPanel() {
           {filteredLectures.map((lecture) => (
             <div
               key={lecture.id}
-              className="flex flex-col md:flex-row md:items-center justify-between p-5 rounded-2xl border border-border bg-background gap-5 hover:border-primary/45 hover:shadow-md transition-all duration-300 group"
+              className="flex flex-col md:flex-row md:items-center justify-between p-5 rounded-2xl border border-pt bg-gradient-to-br from-background to-surface/60 gap-5 hover:border-primary/30 hover:shadow-md transition-all duration-300 group"
             >
               <div className="flex gap-4 items-center flex-1 min-w-0">
-                {/* Premium Order Badge */}
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-muted text-pt font-extrabold text-sm border border-border group-hover:border-primary/20 group-hover:bg-primary/5 transition-all">
+                {/* Premium Order Badge matches admin theme */}
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary font-extrabold text-sm border border-primary/20 group-hover:scale-105 transition-all duration-300">
                   #{lecture.order}
                 </div>
                 <div className="flex-1 min-w-0 space-y-1.5">
@@ -379,7 +379,7 @@ export function AdminLecturesPanel() {
                       )}
                     </span>
                     <span>•</span>
-                    <span className="inline-flex items-center gap-1 font-mono text-[9px] bg-muted px-2 py-0.5 rounded text-pt-faint border border-border">
+                    <span className="inline-flex items-center gap-1 font-mono text-[9px] bg-surface/80 px-2 py-0.5 rounded text-pt-muted border border-pt">
                       GUID: {lecture.bunnyVideoId || "Pending"}
                     </span>
                   </div>
@@ -390,7 +390,7 @@ export function AdminLecturesPanel() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="rounded-xl border border-border bg-background hover:bg-muted text-pt-muted font-bold transition-all px-3"
+                  className="rounded-xl border border-pt bg-background hover:bg-surface text-pt-muted font-bold transition-all px-3"
                   onClick={() => openEditModal(lecture)}
                   disabled={uploading}
                 >

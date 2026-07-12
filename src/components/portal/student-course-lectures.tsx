@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Play, Clock, ArrowRight, X, FilmStrip, ArrowClockwise } from "@phosphor-icons/react";
+import { Check, Play, Clock, ArrowRight, X, FilmStrip, PlayCircle } from "@phosphor-icons/react";
 import { VideoPlayer } from "./video-player";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -141,7 +141,7 @@ export function StudentCourseLectures({
 
       {/* Resume Watching Banner */}
       {resumeLecture && !activeLecture && (
-        <div className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-r from-primary/10 via-primary/5 to-background p-6 shadow-md transition-all hover:border-primary/30">
+        <div className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-r from-primary/10 via-primary/5 to-background p-6 shadow-sm transition-all hover:border-primary/30">
           <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
           <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="space-y-2 flex-1">
@@ -154,9 +154,9 @@ export function StudentCourseLectures({
 
               {resumeLecture.duration && (
                 <div className="flex items-center gap-4 pt-3">
-                  <div className="w-56 h-2 rounded-full bg-muted overflow-hidden">
+                  <div className="w-56 h-2 rounded-full bg-[var(--pt-progress-track)] overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-primary to-primary-light"
+                      className="h-full bg-primary"
                       style={{
                         width: `${Math.min(
                           100,
@@ -170,7 +170,7 @@ export function StudentCourseLectures({
                   <span className="text-xs font-semibold text-pt-muted">
                     {formatProgressTime(progressMap[resumeLecture.id]?.watchedSeconds ?? 0)} /{" "}
                     {formatProgressTime(resumeLecture.duration)}
-                    <span className="text-primary ml-2">
+                    <span className="text-primary ml-2 font-bold">
                       ({Math.round(((progressMap[resumeLecture.id]?.watchedSeconds ?? 0) / resumeLecture.duration) * 100)}% watched)
                     </span>
                   </span>
@@ -186,15 +186,10 @@ export function StudentCourseLectures({
       )}
 
       {/* Lectures List */}
-      <div className="space-y-5">
-        <div className="flex items-center justify-between">
-          <h3 className="font-extrabold text-xl text-pt tracking-tight">Course Lectures</h3>
-          <span className="text-xs text-pt-muted font-medium bg-muted px-2.5 py-1 rounded-lg">
-            {lectures.length} lessons available
-          </span>
-        </div>
+      <div className="space-y-4">
+        <h3 className="font-bold text-lg text-pt tracking-tight">Course Lectures</h3>
 
-        <div className="grid gap-4">
+        <div className="grid gap-3">
           {lectures.map((lecture) => {
             const prog = progressMap[lecture.id];
             const isCompleted = prog?.completed ?? false;
@@ -206,94 +201,65 @@ export function StudentCourseLectures({
               <div
                 key={lecture.id}
                 onClick={() => handlePlay(lecture)}
-                className={cn(
-                  "group rounded-2xl p-5 border bg-background flex flex-col md:flex-row md:items-center justify-between gap-5 cursor-pointer hover:border-primary/45 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300",
-                  isCompleted ? "border-emerald-500/20 bg-emerald-500/[0.01]" : "border-border"
-                )}
+                className="group rounded-2xl border border-pt bg-gradient-to-br from-background to-surface/60 p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg hover:border-primary/30 cursor-pointer"
               >
-                <div className="flex gap-4 items-center flex-1">
-                  {/* Play/Complete Premium Icon Container */}
-                  <div
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0 space-y-1">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-primary flex items-center gap-1.5">
+                      <FilmStrip size={12} weight="bold" />
+                      Lecture {lecture.order} {lecture.level && `• ${lecture.level}`}
+                    </p>
+
+                    <p className="text-lg font-bold text-pt group-hover:text-primary transition-colors">
+                      {lecture.title}
+                    </p>
+
+                    {lecture.description && (
+                      <p className="text-xs text-pt-muted mt-1 leading-relaxed line-clamp-1">{lecture.description}</p>
+                    )}
+
+                    <div className="flex items-center gap-3 mt-3 text-xs text-pt-muted font-medium">
+                      <span className="flex items-center gap-1">
+                        <Clock size={14} />
+                        {formatDuration(lecture.duration)}
+                      </span>
+                      {hasStarted && !isCompleted && lecture.duration && (
+                        <>
+                          <span>•</span>
+                          <span className="text-primary font-bold">
+                            {percent}% watched
+                          </span>
+                        </>
+                      )}
+                    </div>
+
+                    {hasStarted && !isCompleted && lecture.duration && (
+                      <div className="w-full max-w-xs h-1 rounded-full bg-[var(--pt-progress-track)] mt-2.5 overflow-hidden">
+                        <div className="h-full bg-primary" style={{ width: `${percent}%` }} />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Play Action Squircle matches original page design */}
+                  <span
                     className={cn(
-                      "flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl font-extrabold text-lg transition-all duration-300 shadow-sm",
+                      "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl shadow-md transition-all duration-300",
                       isCompleted
-                        ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 group-hover:scale-105"
-                        : hasStarted
-                        ? "bg-primary/10 text-primary border border-primary/20 group-hover:scale-105"
-                        : "bg-muted text-muted-foreground group-hover:bg-primary/5 group-hover:text-primary group-hover:scale-105"
+                        ? "bg-emerald-500 text-white"
+                        : "bg-primary text-primary-foreground group-hover:scale-105"
                     )}
                   >
                     {isCompleted ? (
-                      <Check size={28} weight="bold" />
+                      <Check size={20} weight="bold" />
                     ) : (
-                      <Play size={24} weight="fill" className="ml-1 text-primary group-hover:scale-110 transition-transform" />
+                      <Play size={20} weight="fill" className="ml-0.5" />
                     )}
-                  </div>
-
-                  <div className="flex-1 min-w-0 space-y-1.5">
-                    <div className="flex items-center flex-wrap gap-2">
-                      <span className="inline-flex items-center gap-1 text-[9px] font-extrabold uppercase tracking-widest text-pt-faint">
-                        <FilmStrip size={11} />
-                        Lecture {lecture.order}
-                      </span>
-                      {lecture.level && (
-                        <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-muted text-pt-muted">
-                          {lecture.level}
-                        </span>
-                      )}
-                    </div>
-
-                    <h4
-                      className={cn(
-                        "font-bold text-lg text-pt leading-snug group-hover:text-primary transition-colors",
-                        isCompleted && "text-emerald-950/90 dark:text-emerald-50/90"
-                      )}
-                    >
-                      {lecture.title}
-                    </h4>
-
-                    {lecture.description && (
-                      <p className="text-sm text-pt-muted line-clamp-1 max-w-2xl">{lecture.description}</p>
-                    )}
-
-                    {/* Progress Bar & Stats */}
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 pt-1 text-xs text-pt-muted font-medium">
-                      <span className="flex items-center gap-1.5">
-                        <Clock size={15} />
-                        {formatDuration(lecture.duration)}
-                      </span>
-
-                      {hasStarted && !isCompleted && lecture.duration && (
-                        <div className="flex items-center gap-3 w-full sm:w-auto">
-                          <span className="hidden sm:inline text-pt-faint">•</span>
-                          <div className="w-24 h-1.5 rounded-full bg-muted overflow-hidden shrink-0">
-                            <div className="h-full bg-primary" style={{ width: `${percent}%` }} />
-                          </div>
-                          <span className="text-primary font-bold text-xs">
-                            {percent}% watched
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  </span>
                 </div>
 
-                <div className="self-end md:self-center shrink-0">
-                  {isCompleted ? (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-4 py-1.5 text-xs font-bold text-emerald-600 border border-emerald-500/20 shadow-sm animate-fade-in">
-                      <Check size={14} weight="bold" />
-                      Completed
-                    </span>
-                  ) : hasStarted ? (
-                    <Button variant="secondary" size="sm" className="bg-primary/10 text-primary hover:bg-primary/20 rounded-xl px-4 font-bold border border-primary/20">
-                      <ArrowClockwise size={14} className="mr-1.5" />
-                      Resume ({percent}%)
-                    </Button>
-                  ) : (
-                    <Button size="sm" className="rounded-xl px-4 font-bold">
-                      Start Lesson
-                    </Button>
-                  )}
+                <div className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
+                  {isCompleted ? "Watch again" : hasStarted ? `Resume lesson (${percent}%)` : "Start lesson"}
+                  <ArrowRight size={14} />
                 </div>
               </div>
             );
