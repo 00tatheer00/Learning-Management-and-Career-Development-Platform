@@ -15,6 +15,8 @@ import {
   fetchMergedByProgram,
   getStudentPortalProgramSlugs,
 } from "@/lib/student-portal/program-scope";
+import { prisma } from "@/lib/prisma";
+import { StudentCourseLectures } from "@/components/portal/student-course-lectures";
 
 const typeIcons = {
   video: PlayCircle,
@@ -31,6 +33,33 @@ export default async function StudentCoursePage() {
   const moduleContext = await getStudentModuleContentContext(user);
   const allMaterials = await fetchMergedByProgram(programSlugs, getMaterials);
   const materials = filterByStudentModule(allMaterials, moduleContext, (item) => item.level);
+
+  // Fetch secure Bunny Stream video lectures
+  const allLectures = await prisma.lecture.findMany({
+    where: {
+      programSlug: { in: programSlugs },
+    },
+    orderBy: {
+      order: "asc",
+    },
+  });
+  const lectures = filterByStudentModule(allLectures, moduleContext, (item) => item.level);
+
+  // Fetch watch progress for the current user
+  const progressList = await prisma.watchProgress.findMany({
+    where: {
+      userId: user.id,
+      lectureId: { in: lectures.map((l) => l.id) },
+    },
+  });
+
+  const progressMap: Record<string, { watchedSeconds: number; completed: boolean }> = {};
+  progressList.forEach((p) => {
+    progressMap[p.lectureId] = {
+      watchedSeconds: p.watchedSeconds,
+      completed: p.completed,
+    };
+  });
 
   return (
     <div className="space-y-8">
@@ -65,6 +94,10 @@ export default async function StudentCoursePage() {
           </PortalSurfaceCard>
         );
       })}
+
+      {lectures.length > 0 && (
+        <StudentCourseLectures lectures={lectures} initialProgress={progressMap} />
+      )}
 
       <div>
         <h2 className="text-lg font-bold text-pt mb-4">Lessons &amp; Materials</h2>
