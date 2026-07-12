@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { Plus, Trash, ArrowClockwise, FilmStrip, Pencil, CloudArrowUp, X } from "@phosphor-icons/react";
+import { Plus, Trash, ArrowClockwise, FilmStrip, Pencil, CloudArrowUp, X, Clock } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { PortalPageHeader } from "@/components/portal/portal-ui";
 import { cn } from "@/lib/utils";
@@ -125,6 +125,25 @@ export function AdminLecturesPanel() {
       }
     } catch {
       toast.error("Failed to delete lecture");
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setSelectedFile(file);
+    if (file) {
+      try {
+        const video = document.createElement("video");
+        video.preload = "metadata";
+        video.onloadedmetadata = () => {
+          const mins = (video.duration / 60).toFixed(1);
+          setFormDuration(mins);
+          URL.revokeObjectURL(video.src);
+        };
+        video.src = URL.createObjectURL(file);
+      } catch (err) {
+        console.error("Auto duration detection failed:", err);
+      }
     }
   };
 
@@ -325,47 +344,67 @@ export function AdminLecturesPanel() {
           </Button>
         </div>
       ) : (
-        <div className="grid gap-3">
+        <div className="grid gap-4">
           {filteredLectures.map((lecture) => (
             <div
               key={lecture.id}
-              className="flex flex-col sm:flex-row sm:items-center justify-between p-5 rounded-2xl border border-border bg-background gap-4 hover:border-primary/20 hover:shadow-sm transition-all"
+              className="flex flex-col md:flex-row md:items-center justify-between p-5 rounded-2xl border border-border bg-background gap-5 hover:border-primary/45 hover:shadow-md transition-all duration-300 group"
             >
-              <div className="flex gap-4 items-start">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary font-bold">
-                  {lecture.order}
+              <div className="flex gap-4 items-center flex-1 min-w-0">
+                {/* Premium Order Badge */}
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-muted text-pt font-extrabold text-sm border border-border group-hover:border-primary/20 group-hover:bg-primary/5 transition-all">
+                  #{lecture.order}
                 </div>
-                <div>
-                  <h4 className="font-bold text-base leading-snug">{lecture.title}</h4>
-                  {lecture.description && (
-                    <p className="text-sm text-muted-foreground mt-1 line-clamp-1">{lecture.description}</p>
-                  )}
-                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-xs text-muted-foreground">
+                <div className="flex-1 min-w-0 space-y-1.5">
+                  <div className="flex items-center flex-wrap gap-2">
+                    <h4 className="font-extrabold text-lg text-pt leading-snug group-hover:text-primary transition-colors">
+                      {lecture.title}
+                    </h4>
                     {lecture.level && (
-                      <span className="font-semibold px-2 py-0.5 rounded bg-muted text-primary text-[10px]">
+                      <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-primary/10 text-primary">
                         {lecture.level}
                       </span>
                     )}
-                    {lecture.duration ? (
-                      <span>{(lecture.duration / 60).toFixed(1)} mins</span>
-                    ) : (
-                      <span>No duration</span>
-                    )}
-                    <span>·</span>
-                    <span className="font-mono text-[10px] bg-muted px-1.5 py-0.5 rounded">
-                      ID: {lecture.bunnyVideoId || "Pending"}
+                  </div>
+                  {lecture.description && (
+                    <p className="text-sm text-pt-muted line-clamp-1 max-w-xl">{lecture.description}</p>
+                  )}
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 mt-2 text-xs text-pt-muted font-medium">
+                    <span className="flex items-center gap-1">
+                      <Clock size={14} />
+                      {lecture.duration ? (
+                        <span>{(lecture.duration / 60).toFixed(1)} mins</span>
+                      ) : (
+                        <span className="text-amber-500 font-semibold">No duration</span>
+                      )}
+                    </span>
+                    <span>•</span>
+                    <span className="inline-flex items-center gap-1 font-mono text-[9px] bg-muted px-2 py-0.5 rounded text-pt-faint border border-border">
+                      GUID: {lecture.bunnyVideoId || "Pending"}
                     </span>
                   </div>
                 </div>
               </div>
 
-              <div className="flex gap-2 self-end sm:self-center shrink-0">
-                <Button variant="outline" size="sm" onClick={() => openEditModal(lecture)} disabled={uploading}>
-                  <Pencil size={16} className="mr-1" />
+              <div className="flex gap-2 self-end md:self-center shrink-0">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rounded-xl border border-border bg-background hover:bg-muted text-pt-muted font-bold transition-all px-3"
+                  onClick={() => openEditModal(lecture)}
+                  disabled={uploading}
+                >
+                  <Pencil size={15} className="mr-1.5" />
                   Edit
                 </Button>
-                <Button variant="outline" size="sm" className="text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => handleDelete(lecture.id)} disabled={uploading}>
-                  <Trash size={16} className="mr-1" />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rounded-xl border border-red-200/50 bg-background hover:bg-red-500/10 text-red-500 font-bold transition-all px-3"
+                  onClick={() => handleDelete(lecture.id)}
+                  disabled={uploading}
+                >
+                  <Trash size={15} className="mr-1.5" />
                   Delete
                 </Button>
               </div>
@@ -504,7 +543,7 @@ export function AdminLecturesPanel() {
                   <input
                     type="file"
                     accept="video/*"
-                    onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                    onChange={handleFileChange}
                     className="absolute inset-0 opacity-0 cursor-pointer"
                     disabled={uploading}
                   />
