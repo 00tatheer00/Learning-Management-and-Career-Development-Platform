@@ -35,7 +35,6 @@ export default function TrainersPage() {
                 key={trainer.id}
                 trainer={trainer}
                 variant="detailed"
-                skillLimit={4}
               />
             ))}
           </div>

@@ -27,7 +27,7 @@ export function TrainersSection() {
               viewport={{ once: true }}
               transition={{ delay: index * 0.08 }}
             >
-              <TrainerCard trainer={trainer} skillLimit={3} />
+              <TrainerCard trainer={trainer} />
             </motion.div>
           ))}
         </div>
