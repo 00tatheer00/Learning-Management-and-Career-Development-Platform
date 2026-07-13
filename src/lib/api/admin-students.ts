@@ -131,59 +131,25 @@ export function buildStudentsCsv(rows: AdminStudentRow[]) {
   return `\uFEFF${headers.join(",")}\n${lines.join("\n")}`;
 }
 
+export function buildStudentsExportFilename(programSlug?: string) {
+  const stamp = new Date().toISOString().slice(0, 10);
+  if (programSlug === "web-development") return `eest-web-students-${stamp}.csv`;
+  if (programSlug === "app-development") return `eest-app-students-${stamp}.csv`;
+  return `eest-students-all-${stamp}.csv`;
+}
+
 export function filterAdminStudentRows(
   rows: AdminStudentRow[],
-  options?: { program?: string; module?: string; activeOnly?: boolean }
+  options?: { program?: string; activeOnly?: boolean }
 ): AdminStudentRow[] {
   let result = rows;
   if (options?.program && options.program !== "all") {
     result = result.filter((row) => row.programSlug === options.program);
   }
-  if (options?.module && options.module !== "all") {
-    result = result.filter((row) => row.module === options.module);
-  }
   if (options?.activeOnly) {
     result = result.filter((row) => row.isActive);
   }
   return result;
-}
-
-function moduleSlugForFilename(moduleName: string): string {
-  return moduleName
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-}
-
-export function buildStudentsExportFilename(
-  optionsOrSlug?: string | { programSlug?: string; moduleName?: string }
-) {
-  const stamp = new Date().toISOString().slice(0, 10);
-
-  if (typeof optionsOrSlug === "string") {
-    if (optionsOrSlug === "web-development") return `eest-web-students-${stamp}.csv`;
-    if (optionsOrSlug === "app-development") return `eest-app-students-${stamp}.csv`;
-    return `eest-students-all-${stamp}.csv`;
-  }
-
-  const options = optionsOrSlug;
-  if (options?.programSlug && options?.moduleName) {
-    const programPrefix =
-      options.programSlug === "web-development"
-        ? "web"
-        : options.programSlug === "app-development"
-          ? "app"
-          : options.programSlug;
-    return `eest-${programPrefix}-${moduleSlugForFilename(options.moduleName)}-students-${stamp}.csv`;
-  }
-  if (options?.programSlug === "web-development") return `eest-web-students-${stamp}.csv`;
-  if (options?.programSlug === "app-development") return `eest-app-students-${stamp}.csv`;
-  return `eest-students-all-${stamp}.csv`;
-}
-
-export function isValidModuleForProgram(programSlug: string, moduleName: string): boolean {
-  const program = getProgramBySlug(programSlug);
-  return (program?.modules ?? []).some((mod) => mod.name === moduleName);
 }
 
 export async function deleteAdminStudent(

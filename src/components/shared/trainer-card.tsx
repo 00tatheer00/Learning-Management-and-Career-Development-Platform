@@ -1,12 +1,29 @@
 import Image from "next/image";
+import Link from "next/link";
+import {
+  ArrowRight,
+  Code,
+  DeviceMobileCamera,
+  GraduationCap,
+  Star,
+  User,
+  UsersThree,
+} from "@phosphor-icons/react/dist/ssr";
 import { cn } from "@/lib/utils";
-import { getProgramAccent } from "@/lib/constants/program-accents";
+import {
+  getSkillIconStyle,
+  getTrainerExperienceLabel,
+  getTrainerExpertiseHighlight,
+  getTrainerHeadline,
+  getTrainerRoleBadge,
+  getTrainerShowcaseSkills,
+  getTrainerStudentsTrained,
+} from "@/lib/data/trainer-card-meta";
 import type { Trainer } from "@/types";
 
 interface TrainerCardProps {
   trainer: Trainer;
   variant?: "compact" | "detailed";
-  skillLimit?: number;
   className?: string;
 }
 
@@ -20,116 +37,139 @@ function getInitials(name: string) {
     .toUpperCase();
 }
 
-function getAccent(programSlug?: string) {
-  if (!programSlug) {
-    return {
-      gradient: "from-orange-500 via-orange-600 to-orange-900",
-      glow: "group-hover:shadow-primary/20",
-    };
+function getProgramIcon(programSlug?: string) {
+  if (programSlug === "app-development") {
+    return DeviceMobileCamera;
   }
-
-  const accent = getProgramAccent(programSlug);
-  return { gradient: accent.gradient, glow: accent.glow };
+  return Code;
 }
 
-function TrainerPortrait({ trainer }: { trainer: Trainer }) {
-  const accent = getAccent(trainer.programSlug);
-  const initials = getInitials(trainer.name);
+function TrainerStatPill({
+  icon: Icon,
+  label,
+}: {
+  icon: typeof GraduationCap;
+  label: string;
+}) {
+  return (
+    <div className="flex items-center gap-2 rounded-xl border border-white/80 bg-white/95 px-3 py-2 shadow-[0_8px_24px_-16px_rgba(15,23,42,0.35)] backdrop-blur-sm">
+      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+        <Icon size={14} weight="duotone" aria-hidden="true" />
+      </span>
+      <span className="text-[11px] font-semibold leading-tight text-foreground">{label}</span>
+    </div>
+  );
+}
+
+export function TrainerCard({ trainer, variant = "compact", className }: TrainerCardProps) {
+  const ProgramIcon = getProgramIcon(trainer.programSlug);
+  const showcaseSkills = getTrainerShowcaseSkills(trainer);
   const isLocalImage = trainer.image?.startsWith("/");
-
-  return (
-    <div className="relative aspect-[4/5] w-full overflow-hidden bg-surface">
-      {trainer.image ? (
-        <Image
-          src={trainer.image}
-          alt={trainer.name}
-          fill
-          unoptimized={isLocalImage}
-          className="object-cover"
-          style={{ objectPosition: trainer.imagePosition ?? "center top" }}
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-          priority={trainer.featured}
-        />
-      ) : (
-        <div
-          className={cn(
-            "absolute inset-0 flex items-center justify-center bg-gradient-to-br",
-            accent.gradient
-          )}
-        >
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.18),transparent_45%)]" />
-          <span className="relative text-5xl font-bold tracking-tight text-white/90 sm:text-6xl">
-            {initials}
-          </span>
-        </div>
-      )}
-
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
-
-      {trainer.experience && (
-        <div className="absolute left-4 top-4 z-10">
-          <span className="inline-flex items-center rounded-full border border-white/25 bg-black/35 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white backdrop-blur-md">
-            {trainer.experience}
-          </span>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function TrainerSkills({ skills }: { skills: string[] }) {
-  return (
-    <div className="flex flex-wrap gap-1.5">
-      {skills.map((skill) => (
-        <span
-          key={skill}
-          className="rounded-lg border border-border/60 bg-surface/80 px-2.5 py-1 text-[11px] font-semibold text-muted"
-        >
-          {skill}
-        </span>
-      ))}
-    </div>
-  );
-}
-
-export function TrainerCard({
-  trainer,
-  variant = "compact",
-  skillLimit = 3,
-  className,
-}: TrainerCardProps) {
-  const accent = getAccent(trainer.programSlug);
-  const skills = trainer.expertise.slice(0, skillLimit);
-  const hiddenSkillCount = Math.max(trainer.expertise.length - skills.length, 0);
+  const showBio = variant === "detailed" || trainer.bio.length < 180;
 
   return (
     <article
       className={cn(
-        "group relative transition-all duration-500 hover:-translate-y-2",
-        accent.glow,
+        "group flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-border/70 bg-background shadow-[0_18px_50px_-28px_rgba(15,23,42,0.45)] transition-all duration-500 hover:-translate-y-1 hover:border-primary/20 hover:shadow-[0_28px_60px_-24px_rgba(234,88,12,0.22)]",
         className
       )}
     >
-      <div className="overflow-hidden rounded-[1.75rem] border border-border/70 bg-background shadow-[0_12px_40px_-18px_rgba(15,23,42,0.35)] transition-all duration-500 group-hover:border-primary/25 group-hover:shadow-[0_28px_60px_-24px_rgba(234,88,12,0.28)]">
-        <TrainerPortrait trainer={trainer} />
+      <div className="relative min-h-[300px] overflow-hidden bg-[#FFF4EC] sm:min-h-[320px]">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-70"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle, rgba(148,163,184,0.35) 1px, transparent 1px)",
+            backgroundSize: "14px 14px",
+            maskImage: "linear-gradient(90deg, black 0%, transparent 42%)",
+          }}
+        />
 
-        <div className="space-y-4 border-t border-border/60 bg-background p-4 sm:p-5">
-          <div>
-            <div className="mb-2 h-1 w-10 rounded-full bg-primary" />
-            <h3 className="text-lg font-bold tracking-tight sm:text-xl">{trainer.name}</h3>
-            <p className="mt-1 text-sm font-semibold text-primary">{trainer.designation}</p>
-          </div>
+        <div className="absolute left-5 top-5 z-20">
+          <span className="inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-[10px] font-bold uppercase tracking-[0.14em] text-primary-foreground shadow-sm">
+            <ProgramIcon size={14} weight="bold" aria-hidden="true" />
+            {getTrainerRoleBadge(trainer)}
+          </span>
+        </div>
 
-          {variant === "detailed" && (
-            <p className="text-sm leading-relaxed text-muted">{trainer.bio}</p>
+        <div className="absolute right-4 top-16 z-20 flex max-w-[170px] flex-col gap-2 sm:right-5 sm:top-20">
+          <TrainerStatPill
+            icon={GraduationCap}
+            label={getTrainerExperienceLabel(trainer)}
+          />
+          <TrainerStatPill icon={UsersThree} label={getTrainerStudentsTrained(trainer)} />
+          <TrainerStatPill icon={Star} label={getTrainerExpertiseHighlight(trainer)} />
+        </div>
+
+        <div className="absolute bottom-0 left-1/2 z-10 h-[220px] w-[220px] -translate-x-1/2 translate-y-8 rounded-full bg-primary sm:h-[250px] sm:w-[250px] sm:translate-y-10" />
+
+        <div className="absolute inset-x-0 bottom-0 z-20 flex justify-center px-6">
+          {trainer.image ? (
+            <div className="relative h-[250px] w-full max-w-[280px] sm:h-[270px]">
+              <Image
+                src={trainer.image}
+                alt={trainer.name}
+                fill
+                unoptimized={isLocalImage}
+                className="object-contain object-bottom drop-shadow-[0_18px_28px_rgba(15,23,42,0.18)]"
+                style={{ objectPosition: trainer.imagePosition ?? "center bottom" }}
+                sizes="(max-width: 640px) 90vw, 320px"
+                priority={trainer.featured}
+              />
+            </div>
+          ) : (
+            <div className="relative z-20 flex h-[250px] w-full max-w-[280px] items-end justify-center pb-4">
+              <div className="flex h-36 w-36 items-center justify-center rounded-full bg-gradient-to-br from-slate-800 to-slate-950 text-4xl font-bold text-white shadow-xl">
+                {getInitials(trainer.name)}
+              </div>
+            </div>
           )}
+        </div>
+      </div>
 
-          <div className="space-y-2">
-            <TrainerSkills skills={skills} />
-            {hiddenSkillCount > 0 && (
-              <p className="text-[11px] font-medium text-muted">+{hiddenSkillCount} more skills</p>
-            )}
+      <div className="flex flex-1 flex-col px-5 pb-5 pt-6 sm:px-6 sm:pb-6">
+        <h3 className="text-2xl font-bold tracking-tight text-foreground sm:text-[1.7rem]">
+          {trainer.name}
+        </h3>
+        <p className="mt-1 text-sm font-bold uppercase tracking-[0.16em] text-primary">
+          {getTrainerHeadline(trainer)}
+        </p>
+
+        {showBio && (
+          <p className="mt-4 text-sm leading-relaxed text-muted">{trainer.bio}</p>
+        )}
+
+        <div className="mt-5 inline-flex w-full flex-wrap items-center gap-2 rounded-full border border-border/70 bg-white px-3 py-2 shadow-sm">
+          {showcaseSkills.map((skill) => {
+            const style = getSkillIconStyle(skill);
+            return (
+              <span
+                key={skill}
+                title={skill}
+                className={cn(
+                  "inline-flex h-9 min-w-9 items-center justify-center rounded-full px-2 text-[10px] font-bold",
+                  style.bg,
+                  style.text
+                )}
+              >
+                {style.label}
+              </span>
+            );
+          })}
+        </div>
+
+        <div className="mt-auto flex items-center justify-between gap-3 border-t border-border/60 pt-5">
+          <div className="flex min-w-0 items-center gap-2 text-sm text-muted">
+            <User size={16} weight="duotone" className="shrink-0 text-primary" aria-hidden="true" />
+            <span className="truncate">{trainer.designation}</span>
           </div>
+          <Link
+            href={`/trainers#${trainer.id}`}
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-primary px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+          >
+            View Profile
+            <ArrowRight size={14} weight="bold" aria-hidden="true" />
+          </Link>
         </div>
       </div>
     </article>

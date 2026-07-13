@@ -6,7 +6,6 @@ import {
 } from "@/lib/notifications/approval-templates";
 import { sendApprovalWhatsApp } from "@/lib/notifications/whatsapp";
 import { prisma } from "@/lib/prisma";
-import { getPortalLoginUrl } from "@/lib/site-url";
 
 export async function resendEnrollmentApprovalWhatsApp(enrollmentId: string): Promise<{
   success: boolean;
@@ -27,7 +26,6 @@ export async function resendEnrollmentApprovalWhatsApp(enrollmentId: string): Pr
     firstName,
     courseName,
     module: enrollment.level,
-    portalLoginUrl: getPortalLoginUrl(),
   };
 
   const result = await sendApprovalWhatsApp(enrollment.whatsapp, {

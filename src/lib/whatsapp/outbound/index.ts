@@ -117,7 +117,6 @@ export async function sendWhatsAppApprovalTemplateOutbound(input: {
     firstName: input.params.firstName,
     courseName: input.params.courseName,
     module: input.params.module,
-    portalLoginUrl: input.params.portalLoginUrl,
   });
 
   if (!result.sent) return result;

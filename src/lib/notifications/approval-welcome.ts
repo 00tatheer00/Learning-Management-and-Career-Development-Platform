@@ -29,7 +29,6 @@ export async function sendApprovalWelcomeNotifications(
     firstName,
     courseName,
     module: enrollment.level,
-    portalLoginUrl: loginUrl,
   };
 
   const emailResult = await sendApprovalEmail({
