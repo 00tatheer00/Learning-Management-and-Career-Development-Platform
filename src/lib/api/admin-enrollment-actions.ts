@@ -142,12 +142,29 @@ export async function approveEnrollmentAndCreateAccount(
   const emailError = notifications.emailSent
     ? null
     : (notifications.warnings.find((w) => w.toLowerCase().includes("email")) ??
+        notifications.warnings[0] ??
         "Approval email not sent");
+
+  const whatsappWarning = notifications.warnings.find((w) =>
+    w.toLowerCase().includes("whatsapp") ||
+    w.toLowerCase().includes("template") ||
+    w.toLowerCase().includes("token") ||
+    w.toLowerCase().includes("meta") ||
+    w.toLowerCase().includes("graph")
+  ) ?? notifications.warnings.find((w) => !w.toLowerCase().includes("email"));
 
   const whatsappError = notifications.whatsappSent
     ? null
-    : (notifications.warnings.find((w) => w.toLowerCase().includes("whatsapp")) ??
-        "WhatsApp info message not sent");
+    : (whatsappWarning ?? "WhatsApp info message not sent");
+
+  if (!notifications.whatsappSent) {
+    console.error(
+      "[approval] WhatsApp send failed for enrollment",
+      enrollmentId,
+      "| warnings:",
+      notifications.warnings
+    );
+  }
 
   await prisma.enrollment.update({
     where: { id: enrollmentId },

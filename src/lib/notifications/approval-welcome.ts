@@ -51,10 +51,11 @@ export async function sendApprovalWelcomeNotifications(
   });
 
   if (!whatsappResult.sent) {
-    warnings.push(
+    const errMsg =
       whatsappResult.error ??
-        "Approval WhatsApp template not sent — create eest_registration_approved in Meta first."
-    );
+      "Approval WhatsApp template not sent — create eest_registration_approved in Meta first.";
+    console.error("[approval-welcome] WhatsApp template send failed:", errMsg);
+    warnings.push(errMsg);
   }
 
   return {
