@@ -124,9 +124,12 @@ export async function approveEnrollmentAndCreateAccount(
   });
   const passwordSaved = passwordIssue.ok;
   if (!passwordSaved) {
-    console.warn(
-      "Approval succeeded but portal password was not verified:",
-      passwordIssue.error ?? "unknown error"
+    console.error(
+      "[approval] CRITICAL: Portal password was NOT saved correctly for enrollment",
+      enrollmentId,
+      "student:", student.id, student.email,
+      "error:", passwordIssue.error ?? "unknown",
+      "— Student will NOT be able to log in. Go to Admin → Portal Logins → find student → Repair Logins."
     );
   }
 

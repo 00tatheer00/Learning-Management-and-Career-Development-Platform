@@ -28,8 +28,13 @@ async function findUserByEmail(email: string) {
 
 async function getApprovedEnrollmentsForEmail(email: string) {
   const normalized = normalizeEmail(email);
-  const enrollments = await prisma.enrollment.findMany({
-    where: { status: "approved" },
+  // IMPORTANT: filter by email in the DB — do NOT fetch all rows and filter in JS.
+  // A full table scan here caused Vercel login timeouts for students.
+  return prisma.enrollment.findMany({
+    where: {
+      email: normalized,
+      status: "approved",
+    },
     select: {
       id: true,
       email: true,
@@ -40,8 +45,6 @@ async function getApprovedEnrollmentsForEmail(email: string) {
       createdAt: true,
     },
   });
-
-  return enrollments.filter((entry) => normalizeEmail(entry.email) === normalized);
 }
 
 export async function issueEnrollmentLoginPassword(input: {
@@ -110,23 +113,77 @@ export async function verifyStudentLoginPassword(
 ): Promise<boolean> {
   const normalizedEmail = normalizeEmail(email);
   const normalizedPassword = password.trim();
-  if (!normalizedPassword) return false;
+  if (!normalizedPassword) {
+    console.error("[login] Student login rejected: empty password for", normalizedEmail);
+    return false;
+  }
 
   const user = await findUserByEmail(normalizedEmail);
-  if (!user || user.role !== "student" || !user.isActive) return false;
+  if (!user) {
+    console.error("[login] Student login rejected: no user found for", normalizedEmail);
+    return false;
+  }
+  if (user.role !== "student") {
+    console.error("[login] Student login rejected: user is not a student:", normalizedEmail, "role:", user.role);
+    return false;
+  }
+  if (!user.isActive) {
+    console.error("[login] Student login rejected: account inactive for", normalizedEmail);
+    return false;
+  }
 
-  if (await verifyPassword(normalizedPassword, user.passwordHash)) {
+  // Primary check: bcrypt/scrypt hash on the User record
+  const hashMatch = await verifyPassword(normalizedPassword, user.passwordHash);
+  if (hashMatch) {
     return true;
   }
 
+  console.warn(
+    "[login] Primary hash mismatch for", normalizedEmail,
+    "— trying vault fallback (portalPasswordEnc)"
+  );
+
+  // Fallback: check each approved enrollment's encrypted vault password
   const enrollments = await getApprovedEnrollmentsForEmail(normalizedEmail);
+  if (enrollments.length === 0) {
+    console.error(
+      "[login] Vault fallback: no approved enrollments found for", normalizedEmail,
+      "— student has no approved registration"
+    );
+    return false;
+  }
+
   for (const enrollment of enrollments) {
+    if (!enrollment.portalPasswordEnc) {
+      console.warn(
+        "[login] Vault fallback: enrollment", enrollment.id,
+        "has no portalPasswordEnc — password was never saved to vault"
+      );
+      continue;
+    }
     const stored = decryptPortalPassword(enrollment.portalPasswordEnc);
-    if (stored && safeStringEqual(stored, normalizedPassword)) {
+    if (!stored) {
+      console.warn(
+        "[login] Vault fallback: could not decrypt portalPasswordEnc for enrollment",
+        enrollment.id,
+        "— possible key mismatch (check PORTAL_PASSWORD_SECRET on Vercel)"
+      );
+      continue;
+    }
+    if (safeStringEqual(stored, normalizedPassword)) {
+      console.warn(
+        "[login] Vault fallback succeeded for", normalizedEmail,
+        "— User.passwordHash is stale, call syncLoginHashes from admin Portal Logins to fix permanently"
+      );
       return true;
     }
   }
 
+  console.error(
+    "[login] All checks failed for", normalizedEmail,
+    "— hash mismatch AND vault mismatch for", enrollments.length, "enrollment(s).",
+    "Run 'Repair Logins' from admin Portal Logins panel."
+  );
   return false;
 }
 
