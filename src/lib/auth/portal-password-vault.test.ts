@@ -47,7 +47,7 @@ describe("portal-password-vault", () => {
 
   it("encrypts in production using AUTH_SECRET when PORTAL_PASSWORD_SECRET is missing", async () => {
     const previousNodeEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = "production";
+    Object.defineProperty(process.env, "NODE_ENV", { value: "production", writable: true, configurable: true });
     delete process.env.PORTAL_PASSWORD_SECRET;
     process.env.AUTH_SECRET = "auth-secret-for-tests";
 
@@ -58,7 +58,7 @@ describe("portal-password-vault", () => {
     const stored = encryptPortalPassword("PortalPass99");
     expect(decryptPortalPassword(stored)).toBe("PortalPass99");
 
-    process.env.NODE_ENV = previousNodeEnv;
+    Object.defineProperty(process.env, "NODE_ENV", { value: previousNodeEnv, writable: true, configurable: true });
   });
 
   it("round-trips encrypt and decrypt with the active secret", async () => {

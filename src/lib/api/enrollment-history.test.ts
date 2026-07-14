@@ -38,11 +38,11 @@ describe("mapApplicationSummaries", () => {
 
   it("omits payment screenshots from public summaries by default", () => {
     const summaries = mapApplicationSummaries(records);
-    expect(summaries[0]?.paymentScreenshot).toBeUndefined();
+    expect((summaries[0] as any)?.paymentScreenshot).toBeUndefined();
   });
 
   it("includes payment screenshots only when explicitly allowed", () => {
     const summaries = mapApplicationSummaries(records, { includePaymentScreenshots: true });
-    expect(summaries[0]?.paymentScreenshot).toContain("cloudinary.com");
+    expect((summaries[0] as any)?.paymentScreenshot).toContain("cloudinary.com");
   });
 });

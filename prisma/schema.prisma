@@ -208,6 +208,38 @@ model ClassRecording {
   @@unique([programSlug, classNumber])
 }
 
+model Lecture {
+  id           String   @id @map("_id")
+  programSlug  String
+  level        String?
+  title        String
+  description  String   @default("")
+  order        Int
+  bunnyVideoId String?
+  duration     Float    @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  watchProgress WatchProgress[]
+
+  @@index([programSlug, order])
+}
+
+model WatchProgress {
+  id             String   @id @map("_id")
+  userId         String
+  lectureId      String
+  watchedSeconds Float    @default(0)
+  completed      Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  lecture Lecture @relation(fields: [lectureId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lectureId])
+  @@index([userId])
+}
+
 // ─── WhatsApp Cloud API CRM ───────────────────────────────────────────────────
 
 enum WhatsAppMessageDirection {

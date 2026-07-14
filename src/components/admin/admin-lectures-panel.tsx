@@ -7,6 +7,7 @@ import { PortalPageHeader } from "@/components/portal/portal-ui";
 import { cn } from "@/lib/utils";
 import { toast } from "@/lib/ui/toast";
 import { programs } from "@/lib/data/programs";
+import * as tus from "tus-js-client";
 
 interface Lecture {
   id: string;
