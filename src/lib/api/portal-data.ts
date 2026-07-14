@@ -24,6 +24,7 @@ import type {
 import type { EnrollmentPayload } from "@/types";
 
 function stripSessionPassword(session: LiveSession): LiveSessionPublic {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { roomPassword: _roomPassword, ...publicSession } = session;
   return publicSession;
 }

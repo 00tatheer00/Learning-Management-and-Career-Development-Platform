@@ -13,6 +13,7 @@ export interface NewRegistrationAlertInput {
 }
 
 /** Admin registration WhatsApp alerts disabled. */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function sendAdminNewRegistrationAlert(
   _input: NewRegistrationAlertInput
 ): Promise<{ whatsappSent: boolean; warnings: string[] }> {

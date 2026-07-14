@@ -57,6 +57,7 @@ export async function createUserWithPasswordHash(
 
 export async function updateUser(id: string, updates: Partial<User>): Promise<User | null> {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { passwordHash: _ph, createdAt: _ca, id: _id, ...safe } = updates;
     const user = await prisma.user.update({
       where: { id },
