@@ -5,6 +5,7 @@ import {
   getStudentPortalPasswordForWhatsApp,
 } from "@/lib/api/admin-portal-password";
 import { getPortalLoginUrl } from "@/lib/site-url";
+import { prisma } from "@/lib/prisma";
 
 export async function sendStudentLoginEmail(input: {
   fullName: string;
@@ -53,12 +54,27 @@ export async function resendEnrollmentLoginEmail(enrollmentId: string): Promise<
   });
 
   if (!result.sent) {
+    await prisma.enrollment.update({
+      where: { id: enrollmentId },
+      data: {
+        approvalEmailSent: false,
+        approvalEmailError: result.error ?? "Email was not sent",
+      },
+    });
     return {
       success: false,
       message: "",
       error: result.error ?? "Email was not sent",
     };
   }
+
+  await prisma.enrollment.update({
+    where: { id: enrollmentId },
+    data: {
+      approvalEmailSent: true,
+      approvalEmailError: null,
+    },
+  });
 
   return {
     success: true,
@@ -91,12 +107,27 @@ export async function resendStudentLoginEmail(studentId: string): Promise<{
   });
 
   if (!result.sent) {
+    await prisma.enrollment.updateMany({
+      where: { email: student.email, status: "approved" },
+      data: {
+        approvalEmailSent: false,
+        approvalEmailError: result.error ?? "Email was not sent",
+      },
+    });
     return {
       success: false,
       message: "",
       error: result.error ?? "Email was not sent",
     };
   }
+
+  await prisma.enrollment.updateMany({
+    where: { email: student.email, status: "approved" },
+    data: {
+      approvalEmailSent: true,
+      approvalEmailError: null,
+    },
+  });
 
   return {
     success: true,
