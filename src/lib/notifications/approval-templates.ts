@@ -125,6 +125,7 @@ export interface ApprovalTemplateParams {
   firstName: string;
   courseName: string;
   module: string;
+  portalLoginUrl: string;
 }
 
 export interface RejectionTemplateParams {
@@ -137,18 +138,19 @@ export function buildApprovalTemplatePreview({
   firstName,
   courseName,
   module,
+  portalLoginUrl,
 }: ApprovalTemplateParams): string {
   return [
-    `Hello ${firstName},`,
+    `[Approved] Hello ${firstName},`,
     "",
     "Congratulations! Your registration at Emerging Edge School of Technology has been approved.",
     "",
     `Course: ${courseName}`,
     `Module: ${module}`,
     "",
-    "Your student portal login details have been sent to your registered email. Please check your inbox and spam folder, then log in to the portal.",
+    "Login details sent to your registered email — check inbox and spam, then log in:",
+    portalLoginUrl,
     "",
-    "Welcome to your batch!",
     "EEST Team",
   ].join("\n");
 }

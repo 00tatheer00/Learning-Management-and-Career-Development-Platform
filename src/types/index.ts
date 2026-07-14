@@ -35,14 +35,6 @@ export interface Trainer {
   imagePosition?: string;
   programSlug?: string;
   featured?: boolean;
-  /** Large orange headline under name (e.g. SOFTWARE DEVELOPER) */
-  headlineTitle?: string;
-  /** Right stat pill (e.g. Expert in MERN Stack) */
-  expertiseHighlight?: string;
-  /** Middle stat pill */
-  studentsTrained?: string;
-  /** Tech icons row on card */
-  showcaseSkills?: string[];
   social: {
     linkedin?: string;
     twitter?: string;

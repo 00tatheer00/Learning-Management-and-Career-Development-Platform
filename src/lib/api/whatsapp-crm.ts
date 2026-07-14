@@ -32,7 +32,6 @@ export interface WhatsAppMessageRow {
   direction: "inbound" | "outbound";
   type: string;
   body: string | null;
-  mediaId: string | null;
   status: string;
   statusError: string | null;
   purpose: string | null;
@@ -160,7 +159,6 @@ export async function getWhatsAppConversationMessages(
       direction: row.direction,
       type: row.type,
       body: row.body,
-      mediaId: row.mediaId,
       status: row.status,
       statusError: row.statusError,
       purpose: row.purpose,

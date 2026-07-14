@@ -143,7 +143,7 @@ export default async function ProgramDetailPage({ params }: ProgramPageProps) {
               </div>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {trainers.map((trainer) => (
-                  <TrainerCard key={trainer.id} trainer={trainer} />
+                  <TrainerCard key={trainer.id} trainer={trainer} skillLimit={4} />
                 ))}
               </div>
             </div>

@@ -29,6 +29,7 @@ export async function sendApprovalWelcomeNotifications(
     firstName,
     courseName,
     module: enrollment.level,
+    portalLoginUrl: loginUrl,
   };
 
   const emailResult = await sendApprovalEmail({
@@ -51,11 +52,10 @@ export async function sendApprovalWelcomeNotifications(
   });
 
   if (!whatsappResult.sent) {
-    const errMsg =
+    warnings.push(
       whatsappResult.error ??
-      "Approval WhatsApp template not sent — create eest_registration_approved in Meta first.";
-    console.error("[approval-welcome] WhatsApp template send failed:", errMsg);
-    warnings.push(errMsg);
+        "Approval WhatsApp template not sent — create eest_registration_approved in Meta first."
+    );
   }
 
   return {

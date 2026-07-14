@@ -34,7 +34,9 @@ Congratulations! Your registration at Emerging Edge School of Technology has bee
 Course: {{2}}
 Module: {{3}}
 
-Your student portal login details have been sent to your registered email. Please check your inbox and spam folder, then log in to the portal.
+Your student portal login details have been sent to your registered email. Please check your inbox and spam folder, then log in to the portal:
+
+{{4}}
 
 Welcome to your batch!
 EEST Team`,
@@ -124,6 +126,7 @@ export async function sendCloudRegistrationApprovedTemplate(input: {
   firstName: string;
   courseName: string;
   module: string;
+  portalLoginUrl: string;
 }): Promise<{ sent: boolean; wamid?: string; error?: string }> {
   return sendCloudTemplateMessage({
     to: input.to,
@@ -132,6 +135,7 @@ export async function sendCloudRegistrationApprovedTemplate(input: {
       input.firstName,
       input.courseName,
       input.module,
+      input.portalLoginUrl,
     ],
   });
 }

@@ -19,6 +19,9 @@ import {
   resendEnrollmentLoginEmail,
   resendStudentLoginEmail,
 } from "@/lib/notifications/student-login-email";
+import { resetAllStudentPasswords } from "@/lib/api/admin-credentials-reset-all";
+import { emailAllStudentLogins } from "@/lib/api/admin-credentials-email-all";
+import { fixStudentEmails } from "@/lib/api/fix-student-emails";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -129,6 +132,15 @@ const postSchema = z.discriminatedUnion("action", [
     studentIds: z.array(z.string()).optional(),
     neverLoggedInOnly: z.boolean().optional(),
   }),
+  z.object({
+    action: z.literal("resetAllPasswords"),
+  }),
+  z.object({
+    action: z.literal("emailAllLogins"),
+  }),
+  z.object({
+    action: z.literal("fixEmails"),
+  }),
 ]);
 
 export async function POST(request: Request) {
@@ -236,6 +248,54 @@ export async function POST(request: Request) {
         data: result,
         message:
           result.errors.length > 0 ? `${message} ${result.errors.length} warning(s).` : message,
+      })
+    );
+  }
+
+  if (parsed.data.action === "resetAllPasswords") {
+    const result = await resetAllStudentPasswords();
+    const message =
+      result.reset > 0
+        ? `Reset passwords for ${result.reset} of ${result.total} student(s).`
+        : "No students to reset.";
+
+    return NextResponse.json(
+      createApiResponse(true, {
+        data: result,
+        message:
+          result.errors.length > 0 ? `${message} ${result.errors.length} error(s).` : message,
+      })
+    );
+  }
+
+  if (parsed.data.action === "emailAllLogins") {
+    const result = await emailAllStudentLogins();
+    const parts: string[] = [];
+    if (result.sent > 0) parts.push(`${result.sent} email(s) sent`);
+    if (result.failed > 0) parts.push(`${result.failed} failed`);
+    if (result.skippedNoPassword > 0) parts.push(`${result.skippedNoPassword} skipped (no password)`);
+    const message = parts.length > 0 ? parts.join(", ") + "." : "No students to email.";
+
+    return NextResponse.json(
+      createApiResponse(true, {
+        data: result,
+        message,
+      })
+    );
+  }
+
+  if (parsed.data.action === "fixEmails") {
+    const result = await fixStudentEmails();
+    const message =
+      result.fixed > 0
+        ? `Fixed ${result.fixed} email(s): ${result.fixes.map((f) => `${f.oldEmail} → ${f.newEmail}`).join(", ")}`
+        : "All emails look correct. No fixes needed.";
+
+    return NextResponse.json(
+      createApiResponse(true, {
+        data: result,
+        message:
+          result.errors.length > 0 ? `${message} ${result.errors.length} error(s).` : message,
       })
     );
   }

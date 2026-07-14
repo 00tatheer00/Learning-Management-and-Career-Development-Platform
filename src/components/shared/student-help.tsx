@@ -12,11 +12,7 @@ interface HelpWhatsAppProps {
 
 export function HelpWhatsApp({ className }: HelpWhatsAppProps) {
   const pathname = usePathname();
-  const isAdminOrTrainer = pathname?.startsWith("/admin") || pathname?.startsWith("/trainer");
   const isStudentPortal = pathname?.startsWith("/student");
-
-  // Hide the floating help button on admin and trainer portals
-  if (isAdminOrTrainer) return null;
 
   return (
     <a

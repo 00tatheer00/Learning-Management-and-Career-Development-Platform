@@ -30,38 +30,20 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         try {
           const parsed = credentialsSchema.safeParse(credentials);
-          if (!parsed.success) {
-            console.error("[auth] Login rejected: invalid credentials format");
-            return null;
-          }
+          if (!parsed.success) return null;
 
-          const email = parsed.data.email.toLowerCase();
           const user = await prisma.user.findUnique({
-            where: { email },
+            where: { email: parsed.data.email.toLowerCase() },
           });
 
-          if (!user) {
-            console.error("[auth] Login rejected: no account found for", email);
-            return null;
-          }
-          if (!user.isActive) {
-            console.error("[auth] Login rejected: account inactive for", email);
-            return null;
-          }
+          if (!user || !user.isActive) return null;
 
           const password = parsed.data.password.trim();
           const valid =
             user.role === "student"
               ? await verifyStudentLoginPassword(parsed.data.email, password)
               : await verifyPassword(password, user.passwordHash);
-
-          if (!valid) {
-            // verifyStudentLoginPassword already logs details for students
-            if (user.role !== "student") {
-              console.error("[auth] Login rejected: wrong password for", email, "(role:", user.role + ")");
-            }
-            return null;
-          }
+          if (!valid) return null;
 
           return {
             id: user.id,
@@ -70,7 +52,7 @@ export const authOptions: NextAuthOptions = {
             role: user.role,
           };
         } catch (error) {
-          console.error("[auth] Login authorize exception:", error);
+          console.error("Login authorize error:", error);
           return null;
         }
       },

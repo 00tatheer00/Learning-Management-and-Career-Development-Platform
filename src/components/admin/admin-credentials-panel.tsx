@@ -11,6 +11,8 @@ import {
   ChatsCircle,
   EnvelopeSimple,
   PencilSimple,
+  Warning,
+  Wrench,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -65,6 +67,11 @@ export function AdminCredentialsPanel() {
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [bulkGenerating, setBulkGenerating] = useState(false);
   const [syncingLogins, setSyncingLogins] = useState(false);
+  const [resettingAll, setResettingAll] = useState(false);
+  const [emailingAll, setEmailingAll] = useState(false);
+  const [fixingEmails, setFixingEmails] = useState(false);
+  const [confirmResetAll, setConfirmResetAll] = useState(false);
+  const [confirmEmailAll, setConfirmEmailAll] = useState(false);
   const [credentialModal, setCredentialModal] = useState<{
     name: string;
     loginId: string;
@@ -282,6 +289,76 @@ export function AdminCredentialsPanel() {
     setEditPhone(row.whatsapp === "—" ? "" : row.whatsapp);
   };
 
+  const handleResetAllPasswords = async () => {
+    setConfirmResetAll(false);
+    setResettingAll(true);
+    try {
+      const res = await fetch("/api/admin/credentials", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "resetAllPasswords" }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        toast.success(json.message ?? "All passwords reset.");
+        await load();
+      } else {
+        toast.error(json.error ?? json.message ?? "Reset all failed");
+      }
+    } catch {
+      toast.error("Reset all failed");
+    } finally {
+      setResettingAll(false);
+    }
+  };
+
+  const handleEmailAllLogins = async () => {
+    setConfirmEmailAll(false);
+    setEmailingAll(true);
+    try {
+      const res = await fetch("/api/admin/credentials", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "emailAllLogins" }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        toast.success(json.message ?? "Emails sent.");
+      } else {
+        toast.error(json.error ?? json.message ?? "Email all failed");
+      }
+    } catch {
+      toast.error("Email all failed");
+    } finally {
+      setEmailingAll(false);
+    }
+  };
+
+  const handleFixEmails = async () => {
+    setFixingEmails(true);
+    try {
+      const res = await fetch("/api/admin/credentials", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "fixEmails" }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        toast.success(json.message ?? "Emails fixed.");
+        await load();
+      } else {
+        toast.error(json.error ?? json.message ?? "Fix emails failed");
+      }
+    } catch {
+      toast.error("Fix emails failed");
+    } finally {
+      setFixingEmails(false);
+    }
+  };
+
   const saveEditLogin = async () => {
     if (!editRow) return;
     const email = editEmail.trim();
@@ -452,6 +529,42 @@ export function AdminCredentialsPanel() {
               <Button
                 size="sm"
                 variant="secondary"
+                disabled={fixingEmails}
+                onClick={() => void handleFixEmails()}
+                className="h-8 gap-1.5 text-xs border-amber-300/60 bg-amber-50 text-amber-800 hover:bg-amber-100"
+              >
+                <Wrench size={14} />
+                {fixingEmails ? "Fixing..." : "Fix Emails"}
+              </Button>
+            )}
+            {canWrite && (
+              <Button
+                size="sm"
+                variant="secondary"
+                disabled={resettingAll}
+                onClick={() => setConfirmResetAll(true)}
+                className="h-8 gap-1.5 text-xs border-red-300/60 bg-red-50 text-red-800 hover:bg-red-100"
+              >
+                <Key size={14} />
+                {resettingAll ? "Resetting..." : "Reset All Passwords"}
+              </Button>
+            )}
+            {canWrite && (
+              <Button
+                size="sm"
+                variant="secondary"
+                disabled={emailingAll}
+                onClick={() => setConfirmEmailAll(true)}
+                className="h-8 gap-1.5 text-xs border-sky-300/60 bg-sky-50 text-sky-700 hover:bg-sky-100"
+              >
+                <EnvelopeSimple size={14} weight="fill" />
+                {emailingAll ? "Emailing..." : "Email All Logins"}
+              </Button>
+            )}
+            {canWrite && (
+              <Button
+                size="sm"
+                variant="secondary"
                 disabled={syncingLogins}
                 onClick={() => void handleSyncLoginHashes()}
                 className="h-8 gap-1.5 text-xs"
@@ -590,7 +703,7 @@ export function AdminCredentialsPanel() {
               <div className="flex flex-wrap gap-2 pt-1">
                 <AdminStudentProfileButton target={{ enrollmentId: row.id }} compact />
                 {canWrite && row.hasStoredPassword && (
-                  row.isDemo ? (
+                  <>
                     <Button
                       size="sm"
                       variant="secondary"
@@ -602,18 +715,19 @@ export function AdminCredentialsPanel() {
                       <EnvelopeSimple size={14} weight="fill" />
                       Email
                     </Button>
-                  ) : (
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      className="h-8 text-xs"
-                      disabled={loadingId === row.id}
-                      title="After student messages +92 321 5919502 with Portal login"
-                      onClick={() => void handleResendWhatsApp(row)}
-                    >
-                      WhatsApp
-                    </Button>
-                  )
+                    {!row.isDemo && (
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="h-8 text-xs"
+                        disabled={loadingId === row.id}
+                        title="After student messages +92 321 5919502 with Portal login"
+                        onClick={() => void handleResendWhatsApp(row)}
+                      >
+                        WhatsApp
+                      </Button>
+                    )}
+                  </>
                 )}
               </div>
             </div>
@@ -788,17 +902,16 @@ export function AdminCredentialsPanel() {
                           </button>
                           {canWrite && (
                             <>
-                              {row.isDemo ? (
-                                <button
-                                  type="button"
-                                  title="Email login details to student"
-                                  disabled={!row.hasStoredPassword || loadingId === row.id}
-                                  onClick={() => void handleSendLoginEmail(row)}
-                                  className="rounded border border-sky-300/60 bg-sky-50 p-1.5 text-sky-700 hover:bg-sky-100 disabled:opacity-40"
-                                >
-                                  <EnvelopeSimple size={14} weight="fill" />
-                                </button>
-                              ) : (
+                              <button
+                                type="button"
+                                title="Email login details to student"
+                                disabled={!row.hasStoredPassword || loadingId === row.id}
+                                onClick={() => void handleSendLoginEmail(row)}
+                                className="rounded border border-sky-300/60 bg-sky-50 p-1.5 text-sky-700 hover:bg-sky-100 disabled:opacity-40"
+                              >
+                                <EnvelopeSimple size={14} weight="fill" />
+                              </button>
+                              {!row.isDemo && (
                                 <button
                                   type="button"
                                   title="Send login via WhatsApp (student must message +92 321 5919502 first)"
@@ -955,6 +1068,74 @@ export function AdminCredentialsPanel() {
             </div>
           </div>
         )}
+      </Modal>
+
+      {/* Confirm Reset All Passwords Modal */}
+      <Modal
+        open={confirmResetAll}
+        onClose={() => setConfirmResetAll(false)}
+        title="Reset All Student Passwords"
+      >
+        <div className="space-y-4">
+          <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4">
+            <Warning size={24} weight="fill" className="shrink-0 text-red-600 mt-0.5" />
+            <div className="text-sm">
+              <p className="font-semibold text-red-800">
+                This will reset passwords for ALL {meta.total} student(s).
+              </p>
+              <p className="text-red-700 mt-1">
+                Every student will get a new password. Old passwords will stop working immediately.
+                You can then click &quot;Email All Logins&quot; to send the new passwords.
+              </p>
+            </div>
+          </div>
+          <div className="flex justify-end gap-3">
+            <Button variant="secondary" onClick={() => setConfirmResetAll(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={() => void handleResetAllPasswords()}
+              className="bg-red-600 text-white hover:bg-red-700"
+            >
+              <Key size={16} className="mr-1.5" />
+              Reset All Passwords
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Confirm Email All Logins Modal */}
+      <Modal
+        open={confirmEmailAll}
+        onClose={() => setConfirmEmailAll(false)}
+        title="Email All Student Logins"
+      >
+        <div className="space-y-4">
+          <div className="flex items-start gap-3 rounded-xl border border-sky-200 bg-sky-50 p-4">
+            <EnvelopeSimple size={24} weight="fill" className="shrink-0 text-sky-600 mt-0.5" />
+            <div className="text-sm">
+              <p className="font-semibold text-sky-800">
+                Send login details to ALL {meta.total} student(s) via email.
+              </p>
+              <p className="text-sky-700 mt-1">
+                Each student will receive an email with their login ID, password, and portal link.
+                Students without a saved password will be skipped.
+              </p>
+            </div>
+          </div>
+          <div className="flex justify-end gap-3">
+            <Button variant="secondary" onClick={() => setConfirmEmailAll(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={() => void handleEmailAllLogins()}
+              className="bg-sky-600 text-white hover:bg-sky-700"
+            >
+              <EnvelopeSimple size={16} weight="fill" className="mr-1.5" />
+              Email All Logins
+            </Button>
+          </div>
+        </div>
       </Modal>
     </div>
   );

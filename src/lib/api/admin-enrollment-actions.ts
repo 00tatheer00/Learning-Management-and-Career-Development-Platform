@@ -124,12 +124,9 @@ export async function approveEnrollmentAndCreateAccount(
   });
   const passwordSaved = passwordIssue.ok;
   if (!passwordSaved) {
-    console.error(
-      "[approval] CRITICAL: Portal password was NOT saved correctly for enrollment",
-      enrollmentId,
-      "student:", student.id, student.email,
-      "error:", passwordIssue.error ?? "unknown",
-      "— Student will NOT be able to log in. Go to Admin → Portal Logins → find student → Repair Logins."
+    console.warn(
+      "Approval succeeded but portal password was not verified:",
+      passwordIssue.error ?? "unknown error"
     );
   }
 
@@ -145,29 +142,12 @@ export async function approveEnrollmentAndCreateAccount(
   const emailError = notifications.emailSent
     ? null
     : (notifications.warnings.find((w) => w.toLowerCase().includes("email")) ??
-        notifications.warnings[0] ??
         "Approval email not sent");
-
-  const whatsappWarning = notifications.warnings.find((w) =>
-    w.toLowerCase().includes("whatsapp") ||
-    w.toLowerCase().includes("template") ||
-    w.toLowerCase().includes("token") ||
-    w.toLowerCase().includes("meta") ||
-    w.toLowerCase().includes("graph")
-  ) ?? notifications.warnings.find((w) => !w.toLowerCase().includes("email"));
 
   const whatsappError = notifications.whatsappSent
     ? null
-    : (whatsappWarning ?? "WhatsApp info message not sent");
-
-  if (!notifications.whatsappSent) {
-    console.error(
-      "[approval] WhatsApp send failed for enrollment",
-      enrollmentId,
-      "| warnings:",
-      notifications.warnings
-    );
-  }
+    : (notifications.warnings.find((w) => w.toLowerCase().includes("whatsapp")) ??
+        "WhatsApp info message not sent");
 
   await prisma.enrollment.update({
     where: { id: enrollmentId },
