@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/auth/password";
+import { encryptPortalPassword } from "@/lib/auth/portal-password-vault";
 
 const TOKEN_TTL_MS = 60 * 60 * 1000;
 
@@ -44,10 +45,27 @@ export async function resetPasswordWithToken(
 
   const passwordHash = await hashPassword(newPassword);
 
+  // Update student password hash for login
   await prisma.user.update({
     where: { email: record.email },
     data: { passwordHash },
   });
+
+  // Encrypt and update the password in the admin-visible vault (Enrollments)
+  try {
+    const encryptedPassword = encryptPortalPassword(newPassword);
+    await prisma.enrollment.updateMany({
+      where: {
+        email: record.email.toLowerCase().trim(),
+        status: "approved",
+      },
+      data: {
+        portalPasswordEnc: encryptedPassword,
+      },
+    });
+  } catch (error) {
+    console.error("Failed to sync reset password to enrollment vault:", error);
+  }
 
   await prisma.passwordResetToken.delete({ where: { id: record.id } });
 
