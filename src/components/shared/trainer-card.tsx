@@ -44,7 +44,7 @@ function TrainerPortrait({ trainer }: { trainer: Trainer }) {
   const isLocalImage = trainer.image?.startsWith("/");
 
   return (
-    <div className="relative aspect-[1.4/1] w-full overflow-hidden bg-surface">
+    <div className="relative aspect-square w-full overflow-hidden bg-surface">
       {trainer.image ? (
         <Image
           src={trainer.image}
