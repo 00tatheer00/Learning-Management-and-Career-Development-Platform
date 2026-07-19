@@ -6,6 +6,7 @@ import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FreeCoursePromo } from "@/components/shared/free-course-promo";
 import { PAYMENT_CONFIG } from "@/lib/constants/payment";
+import { REGISTRATION_OPEN } from "@/lib/constants";
 
 export function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -63,12 +64,18 @@ export function HeroSection() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 max-w-md sm:max-w-none mx-auto">
-            <Button size="lg" className="text-base h-14 px-8" asChild>
-              <Link href="/register" prefetch>
-                Register Now
-                <ArrowRight className="w-5 h-5" aria-hidden="true" />
-              </Link>
-            </Button>
+            {REGISTRATION_OPEN ? (
+              <Button size="lg" className="text-base h-14 px-8" asChild>
+                <Link href="/register" prefetch>
+                  Register Now
+                  <ArrowRight className="w-5 h-5" aria-hidden="true" />
+                </Link>
+              </Button>
+            ) : (
+              <Button size="lg" disabled className="text-base h-14 px-8 opacity-75 cursor-not-allowed">
+                Admissions Closed
+              </Button>
+            )}
             <Button size="lg" variant="secondary" className="text-base h-14" asChild>
               <Link href="/programs" prefetch>See All Courses</Link>
             </Button>

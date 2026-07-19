@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Mail, Phone, MapPin } from "lucide-react";
-import { SITE_CONFIG } from "@/lib/constants";
+import { SITE_CONFIG, REGISTRATION_OPEN } from "@/lib/constants";
 import { getOfficialTelHref } from "@/lib/constants/contact";
 import { SiteLogo } from "@/components/shared/site-logo";
 
@@ -70,25 +70,33 @@ export function Footer() {
             </div>
           </div>
 
-          {Object.entries(footerLinks).map(([category, links]) => (
-            <div key={category}>
-              <h3 className="text-sm font-semibold uppercase tracking-wider mb-4 capitalize">
-                {category}
-              </h3>
-              <ul className="space-y-3">
-                {links.map((link) => (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      className="text-sm text-muted hover:text-primary transition-colors"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          {Object.entries(footerLinks).map(([category, links]) => {
+            const filteredLinks = links.filter((link) => {
+              if (link.href === "/register" && !REGISTRATION_OPEN) {
+                return false;
+              }
+              return true;
+            });
+            return (
+              <div key={category}>
+                <h3 className="text-sm font-semibold uppercase tracking-wider mb-4 capitalize">
+                  {category}
+                </h3>
+                <ul className="space-y-3">
+                  {filteredLinks.map((link) => (
+                    <li key={link.href}>
+                      <Link
+                        href={link.href}
+                        className="text-sm text-muted hover:text-primary transition-colors"
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
         </div>
 
         <div className="mt-12 pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">

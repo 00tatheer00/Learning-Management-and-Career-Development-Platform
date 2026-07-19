@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
+import { REGISTRATION_OPEN } from "@/lib/constants";
 import { getBatchForProgram } from "@/lib/constants/batch";
 import { createApiResponse } from "@/lib/api/enrollment";
 import { saveEnrollment } from "@/lib/api/portal-data";
@@ -57,6 +58,16 @@ function friendlyValidationMessage(issue: z.ZodIssue | undefined): string {
 
 export async function POST(request: Request) {
   try {
+    if (!REGISTRATION_OPEN) {
+      return NextResponse.json(
+        createApiResponse(false, {
+          error: "Registration closed",
+          message: "Registration is currently closed for the new batch. Please wait for the next announcement.",
+        }),
+        { status: 400 }
+      );
+    }
+
     const limited = await rateLimitByIp(request, "enrollment", 3, 60 * 60);
     if (limited) {
       return NextResponse.json(

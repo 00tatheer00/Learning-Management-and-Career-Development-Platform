@@ -12,6 +12,7 @@ import type { Icon } from "@phosphor-icons/react";
 import { PremiumIcon } from "@/components/shared/premium-icon";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { REGISTRATION_OPEN } from "@/lib/constants";
 
 const portalFeatures: { icon: Icon; title: string; description: string }[] = [
   {
@@ -58,12 +59,18 @@ export function StudentPortalFeatures() {
 
       <div className="text-center mt-12">
         <p className="text-muted mb-4">Not enrolled yet?</p>
-        <Button asChild>
-          <Link href="/register">
-            Apply Now
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </Button>
+        {REGISTRATION_OPEN ? (
+          <Button asChild>
+            <Link href="/register">
+              Apply Now
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </Button>
+        ) : (
+          <Button disabled className="opacity-75 cursor-not-allowed">
+            Admissions Closed
+          </Button>
+        )}
       </div>
     </>
   );

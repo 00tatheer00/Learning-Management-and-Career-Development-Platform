@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { List, X } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { SiteLogo } from "@/components/shared/site-logo";
-import { NAV_LINKS } from "@/lib/constants";
+import { NAV_LINKS, REGISTRATION_OPEN } from "@/lib/constants";
 import { isNavLinkActive } from "@/lib/nav-active";
 import { cn } from "@/lib/utils";
 
@@ -88,11 +88,17 @@ export function Navbar() {
               Student Login
             </Link>
           </Button>
-          <Button size="sm" asChild>
-            <Link href="/register" prefetch>
-              Apply Now
-            </Link>
-          </Button>
+          {REGISTRATION_OPEN ? (
+            <Button size="sm" asChild>
+              <Link href="/register" prefetch>
+                Apply Now
+              </Link>
+            </Button>
+          ) : (
+            <Button size="sm" variant="secondary" disabled className="opacity-70 cursor-not-allowed">
+              Admissions Closed
+            </Button>
+          )}
         </div>
 
         <button
@@ -141,11 +147,17 @@ export function Navbar() {
                     Student Login
                   </Link>
                 </Button>
-                <Button asChild>
-                  <Link href="/register" prefetch onClick={() => setIsMobileOpen(false)}>
-                    Apply Now
-                  </Link>
-                </Button>
+                {REGISTRATION_OPEN ? (
+                  <Button asChild>
+                    <Link href="/register" prefetch onClick={() => setIsMobileOpen(false)}>
+                      Apply Now
+                    </Link>
+                  </Button>
+                ) : (
+                  <Button variant="secondary" disabled className="opacity-70 cursor-not-allowed w-full">
+                    Admissions Closed
+                  </Button>
+                )}
               </div>
             </div>
           </div>

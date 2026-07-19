@@ -6,6 +6,7 @@ import { ArrowRight, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FreeCoursePromo } from "@/components/shared/free-course-promo";
 import { PAYMENT_CONFIG } from "@/lib/constants/payment";
+import { REGISTRATION_OPEN } from "@/lib/constants";
 
 export function CTASection() {
   return (
@@ -40,12 +41,18 @@ export function CTASection() {
               and begin your journey with expert mentorship.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button size="lg" asChild>
-                <Link href="/register">
-                  Apply Now
-                  <ArrowRight className="w-5 h-5" aria-hidden="true" />
-                </Link>
-              </Button>
+              {REGISTRATION_OPEN ? (
+                <Button size="lg" asChild>
+                  <Link href="/register">
+                    Apply Now
+                    <ArrowRight className="w-5 h-5" aria-hidden="true" />
+                  </Link>
+                </Button>
+              ) : (
+                <Button size="lg" disabled className="opacity-75 cursor-not-allowed">
+                  Admissions Closed
+                </Button>
+              )}
               <Button size="lg" variant="secondary" asChild>
                 <Link href="/contact">
                   <Mail className="w-5 h-5" aria-hidden="true" />

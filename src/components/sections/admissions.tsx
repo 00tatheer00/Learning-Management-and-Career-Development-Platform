@@ -12,6 +12,7 @@ import { SectionHeader } from "@/components/shared/section-header";
 import { FreeCoursePromo } from "@/components/shared/free-course-promo";
 import { PremiumIcon } from "@/components/shared/premium-icon";
 import { Button } from "@/components/ui/button";
+import { REGISTRATION_OPEN } from "@/lib/constants";
 import {
   eligibility,
   applicationProcess as process,
@@ -102,9 +103,15 @@ export function AdmissionsSection() {
                 </li>
               ))}
             </ul>
-            <Button className="w-full" asChild>
-              <Link href="/register">Register Now</Link>
-            </Button>
+            {REGISTRATION_OPEN ? (
+              <Button className="w-full" asChild>
+                <Link href="/register">Register Now</Link>
+              </Button>
+            ) : (
+              <Button className="w-full opacity-75 cursor-not-allowed" disabled>
+                Admissions Closed
+              </Button>
+            )}
           </motion.div>
         </div>
       </div>

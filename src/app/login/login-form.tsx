@@ -22,6 +22,7 @@ import { Alert } from "@/components/ui/alert";
 import { toast } from "@/lib/ui/toast";
 import type { UserRole } from "@/types/portal";
 import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
+import { REGISTRATION_OPEN } from "@/lib/constants";
 
 const ROLES: {
   role: UserRole;
@@ -239,9 +240,13 @@ export default function LoginForm({
           <div className="mt-6 pt-6 border-t border-border text-center space-y-3">
             <p className="text-sm text-muted">
               Not registered yet?{" "}
-              <Link href="/register" className="text-primary font-semibold hover:underline">
-                Register here
-              </Link>
+              {REGISTRATION_OPEN ? (
+                <Link href="/register" className="text-primary font-semibold hover:underline">
+                  Register here
+                </Link>
+              ) : (
+                <span className="text-muted font-semibold">Admissions are closed</span>
+              )}
             </p>
             <Link href="/" className="text-sm text-muted hover:text-foreground block">
               ← Back to website

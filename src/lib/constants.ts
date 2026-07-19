@@ -33,3 +33,5 @@ export const NAV_LINKS = [
   { href: "/student-portal", label: "Student Portal" },
   { href: "/contact", label: "Contact" },
 ] as const;
+
+export const REGISTRATION_OPEN = false;

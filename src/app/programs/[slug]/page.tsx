@@ -11,7 +11,7 @@ import { BreadcrumbSchema, CourseSchema } from "@/components/seo/json-ld";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { createMetadata } from "@/lib/seo/metadata";
-import { SITE_CONFIG } from "@/lib/constants";
+import { SITE_CONFIG, REGISTRATION_OPEN } from "@/lib/constants";
 import { programs, getProgramBySlug, getProgramTopicCount, programHasSyllabus } from "@/lib/data/programs";
 import { getTrainersByProgramSlug } from "@/lib/data/trainers";
 
@@ -150,19 +150,25 @@ export default async function ProgramDetailPage({ params }: ProgramPageProps) {
           )}
 
           <div className="flex flex-col gap-3 sm:flex-row">
-            {isActive ? (
-              <Button size="lg" asChild>
-                <Link href={`/register?program=${program.slug}`}>
-                  Apply for This Program
-                  <ArrowRight className="h-5 w-5" />
-                </Link>
-              </Button>
+            {REGISTRATION_OPEN ? (
+              isActive ? (
+                <Button size="lg" asChild>
+                  <Link href={`/register?program=${program.slug}`}>
+                    Apply for This Program
+                    <ArrowRight className="h-5 w-5" />
+                  </Link>
+                </Button>
+              ) : (
+                <Button size="lg" variant="secondary" asChild>
+                  <Link href="/register">
+                    Register for Open Programs
+                    <ArrowRight className="h-5 w-5" />
+                  </Link>
+                </Button>
+              )
             ) : (
-              <Button size="lg" variant="secondary" asChild>
-                <Link href="/register">
-                  Register for Open Programs
-                  <ArrowRight className="h-5 w-5" />
-                </Link>
+              <Button size="lg" disabled className="opacity-75 cursor-not-allowed">
+                Admissions Closed (Next Batch Coming Soon)
               </Button>
             )}
             <Button size="lg" variant="outline" asChild>
