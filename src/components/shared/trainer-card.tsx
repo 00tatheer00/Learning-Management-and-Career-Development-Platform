@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -331,9 +333,11 @@ export function TrainerCard({
                 <GithubLogo size={16} weight="bold" />
               </a>
               <a 
-                href={trainer.social?.website || "/"} 
+                href={trainer.social?.twitter || "https://twitter.com"} 
+                target="_blank" 
+                rel="noopener noreferrer" 
                 className="hover:text-primary transition-colors"
-                aria-label={`${trainer.name} Website`}
+                aria-label={`${trainer.name} Twitter`}
               >
                 <Globe size={16} weight="bold" />
               </a>
