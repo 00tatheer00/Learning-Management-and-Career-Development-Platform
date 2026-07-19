@@ -114,7 +114,6 @@ export const trainers: Trainer[] = [
     bio: "Trains students to edit cinematic content, reels, and professional videos for brands and creators.",
     social: {},
   },
-  },
 ];
 
 export const featuredTrainers = trainers.filter((trainer) => trainer.featured);
