@@ -44,7 +44,7 @@ function TrainerPortrait({ trainer }: { trainer: Trainer }) {
   const isLocalImage = trainer.image?.startsWith("/");
 
   return (
-    <div className="relative aspect-[4/5] w-full overflow-hidden bg-surface">
+    <div className="relative aspect-[1.4/1] w-full overflow-hidden bg-surface">
       {trainer.image ? (
         <Image
           src={trainer.image}
@@ -118,54 +118,59 @@ export function TrainerCard({
   const hiddenSkillCount = Math.max(trainer.expertise.length - skills.length, 0);
 
   return (
-    <article
+    <div
       className={cn(
-        "group relative flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-background shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-black/[0.04] hover:border-border",
+        "group relative p-[1.2px] overflow-hidden rounded-2xl bg-border/60 transition-all duration-300 hover:shadow-lg hover:shadow-black/[0.04]",
         className
       )}
     >
-      {/* Portrait */}
-      <TrainerPortrait trainer={trainer} />
+      {/* Animated sweeping conic gradient border on hover */}
+      <span className="absolute inset-[-1000%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_50%,#ea580c_100%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-      {/* Content */}
-      <div className="flex flex-1 flex-col gap-3.5 p-5">
-        {/* Name & role */}
-        <div>
-          <h3 className="text-base font-semibold tracking-tight sm:text-lg">
-            {trainer.name}
-          </h3>
-          <p className="mt-0.5 text-xs font-medium text-primary">
-            {trainer.designation}
-          </p>
-        </div>
+      <article className="relative flex flex-col w-full h-full overflow-hidden rounded-[15px] bg-background">
+        {/* Portrait */}
+        <TrainerPortrait trainer={trainer} />
 
-        {/* Bio (detailed variant only) */}
-        {variant === "detailed" && (
-          <p className="text-[13px] leading-relaxed text-muted-foreground line-clamp-3">
-            {trainer.bio}
-          </p>
-        )}
+        {/* Content */}
+        <div className="flex flex-1 flex-col gap-2.5 p-4">
+          {/* Name & role */}
+          <div>
+            <h3 className="text-sm font-semibold tracking-tight sm:text-base">
+              {trainer.name}
+            </h3>
+            <p className="mt-0.5 text-[11px] font-medium text-primary leading-none">
+              {trainer.designation}
+            </p>
+          </div>
 
-        {/* Skills */}
-        <div className="mt-auto space-y-1.5">
-          <TrainerSkills skills={skills} />
-          {hiddenSkillCount > 0 && (
-            <p className="text-[10px] font-medium text-muted-foreground">
-              +{hiddenSkillCount} more
+          {/* Bio (detailed variant only) */}
+          {variant === "detailed" && (
+            <p className="text-xs leading-relaxed text-muted-foreground line-clamp-3">
+              {trainer.bio}
             </p>
           )}
-        </div>
 
-        {/* View profile link */}
-        <Link
-          href={`/programs/${trainer.programSlug}`}
-          className="mt-1 inline-flex items-center gap-1.5 text-xs font-semibold text-foreground/70 transition-colors duration-200 hover:text-primary group/link"
-          aria-label={`View ${trainer.name}'s program`}
-        >
-          View Profile
-          <ArrowRight className="h-3 w-3 transition-transform duration-200 group-hover/link:translate-x-0.5" />
-        </Link>
-      </div>
-    </article>
+          {/* Skills */}
+          <div className="mt-auto space-y-1.5">
+            <TrainerSkills skills={skills} />
+            {hiddenSkillCount > 0 && (
+              <p className="text-[9px] font-medium text-muted-foreground">
+                +{hiddenSkillCount} more
+              </p>
+            )}
+          </div>
+
+          {/* View profile link */}
+          <Link
+            href={`/programs/${trainer.programSlug}`}
+            className="mt-1 inline-flex items-center gap-1.5 text-[11px] font-semibold text-foreground/70 transition-colors duration-200 hover:text-primary group/link"
+            aria-label={`View ${trainer.name}'s program`}
+          >
+            View Profile
+            <ArrowRight className="h-3 w-3 transition-transform duration-200 group-hover/link:translate-x-0.5" />
+          </Link>
+        </div>
+      </article>
+    </div>
   );
 }

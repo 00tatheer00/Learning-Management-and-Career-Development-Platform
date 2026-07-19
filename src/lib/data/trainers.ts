@@ -2,6 +2,19 @@ import type { Trainer } from "@/types";
 
 export const trainers: Trainer[] = [
   {
+    id: "trainer-faiza",
+    name: "Faiza Ghaffar",
+    designation: "Associate AI Engineer",
+    programSlug: "artificial-intelligence",
+    featured: true,
+    expertise: ["Machine Learning", "Python", "AI Tools", "Data Thinking"],
+    experience: "3+ years",
+    bio: "Introduces practical AI workflows, model basics, and how to apply intelligence in real products.",
+    image: "/trainers/faiza-ghaffar.jpg",
+    imagePosition: "center 20%",
+    social: {},
+  },
+  {
     id: "trainer-tatheer",
     name: "S Tatheer Hussain",
     designation: "Web Development Trainer",
@@ -101,16 +114,6 @@ export const trainers: Trainer[] = [
     bio: "Trains students to edit cinematic content, reels, and professional videos for brands and creators.",
     social: {},
   },
-  {
-    id: "trainer-faiza",
-    name: "Faiza Ghaffar",
-    designation: "AI Trainer",
-    programSlug: "artificial-intelligence",
-    featured: true,
-    expertise: ["Machine Learning", "Python", "AI Tools", "Data Thinking"],
-    experience: "3+ years",
-    bio: "Introduces practical AI workflows, model basics, and how to apply intelligence in real products.",
-    social: {},
   },
 ];
 
