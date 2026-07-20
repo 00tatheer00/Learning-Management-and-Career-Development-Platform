@@ -49,7 +49,7 @@ export function generateClassSlots(
 
   const config = PROGRAM_CLASS_CONFIG[programSlug];
   const now = options?.now ?? new Date();
-  const maxClasses = options?.maxClasses ?? 36;
+  const maxClasses = options?.maxClasses ?? 60;
   const slots: ClassSlot[] = [];
   let cursor = config.startDate;
   let classNumber = 0;

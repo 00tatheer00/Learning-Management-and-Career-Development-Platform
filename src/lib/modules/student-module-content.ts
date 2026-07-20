@@ -45,15 +45,16 @@ export function canStudentAccessModuleContent(
 ): boolean {
   if (isDemoPortalStudent(options?.email)) return true;
 
-  const activeModule = getStudentActiveModule(
-    programSlug,
-    studentLevel,
-    options?.approvedLevels
-  );
-  if (!activeModule) return false;
-
   const resolvedContent = resolveContentModuleLevel(programSlug, contentLevel);
-  return resolvedContent === activeModule;
+  if (!resolvedContent) return false;
+
+  const enrolled = new Set(
+    [...(options?.approvedLevels ?? []), studentLevel ?? ""]
+      .map((level) => level?.trim())
+      .filter(Boolean)
+  );
+
+  return enrolled.has(resolvedContent);
 }
 
 export function filterByStudentModule<T>(

@@ -38,8 +38,10 @@ export function TrainerRecordingsPanel({ programSlug, courseTitle }: TrainerReco
   });
 
   const progress = getClassProgress(programSlug);
-  const suggestedClass =
-    progress.completedCount > 0 ? progress.completedCount : progress.todaySlot?.classNumber ?? 1;
+  const maxUploadedClass = recordings.length > 0
+    ? Math.max(...recordings.map((r) => r.classNumber))
+    : 0;
+  const suggestedClass = maxUploadedClass > 0 ? maxUploadedClass + 1 : 1;
 
   const load = () =>
     fetch("/api/trainer/recordings")
