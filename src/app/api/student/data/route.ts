@@ -29,6 +29,12 @@ export async function GET() {
   const filteredSubmissions = submissions.filter((item) => assignmentIds.has(item.assignmentId));
 
   return NextResponse.json(
-    createApiResponse(true, { data: { assignments, submissions: filteredSubmissions } })
+    createApiResponse(true, {
+      data: {
+        assignments,
+        submissions: filteredSubmissions,
+        programSlug: user.programSlug,
+      },
+    })
   );
 }

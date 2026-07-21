@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CheckCircle, Clock } from "@phosphor-icons/react";
+import { CheckCircle, Clock, ArrowSquareOut, GraduationCap } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { PortalPageHeader, EmptyState } from "@/components/portal/portal-ui";
@@ -90,6 +90,32 @@ export default function StudentAssignmentsPage() {
         title="Assignments"
         description="Read the task, write your answer, and submit. Your trainer will review it."
       />
+
+      {/* Google Classroom Banner */}
+      <div className="portal-card rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-5 sm:p-6 mb-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-start gap-4">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary">
+              <GraduationCap size={28} weight="duotone" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-pt">Google Classroom</h2>
+              <p className="text-sm text-pt-muted mt-1 max-w-xl leading-relaxed">
+                Access your class assignments, view course tasks, and submit your homework directly on Google Classroom.
+              </p>
+            </div>
+          </div>
+          <a
+            href="https://classroom.google.com/c/ODcwODkwODU5Mjk2?cjc=wikqarqt"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:bg-primary/90 hover:shadow-md"
+          >
+            Go to Google Classroom
+            <ArrowSquareOut size={18} weight="bold" />
+          </a>
+        </div>
+      </div>
 
       {pageLoading ? (
         <div className="space-y-3">
