@@ -55,30 +55,55 @@ function AdmissionsCountdownTimer() {
 
   return (
     <div className="flex flex-col items-center justify-center my-1 sm:my-0">
-      <div className="inline-flex items-center gap-2 sm:gap-3 rounded-2xl border border-red-200/90 bg-gradient-to-r from-red-50/90 via-amber-50/90 to-orange-50/90 px-3.5 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-bold text-red-900 shadow-md shadow-red-500/10 transition-all hover:scale-102">
-        <span className="relative flex h-3 w-3 shrink-0">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75" />
-          <span className="relative inline-flex rounded-full h-3 w-3 bg-red-600" />
+      {/* Sleek Header Badge */}
+      <div className="flex items-center gap-1.5 mb-1.5">
+        <span className="relative flex h-2 w-2">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75" />
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-600" />
         </span>
-        <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-red-700 whitespace-nowrap">
-          Admissions Close July 31:
+        <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.18em] text-orange-600">
+          Admissions Close July 31
         </span>
-        <div className="flex items-center gap-1 sm:gap-1.5 tabular-nums font-black text-slate-900 text-sm sm:text-base">
-          <span className="bg-white px-2 sm:px-2.5 py-1 rounded-lg border border-red-200 text-red-700 shadow-2xs">
-            {pad(days)}<span className="text-[10px] font-semibold text-slate-500 ml-0.5">d</span>
-          </span>
-          <span className="text-red-500 font-bold text-sm sm:text-base">:</span>
-          <span className="bg-white px-2 sm:px-2.5 py-1 rounded-lg border border-red-200 text-red-700 shadow-2xs">
-            {pad(hours)}<span className="text-[10px] font-semibold text-slate-500 ml-0.5">h</span>
-          </span>
-          <span className="text-red-500 font-bold text-sm sm:text-base">:</span>
-          <span className="bg-white px-2 sm:px-2.5 py-1 rounded-lg border border-red-200 text-red-700 shadow-2xs">
-            {pad(minutes)}<span className="text-[10px] font-semibold text-slate-500 ml-0.5">m</span>
-          </span>
-          <span className="text-red-500 font-bold text-sm sm:text-base">:</span>
-          <span className="bg-white px-2 sm:px-2.5 py-1 rounded-lg border border-red-200 text-red-700 shadow-2xs text-red-600 animate-pulse">
-            {pad(seconds)}<span className="text-[10px] font-semibold text-slate-500 ml-0.5">s</span>
-          </span>
+      </div>
+
+      {/* Professional Executive Timer Cards */}
+      <div className="flex items-center gap-1.5 sm:gap-2 text-slate-900">
+        {/* Days */}
+        <div className="flex flex-col items-center">
+          <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-slate-900 text-white font-mono text-sm sm:text-lg font-black shadow-md shadow-slate-900/10 border border-slate-800">
+            {pad(days)}
+          </div>
+          <span className="text-[9px] font-extrabold tracking-wider text-slate-500 uppercase mt-1">Days</span>
+        </div>
+
+        <span className="text-slate-400 font-bold text-sm sm:text-base -mt-3.5">:</span>
+
+        {/* Hours */}
+        <div className="flex flex-col items-center">
+          <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-slate-900 text-white font-mono text-sm sm:text-lg font-black shadow-md shadow-slate-900/10 border border-slate-800">
+            {pad(hours)}
+          </div>
+          <span className="text-[9px] font-extrabold tracking-wider text-slate-500 uppercase mt-1">Hours</span>
+        </div>
+
+        <span className="text-slate-400 font-bold text-sm sm:text-base -mt-3.5">:</span>
+
+        {/* Minutes */}
+        <div className="flex flex-col items-center">
+          <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-slate-900 text-white font-mono text-sm sm:text-lg font-black shadow-md shadow-slate-900/10 border border-slate-800">
+            {pad(minutes)}
+          </div>
+          <span className="text-[9px] font-extrabold tracking-wider text-slate-500 uppercase mt-1">Mins</span>
+        </div>
+
+        <span className="text-slate-400 font-bold text-sm sm:text-base -mt-3.5">:</span>
+
+        {/* Seconds */}
+        <div className="flex flex-col items-center">
+          <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-gradient-to-b from-orange-500 to-amber-600 text-white font-mono text-sm sm:text-lg font-black shadow-md shadow-orange-500/20 border border-orange-400 animate-pulse">
+            {pad(seconds)}
+          </div>
+          <span className="text-[9px] font-extrabold tracking-wider text-orange-600 uppercase mt-1">Secs</span>
         </div>
       </div>
     </div>
