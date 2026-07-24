@@ -56,49 +56,52 @@ export function HeroSection() {
             <div className="flex flex-col lg:flex-row items-center justify-between gap-5 sm:gap-6 pl-12 sm:pl-16 pr-2 sm:pr-4 py-1">
               
               {/* Left Title Section */}
-              <div className="flex flex-col text-left">
+              <div className="flex flex-col text-left shrink-0">
                 <span className="text-[11px] font-extrabold uppercase tracking-widest text-orange-600">
                   ADMISSIONS OPEN
                 </span>
-                <div className="flex items-baseline gap-1.5 mt-0.5">
-                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight uppercase leading-none">
-                    2nd MODULE
+                <div className="flex items-center gap-3 mt-1">
+                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight uppercase leading-none flex flex-col">
+                    <span>2ND</span>
+                    <span>MODULE</span>
                   </h2>
-                  <span className="font-serif italic font-extrabold text-orange-500 text-lg sm:text-xl">
-                    Live Now!
+                  <span className="font-serif italic font-extrabold text-orange-500 text-2xl sm:text-3xl leading-none">
+                    Live<br />Now!
                   </span>
                 </div>
               </div>
 
               {/* Vertical Divider */}
-              <div className="hidden lg:block h-10 w-px bg-slate-200/90 mx-1" />
+              <div className="hidden lg:block h-14 w-px bg-slate-200/90 mx-2" />
 
-              {/* Center Features Row */}
-              <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
-                
-                {/* Feature 1: Module 1 Recordings Included */}
-                <div className="flex items-center gap-2.5">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-purple-100 text-purple-600 shadow-xs">
-                    <PlayCircle size={22} weight="fill" />
+              {/* Center Features Row matching screenshot alignment */}
+              <div className="flex flex-col items-center gap-2.5 my-1">
+                {/* Top Row: Module 1 & Learn from Experts */}
+                <div className="flex flex-wrap items-center justify-center gap-5 sm:gap-8">
+                  {/* Feature 1: Module 1 Recordings Included */}
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-purple-100 text-purple-600 shadow-xs">
+                      <PlayCircle size={22} weight="fill" />
+                    </div>
+                    <div className="text-left text-xs leading-tight">
+                      <p className="font-extrabold text-slate-900">Module 1</p>
+                      <p className="text-slate-500 font-medium">Recordings Included</p>
+                    </div>
                   </div>
-                  <div className="text-left text-xs leading-tight">
-                    <p className="font-extrabold text-slate-900">Module 1</p>
-                    <p className="text-slate-500 font-medium">Recordings Included</p>
+
+                  {/* Feature 2: Learn from Experts */}
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 shadow-xs">
+                      <GraduationCap size={22} weight="duotone" />
+                    </div>
+                    <div className="text-left text-xs leading-tight">
+                      <p className="text-slate-500 font-medium">Learn from</p>
+                      <p className="font-extrabold text-slate-900">Experts</p>
+                    </div>
                   </div>
                 </div>
 
-                {/* Feature 2: Learn from Experts */}
-                <div className="flex items-center gap-2.5">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 shadow-xs">
-                    <GraduationCap size={22} weight="duotone" />
-                  </div>
-                  <div className="text-left text-xs leading-tight">
-                    <p className="text-slate-500 font-medium">Learn from</p>
-                    <p className="font-extrabold text-slate-900">Experts</p>
-                  </div>
-                </div>
-
-                {/* Feature 3: Upgrade Your Future */}
+                {/* Bottom Row: Upgrade Your Future */}
                 <div className="flex items-center gap-2.5">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-100 text-orange-600 shadow-xs">
                     <RocketLaunch size={22} weight="duotone" />
@@ -108,11 +111,10 @@ export function HeroSection() {
                     <p className="font-extrabold text-slate-900">Future</p>
                   </div>
                 </div>
-
               </div>
 
               {/* Vertical Divider */}
-              <div className="hidden lg:block h-10 w-px bg-slate-200/90 mx-1" />
+              <div className="hidden lg:block h-14 w-px bg-slate-200/90 mx-2" />
 
               {/* Right Action Button Section */}
               <div className="flex flex-col items-center shrink-0">
@@ -123,7 +125,7 @@ export function HeroSection() {
                   <span>APPLY NOW</span>
                   <ArrowRight size={14} className="stroke-[3]" />
                 </Link>
-                <span className="text-[11px] text-slate-500 font-medium mt-1 text-center">
+                <span className="text-[11px] text-slate-500 font-medium mt-1.5 text-center">
                   Seats are <strong className="text-orange-600 font-bold">Limited!</strong>
                 </span>
               </div>
