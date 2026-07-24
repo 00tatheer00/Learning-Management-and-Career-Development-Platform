@@ -41,14 +41,33 @@ export function HeroSection() {
         aria-hidden="true"
       />
 
-      <div className="container-custom relative z-10 flex flex-col items-center px-4 sm:px-6 lg:px-8 text-center">
-        <div className="w-full max-w-4xl flex flex-col items-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/40 bg-gradient-to-r from-emerald-500/20 via-primary/15 to-emerald-500/20 px-4 py-1.5 text-xs sm:text-sm font-extrabold text-emerald-800 dark:text-emerald-300 mb-4 shadow-sm">
-            <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
-            🔥 ADMISSIONS ARE NOW OPEN FOR 2nd MODULE! 🎉
-          </div>
+          {/* Premium Glowing Announcement Banner */}
+          <div className="relative group mb-8 transition-all duration-300 transform hover:scale-[1.02] max-w-2xl mx-auto">
+            {/* Outer Animated Glow Ring */}
+            <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-orange-500 via-emerald-500 to-amber-500 opacity-85 blur-md group-hover:opacity-100 transition duration-500 animate-pulse" />
+            
+            {/* Inner Dark Glass Container */}
+            <div className="relative flex flex-wrap items-center justify-center gap-2 sm:gap-3 rounded-full border-2 border-emerald-400/80 bg-slate-950 px-5 py-3 text-xs sm:text-sm font-semibold text-white shadow-2xl backdrop-blur-xl">
+              <span className="relative flex h-3 w-3 shrink-0 items-center justify-center">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500" />
+              </span>
 
-          <FreeCoursePromo variant="compact" className="mb-6" />
+              <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 px-3 py-0.5 text-xs font-black uppercase tracking-wider text-white shadow-md shadow-orange-500/30">
+                ⚡ ADMISSIONS OPEN
+              </span>
+
+              <span className="font-extrabold tracking-tight text-white text-sm sm:text-base">
+                2nd Module Live Now! 🎉
+              </span>
+
+              <span className="hidden md:inline text-slate-600 font-normal">|</span>
+
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/20 border border-emerald-400/50 px-2.5 py-0.5 text-xs font-bold text-emerald-300">
+                <span>🎬</span> Module 1 Recordings Included
+              </span>
+            </div>
+          </div>
 
           <h1
             id="hero-heading"

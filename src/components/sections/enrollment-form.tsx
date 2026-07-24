@@ -557,23 +557,29 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
 
   return (
     <div id="register-form-panel">
-      <div className="mb-6 rounded-2xl border-2 border-emerald-400/60 bg-gradient-to-r from-emerald-500/15 via-primary/10 to-amber-500/15 p-4 sm:p-5 shadow-md backdrop-blur-sm relative overflow-hidden">
-        <div className="flex items-center gap-3">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white font-bold text-xl animate-bounce shadow-md shadow-emerald-500/30">
-            🎉
-          </span>
-          <div>
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="font-extrabold text-base sm:text-lg text-foreground">
-                Admissions Are Now OPEN For 2nd Module! 🚀
-              </span>
-              <span className="rounded-full bg-emerald-500 px-2.5 py-0.5 text-xs font-black uppercase tracking-wide text-white animate-pulse">
-                Limited Seats Available
-              </span>
+      {/* High-Impact Announcement Banner */}
+      <div className="mb-8 relative group overflow-hidden rounded-2xl border-2 border-emerald-400/80 bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 p-5 sm:p-6 shadow-2xl text-white">
+        <div className="absolute top-0 right-0 h-40 w-40 rounded-full bg-emerald-500/20 blur-3xl" aria-hidden="true" />
+        <div className="absolute bottom-0 left-0 h-40 w-40 rounded-full bg-orange-500/20 blur-3xl" aria-hidden="true" />
+        
+        <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-4">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 text-white font-extrabold text-2xl shadow-lg shadow-orange-500/30 animate-bounce">
+              ⚡
+            </span>
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-black text-lg sm:text-xl tracking-tight text-white">
+                  2nd Module Admissions Live! 🚀
+                </span>
+                <span className="rounded-full bg-emerald-500 px-3 py-0.5 text-xs font-black uppercase tracking-wider text-white shadow-md shadow-emerald-500/30 animate-pulse">
+                  Limited Seats
+                </span>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-300 mt-1.5 leading-relaxed max-w-xl">
+                Apply now for the 2nd Module! Full <strong>video recordings, code files, &amp; tasks for Module 1 (HTML &amp; CSS)</strong> are unlocked immediately upon enrollment!
+              </p>
             </div>
-            <p className="text-xs sm:text-sm text-muted mt-1 leading-relaxed">
-              2nd Module admissions are officially live! Complete the form below to reserve your seat today.
-            </p>
           </div>
         </div>
       </div>
