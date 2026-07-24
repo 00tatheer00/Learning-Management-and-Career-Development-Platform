@@ -54,30 +54,32 @@ function AdmissionsCountdownTimer() {
   const pad = (n: number) => String(n).padStart(2, "0");
 
   return (
-    <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-xl border border-red-200/90 bg-gradient-to-r from-red-50/90 via-amber-50/80 to-orange-50/90 px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs font-bold text-red-900 shadow-sm mt-1 sm:mt-1.5">
-      <span className="relative flex h-2 w-2 shrink-0">
-        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
-        <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600" />
-      </span>
-      <span className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider text-red-700 whitespace-nowrap">
-        Closes July 31:
-      </span>
-      <div className="flex items-center gap-0.5 sm:gap-1 tabular-nums font-black text-slate-900 text-xs">
-        <span className="bg-white px-1 sm:px-1.5 py-0.5 rounded border border-red-200 text-red-700 shadow-2xs">
-          {pad(days)}<span className="text-[9px] font-medium text-slate-500">d</span>
+    <div className="flex flex-col items-center justify-center my-1 sm:my-0">
+      <div className="inline-flex items-center gap-2 sm:gap-3 rounded-2xl border border-red-200/90 bg-gradient-to-r from-red-50/90 via-amber-50/90 to-orange-50/90 px-3.5 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-bold text-red-900 shadow-md shadow-red-500/10 transition-all hover:scale-102">
+        <span className="relative flex h-3 w-3 shrink-0">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75" />
+          <span className="relative inline-flex rounded-full h-3 w-3 bg-red-600" />
         </span>
-        <span className="text-red-500 font-bold text-[11px]">:</span>
-        <span className="bg-white px-1 sm:px-1.5 py-0.5 rounded border border-red-200 text-red-700 shadow-2xs">
-          {pad(hours)}<span className="text-[9px] font-medium text-slate-500">h</span>
+        <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-red-700 whitespace-nowrap">
+          Admissions Close July 31:
         </span>
-        <span className="text-red-500 font-bold text-[11px]">:</span>
-        <span className="bg-white px-1 sm:px-1.5 py-0.5 rounded border border-red-200 text-red-700 shadow-2xs">
-          {pad(minutes)}<span className="text-[9px] font-medium text-slate-500">m</span>
-        </span>
-        <span className="text-red-500 font-bold text-[11px]">:</span>
-        <span className="bg-white px-1 sm:px-1.5 py-0.5 rounded border border-red-200 text-red-700 shadow-2xs text-red-600 animate-pulse">
-          {pad(seconds)}<span className="text-[9px] font-medium text-slate-500">s</span>
-        </span>
+        <div className="flex items-center gap-1 sm:gap-1.5 tabular-nums font-black text-slate-900 text-sm sm:text-base">
+          <span className="bg-white px-2 sm:px-2.5 py-1 rounded-lg border border-red-200 text-red-700 shadow-2xs">
+            {pad(days)}<span className="text-[10px] font-semibold text-slate-500 ml-0.5">d</span>
+          </span>
+          <span className="text-red-500 font-bold text-sm sm:text-base">:</span>
+          <span className="bg-white px-2 sm:px-2.5 py-1 rounded-lg border border-red-200 text-red-700 shadow-2xs">
+            {pad(hours)}<span className="text-[10px] font-semibold text-slate-500 ml-0.5">h</span>
+          </span>
+          <span className="text-red-500 font-bold text-sm sm:text-base">:</span>
+          <span className="bg-white px-2 sm:px-2.5 py-1 rounded-lg border border-red-200 text-red-700 shadow-2xs">
+            {pad(minutes)}<span className="text-[10px] font-semibold text-slate-500 ml-0.5">m</span>
+          </span>
+          <span className="text-red-500 font-bold text-sm sm:text-base">:</span>
+          <span className="bg-white px-2 sm:px-2.5 py-1 rounded-lg border border-red-200 text-red-700 shadow-2xs text-red-600 animate-pulse">
+            {pad(seconds)}<span className="text-[10px] font-semibold text-slate-500 ml-0.5">s</span>
+          </span>
+        </div>
       </div>
     </div>
   );
@@ -144,49 +146,13 @@ export function HeroSection() {
                     Live<span className="inline sm:hidden"> </span><br className="hidden sm:inline" />Now!
                   </span>
                 </div>
-                <AdmissionsCountdownTimer />
               </div>
 
               {/* Vertical Divider (Desktop) */}
               <div className="hidden lg:block h-14 w-px bg-slate-200/90 mx-1" />
 
-              {/* Center Features Row - 1 Single Horizontal Row on sm+ and Clean Mobile Stack */}
-              <div className="flex flex-wrap sm:flex-nowrap items-center justify-center gap-3 sm:gap-4 lg:gap-6 xl:gap-8 my-1 w-full lg:w-auto">
-                
-                {/* Feature 1: Module 1 Recordings Included */}
-                <div className="flex items-center gap-2 sm:gap-2.5 bg-white/60 sm:bg-transparent p-2 sm:p-0 rounded-xl sm:rounded-none border border-slate-100 sm:border-none shadow-2xs sm:shadow-none">
-                  <div className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-full bg-purple-100 text-purple-600 shadow-xs">
-                    <PlayCircle size={20} className="sm:w-[22px] sm:h-[22px]" weight="fill" />
-                  </div>
-                  <div className="text-left text-[11px] sm:text-xs leading-tight whitespace-nowrap">
-                    <p className="font-extrabold text-slate-900">Module 1</p>
-                    <p className="text-slate-500 font-medium">Recordings Included</p>
-                  </div>
-                </div>
-
-                {/* Feature 2: Learn from Experts */}
-                <div className="flex items-center gap-2 sm:gap-2.5 bg-white/60 sm:bg-transparent p-2 sm:p-0 rounded-xl sm:rounded-none border border-slate-100 sm:border-none shadow-2xs sm:shadow-none">
-                  <div className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 shadow-xs">
-                    <GraduationCap size={20} className="sm:w-[22px] sm:h-[22px]" weight="duotone" />
-                  </div>
-                  <div className="text-left text-[11px] sm:text-xs leading-tight whitespace-nowrap">
-                    <p className="text-slate-500 font-medium">Learn from</p>
-                    <p className="font-extrabold text-slate-900">Experts</p>
-                  </div>
-                </div>
-
-                {/* Feature 3: Upgrade Your Future */}
-                <div className="flex items-center gap-2 sm:gap-2.5 bg-white/60 sm:bg-transparent p-2 sm:p-0 rounded-xl sm:rounded-none border border-slate-100 sm:border-none shadow-2xs sm:shadow-none">
-                  <div className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-full bg-orange-100 text-orange-600 shadow-xs">
-                    <RocketLaunch size={20} className="sm:w-[22px] sm:h-[22px]" weight="duotone" />
-                  </div>
-                  <div className="text-left text-[11px] sm:text-xs leading-tight whitespace-nowrap">
-                    <p className="text-slate-500 font-medium">Upgrade Your</p>
-                    <p className="font-extrabold text-slate-900">Future</p>
-                  </div>
-                </div>
-
-              </div>
+              {/* Center Section: Prominent Big Timer */}
+              <AdmissionsCountdownTimer />
 
               {/* Vertical Divider (Desktop) */}
               <div className="hidden lg:block h-14 w-px bg-slate-200/90 mx-1" />
