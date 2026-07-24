@@ -74,34 +74,31 @@ export function HeroSection() {
               {/* Vertical Divider */}
               <div className="hidden lg:block h-14 w-px bg-slate-200/90 mx-2" />
 
-              {/* Center Features Row matching screenshot alignment */}
-              <div className="flex flex-col items-center gap-2.5 my-1">
-                {/* Top Row: Module 1 & Learn from Experts */}
-                <div className="flex flex-wrap items-center justify-center gap-5 sm:gap-8">
-                  {/* Feature 1: Module 1 Recordings Included */}
-                  <div className="flex items-center gap-2.5">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-purple-100 text-purple-600 shadow-xs">
-                      <PlayCircle size={22} weight="fill" />
-                    </div>
-                    <div className="text-left text-xs leading-tight">
-                      <p className="font-extrabold text-slate-900">Module 1</p>
-                      <p className="text-slate-500 font-medium">Recordings Included</p>
-                    </div>
+              {/* Center Features Row - All 3 Chips Perfectly Aligned in One Single Row */}
+              <div className="flex flex-wrap items-center justify-center gap-5 sm:gap-6 xl:gap-8 my-1">
+                {/* Feature 1: Module 1 Recordings Included */}
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-purple-100 text-purple-600 shadow-xs">
+                    <PlayCircle size={22} weight="fill" />
                   </div>
-
-                  {/* Feature 2: Learn from Experts */}
-                  <div className="flex items-center gap-2.5">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 shadow-xs">
-                      <GraduationCap size={22} weight="duotone" />
-                    </div>
-                    <div className="text-left text-xs leading-tight">
-                      <p className="text-slate-500 font-medium">Learn from</p>
-                      <p className="font-extrabold text-slate-900">Experts</p>
-                    </div>
+                  <div className="text-left text-xs leading-tight">
+                    <p className="font-extrabold text-slate-900">Module 1</p>
+                    <p className="text-slate-500 font-medium">Recordings Included</p>
                   </div>
                 </div>
 
-                {/* Bottom Row: Upgrade Your Future */}
+                {/* Feature 2: Learn from Experts */}
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 shadow-xs">
+                    <GraduationCap size={22} weight="duotone" />
+                  </div>
+                  <div className="text-left text-xs leading-tight">
+                    <p className="text-slate-500 font-medium">Learn from</p>
+                    <p className="font-extrabold text-slate-900">Experts</p>
+                  </div>
+                </div>
+
+                {/* Feature 3: Upgrade Your Future */}
                 <div className="flex items-center gap-2.5">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-100 text-orange-600 shadow-xs">
                     <RocketLaunch size={22} weight="duotone" />
