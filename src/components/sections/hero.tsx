@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { PlayCircle, GraduationCap, RocketLaunch } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { PAYMENT_CONFIG } from "@/lib/constants/payment";
 import { REGISTRATION_OPEN } from "@/lib/constants";
@@ -41,29 +42,93 @@ export function HeroSection() {
       />
 
       <div className="container-custom relative z-10 flex flex-col items-center px-4 sm:px-6 lg:px-8 text-center">
-        <div className="w-full max-w-4xl flex flex-col items-center">
-          {/* Neumorphic Soft UI Announcement Pill Badge */}
-          <div className="mb-8 inline-flex flex-wrap items-center justify-center gap-2.5 sm:gap-3.5 rounded-full bg-[#edf2f7] dark:bg-[#1a1e26] px-5 py-2.5 sm:px-6 sm:py-3 text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 transition-all duration-300 hover:scale-[1.01] shadow-[8px_8px_20px_rgba(166,180,200,0.45),-8px_-8px_20px_rgba(255,255,255,0.9)] dark:shadow-[8px_8px_20px_rgba(0,0,0,0.6),-8px_-8px_20px_rgba(255,255,255,0.04)] border border-slate-200/60 dark:border-slate-800">
-            {/* Live Pulse Badge */}
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#e2e8f0] dark:bg-[#12151c] px-3 py-1 text-xs font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.12),inset_-2px_-2px_4px_rgba(255,255,255,0.8)] dark:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.6),inset_-2px_-2px_4px_rgba(255,255,255,0.04)]">
-              <span className="relative flex h-2.5 w-2.5 shrink-0 items-center justify-center">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-              </span>
-              ⚡ ADMISSIONS OPEN
-            </span>
+        <div className="w-full max-w-5xl flex flex-col items-center">
+          {/* Exact Premium Announcement Card matching user mockup */}
+          <div className="relative mb-8 w-full overflow-hidden rounded-[24px] border border-orange-200/80 bg-gradient-to-r from-orange-50/80 via-white to-orange-50/50 p-4 sm:p-5 shadow-xl shadow-orange-500/10 text-slate-900 transition-all duration-300 hover:shadow-2xl hover:shadow-orange-500/15">
+            
+            {/* Orange Ribbon Tag on Top-Left */}
+            <div className="absolute top-0 left-5 sm:left-6 z-10">
+              <div className="relative bg-gradient-to-b from-orange-500 to-amber-600 px-3 py-1.5 text-[11px] font-black uppercase tracking-wider text-white shadow-md rounded-b-md">
+                NEW
+              </div>
+            </div>
 
-            {/* Main Text */}
-            <span className="font-extrabold tracking-tight text-slate-900 dark:text-white text-sm sm:text-base">
-              2nd Module Live Now! 🎉
-            </span>
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-5 sm:gap-6 pl-12 sm:pl-16 pr-2 sm:pr-4 py-1">
+              
+              {/* Left Title Section */}
+              <div className="flex flex-col text-left">
+                <span className="text-[11px] font-extrabold uppercase tracking-widest text-orange-600">
+                  ADMISSIONS OPEN
+                </span>
+                <div className="flex items-baseline gap-1.5 mt-0.5">
+                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight uppercase leading-none">
+                    2nd MODULE
+                  </h2>
+                  <span className="font-serif italic font-extrabold text-orange-500 text-lg sm:text-xl">
+                    Live Now!
+                  </span>
+                </div>
+              </div>
 
-            <span className="hidden sm:inline text-slate-300 dark:text-slate-700 font-light">|</span>
+              {/* Vertical Divider */}
+              <div className="hidden lg:block h-10 w-px bg-slate-200/90 mx-1" />
 
-            {/* Secondary Inset Tag */}
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#e2e8f0] dark:bg-[#12151c] px-3 py-1 text-xs font-bold text-slate-700 dark:text-slate-300 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.12),inset_-2px_-2px_4px_rgba(255,255,255,0.8)] dark:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.6),inset_-2px_-2px_4px_rgba(255,255,255,0.04)]">
-              <span>🎬</span> Module 1 Recordings Included
-            </span>
+              {/* Center Features Row */}
+              <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
+                
+                {/* Feature 1: Module 1 Recordings Included */}
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-purple-100 text-purple-600 shadow-xs">
+                    <PlayCircle size={22} weight="fill" />
+                  </div>
+                  <div className="text-left text-xs leading-tight">
+                    <p className="font-extrabold text-slate-900">Module 1</p>
+                    <p className="text-slate-500 font-medium">Recordings Included</p>
+                  </div>
+                </div>
+
+                {/* Feature 2: Learn from Experts */}
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 shadow-xs">
+                    <GraduationCap size={22} weight="duotone" />
+                  </div>
+                  <div className="text-left text-xs leading-tight">
+                    <p className="text-slate-500 font-medium">Learn from</p>
+                    <p className="font-extrabold text-slate-900">Experts</p>
+                  </div>
+                </div>
+
+                {/* Feature 3: Upgrade Your Future */}
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-100 text-orange-600 shadow-xs">
+                    <RocketLaunch size={22} weight="duotone" />
+                  </div>
+                  <div className="text-left text-xs leading-tight">
+                    <p className="text-slate-500 font-medium">Upgrade Your</p>
+                    <p className="font-extrabold text-slate-900">Future</p>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Vertical Divider */}
+              <div className="hidden lg:block h-10 w-px bg-slate-200/90 mx-1" />
+
+              {/* Right Action Button Section */}
+              <div className="flex flex-col items-center shrink-0">
+                <Link
+                  href="/register"
+                  className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 px-6 py-2.5 text-xs font-black uppercase tracking-wider text-white shadow-lg shadow-orange-500/30 hover:scale-105 hover:shadow-orange-500/40 transition-all duration-200"
+                >
+                  <span>APPLY NOW</span>
+                  <ArrowRight size={14} className="stroke-[3]" />
+                </Link>
+                <span className="text-[11px] text-slate-500 font-medium mt-1 text-center">
+                  Seats are <strong className="text-orange-600 font-bold">Limited!</strong>
+                </span>
+              </div>
+
+            </div>
           </div>
 
           <h1

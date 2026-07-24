@@ -557,27 +557,34 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
 
   return (
     <div id="register-form-panel">
-      {/* Neumorphic Soft UI Banner */}
-      <div className="mb-8 rounded-3xl bg-[#edf2f7] dark:bg-[#1a1e26] p-6 sm:p-7 shadow-[10px_10px_25px_rgba(166,180,200,0.4),-10px_-10px_25px_rgba(255,255,255,0.9)] dark:shadow-[10px_10px_25px_rgba(0,0,0,0.6),-10px_-10px_25px_rgba(255,255,255,0.04)] border border-slate-200/60 dark:border-slate-800">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex items-start gap-4">
-            {/* Neumorphic Inset Icon Button */}
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#e2e8f0] dark:bg-[#12151c] text-xl font-bold shadow-[inset_3px_3px_6px_rgba(0,0,0,0.12),inset_-3px_-3px_6px_rgba(255,255,255,0.8)] dark:shadow-[inset_3px_3px_6px_rgba(0,0,0,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.04)]">
-              ⚡
+      {/* Exact Premium Announcement Card matching user mockup */}
+      <div className="relative mb-8 w-full overflow-hidden rounded-[24px] border border-orange-200/80 bg-gradient-to-r from-orange-50/80 via-white to-orange-50/50 p-4 sm:p-5 shadow-xl shadow-orange-500/10 text-slate-900">
+        {/* Orange Ribbon Tag on Top-Left */}
+        <div className="absolute top-0 left-5 sm:left-6 z-10">
+          <div className="relative bg-gradient-to-b from-orange-500 to-amber-600 px-3 py-1 text-[11px] font-black uppercase tracking-wider text-white shadow-md rounded-b-md">
+            NEW
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pl-12 sm:pl-16 pr-2 py-1">
+          <div>
+            <span className="text-[11px] font-extrabold uppercase tracking-widest text-orange-600">
+              ADMISSIONS OPEN
             </span>
-            <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <h3 className="font-extrabold text-lg sm:text-xl tracking-tight text-slate-900 dark:text-white">
-                  2nd Module Admissions Are Live! 🚀
-                </h3>
-                <span className="rounded-full bg-emerald-500/15 border border-emerald-500/30 px-3 py-0.5 text-xs font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
-                  Limited Seats
-                </span>
-              </div>
-              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1.5 leading-relaxed">
-                Apply now for the 2nd Module! Full <strong>video recordings &amp; assignment tasks for Module 1 (HTML &amp; CSS)</strong> will be unlocked immediately upon enrollment.
-              </p>
+            <div className="flex flex-wrap items-baseline gap-2 mt-0.5">
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight uppercase leading-none">
+                2nd MODULE
+              </h2>
+              <span className="font-serif italic font-extrabold text-orange-500 text-lg sm:text-xl">
+                Live Now!
+              </span>
+              <span className="rounded-full bg-orange-100 border border-orange-200 px-2.5 py-0.5 text-xs font-bold text-orange-700">
+                Module 1 Recordings Included
+              </span>
             </div>
+            <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
+              Complete the form below to reserve your seat today. Full <strong>video recordings &amp; tasks for Module 1 (HTML &amp; CSS)</strong> are unlocked immediately upon registration!
+            </p>
           </div>
         </div>
       </div>
