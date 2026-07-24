@@ -925,8 +925,50 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                 <span>📸</span> Share receipt screenshot here
               </p>
               <p className="text-xs sm:text-sm text-emerald-800 dark:text-emerald-300 leading-relaxed">
-                After approval of your payment (PKR 1,000 one-time registration), you will get a message on WhatsApp or an email with your portal access!
+                After approval of your payment (PKR 1,000 one-time registration per module), you will get a confirmation message on WhatsApp or an email with your portal login details!
               </p>
+            </div>
+
+            {/* Strict Receipt Requirement & Sample Preview Box */}
+            <div className="rounded-xl border-2 border-amber-300/90 bg-gradient-to-br from-amber-50 via-white to-red-50 p-4 sm:p-5 mb-5 shadow-sm text-slate-900">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex-1 text-left">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-red-600 text-white font-bold text-xs">
+                      ⚠️
+                    </span>
+                    <h4 className="font-extrabold text-sm sm:text-base text-red-900">
+                      Required Receipt Screenshot Format
+                    </h4>
+                  </div>
+                  <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                    Upload <strong>ONLY</strong> the official Easypaisa <strong>&quot;Transaction Successful&quot;</strong> receipt screenshot showing the <strong>Transaction ID (TRX ID), Date &amp; Time</strong> (see sample image).
+                  </p>
+                  <p className="text-xs font-bold text-red-800 mt-2.5 bg-red-100/90 p-2.5 rounded-lg border border-red-200">
+                    🛑 <strong>IMPORTANT:</strong> Upload this exact receipt format — any other screenshot (SMS text, incomplete screen, old receipt, or fake proof) will be <u>REJECTED</u> immediately!
+                  </p>
+                </div>
+
+                {/* Sample Receipt Image Preview */}
+                <div className="shrink-0 flex flex-col items-center gap-1.5 w-full sm:w-auto">
+                  <div className="relative group overflow-hidden rounded-xl border-2 border-amber-400 bg-slate-950 shadow-md">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src="/sample-easypaisa-receipt.png"
+                      alt="Sample Valid Easypaisa Receipt Screenshot"
+                      className="h-40 sm:h-48 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-x-0 bottom-0 bg-slate-950/90 px-2 py-1 text-center">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-amber-300">
+                        Required Sample Receipt
+                      </span>
+                    </div>
+                  </div>
+                  <span className="text-[11px] text-slate-600 font-semibold">
+                    Must show TRX ID &amp; Date
+                  </span>
+                </div>
+              </div>
             </div>
 
             <PaymentInfoCard compact className="mb-5" />
@@ -937,8 +979,8 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                 {PAYMENT_CONFIG.registrationFee.toLocaleString()} only
               </RequiredLabel>
               <p className="text-xs text-muted mt-1 mb-2">
-                <strong>Required.</strong> Please upload a clear receipt screenshot after making your Easypaisa payment. Max size{" "}
-                4MB — large phone photos are auto-compressed.
+                <strong>Required.</strong> Please upload a clear Easypaisa &quot;Transaction Successful&quot; receipt screenshot showing TRX ID &amp; Date. Max size{" "}
+                4MB.
               </p>
               <div className="mt-1 max-w-full overflow-hidden">
               <Input
