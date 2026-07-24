@@ -42,7 +42,7 @@ export function PaymentInfoCard({ className, compact = false }: PaymentInfoCardP
               Easypaisa Payment
             </p>
             <p className="mt-0.5 text-xs text-muted">
-              Rs {PAYMENT_CONFIG.registrationFee.toLocaleString()} · one-time registration
+              Rs {PAYMENT_CONFIG.registrationFee.toLocaleString()} · one-time registration per module
             </p>
           </div>
         </div>

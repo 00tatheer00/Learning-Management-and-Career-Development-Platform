@@ -75,8 +75,7 @@ export function FreeCoursePromo({
             {PAYMENT_CONFIG.registrationNote}
           </p>
           <p className="text-xs text-muted leading-relaxed">
-            This is a one-time payment to secure your seat. You do not pay for
-            classes, levels, or course materials after this.
+            This is a one-time registration fee per module. You do not pay any extra monthly tuition fees for the module.
           </p>
         </div>
       </div>

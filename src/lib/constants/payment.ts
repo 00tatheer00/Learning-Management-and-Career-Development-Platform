@@ -7,13 +7,13 @@ export const PAYMENT_CONFIG = {
     accountName: "Fouzia Bibi",
   },
   headline: "Course is 100% FREE",
-  registrationLabel: "One-Time Fee",
-  registrationNote: "Only Rs 1,000 to join — pay once, learn free",
-  freeNote: "After Rs 1,000 registration, all classes and levels are free. No extra charges.",
+  registrationLabel: "One-Time Fee Per Module",
+  registrationNote: "Only Rs 1,000 per module registration — pay once per module",
+  freeNote: "Only Rs 1,000 registration fee per module. All classes & tasks in the module are free.",
   feeNote:
-    "Pay PKR 1,000 once to register. The entire course ahead is fully free.",
+    "Pay PKR 1,000 registration fee per module. All lectures & tasks for the module are included.",
   postRegistrationAccess: {
-    title: "What you get after you pay Rs 1,000",
+    title: "What you get after you pay Rs 1,000 per module",
     subtitle: "After we verify your payment, you will get:",
     items: [
       "Added to WhatsApp group",

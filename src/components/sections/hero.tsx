@@ -147,7 +147,7 @@ export function HeroSection() {
             <strong className="text-foreground">
               Rs {PAYMENT_CONFIG.registrationFee.toLocaleString()}
             </strong>{" "}
-            once to join. Classes are online on WhatsApp.
+            registration fee per module to join. Classes are online on WhatsApp.
           </p>
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 max-w-md sm:max-w-none mx-auto">
