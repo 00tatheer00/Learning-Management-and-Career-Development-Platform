@@ -16,9 +16,14 @@ export function getBatchForProgram(programSlug: string): string {
 
 export function getRegistrationPhase(item: {
   createdAt?: string | Date | null;
+  appliedAt?: string | Date | null;
   batch?: string | null;
   level?: string | null;
+  module?: string | null;
 }): RegistrationPhase {
+  if (!item) return "phase-1";
+
+  // 1. Explicit Phase 2 in batch label
   if (
     item.batch?.includes("Phase 2") ||
     item.batch?.includes("2nd Module")
@@ -26,10 +31,24 @@ export function getRegistrationPhase(item: {
     return "phase-2";
   }
 
-  if (item.createdAt) {
-    const createdDate = new Date(item.createdAt);
+  // 2. 2nd Module / Advanced topics (React, Advanced, Module 2, Flutter Advanced, AI, etc.)
+  const levelStr = String(item.level || item.module || "").toLowerCase();
+  if (
+    levelStr.includes("react") ||
+    levelStr.includes("module 2") ||
+    levelStr.includes("advanced") ||
+    levelStr.includes("2nd") ||
+    levelStr.includes("ai")
+  ) {
+    return "phase-2";
+  }
+
+  // 3. Applications / Accounts created on or after Phase 2 start date (July 24, 2026)
+  const dateVal = item.createdAt || item.appliedAt;
+  if (dateVal) {
+    const createdDate = new Date(dateVal);
     const phase2Start = new Date(PHASE_2_START_ISO);
-    if (!isNaN(createdDate.getTime()) && createdDate >= phase2Start) {
+    if (!isNaN(createdDate.getTime()) && createdDate.getTime() >= phase2Start.getTime()) {
       return "phase-2";
     }
   }
