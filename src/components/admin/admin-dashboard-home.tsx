@@ -127,32 +127,120 @@ export function AdminDashboardLoader() {
 }
 
 function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
+  const [phaseFilter, setPhaseFilter] = useState<"all" | "phase-1" | "phase-2">("all");
+
+  const metrics = useMemo(() => {
+    if (phaseFilter === "phase-1" && data.phaseBreakdown?.phase1) {
+      return data.phaseBreakdown.phase1;
+    }
+    if (phaseFilter === "phase-2" && data.phaseBreakdown?.phase2) {
+      return data.phaseBreakdown.phase2;
+    }
+    return {
+      totalEnrollments: data.totalEnrollments,
+      approvedEnrollments: data.approvedEnrollments,
+      pendingEnrollments: data.pendingEnrollments,
+      students: data.students,
+      firstTimeRegistrations: data.firstTimeRegistrations,
+      returningRegistrations: data.returningRegistrations,
+      estimatedRevenue: data.estimatedRevenue,
+      loggedInStudents: data.loggedInStudents,
+      webStudents: data.webStudents,
+      appStudents: data.appStudents,
+    };
+  }, [phaseFilter, data]);
+
   const loginRate =
-    data.students > 0 ? Math.round((data.loggedInStudents / data.students) * 100) : 0;
+    metrics.students > 0 ? Math.round((metrics.loggedInStudents / metrics.students) * 100) : 0;
   const approvalRate =
-    data.totalEnrollments > 0
-      ? Math.round((data.approvedEnrollments / data.totalEnrollments) * 100)
+    metrics.totalEnrollments > 0
+      ? Math.round((metrics.approvedEnrollments / metrics.totalEnrollments) * 100)
       : 0;
+
+  const displayData: AdminDashboardData = {
+    ...data,
+    totalEnrollments: metrics.totalEnrollments,
+    approvedEnrollments: metrics.approvedEnrollments,
+    pendingEnrollments: metrics.pendingEnrollments,
+    students: metrics.students,
+    firstTimeRegistrations: metrics.firstTimeRegistrations,
+    returningRegistrations: metrics.returningRegistrations,
+    estimatedRevenue: metrics.estimatedRevenue,
+    loggedInStudents: metrics.loggedInStudents,
+    neverLoggedInStudents: Math.max(0, metrics.students - metrics.loggedInStudents),
+    webStudents: metrics.webStudents,
+    appStudents: metrics.appStudents,
+  };
 
   return (
     <div className={DASHBOARD_SHELL}>
-      {/* Header */}
-      <div className="shrink-0 flex flex-wrap items-end justify-between gap-3 border-b border-pt pb-3">
+      {/* Header with Phase Toggle */}
+      <div className="shrink-0 flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-pt pb-4">
         <div className="min-w-0">
           <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-pt-faint">
             Overview
           </p>
-          <h1 className="mt-1 text-xl font-semibold tracking-tight text-pt sm:text-2xl">
+          <h1 className="mt-1 text-xl font-semibold tracking-tight text-pt sm:text-2xl flex items-center gap-2">
             Dashboard
+            {phaseFilter !== "all" && (
+              <span className={cn(
+                "text-xs font-bold px-2.5 py-0.5 rounded-full border",
+                phaseFilter === "phase-1" ? "bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border-indigo-500/30" : "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30"
+              )}>
+                {phaseFilter === "phase-1" ? "Phase 1 (Module 1)" : "Phase 2 (2nd Module)"}
+              </span>
+            )}
           </h1>
           <p className="mt-1 text-sm text-pt-muted">
-            {data.students.toLocaleString()} students · {data.trainers} trainers · {approvalRate}%
+            {metrics.students.toLocaleString()} students · {data.trainers} trainers · {approvalRate}%
             approval rate
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 shrink-0">
-          {data.pendingEnrollments > 0 && (
+          {/* Interactive Phase Filter Buttons */}
+          <div className="inline-flex items-center rounded-lg border border-slate-200 bg-slate-100 p-1 dark:border-slate-800 dark:bg-slate-900 text-xs font-semibold">
+            <button
+              type="button"
+              onClick={() => setPhaseFilter("all")}
+              className={cn(
+                "rounded-md px-3 py-1.5 transition-all",
+                phaseFilter === "all"
+                  ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm"
+                  : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+              )}
+            >
+              All ({data.totalEnrollments})
+            </button>
+            <button
+              type="button"
+              onClick={() => setPhaseFilter("phase-1")}
+              className={cn(
+                "rounded-md px-3 py-1.5 transition-all flex items-center gap-1.5",
+                phaseFilter === "phase-1"
+                  ? "bg-indigo-600 text-white shadow-sm"
+                  : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+              )}
+            >
+              <span className="h-2 w-2 rounded-full bg-indigo-400" />
+              Phase 1 ({data.phaseBreakdown?.phase1.totalEnrollments ?? 0})
+            </button>
+            <button
+              type="button"
+              onClick={() => setPhaseFilter("phase-2")}
+              className={cn(
+                "rounded-md px-3 py-1.5 transition-all flex items-center gap-1.5",
+                phaseFilter === "phase-2"
+                  ? "bg-emerald-600 text-white shadow-sm"
+                  : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+              )}
+            >
+              <span className="h-2 w-2 rounded-full bg-emerald-400" />
+              Phase 2 ({data.phaseBreakdown?.phase2.totalEnrollments ?? 0})
+            </button>
+          </div>
+
+          {metrics.pendingEnrollments > 0 && (
             <Link
               href="/admin/enrollments"
               className={cn(
@@ -160,20 +248,152 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
                 "inline-flex items-center gap-2 rounded-lg bg-amber-700 px-3.5 py-2 text-xs font-medium text-white hover:bg-amber-800 shadow-sm shadow-amber-900/10"
               )}
             >
-              {data.pendingEnrollments} pending review
+              {metrics.pendingEnrollments} pending
               <ArrowRight size={14} weight="bold" />
             </Link>
           )}
-          <Link
-            href="/admin/live-classes"
+        </div>
+      </div>
+
+      {/* Phase Breakdown Comparison Cards */}
+      <div className="shrink-0 rounded-xl border border-slate-200 bg-gradient-to-r from-indigo-50/30 via-white to-emerald-50/30 p-4 dark:border-slate-800 dark:from-slate-900 dark:to-slate-900 shadow-sm">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3">
+          <div>
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <span>⚡</span> Registration Phase Analytics
+            </h3>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Click a phase below to filter all main dashboard stats
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setPhaseFilter(phaseFilter === "phase-1" ? "all" : "phase-1")}
+              className={cn(
+                "text-xs font-semibold px-2.5 py-1 rounded-lg border transition-all flex items-center gap-1.5",
+                phaseFilter === "phase-1"
+                  ? "bg-indigo-600 text-white border-indigo-600"
+                  : "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800"
+              )}
+            >
+              <span className="h-2 w-2 rounded-full bg-indigo-500" />
+              Phase 1 (Module 1)
+            </button>
+            <button
+              type="button"
+              onClick={() => setPhaseFilter(phaseFilter === "phase-2" ? "all" : "phase-2")}
+              className={cn(
+                "text-xs font-semibold px-2.5 py-1 rounded-lg border transition-all flex items-center gap-1.5",
+                phaseFilter === "phase-2"
+                  ? "bg-emerald-600 text-white border-emerald-600"
+                  : "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800"
+              )}
+            >
+              <span className="h-2 w-2 rounded-full bg-emerald-500" />
+              Phase 2 (2nd Module)
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+          {/* Phase 1 Card */}
+          <div
+            onClick={() => setPhaseFilter("phase-1")}
             className={cn(
-              pressable,
-              "inline-flex items-center gap-2 rounded-lg border border-pt bg-pt-surface px-3.5 py-2 text-xs font-medium text-pt-secondary hover:bg-pt-muted"
+              "cursor-pointer rounded-xl border p-3.5 transition-all",
+              phaseFilter === "phase-1"
+                ? "border-indigo-500 bg-indigo-50/90 dark:bg-indigo-950/50 shadow-md ring-2 ring-indigo-500/20"
+                : "border-indigo-200/80 bg-white dark:bg-slate-900 hover:border-indigo-400"
             )}
           >
-            <Broadcast size={15} weight="duotone" />
-            Portal classes
-          </Link>
+            <div className="flex items-center justify-between gap-2 mb-2.5">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-100 px-2.5 py-0.5 text-xs font-bold text-indigo-800 dark:bg-indigo-900/60 dark:text-indigo-200">
+                <span className="h-2 w-2 rounded-full bg-indigo-600" />
+                Phase 1 (Module 1 — HTML &amp; CSS)
+              </span>
+              <span className="text-xs font-bold text-indigo-700 dark:text-indigo-400">
+                {data.phaseBreakdown?.phase1.totalEnrollments ?? 0} Enrollments
+              </span>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 text-center py-2 bg-indigo-50/50 dark:bg-indigo-950/30 rounded-lg mb-2">
+              <div>
+                <p className="text-[11px] text-slate-500 font-medium">Approved</p>
+                <p className="text-base font-bold text-indigo-700 dark:text-indigo-300">
+                  {data.phaseBreakdown?.phase1.approvedEnrollments ?? 0}
+                </p>
+              </div>
+              <div>
+                <p className="text-[11px] text-slate-500 font-medium">Pending</p>
+                <p className="text-base font-bold text-amber-600 dark:text-amber-400">
+                  {data.phaseBreakdown?.phase1.pendingEnrollments ?? 0}
+                </p>
+              </div>
+              <div>
+                <p className="text-[11px] text-slate-500 font-medium">Students</p>
+                <p className="text-base font-bold text-slate-900 dark:text-white">
+                  {data.phaseBreakdown?.phase1.students ?? 0}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400 font-medium">
+              <span>Est. Revenue:</span>
+              <span className="font-bold text-emerald-700 dark:text-emerald-400">
+                PKR {(data.phaseBreakdown?.phase1.estimatedRevenue ?? 0).toLocaleString()}
+              </span>
+            </div>
+          </div>
+
+          {/* Phase 2 Card */}
+          <div
+            onClick={() => setPhaseFilter("phase-2")}
+            className={cn(
+              "cursor-pointer rounded-xl border p-3.5 transition-all",
+              phaseFilter === "phase-2"
+                ? "border-emerald-500 bg-emerald-50/90 dark:bg-emerald-950/50 shadow-md ring-2 ring-emerald-500/20"
+                : "border-emerald-200/80 bg-white dark:bg-slate-900 hover:border-emerald-400"
+            )}
+          >
+            <div className="flex items-center justify-between gap-2 mb-2.5">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-bold text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-200">
+                <span className="h-2 w-2 rounded-full bg-emerald-600" />
+                Phase 2 (2nd Module — Advanced)
+              </span>
+              <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">
+                {data.phaseBreakdown?.phase2.totalEnrollments ?? 0} Enrollments
+              </span>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 text-center py-2 bg-emerald-50/50 dark:bg-emerald-950/30 rounded-lg mb-2">
+              <div>
+                <p className="text-[11px] text-slate-500 font-medium">Approved</p>
+                <p className="text-base font-bold text-emerald-700 dark:text-emerald-300">
+                  {data.phaseBreakdown?.phase2.approvedEnrollments ?? 0}
+                </p>
+              </div>
+              <div>
+                <p className="text-[11px] text-slate-500 font-medium">Pending</p>
+                <p className="text-base font-bold text-amber-600 dark:text-amber-400">
+                  {data.phaseBreakdown?.phase2.pendingEnrollments ?? 0}
+                </p>
+              </div>
+              <div>
+                <p className="text-[11px] text-slate-500 font-medium">Students</p>
+                <p className="text-base font-bold text-slate-900 dark:text-white">
+                  {data.phaseBreakdown?.phase2.students ?? 0}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400 font-medium">
+              <span>Est. Revenue:</span>
+              <span className="font-bold text-emerald-700 dark:text-emerald-400">
+                PKR {(data.phaseBreakdown?.phase2.estimatedRevenue ?? 0).toLocaleString()}
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -182,15 +402,15 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
         <MetricCard
           href="/admin/enrollments"
           label="Total registrations"
-          value={data.totalEnrollments}
-          hint="All-time submissions"
+          value={metrics.totalEnrollments}
+          hint="Submissions count"
           icon={<ClipboardText size={18} weight="duotone" />}
           tone="slate"
         />
         <MetricCard
           href="/admin/enrollments"
           label="Paid / approved"
-          value={data.approvedEnrollments}
+          value={metrics.approvedEnrollments}
           hint={data.trends.approved}
           icon={<ChartBar size={18} weight="duotone" />}
           trend={data.trends.approved}
@@ -199,17 +419,17 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
         <MetricCard
           href="/admin/enrollments"
           label="Pending review"
-          value={data.pendingEnrollments}
+          value={metrics.pendingEnrollments}
           hint={data.trends.pending}
           icon={<ClipboardText size={18} weight="duotone" />}
-          highlight={data.pendingEnrollments > 0}
+          highlight={metrics.pendingEnrollments > 0}
           trend={data.trends.pending}
           tone="amber"
         />
         <MetricCard
           href="/admin/students"
           label="Active students"
-          value={data.students}
+          value={metrics.students}
           hint={data.trends.students}
           icon={<GraduationCap size={18} weight="duotone" />}
           trend={data.trends.students}
@@ -227,9 +447,9 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
         >
           <div className="flex items-baseline gap-2">
             <span className="text-3xl font-semibold tabular-nums tracking-tight text-pt">
-              <CountUp end={data.loggedInStudents} duration={1.2} separator="," />
+              <CountUp end={metrics.loggedInStudents} duration={1.2} separator="," />
             </span>
-            <span className="text-sm text-pt-faint">/ {data.students.toLocaleString()}</span>
+            <span className="text-sm text-pt-faint">/ {metrics.students.toLocaleString()}</span>
             <span className="ml-auto text-xs font-medium text-pt-muted">{loginRate}% logged in</span>
           </div>
           <div className="mt-3 h-1.5 overflow-hidden rounded-full portal-progress-track">
@@ -239,7 +459,7 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
             />
           </div>
           <p className="mt-2 text-xs text-pt-muted">
-            {data.neverLoggedInStudents} students have not logged in yet
+            {displayData.neverLoggedInStudents} students have not logged in yet
           </p>
         </InsightCard>
 
@@ -266,9 +486,9 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
         </InsightCard>
       </div>
 
-      {/* Bottom panel — stacks naturally; page scrolls if needed */}
+      {/* Bottom panel */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-        <StudentMixPanel data={data} />
+        <StudentMixPanel data={displayData} />
 
         <div className="lg:col-span-2 portal-panel portal-panel-slate p-4 sm:p-5">
           <div className="mb-3">
