@@ -255,144 +255,123 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
         </div>
       </div>
 
-      {/* Phase Breakdown Comparison Cards */}
-      <div className="shrink-0 rounded-xl border border-slate-200 bg-gradient-to-r from-indigo-50/30 via-white to-emerald-50/30 p-4 dark:border-slate-800 dark:from-slate-900 dark:to-slate-900 shadow-sm">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3">
-          <div>
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <span>⚡</span> Registration Phase Analytics
-            </h3>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Click a phase below to filter all main dashboard stats
-            </p>
+      {/* Registration Phases Overview Cards */}
+      <div className="shrink-0 grid grid-cols-1 md:grid-cols-2 gap-3">
+        {/* Phase 1 Card */}
+        <div
+          onClick={() => setPhaseFilter(phaseFilter === "phase-1" ? "all" : "phase-1")}
+          className={cn(
+            pressable,
+            "group relative rounded-xl border p-4 sm:p-5 transition-all",
+            tones.indigo.card,
+            phaseFilter === "phase-1" ? "ring-2 ring-indigo-500 shadow-pt-md" : ""
+          )}
+        >
+          <div className="flex items-center justify-between gap-3 mb-3">
+            <div className="flex items-center gap-2.5">
+              <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-lg font-bold text-xs", tones.indigo.icon)}>
+                P1
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold tracking-tight text-pt">Phase 1 (Module 1)</h3>
+                <p className="text-xs text-pt-muted">HTML &amp; CSS Module</p>
+              </div>
+            </div>
+            <span className={cn(
+              "rounded-full px-2.5 py-1 text-[11px] font-semibold border",
+              phaseFilter === "phase-1"
+                ? "bg-indigo-600 text-white border-indigo-600"
+                : "bg-indigo-50 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800"
+            )}>
+              {data.phaseBreakdown?.phase1.totalEnrollments ?? 0} Registrations
+            </span>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setPhaseFilter(phaseFilter === "phase-1" ? "all" : "phase-1")}
-              className={cn(
-                "text-xs font-semibold px-2.5 py-1 rounded-lg border transition-all flex items-center gap-1.5",
-                phaseFilter === "phase-1"
-                  ? "bg-indigo-600 text-white border-indigo-600"
-                  : "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800"
-              )}
-            >
-              <span className="h-2 w-2 rounded-full bg-indigo-500" />
-              Phase 1 (Module 1)
-            </button>
-            <button
-              type="button"
-              onClick={() => setPhaseFilter(phaseFilter === "phase-2" ? "all" : "phase-2")}
-              className={cn(
-                "text-xs font-semibold px-2.5 py-1 rounded-lg border transition-all flex items-center gap-1.5",
-                phaseFilter === "phase-2"
-                  ? "bg-emerald-600 text-white border-emerald-600"
-                  : "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800"
-              )}
-            >
-              <span className="h-2 w-2 rounded-full bg-emerald-500" />
-              Phase 2 (2nd Module)
-            </button>
+
+          <div className="grid grid-cols-3 gap-2 py-2.5 px-3 rounded-lg border border-pt-subtle bg-pt-surface/70 text-center">
+            <div>
+              <p className="text-lg font-semibold tabular-nums text-pt">
+                <CountUp end={data.phaseBreakdown?.phase1.approvedEnrollments ?? 0} duration={1} />
+              </p>
+              <p className="text-[11px] font-medium text-emerald-700 dark:text-emerald-400">Approved</p>
+            </div>
+            <div>
+              <p className="text-lg font-semibold tabular-nums text-pt">
+                <CountUp end={data.phaseBreakdown?.phase1.pendingEnrollments ?? 0} duration={1} />
+              </p>
+              <p className="text-[11px] font-medium text-amber-600 dark:text-amber-400">Pending</p>
+            </div>
+            <div>
+              <p className="text-lg font-semibold tabular-nums text-pt">
+                <CountUp end={data.phaseBreakdown?.phase1.students ?? 0} duration={1} />
+              </p>
+              <p className="text-[11px] font-medium text-pt-secondary">Active Students</p>
+            </div>
+          </div>
+
+          <div className="mt-3 flex items-center justify-between text-xs font-medium text-pt-muted">
+            <span>Estimated Revenue</span>
+            <span className="font-semibold text-emerald-700 dark:text-emerald-400 tabular-nums">
+              PKR {(data.phaseBreakdown?.phase1.estimatedRevenue ?? 0).toLocaleString()}
+            </span>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-          {/* Phase 1 Card */}
-          <div
-            onClick={() => setPhaseFilter("phase-1")}
-            className={cn(
-              "cursor-pointer rounded-xl border p-3.5 transition-all",
-              phaseFilter === "phase-1"
-                ? "border-indigo-500 bg-indigo-50/90 dark:bg-indigo-950/50 shadow-md ring-2 ring-indigo-500/20"
-                : "border-indigo-200/80 bg-white dark:bg-slate-900 hover:border-indigo-400"
-            )}
-          >
-            <div className="flex items-center justify-between gap-2 mb-2.5">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-100 px-2.5 py-0.5 text-xs font-bold text-indigo-800 dark:bg-indigo-900/60 dark:text-indigo-200">
-                <span className="h-2 w-2 rounded-full bg-indigo-600" />
-                Phase 1 (Module 1 — HTML &amp; CSS)
-              </span>
-              <span className="text-xs font-bold text-indigo-700 dark:text-indigo-400">
-                {data.phaseBreakdown?.phase1.totalEnrollments ?? 0} Enrollments
-              </span>
-            </div>
-
-            <div className="grid grid-cols-3 gap-2 text-center py-2 bg-indigo-50/50 dark:bg-indigo-950/30 rounded-lg mb-2">
-              <div>
-                <p className="text-[11px] text-slate-500 font-medium">Approved</p>
-                <p className="text-base font-bold text-indigo-700 dark:text-indigo-300">
-                  {data.phaseBreakdown?.phase1.approvedEnrollments ?? 0}
-                </p>
+        {/* Phase 2 Card */}
+        <div
+          onClick={() => setPhaseFilter(phaseFilter === "phase-2" ? "all" : "phase-2")}
+          className={cn(
+            pressable,
+            "group relative rounded-xl border p-4 sm:p-5 transition-all",
+            tones.emerald.card,
+            phaseFilter === "phase-2" ? "ring-2 ring-emerald-500 shadow-pt-md" : ""
+          )}
+        >
+          <div className="flex items-center justify-between gap-3 mb-3">
+            <div className="flex items-center gap-2.5">
+              <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-lg font-bold text-xs", tones.emerald.icon)}>
+                P2
               </div>
               <div>
-                <p className="text-[11px] text-slate-500 font-medium">Pending</p>
-                <p className="text-base font-bold text-amber-600 dark:text-amber-400">
-                  {data.phaseBreakdown?.phase1.pendingEnrollments ?? 0}
-                </p>
-              </div>
-              <div>
-                <p className="text-[11px] text-slate-500 font-medium">Students</p>
-                <p className="text-base font-bold text-slate-900 dark:text-white">
-                  {data.phaseBreakdown?.phase1.students ?? 0}
-                </p>
+                <h3 className="text-sm font-semibold tracking-tight text-pt">Phase 2 (2nd Module)</h3>
+                <p className="text-xs text-pt-muted">Advanced Level Registrations</p>
               </div>
             </div>
+            <span className={cn(
+              "rounded-full px-2.5 py-1 text-[11px] font-semibold border",
+              phaseFilter === "phase-2"
+                ? "bg-emerald-600 text-white border-emerald-600"
+                : "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800"
+            )}>
+              {data.phaseBreakdown?.phase2.totalEnrollments ?? 0} Registrations
+            </span>
+          </div>
 
-            <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400 font-medium">
-              <span>Est. Revenue:</span>
-              <span className="font-bold text-emerald-700 dark:text-emerald-400">
-                PKR {(data.phaseBreakdown?.phase1.estimatedRevenue ?? 0).toLocaleString()}
-              </span>
+          <div className="grid grid-cols-3 gap-2 py-2.5 px-3 rounded-lg border border-pt-subtle bg-pt-surface/70 text-center">
+            <div>
+              <p className="text-lg font-semibold tabular-nums text-pt">
+                <CountUp end={data.phaseBreakdown?.phase2.approvedEnrollments ?? 0} duration={1} />
+              </p>
+              <p className="text-[11px] font-medium text-emerald-700 dark:text-emerald-400">Approved</p>
+            </div>
+            <div>
+              <p className="text-lg font-semibold tabular-nums text-pt">
+                <CountUp end={data.phaseBreakdown?.phase2.pendingEnrollments ?? 0} duration={1} />
+              </p>
+              <p className="text-[11px] font-medium text-amber-600 dark:text-amber-400">Pending</p>
+            </div>
+            <div>
+              <p className="text-lg font-semibold tabular-nums text-pt">
+                <CountUp end={data.phaseBreakdown?.phase2.students ?? 0} duration={1} />
+              </p>
+              <p className="text-[11px] font-medium text-pt-secondary">Active Students</p>
             </div>
           </div>
 
-          {/* Phase 2 Card */}
-          <div
-            onClick={() => setPhaseFilter("phase-2")}
-            className={cn(
-              "cursor-pointer rounded-xl border p-3.5 transition-all",
-              phaseFilter === "phase-2"
-                ? "border-emerald-500 bg-emerald-50/90 dark:bg-emerald-950/50 shadow-md ring-2 ring-emerald-500/20"
-                : "border-emerald-200/80 bg-white dark:bg-slate-900 hover:border-emerald-400"
-            )}
-          >
-            <div className="flex items-center justify-between gap-2 mb-2.5">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-bold text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-200">
-                <span className="h-2 w-2 rounded-full bg-emerald-600" />
-                Phase 2 (2nd Module — Advanced)
-              </span>
-              <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">
-                {data.phaseBreakdown?.phase2.totalEnrollments ?? 0} Enrollments
-              </span>
-            </div>
-
-            <div className="grid grid-cols-3 gap-2 text-center py-2 bg-emerald-50/50 dark:bg-emerald-950/30 rounded-lg mb-2">
-              <div>
-                <p className="text-[11px] text-slate-500 font-medium">Approved</p>
-                <p className="text-base font-bold text-emerald-700 dark:text-emerald-300">
-                  {data.phaseBreakdown?.phase2.approvedEnrollments ?? 0}
-                </p>
-              </div>
-              <div>
-                <p className="text-[11px] text-slate-500 font-medium">Pending</p>
-                <p className="text-base font-bold text-amber-600 dark:text-amber-400">
-                  {data.phaseBreakdown?.phase2.pendingEnrollments ?? 0}
-                </p>
-              </div>
-              <div>
-                <p className="text-[11px] text-slate-500 font-medium">Students</p>
-                <p className="text-base font-bold text-slate-900 dark:text-white">
-                  {data.phaseBreakdown?.phase2.students ?? 0}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400 font-medium">
-              <span>Est. Revenue:</span>
-              <span className="font-bold text-emerald-700 dark:text-emerald-400">
-                PKR {(data.phaseBreakdown?.phase2.estimatedRevenue ?? 0).toLocaleString()}
-              </span>
-            </div>
+          <div className="mt-3 flex items-center justify-between text-xs font-medium text-pt-muted">
+            <span>Estimated Revenue</span>
+            <span className="font-semibold text-emerald-700 dark:text-emerald-400 tabular-nums">
+              PKR {(data.phaseBreakdown?.phase2.estimatedRevenue ?? 0).toLocaleString()}
+            </span>
           </div>
         </div>
       </div>
