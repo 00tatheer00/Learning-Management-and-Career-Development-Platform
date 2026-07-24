@@ -557,27 +557,25 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
 
   return (
     <div id="register-form-panel">
-      {/* High-Impact Announcement Banner */}
-      <div className="mb-8 relative group overflow-hidden rounded-2xl border-2 border-emerald-400/80 bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 p-5 sm:p-6 shadow-2xl text-white">
-        <div className="absolute top-0 right-0 h-40 w-40 rounded-full bg-emerald-500/20 blur-3xl" aria-hidden="true" />
-        <div className="absolute bottom-0 left-0 h-40 w-40 rounded-full bg-orange-500/20 blur-3xl" aria-hidden="true" />
-        
-        <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      {/* Neumorphic Soft UI Banner */}
+      <div className="mb-8 rounded-3xl bg-[#edf2f7] dark:bg-[#1a1e26] p-6 sm:p-7 shadow-[10px_10px_25px_rgba(166,180,200,0.4),-10px_-10px_25px_rgba(255,255,255,0.9)] dark:shadow-[10px_10px_25px_rgba(0,0,0,0.6),-10px_-10px_25px_rgba(255,255,255,0.04)] border border-slate-200/60 dark:border-slate-800">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-start gap-4">
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 text-white font-extrabold text-2xl shadow-lg shadow-orange-500/30 animate-bounce">
+            {/* Neumorphic Inset Icon Button */}
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#e2e8f0] dark:bg-[#12151c] text-xl font-bold shadow-[inset_3px_3px_6px_rgba(0,0,0,0.12),inset_-3px_-3px_6px_rgba(255,255,255,0.8)] dark:shadow-[inset_3px_3px_6px_rgba(0,0,0,0.6),inset_-3px_-3px_6px_rgba(255,255,255,0.04)]">
               ⚡
             </span>
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <span className="font-black text-lg sm:text-xl tracking-tight text-white">
-                  2nd Module Admissions Live! 🚀
-                </span>
-                <span className="rounded-full bg-emerald-500 px-3 py-0.5 text-xs font-black uppercase tracking-wider text-white shadow-md shadow-emerald-500/30 animate-pulse">
+                <h3 className="font-extrabold text-lg sm:text-xl tracking-tight text-slate-900 dark:text-white">
+                  2nd Module Admissions Are Live! 🚀
+                </h3>
+                <span className="rounded-full bg-emerald-500/15 border border-emerald-500/30 px-3 py-0.5 text-xs font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
                   Limited Seats
                 </span>
               </div>
-              <p className="text-xs sm:text-sm text-slate-300 mt-1.5 leading-relaxed max-w-xl">
-                Apply now for the 2nd Module! Full <strong>video recordings, code files, &amp; tasks for Module 1 (HTML &amp; CSS)</strong> are unlocked immediately upon enrollment!
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1.5 leading-relaxed">
+                Apply now for the 2nd Module! Full <strong>video recordings &amp; assignment tasks for Module 1 (HTML &amp; CSS)</strong> will be unlocked immediately upon enrollment.
               </p>
             </div>
           </div>

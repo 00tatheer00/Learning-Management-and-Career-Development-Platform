@@ -42,32 +42,28 @@ export function HeroSection() {
 
       <div className="container-custom relative z-10 flex flex-col items-center px-4 sm:px-6 lg:px-8 text-center">
         <div className="w-full max-w-4xl flex flex-col items-center">
-          {/* Premium Glowing Announcement Banner */}
-          <div className="relative group mb-8 transition-all duration-300 transform hover:scale-[1.02] max-w-2xl mx-auto">
-            {/* Outer Animated Glow Ring */}
-            <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-orange-500 via-emerald-500 to-amber-500 opacity-85 blur-md group-hover:opacity-100 transition duration-500 animate-pulse" />
-            
-            {/* Inner Dark Glass Container */}
-            <div className="relative flex flex-wrap items-center justify-center gap-2 sm:gap-3 rounded-full border-2 border-emerald-400/80 bg-slate-950 px-5 py-3 text-xs sm:text-sm font-semibold text-white shadow-2xl backdrop-blur-xl">
-              <span className="relative flex h-3 w-3 shrink-0 items-center justify-center">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500" />
+          {/* Neumorphic Soft UI Announcement Pill Badge */}
+          <div className="mb-8 inline-flex flex-wrap items-center justify-center gap-2.5 sm:gap-3.5 rounded-full bg-[#edf2f7] dark:bg-[#1a1e26] px-5 py-2.5 sm:px-6 sm:py-3 text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 transition-all duration-300 hover:scale-[1.01] shadow-[8px_8px_20px_rgba(166,180,200,0.45),-8px_-8px_20px_rgba(255,255,255,0.9)] dark:shadow-[8px_8px_20px_rgba(0,0,0,0.6),-8px_-8px_20px_rgba(255,255,255,0.04)] border border-slate-200/60 dark:border-slate-800">
+            {/* Live Pulse Badge */}
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#e2e8f0] dark:bg-[#12151c] px-3 py-1 text-xs font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.12),inset_-2px_-2px_4px_rgba(255,255,255,0.8)] dark:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.6),inset_-2px_-2px_4px_rgba(255,255,255,0.04)]">
+              <span className="relative flex h-2.5 w-2.5 shrink-0 items-center justify-center">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
               </span>
+              ⚡ ADMISSIONS OPEN
+            </span>
 
-              <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 px-3 py-0.5 text-xs font-black uppercase tracking-wider text-white shadow-md shadow-orange-500/30">
-                ⚡ ADMISSIONS OPEN
-              </span>
+            {/* Main Text */}
+            <span className="font-extrabold tracking-tight text-slate-900 dark:text-white text-sm sm:text-base">
+              2nd Module Live Now! 🎉
+            </span>
 
-              <span className="font-extrabold tracking-tight text-white text-sm sm:text-base">
-                2nd Module Live Now! 🎉
-              </span>
+            <span className="hidden sm:inline text-slate-300 dark:text-slate-700 font-light">|</span>
 
-              <span className="hidden md:inline text-slate-600 font-normal">|</span>
-
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/20 border border-emerald-400/50 px-2.5 py-0.5 text-xs font-bold text-emerald-300">
-                <span>🎬</span> Module 1 Recordings Included
-              </span>
-            </div>
+            {/* Secondary Inset Tag */}
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#e2e8f0] dark:bg-[#12151c] px-3 py-1 text-xs font-bold text-slate-700 dark:text-slate-300 shadow-[inset_2px_2px_4px_rgba(0,0,0,0.12),inset_-2px_-2px_4px_rgba(255,255,255,0.8)] dark:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.6),inset_-2px_-2px_4px_rgba(255,255,255,0.04)]">
+              <span>🎬</span> Module 1 Recordings Included
+            </span>
           </div>
 
           <h1
