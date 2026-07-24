@@ -9,6 +9,7 @@ import {
   filterPastSessions,
   filterTrackedPastSessions,
   getBoostedAttendancePercent,
+  isDeterministicSessionPresent,
   isSessionPast,
 } from "@/lib/api/attendance-analytics";
 
@@ -223,5 +224,21 @@ describe("attendance analytics", () => {
 
     // Consistent hash check
     expect(getBoostedAttendancePercent(20, "stu_low_1")).toBe(boosted0);
+  });
+
+  it("deterministically marks class sessions as present to match target percentage without fluctuations", () => {
+    const res1 = isDeterministicSessionPresent("stu1", "sess1", 85);
+    const res1Repeat = isDeterministicSessionPresent("stu1", "sess1", 85);
+    expect(res1).toBe(res1Repeat);
+
+    let presentCount = 0;
+    for (let i = 0; i < 100; i++) {
+      if (isDeterministicSessionPresent("stu_test", `sess_${i}`, 85)) {
+        presentCount++;
+      }
+    }
+    // Should be around 85 out of 100
+    expect(presentCount).toBeGreaterThanOrEqual(75);
+    expect(presentCount).toBeLessThanOrEqual(95);
   });
 });
