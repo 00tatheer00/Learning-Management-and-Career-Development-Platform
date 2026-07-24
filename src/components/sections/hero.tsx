@@ -1,12 +1,87 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { PlayCircle, GraduationCap, RocketLaunch } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { PAYMENT_CONFIG } from "@/lib/constants/payment";
 import { REGISTRATION_OPEN } from "@/lib/constants";
+
+function useCountdown(targetDateIso: string) {
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+    isExpired: false,
+  });
+
+  useEffect(() => {
+    const target = new Date(targetDateIso).getTime();
+
+    const updateTimer = () => {
+      const now = new Date().getTime();
+      const difference = target - now;
+
+      if (difference <= 0) {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0, isExpired: true });
+        return;
+      }
+
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+      setTimeLeft({ days, hours, minutes, seconds, isExpired: false });
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+
+    return () => clearInterval(interval);
+  }, [targetDateIso]);
+
+  return timeLeft;
+}
+
+function AdmissionsCountdownTimer() {
+  const { days, hours, minutes, seconds, isExpired } = useCountdown("2026-07-31T23:59:59+05:00");
+
+  if (isExpired) return null;
+
+  const pad = (n: number) => String(n).padStart(2, "0");
+
+  return (
+    <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-xl border border-red-200/90 bg-gradient-to-r from-red-50/90 via-amber-50/80 to-orange-50/90 px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs font-bold text-red-900 shadow-sm mt-1 sm:mt-1.5">
+      <span className="relative flex h-2 w-2 shrink-0">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+        <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600" />
+      </span>
+      <span className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider text-red-700 whitespace-nowrap">
+        Closes July 31:
+      </span>
+      <div className="flex items-center gap-0.5 sm:gap-1 tabular-nums font-black text-slate-900 text-xs">
+        <span className="bg-white px-1 sm:px-1.5 py-0.5 rounded border border-red-200 text-red-700 shadow-2xs">
+          {pad(days)}<span className="text-[9px] font-medium text-slate-500">d</span>
+        </span>
+        <span className="text-red-500 font-bold text-[11px]">:</span>
+        <span className="bg-white px-1 sm:px-1.5 py-0.5 rounded border border-red-200 text-red-700 shadow-2xs">
+          {pad(hours)}<span className="text-[9px] font-medium text-slate-500">h</span>
+        </span>
+        <span className="text-red-500 font-bold text-[11px]">:</span>
+        <span className="bg-white px-1 sm:px-1.5 py-0.5 rounded border border-red-200 text-red-700 shadow-2xs">
+          {pad(minutes)}<span className="text-[9px] font-medium text-slate-500">m</span>
+        </span>
+        <span className="text-red-500 font-bold text-[11px]">:</span>
+        <span className="bg-white px-1 sm:px-1.5 py-0.5 rounded border border-red-200 text-red-700 shadow-2xs text-red-600 animate-pulse">
+          {pad(seconds)}<span className="text-[9px] font-medium text-slate-500">s</span>
+        </span>
+      </div>
+    </div>
+  );
+}
 
 export function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -69,6 +144,7 @@ export function HeroSection() {
                     Live<span className="inline sm:hidden"> </span><br className="hidden sm:inline" />Now!
                   </span>
                 </div>
+                <AdmissionsCountdownTimer />
               </div>
 
               {/* Vertical Divider (Desktop) */}
