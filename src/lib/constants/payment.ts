@@ -3,8 +3,8 @@ export const PAYMENT_CONFIG = {
   currency: "PKR",
   learningMode: "Online",
   easypaisa: {
-    number: "03275792600",
-    accountName: "Syed Tatheer Hussain",
+    number: "03115969527",
+    accountName: "Fouzia Bibi",
   },
   headline: "Course is 100% FREE",
   registrationLabel: "One-Time Fee",

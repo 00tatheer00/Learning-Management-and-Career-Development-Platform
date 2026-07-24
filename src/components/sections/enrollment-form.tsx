@@ -704,6 +704,10 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                   {...fieldA11y("email", errors)}
                   {...register("email")}
                 />
+                <p className="mt-2 text-xs font-medium text-emerald-900 dark:text-emerald-200 flex items-start gap-1.5 bg-emerald-50 dark:bg-emerald-950/40 p-2.5 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                  <span className="shrink-0 text-base">📩</span>
+                  <span><strong>Important:</strong> Please use your <strong>main active email address</strong>, because your portal login details &amp; credentials will be sent directly to your email.</span>
+                </p>
                 <FieldError id="email-error" message={errors.email?.message} />
               </div>
             </div>
@@ -916,10 +920,12 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
           </FormSection>
 
           <FormSection title="Payment Verification" step={4} mobileStep={mobileStep}>
-            <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 mb-4">
-              <p className="text-sm font-semibold text-emerald-800">
-                Remember: Course is FREE — upload proof of your PKR 1,000 registration
-                payment only.
+            <div className="rounded-xl border border-emerald-300 bg-emerald-50/90 dark:bg-emerald-950/50 p-4 mb-4">
+              <p className="text-sm font-bold text-emerald-900 dark:text-emerald-200 flex items-center gap-2 mb-1">
+                <span>📸</span> Share receipt screenshot here
+              </p>
+              <p className="text-xs sm:text-sm text-emerald-800 dark:text-emerald-300 leading-relaxed">
+                After approval of your payment (PKR 1,000 one-time registration), you will get a message on WhatsApp or an email with your portal access!
               </p>
             </div>
 
@@ -927,12 +933,12 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
 
             <div>
               <RequiredLabel htmlFor="paymentScreenshot">
-                Upload Payment Screenshot — PKR{" "}
+                Upload Payment Receipt Screenshot — PKR{" "}
                 {PAYMENT_CONFIG.registrationFee.toLocaleString()} only
               </RequiredLabel>
               <p className="text-xs text-muted mt-1 mb-2">
-                <strong>Required.</strong> Upload a clear JPG/PNG screenshot after payment. Max size{" "}
-                4MB — large phone photos are auto-compressed when possible.
+                <strong>Required.</strong> Please upload a clear receipt screenshot after making your Easypaisa payment. Max size{" "}
+                4MB — large phone photos are auto-compressed.
               </p>
               <div className="mt-1 max-w-full overflow-hidden">
               <Input

@@ -79,12 +79,14 @@ export function PaymentInfoCard({ className, compact = false }: PaymentInfoCardP
         </button>
       </div>
 
-      {!compact && (
-        <p className="relative mt-3 flex items-start gap-1.5 text-xs leading-relaxed text-muted">
-          <ArrowRight size={14} weight="bold" className="mt-0.5 shrink-0 text-emerald-600" />
-          Easypaisa app → Send Money → screenshot → upload in the form.
+      <div className="mt-3 rounded-lg border border-emerald-200/90 bg-emerald-50/80 p-2.5 text-xs text-emerald-900">
+        <p className="font-bold text-emerald-800 flex items-center gap-1.5">
+          <span>📸</span> Share receipt screenshot in the form below
         </p>
-      )}
+        <p className="mt-1 text-emerald-700 leading-relaxed">
+          After approval of your payment, you will get a confirmation message or email with your portal access!
+        </p>
+      </div>
     </div>
   );
 }
