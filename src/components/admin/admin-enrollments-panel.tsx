@@ -166,7 +166,7 @@ export function AdminEnrollmentsPanel() {
         .toLowerCase()
         .includes(query);
     });
-  }, [enrollments, statusFilter, programFilter, quickFilter, search]);
+  }, [enrollments, statusFilter, programFilter, quickFilter, search, phaseFilter]);
 
   const pendingSelectedCount = selectedIds.filter((id) => {
     const enrollment = enrollments.find((item) => item.id === id);

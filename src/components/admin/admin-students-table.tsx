@@ -24,7 +24,7 @@ import {
   type RegistrationPhase,
 } from "@/lib/constants/batch";
 import { getProgramBySlug } from "@/lib/data/programs";
-import { formatAppliedDate } from "@/lib/utils";
+import { formatAppliedDate, cn } from "@/lib/utils";
 import { toast } from "@/lib/ui/toast";
 import { useAdminPermissions } from "@/components/admin/admin-permissions";
 import { OpenStudentProfileButton, AdminStudentProfileButton } from "@/components/admin/admin-student-profile-drawer";
@@ -94,7 +94,7 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
         .toLowerCase()
         .includes(query);
     });
-  }, [students, search, courseFilter, selectedCourse, selectedModule, statusFilter, browseView]);
+  }, [students, search, courseFilter, selectedCourse, selectedModule, statusFilter, phaseFilter, browseView]);
 
   const runAction = async (
     id: string,

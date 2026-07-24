@@ -4,7 +4,6 @@ import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { FreeCoursePromo } from "@/components/shared/free-course-promo";
 import { PAYMENT_CONFIG } from "@/lib/constants/payment";
 import { REGISTRATION_OPEN } from "@/lib/constants";
 
@@ -41,6 +40,8 @@ export function HeroSection() {
         aria-hidden="true"
       />
 
+      <div className="container-custom relative z-10 flex flex-col items-center px-4 sm:px-6 lg:px-8 text-center">
+        <div className="w-full max-w-4xl flex flex-col items-center">
           {/* Premium Glowing Announcement Banner */}
           <div className="relative group mb-8 transition-all duration-300 transform hover:scale-[1.02] max-w-2xl mx-auto">
             {/* Outer Animated Glow Ring */}
