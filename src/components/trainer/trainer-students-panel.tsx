@@ -15,6 +15,11 @@ import { Input } from "@/components/ui/input";
 import { PortalPageHeader, EmptyState } from "@/components/portal/portal-ui";
 import { getProgramCategory } from "@/lib/constants/program-categories";
 import {
+  getRegistrationPhase,
+  getPhaseInfo,
+  type RegistrationPhase,
+} from "@/lib/constants/batch";
+import {
   groupStudentsByModule,
   getModuleFilterOptions,
 } from "@/lib/trainer/group-students-by-module";
@@ -45,6 +50,7 @@ export function TrainerStudentsPanel({
   const searchParams = useSearchParams();
   const initialModule = searchParams.get("module");
   const [moduleFilter, setModuleFilter] = useState<string>("all");
+  const [phaseFilter, setPhaseFilter] = useState<"all" | RegistrationPhase>("all");
   const [search, setSearch] = useState("");
 
   const category = getProgramCategory(programSlug);
@@ -73,6 +79,17 @@ export function TrainerStudentsPanel({
       groups = groups.filter((group) => group.moduleName === moduleFilter);
     }
 
+    if (phaseFilter !== "all") {
+      groups = groups
+        .map((group) => ({
+          ...group,
+          students: group.students.filter(
+            (student) => getRegistrationPhase(student) === phaseFilter
+          ),
+        }))
+        .filter((group) => group.students.length > 0);
+    }
+
     if (!query) return groups;
 
     return groups
@@ -87,7 +104,7 @@ export function TrainerStudentsPanel({
         ),
       }))
       .filter((group) => group.students.length > 0);
-  }, [moduleGroups, moduleFilter, search]);
+  }, [moduleGroups, moduleFilter, phaseFilter, search]);
 
   const visibleCount = filteredGroups.reduce((sum, group) => sum + group.students.length, 0);
 
@@ -152,6 +169,32 @@ export function TrainerStudentsPanel({
           >
             <p className="text-xs font-semibold text-muted truncate">{mod.name}</p>
             <p className="text-2xl font-bold mt-0.5">{mod.count}</p>
+          </button>
+        ))}
+      </div>
+
+      {/* Phase Segment Buttons */}
+      <div className="flex flex-wrap items-center gap-2 mb-4 border-b border-border/60 pb-3">
+        <span className="text-xs font-bold uppercase tracking-wider text-muted mr-1">
+          Phase:
+        </span>
+        {[
+          { id: "all", label: "All Phases" },
+          { id: "phase-1", label: "Phase 1 (Module 1)" },
+          { id: "phase-2", label: "Phase 2 (2nd Module)" },
+        ].map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => setPhaseFilter(item.id as "all" | RegistrationPhase)}
+            className={cn(
+              "rounded-lg px-3 py-1.5 text-xs font-extrabold transition-all",
+              phaseFilter === item.id
+                ? "bg-emerald-600 text-white shadow-sm"
+                : "border border-border bg-background text-muted hover:text-foreground"
+            )}
+          >
+            {item.label}
           </button>
         ))}
       </div>
@@ -262,7 +305,18 @@ export function TrainerStudentsPanel({
                       </div>
                       <div className="min-w-0">
                         <p className="font-semibold truncate">{student.name}</p>
-                        <p className="text-xs text-muted truncate">{courseTitle}</p>
+                        <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
+                          <p className="text-xs text-muted truncate">{courseTitle}</p>
+                          {(() => {
+                            const phase = getRegistrationPhase(student);
+                            const info = getPhaseInfo(phase);
+                            return (
+                              <span className={cn("inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-extrabold", info.badgeClass)}>
+                                {info.label}
+                              </span>
+                            );
+                          })()}
+                        </div>
                       </div>
                     </div>
 

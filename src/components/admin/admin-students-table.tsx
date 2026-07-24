@@ -17,7 +17,12 @@ import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
 import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
 import { getProgramCategory } from "@/lib/constants/program-categories";
-import { DEFAULT_BATCH_NAME } from "@/lib/constants/batch";
+import {
+  DEFAULT_BATCH_NAME,
+  getRegistrationPhase,
+  getPhaseInfo,
+  type RegistrationPhase,
+} from "@/lib/constants/batch";
 import { getProgramBySlug } from "@/lib/data/programs";
 import { formatAppliedDate } from "@/lib/utils";
 import { toast } from "@/lib/ui/toast";
@@ -41,12 +46,19 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
   const [selectedModule, setSelectedModule] = useState<string>("all");
   const [search, setSearch] = useState("");
   const [courseFilter, setCourseFilter] = useState("all");
+  const [phaseFilter, setPhaseFilter] = useState<"all" | RegistrationPhase>("all");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [editStudent, setEditStudent] = useState<AdminStudentRow | null>(null);
   const [editModule, setEditModule] = useState("");
   const [editBatch, setEditBatch] = useState(DEFAULT_BATCH_NAME);
   const [deleteTarget, setDeleteTarget] = useState<AdminStudentRow | null>(null);
+
+  const phaseCounts = useMemo(() => {
+    const phase1 = students.filter((s) => getRegistrationPhase(s) === "phase-1").length;
+    const phase2 = students.filter((s) => getRegistrationPhase(s) === "phase-2").length;
+    return { all: students.length, phase1, phase2 };
+  }, [students]);
 
   const courseStudentCounts = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -73,6 +85,7 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
       const course = selectedCourse ?? (courseFilter !== "all" ? courseFilter : null);
       if (course && student.programSlug !== course) return false;
       if (selectedModule !== "all" && student.module !== selectedModule) return false;
+      if (phaseFilter !== "all" && getRegistrationPhase(student) !== phaseFilter) return false;
       if (statusFilter === "active" && !student.isActive) return false;
       if (statusFilter === "inactive" && student.isActive) return false;
       if (!query) return true;
@@ -316,6 +329,30 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
         </div>
       )}
 
+      <div className="flex flex-wrap items-center gap-2 border-b border-border/60 pb-3">
+        <span className="text-xs font-bold uppercase tracking-wider text-muted mr-1">
+          Phase:
+        </span>
+        {[
+          { id: "all", label: "All Phases", count: phaseCounts.all },
+          { id: "phase-1", label: "Phase 1 (Module 1)", count: phaseCounts.phase1 },
+          { id: "phase-2", label: "Phase 2 (2nd Module)", count: phaseCounts.phase2 },
+        ].map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => setPhaseFilter(item.id as "all" | RegistrationPhase)}
+            className={`rounded-lg px-3 py-1.5 text-xs font-extrabold transition-all ${
+              phaseFilter === item.id
+                ? "bg-emerald-600 text-white shadow-sm"
+                : "border border-border bg-background text-muted hover:text-foreground"
+            }`}
+          >
+            {item.label} ({item.count})
+          </button>
+        ))}
+      </div>
+
       <div className="flex flex-wrap gap-2 items-center">
         <Button
           type="button"
@@ -452,6 +489,15 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
               </span>
               <span className="rounded-full border border-border px-2.5 py-1">{student.module}</span>
               <span className="rounded-full border border-border px-2.5 py-1">{student.batch}</span>
+              {(() => {
+                const phase = getRegistrationPhase(student);
+                const info = getPhaseInfo(phase);
+                return (
+                  <span className={cn("inline-flex items-center rounded-full border px-2.5 py-1 font-extrabold", info.badgeClass)}>
+                    {info.label}
+                  </span>
+                );
+              })()}
             </div>
             <p className="mt-2 text-xs text-muted font-mono break-all">{student.cnic}</p>
             <div className="mt-3 flex flex-wrap gap-2 border-t border-border pt-3">
@@ -554,9 +600,20 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
                   <td className="px-4 py-4 font-medium">{student.course}</td>
                   <td className="px-4 py-4">{student.module}</td>
                   <td className="px-4 py-4">
-                    <span className="inline-flex rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
-                      {student.batch}
-                    </span>
+                    <div className="flex flex-col gap-1.5 items-start">
+                      <span className="inline-flex rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
+                        {student.batch}
+                      </span>
+                      {(() => {
+                        const phase = getRegistrationPhase(student);
+                        const info = getPhaseInfo(phase);
+                        return (
+                          <span className={cn("inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-extrabold", info.badgeClass)}>
+                            {info.shortLabel}
+                          </span>
+                        );
+                      })()}
+                    </div>
                   </td>
                   <td className="px-4 py-4">
                     <span

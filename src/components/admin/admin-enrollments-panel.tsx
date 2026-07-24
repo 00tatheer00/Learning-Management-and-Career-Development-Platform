@@ -30,10 +30,16 @@ import { playPortalSound, primePortalSounds } from "@/lib/ui/portal-sounds";
 import { Alert } from "@/components/ui/alert";
 import { useAdminPermissions } from "@/components/admin/admin-permissions";
 import { OpenStudentProfileButton, AdminStudentProfileButton } from "@/components/admin/admin-student-profile-drawer";
+import {
+  getRegistrationPhase,
+  getPhaseInfo,
+  type RegistrationPhase,
+} from "@/lib/constants/batch";
 import type { AdminEnrollmentRow } from "@/lib/api/admin-enrollments";
 import { paymentScreenshotHref } from "@/lib/api/admin-client";
 
 type StatusFilter = "all" | "pending" | "approved" | "rejected";
+type PhaseFilter = "all" | RegistrationPhase;
 type QuickFilter = "all" | "today" | "returning" | "duplicates" | "whatsapp-failed" | "no-payment";
 type PendingAction = { id: string; type: "approved" | "rejected"; name: string };
 
@@ -55,7 +61,14 @@ export function AdminEnrollmentsPanel() {
   const [bulkLoading, setBulkLoading] = useState(false);
   const [fetchError, setFetchError] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("pending");
+  const [phaseFilter, setPhaseFilter] = useState<PhaseFilter>("all");
   const [programFilter, setProgramFilter] = useState<string>("all");
+
+  const phaseCounts = useMemo(() => {
+    const phase1 = enrollments.filter((e) => getRegistrationPhase(e) === "phase-1").length;
+    const phase2 = enrollments.filter((e) => getRegistrationPhase(e) === "phase-2").length;
+    return { all: enrollments.length, phase1, phase2 };
+  }, [enrollments]);
   const [quickFilter, setQuickFilter] = useState<QuickFilter>("all");
   const [search, setSearch] = useState("");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -127,6 +140,7 @@ export function AdminEnrollmentsPanel() {
     return enrollments.filter((enrollment) => {
       if (statusFilter !== "all" && enrollment.status !== statusFilter) return false;
       if (programFilter !== "all" && enrollment.program !== programFilter) return false;
+      if (phaseFilter !== "all" && getRegistrationPhase(enrollment) !== phaseFilter) return false;
       if (quickFilter === "today" && !isCreatedToday(enrollment.createdAt)) return false;
       if (quickFilter === "returning" && !enrollment.isReturningApplicant) return false;
       if (quickFilter === "duplicates" && !enrollment.duplicateMatch) return false;
@@ -445,6 +459,30 @@ export function AdminEnrollmentsPanel() {
           ))}
         </div>
 
+        <div className="flex flex-wrap items-center gap-2 border-b border-border/60 pb-3">
+          <span className="text-xs font-bold uppercase tracking-wider text-muted mr-1">
+            Phase:
+          </span>
+          {[
+            { id: "all", label: "All Phases", count: phaseCounts.all },
+            { id: "phase-1", label: "Phase 1 (Module 1)", count: phaseCounts.phase1 },
+            { id: "phase-2", label: "Phase 2 (2nd Module)", count: phaseCounts.phase2 },
+          ].map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => setPhaseFilter(item.id as PhaseFilter)}
+              className={`rounded-lg px-3 py-1.5 text-xs font-extrabold transition-all ${
+                phaseFilter === item.id
+                  ? "bg-emerald-600 text-white shadow-sm"
+                  : "border border-border bg-background text-muted hover:text-foreground"
+              }`}
+            >
+              {item.label} ({item.count})
+            </button>
+          ))}
+        </div>
+
         <div className="flex flex-wrap gap-2">
           {(["pending", "approved", "rejected", "all"] as const).map((filter) => (
             <button
@@ -516,6 +554,8 @@ export function AdminEnrollmentsPanel() {
               ? paymentScreenshotHref(enrollment.id)
               : null;
             const isPending = enrollment.status === "pending";
+            const phase = getRegistrationPhase(enrollment);
+            const phaseInfo = getPhaseInfo(phase);
 
             return (
               <div
@@ -543,6 +583,9 @@ export function AdminEnrollmentsPanel() {
                           />
                         )}
                         <StatusBadge status={enrollment.status} />
+                        <span className={cn("inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-extrabold", phaseInfo.badgeClass)}>
+                          {phaseInfo.label}
+                        </span>
                         {enrollment.applicationNumber > 1 && (
                           <span className="inline-flex items-center rounded-full portal-tag-amber px-3 py-1 text-xs font-bold">
                             {enrollment.applicationNumber}
