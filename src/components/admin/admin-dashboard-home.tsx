@@ -278,10 +278,10 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
               </div>
             </div>
             <span className={cn(
-              "rounded-full px-2.5 py-1 text-[11px] font-semibold border",
+              "rounded-full px-3 py-1 text-xs font-extrabold border shadow-sm transition-all",
               phaseFilter === "phase-1"
-                ? "bg-indigo-600 text-white border-indigo-600"
-                : "bg-indigo-50 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800"
+                ? "bg-indigo-600 text-white border-indigo-700"
+                : "bg-indigo-100 text-indigo-950 border-indigo-300 dark:bg-indigo-950 dark:text-indigo-200 dark:border-indigo-700"
             )}>
               {data.phaseBreakdown?.phase1.totalEnrollments ?? 0} Registrations
             </span>
@@ -337,10 +337,10 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
               </div>
             </div>
             <span className={cn(
-              "rounded-full px-2.5 py-1 text-[11px] font-semibold border",
+              "rounded-full px-3 py-1 text-xs font-extrabold border shadow-sm transition-all",
               phaseFilter === "phase-2"
-                ? "bg-emerald-600 text-white border-emerald-600"
-                : "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800"
+                ? "bg-emerald-600 text-white border-emerald-700"
+                : "bg-emerald-100 text-emerald-950 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-200 dark:border-emerald-700"
             )}>
               {data.phaseBreakdown?.phase2.totalEnrollments ?? 0} Registrations
             </span>
