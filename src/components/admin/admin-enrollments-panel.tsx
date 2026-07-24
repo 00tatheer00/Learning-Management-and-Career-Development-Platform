@@ -85,6 +85,8 @@ export function AdminEnrollmentsPanel() {
     password: string;
     loginUrl: string;
     enrollmentId: string;
+    phone?: string;
+    courseTitle?: string;
     studentId?: string;
     emailSent?: boolean;
     emailError?: string;
@@ -279,6 +281,8 @@ export function AdminEnrollmentsPanel() {
           password: data.credentials.password,
           loginUrl: data.credentials.loginUrl,
           enrollmentId: id,
+          phone: enrollment?.whatsapp,
+          courseTitle: enrollment?.courseTitle,
           studentId: data.notification?.studentId,
           emailSent: data.notification?.emailSent,
           emailError: data.notification?.emailError,
@@ -659,7 +663,37 @@ export function AdminEnrollmentsPanel() {
 
                       <div className="mt-4 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
                         <Field label="Email" value={enrollment.email} />
-                        <Field label="WhatsApp" value={enrollment.whatsapp} />
+                        <div className="flex items-center justify-between gap-2 rounded-lg bg-surface px-3 py-1.5 border border-border/50">
+                          <div>
+                            <p className="text-[10px] font-bold uppercase tracking-wider text-muted">WhatsApp</p>
+                            <p className="font-mono text-sm font-semibold">{enrollment.whatsapp}</p>
+                          </div>
+                          <a
+                            href={getWhatsAppDirectLink(
+                              enrollment.whatsapp,
+                              enrollment.status === "approved"
+                                ? buildApprovalWhatsAppMessage({
+                                    studentName: enrollment.fullName,
+                                    programTitle: enrollment.courseTitle,
+                                    email: enrollment.email,
+                                  })
+                                : enrollment.status === "rejected"
+                                  ? buildRejectionWhatsAppMessage({
+                                      studentName: enrollment.fullName,
+                                      programTitle: enrollment.courseTitle,
+                                      reason: enrollment.adminNotes || undefined,
+                                    })
+                                  : `Assalam-o-Alaikum ${enrollment.fullName}! This is Emerging Edge School regarding your ${enrollment.courseTitle} application.`
+                            )}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600/10 px-2.5 py-1 text-xs font-extrabold text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 hover:bg-emerald-600 hover:text-white transition-all shadow-2xs"
+                            title="Open WhatsApp Direct Chat"
+                          >
+                            <ChatsCircle size={15} weight="fill" />
+                            Chat
+                          </a>
+                        </div>
                         <Field label="CNIC" value={enrollment.cnic} mono />
                         <Field label="Institution" value={enrollment.institution} />
                         <Field label="Class / Semester" value={enrollment.classSemester} />
@@ -1010,21 +1044,36 @@ export function AdminEnrollmentsPanel() {
               )}
             </div>
 
-            <div
-              className={cn(
-                "mt-3 rounded-xl p-4 text-sm",
-                approvedCredentials.whatsappSent ? "portal-callout-success" : "portal-callout-amber"
-              )}
-            >
-              <p className="font-semibold flex items-center gap-2">
-                <ChatsCircle size={18} weight="duotone" />
-                {approvedCredentials.whatsappSent
-                  ? "WhatsApp info message sent"
-                  : "WhatsApp info message not sent"}
-              </p>
-              {!approvedCredentials.whatsappSent && approvedCredentials.whatsappError && (
-                <p className="mt-1 text-xs opacity-90">{approvedCredentials.whatsappError}</p>
-              )}
+            {/* Option 1: 1-Click WhatsApp Direct Chat Button */}
+            <div className="mt-3 rounded-xl p-4 text-sm border border-emerald-300/80 bg-emerald-500/10 dark:bg-emerald-950/30">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div>
+                  <p className="font-extrabold text-emerald-800 dark:text-emerald-300 flex items-center gap-2">
+                    <ChatsCircle size={18} weight="fill" className="text-emerald-600" />
+                    Send WhatsApp Congrats (1-Click)
+                  </p>
+                  <p className="mt-0.5 text-xs text-emerald-700/90 dark:text-emerald-400">
+                    Opens WhatsApp Web / Mobile App with pre-filled congrats message.
+                  </p>
+                </div>
+                <a
+                  href={getWhatsAppDirectLink(
+                    approvedCredentials.phone || approvedCredentials.loginId,
+                    buildApprovalWhatsAppMessage({
+                      studentName: approvedCredentials.name,
+                      programTitle: approvedCredentials.courseTitle || "Course Module",
+                      email: approvedCredentials.loginId,
+                      portalLoginUrl: approvedCredentials.loginUrl,
+                    })
+                  )}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-black uppercase tracking-wider text-white shadow-md hover:bg-emerald-700 transition-all shrink-0"
+                >
+                  <ChatsCircle size={18} weight="fill" />
+                  <span>Open WhatsApp</span>
+                </a>
+              </div>
             </div>
 
             <div className="mt-4 rounded-xl border border-border bg-surface p-4 space-y-2 text-sm">
@@ -1081,45 +1130,6 @@ export function AdminEnrollmentsPanel() {
                 >
                   <ArrowCounterClockwise size={16} />
                   {resendLoading === "email" ? "Sending..." : "Resend login (Email)"}
-                </Button>
-              )}
-              {!approvedCredentials.whatsappSent && (
-                <Button
-                  variant="secondary"
-                  className="gap-2"
-                  disabled={resendLoading !== null}
-                  onClick={async () => {
-                    setResendLoading("whatsapp");
-                    try {
-                      const res = await fetch("/api/admin/whatsapp", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                          action: "resendApprovalInfo",
-                          enrollmentId: approvedCredentials.enrollmentId,
-                        }),
-                      });
-                      const json = await res.json();
-                      if (json.success) {
-                        toast.success(json.message ?? "WhatsApp info resent.");
-                        setApprovedCredentials((current) =>
-                          current
-                            ? { ...current, whatsappSent: true, whatsappError: undefined }
-                            : current
-                        );
-                        void load();
-                      } else {
-                        toast.error(json.error ?? json.message ?? "Resend failed");
-                      }
-                    } catch {
-                      toast.error("Resend failed");
-                    } finally {
-                      setResendLoading(null);
-                    }
-                  }}
-                >
-                  <ArrowCounterClockwise size={16} />
-                  {resendLoading === "whatsapp" ? "Sending..." : "Resend info (WhatsApp)"}
                 </Button>
               )}
               <Button
