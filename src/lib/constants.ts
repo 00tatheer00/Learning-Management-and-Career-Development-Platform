@@ -34,4 +34,4 @@ export const NAV_LINKS = [
   { href: "/contact", label: "Contact" },
 ] as const;
 
-export const REGISTRATION_OPEN = false;
+export const REGISTRATION_OPEN = true;

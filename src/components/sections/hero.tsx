@@ -42,7 +42,12 @@ export function HeroSection() {
       />
 
       <div className="container-custom relative z-10 flex flex-col items-center px-4 sm:px-6 lg:px-8 text-center">
-        <div className="w-full max-w-4xl">
+        <div className="w-full max-w-4xl flex flex-col items-center">
+          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/40 bg-gradient-to-r from-emerald-500/20 via-primary/15 to-emerald-500/20 px-4 py-1.5 text-xs sm:text-sm font-extrabold text-emerald-800 dark:text-emerald-300 mb-4 shadow-sm">
+            <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
+            🔥 ADMISSIONS ARE NOW OPEN FOR 2nd MODULE! 🎉
+          </div>
+
           <FreeCoursePromo variant="compact" className="mb-6" />
 
           <h1

@@ -98,12 +98,29 @@ function EnrollmentModulePicker({
               </span>
 
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">
-                  Module {index + 1}
-                </p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">
+                    Module {index + 1}
+                  </p>
+                  {mod.name === "HTML & CSS" && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-0.5 text-xs font-extrabold text-emerald-700 dark:text-emerald-300">
+                      ✓ Done / Completed
+                    </span>
+                  )}
+                </div>
                 <p className="mt-1 text-base font-semibold text-foreground">{mod.name}</p>
                 {mod.subtitle && (
                   <p className="mt-1.5 text-sm leading-relaxed text-muted">{mod.subtitle}</p>
+                )}
+                {mod.name === "HTML & CSS" && (
+                  <div className="mt-2.5 rounded-lg border border-amber-300/80 bg-amber-500/10 p-3 text-xs sm:text-sm text-amber-950 dark:text-amber-200">
+                    <p className="font-bold text-amber-800 dark:text-amber-300 flex items-center gap-1.5">
+                      <span>🎬</span> Module 1 Done! Recordings &amp; Tasks Included
+                    </p>
+                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                      Ye Module 1 (HTML &amp; CSS) complete ho gaya hai. Agar aap abhi apply kartay hain to aapko iski complete <strong>video recordings aur assignment tasks mil jayngy</strong>, aur aap upcoming modules live continue kar saktay hain!
+                    </p>
+                  </div>
                 )}
                 <div className="mt-3 flex flex-wrap gap-2">
                   <span className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-surface/80 px-2.5 py-1 text-xs font-medium text-muted">
@@ -540,6 +557,27 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
 
   return (
     <div id="register-form-panel">
+      <div className="mb-6 rounded-2xl border-2 border-emerald-400/60 bg-gradient-to-r from-emerald-500/15 via-primary/10 to-amber-500/15 p-4 sm:p-5 shadow-md backdrop-blur-sm relative overflow-hidden">
+        <div className="flex items-center gap-3">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white font-bold text-xl animate-bounce shadow-md shadow-emerald-500/30">
+            🎉
+          </span>
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="font-extrabold text-base sm:text-lg text-foreground">
+                Admissions Are Now OPEN For 2nd Module! 🚀
+              </span>
+              <span className="rounded-full bg-emerald-500 px-2.5 py-0.5 text-xs font-black uppercase tracking-wide text-white animate-pulse">
+                Limited Seats Available
+              </span>
+            </div>
+            <p className="text-xs sm:text-sm text-muted mt-1 leading-relaxed">
+              2nd Module admissions are officially live! Complete the form below to reserve your seat today.
+            </p>
+          </div>
+        </div>
+      </div>
+
       <div className="mb-6">
         <p className="text-sm font-semibold uppercase tracking-wider text-primary mb-2">
           Registration Form

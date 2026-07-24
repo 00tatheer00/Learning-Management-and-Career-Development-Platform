@@ -62,7 +62,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         createApiResponse(false, {
           error: "Registration closed",
-          message: "Registration is currently closed for the new batch. Please wait for the next announcement.",
+          message: "Registration is currently closed for the 2nd module. Please wait for the next announcement.",
         }),
         { status: 400 }
       );
