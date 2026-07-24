@@ -37,6 +37,11 @@ import {
 } from "@/lib/constants/batch";
 import type { AdminEnrollmentRow } from "@/lib/api/admin-enrollments";
 import { paymentScreenshotHref } from "@/lib/api/admin-client";
+import {
+  getWhatsAppDirectLink,
+  buildApprovalWhatsAppMessage,
+  buildRejectionWhatsAppMessage,
+} from "@/lib/utils/whatsapp-direct";
 
 type StatusFilter = "all" | "pending" | "approved" | "rejected";
 type PhaseFilter = "all" | RegistrationPhase;

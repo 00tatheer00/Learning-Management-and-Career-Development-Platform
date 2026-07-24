@@ -197,7 +197,7 @@ export function AdminCredentialsPanel() {
   const handleResendWhatsApp = (row: AdminCredentialRow) => {
     const text = buildApprovalWhatsAppMessage({
       studentName: row.name,
-      programTitle: row.courseTitle,
+      programTitle: row.course,
       email: row.email,
       portalLoginUrl: row.loginUrl,
     });

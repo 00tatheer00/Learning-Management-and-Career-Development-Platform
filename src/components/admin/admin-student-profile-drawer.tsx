@@ -305,7 +305,7 @@ function AdminStudentProfileDrawer() {
 
   const resendWhatsApp = () => {
     if (!profile) return;
-    const text = `Assalam-o-Alaikum ${profile.name}! This is Emerging Edge School regarding your ${profile.courseTitle} application.`;
+    const text = `Assalam-o-Alaikum ${profile.name}! This is Emerging Edge School regarding your ${profile.course || "course"} application.`;
     const link = getWhatsAppDirectLink(profile.whatsapp, text);
     window.open(link, "_blank");
     toast.success("Opening WhatsApp", `Opening WhatsApp chat for ${profile.name}...`);

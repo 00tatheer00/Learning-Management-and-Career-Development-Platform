@@ -1,10 +1,5 @@
 import { getProgramBySlug } from "@/lib/data/programs";
-import {
-  buildApprovalTemplatePreview,
-  type ApprovalTemplateParams,
-} from "@/lib/notifications/approval-templates";
 import { sendApprovalEmail } from "@/lib/notifications/email";
-import { sendApprovalWhatsApp } from "@/lib/notifications/whatsapp";
 import { getPortalLoginUrl } from "@/lib/site-url";
 
 interface EnrollmentNotificationRecord {
@@ -23,15 +18,6 @@ export async function sendApprovalWelcomeNotifications(
   const loginUrl = getPortalLoginUrl();
   const courseName = getProgramBySlug(enrollment.program)?.title ?? enrollment.program;
   const programLevel = getProgramBySlug(enrollment.program)?.level ?? "—";
-  const firstName = enrollment.fullName.split(" ")[0] ?? enrollment.fullName;
-
-  const params: ApprovalTemplateParams = {
-    firstName,
-    courseName,
-    module: enrollment.level,
-    portalLoginUrl: loginUrl,
-  };
-
   const emailResult = await sendApprovalEmail({
     to: enrollment.email,
     studentName: enrollment.fullName,

@@ -1,10 +1,3 @@
-import { getProgramBySlug } from "@/lib/data/programs";
-import {
-  buildRejectionTemplatePreview,
-  type RejectionTemplateParams,
-} from "@/lib/notifications/approval-templates";
-import { sendRejectionWhatsApp } from "@/lib/notifications/whatsapp";
-
 interface RejectionNoticeInput {
   fullName: string;
   email: string;
@@ -15,8 +8,9 @@ interface RejectionNoticeInput {
 }
 
 export async function sendRejectionNotifications(
-  _input: RejectionNoticeInput
+  input: RejectionNoticeInput
 ): Promise<{ whatsappSent: boolean; warnings: string[] }> {
+  void input;
   // Option 1: Direct 1-Click WhatsApp Chat enabled in Admin UI
   return { whatsappSent: true, warnings: [] };
 }
