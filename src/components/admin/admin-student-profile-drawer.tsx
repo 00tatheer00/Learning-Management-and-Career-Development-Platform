@@ -28,6 +28,7 @@ import { Button } from "@/components/ui/button";
 import { useAdminPermissions } from "@/components/admin/admin-permissions";
 import type { AdminStudentProfile } from "@/lib/api/admin-student-profile";
 import { paymentScreenshotHref, revealEnrollmentPassword, revealStudentPassword } from "@/lib/api/admin-client";
+import { getWhatsAppDirectLink } from "@/lib/utils/whatsapp-direct";
 import { cn, formatAppliedDateTime } from "@/lib/utils";
 import { toast } from "@/lib/ui/toast";
 
@@ -302,34 +303,12 @@ function AdminStudentProfileDrawer() {
     setShowPassword(true);
   };
 
-  const resendWhatsApp = async () => {
-    if (!profile?.studentId && !profile?.focusedEnrollmentId) return;
-    setActionLoading("whatsapp");
-    try {
-      const body = profile.focusedEnrollmentId
-        ? { action: "resendLogin", enrollmentId: profile.focusedEnrollmentId }
-        : profile.studentId
-          ? { action: "resendLogin", studentId: profile.studentId }
-          : null;
-
-      if (!body) return;
-
-      const res = await fetch("/api/admin/whatsapp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      const json = await res.json();
-      if (json.success) {
-        toast.success(json.message ?? "WhatsApp sent.");
-      } else {
-        toast.error(json.error ?? json.message ?? "WhatsApp send failed");
-      }
-    } catch {
-      toast.error("WhatsApp send failed");
-    } finally {
-      setActionLoading(null);
-    }
+  const resendWhatsApp = () => {
+    if (!profile) return;
+    const text = `Assalam-o-Alaikum ${profile.name}! This is Emerging Edge School regarding your ${profile.courseTitle} application.`;
+    const link = getWhatsAppDirectLink(profile.whatsapp, text);
+    window.open(link, "_blank");
+    toast.success("Opening WhatsApp", `Opening WhatsApp chat for ${profile.name}...`);
   };
 
   const initials = (profile?.name ?? "?")

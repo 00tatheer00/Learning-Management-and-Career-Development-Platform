@@ -29,6 +29,7 @@ import { useAdminPermissions } from "@/components/admin/admin-permissions";
 import { OpenStudentProfileButton, AdminStudentProfileButton } from "@/components/admin/admin-student-profile-drawer";
 import type { AdminCredentialRow } from "@/lib/api/admin-credentials";
 import { revealEnrollmentPassword } from "@/lib/api/admin-client";
+import { getWhatsAppDirectLink, buildApprovalWhatsAppMessage } from "@/lib/utils/whatsapp-direct";
 
 interface CredentialsMeta {
   total: number;
@@ -193,26 +194,16 @@ export function AdminCredentialsPanel() {
     );
   };
 
-  const handleResendWhatsApp = async (row: AdminCredentialRow) => {
-    setLoadingId(row.id);
-    try {
-      const res = await fetch("/api/admin/whatsapp", {
-        method: "POST",
-        credentials: "same-origin",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "resendLogin", enrollmentId: row.id }),
-      });
-      const json = await res.json();
-      if (json.success) {
-        toast.success(json.message ?? "WhatsApp sent.");
-      } else {
-        toast.error(json.error ?? json.message ?? "WhatsApp send failed");
-      }
-    } catch {
-      toast.error("WhatsApp send failed");
-    } finally {
-      setLoadingId(null);
-    }
+  const handleResendWhatsApp = (row: AdminCredentialRow) => {
+    const text = buildApprovalWhatsAppMessage({
+      studentName: row.name,
+      programTitle: row.courseTitle,
+      email: row.email,
+      portalLoginUrl: row.loginUrl,
+    });
+    const link = getWhatsAppDirectLink(row.whatsapp, text);
+    window.open(link, "_blank");
+    toast.success("Opening WhatsApp", `Opening WhatsApp chat for ${row.name}...`);
   };
 
   const handleSendLoginEmail = async (row: AdminCredentialRow) => {
