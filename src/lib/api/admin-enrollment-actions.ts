@@ -159,12 +159,12 @@ export async function approveEnrollmentAndCreateAccount(
     },
   });
 
-  const parts: string[] = ["Registration approved. Module login saved."];
-  if (notifications.emailSent) parts.push("Email sent.");
-  else parts.push(`Email failed: ${notifications.warnings.find((w) => w.toLowerCase().includes("email")) ?? "not sent"}`);
-  if (notifications.whatsappSent) parts.push("WhatsApp sent.");
-  else if (whatsappError) parts.push(`WhatsApp failed: ${whatsappError}`);
-
+  const parts: string[] = ["Registration approved. Student account created."];
+  if (notifications.emailSent) {
+    parts.push("Login email sent.");
+  } else {
+    parts.push(`Email failed: ${notifications.warnings.find((w) => w.toLowerCase().includes("email")) ?? "not sent"}`);
+  }
   const message = parts.join(" ");
 
   return {

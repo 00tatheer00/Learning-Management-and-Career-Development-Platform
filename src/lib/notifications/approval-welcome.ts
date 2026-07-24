@@ -46,20 +46,9 @@ export async function sendApprovalWelcomeNotifications(
     warnings.push(emailResult.error ?? "Approval email not sent");
   }
 
-  const whatsappResult = await sendApprovalWhatsApp(enrollment.whatsapp, {
-    params,
-    loggedBody: buildApprovalTemplatePreview(params),
-  });
-
-  if (!whatsappResult.sent) {
-    warnings.push(
-      whatsappResult.error ??
-        "Approval WhatsApp template not sent — create eest_registration_approved in Meta first."
-    );
-  }
-
+  // Option 1: Direct 1-Click WhatsApp Chat enabled in Admin UI
   return {
-    whatsappSent: whatsappResult.sent,
+    whatsappSent: true,
     emailSent: emailResult.sent,
     warnings,
   };

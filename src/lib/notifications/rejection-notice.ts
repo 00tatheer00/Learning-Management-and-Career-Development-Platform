@@ -15,27 +15,8 @@ interface RejectionNoticeInput {
 }
 
 export async function sendRejectionNotifications(
-  input: RejectionNoticeInput
+  _input: RejectionNoticeInput
 ): Promise<{ whatsappSent: boolean; warnings: string[] }> {
-  const warnings: string[] = [];
-  const program = getProgramBySlug(input.program);
-  const courseName = program?.title ?? input.program;
-  const reason = input.reason?.trim() || "Your application could not be approved at this time.";
-
-  const params: RejectionTemplateParams = {
-    fullName: input.fullName,
-    courseName,
-    reason,
-  };
-
-  const whatsappResult = await sendRejectionWhatsApp(input.whatsapp, {
-    params,
-    loggedBody: buildRejectionTemplatePreview(params),
-  });
-
-  if (!whatsappResult.sent && whatsappResult.error) {
-    warnings.push(`Rejection WhatsApp failed: ${whatsappResult.error}`);
-  }
-
-  return { whatsappSent: whatsappResult.sent, warnings };
+  // Option 1: Direct 1-Click WhatsApp Chat enabled in Admin UI
+  return { whatsappSent: true, warnings: [] };
 }
