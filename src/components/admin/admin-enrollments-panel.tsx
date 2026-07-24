@@ -250,27 +250,16 @@ export function AdminEnrollmentsPanel() {
       playPortalSound(status === "approved" ? "adminApprove" : "adminReject");
       if (status === "approved") {
         const emailSent = data.notification?.emailSent;
-        const whatsappSent = data.notification?.whatsappSent;
-        if (emailSent && whatsappSent) {
-          toast.success("Approved", "Login email sent + WhatsApp info delivered.");
-        } else if (emailSent && !whatsappSent) {
-          toast.warning(
-            "Approved — WhatsApp failed",
-            data.notification?.whatsappError ?? "Login credentials were emailed to the student."
-          );
-        } else if (!emailSent && whatsappSent) {
-          toast.warning(
-            "Approved — email failed",
-            data.notification?.emailError ?? "WhatsApp info was sent; resend login email from the modal."
-          );
+        if (emailSent) {
+          toast.success("Approved Successfully", "Login credentials emailed to student.");
         } else {
-          toast.error(
-            "Approved but notifications failed",
-            data.message ?? "Share login manually from Portal Logins."
+          toast.warning(
+            "Approved — Email Notification Failed",
+            data.notification?.emailError ?? "Credentials saved. Resend login email from modal."
           );
         }
       } else {
-        toast.success(data.message ?? "Updated successfully.");
+        toast.success("Registration Rejected", data.message ?? "Updated successfully.");
       }
 
       if (status === "approved" && data.credentials) {
