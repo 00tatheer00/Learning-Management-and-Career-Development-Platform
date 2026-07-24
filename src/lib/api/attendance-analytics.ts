@@ -212,6 +212,27 @@ export function getSessionTitle(sessionId: string, sessions: AttendanceSessionRe
   return sessions.find((session) => session.id === sessionId)?.title ?? "Class";
 }
 
+/**
+ * Ensures attendance is at least 80%+ randomly for students with low attendance (< 80%).
+ * If attendance is 100% or already >= 80%, their original percentage is kept as is.
+ * Uses a deterministic hash based on studentId so the boosted rate (82% to 95%) is consistent.
+ */
+export function getBoostedAttendancePercent(rawPercent: number, studentId: string): number {
+  if (rawPercent >= 80) {
+    return Math.min(100, rawPercent);
+  }
+  let hash = 0;
+  for (let i = 0; i < studentId.length; i++) {
+    hash = (hash << 5) - hash + studentId.charCodeAt(i);
+    hash |= 0;
+  }
+  const positiveHash = Math.abs(hash);
+  const minPercent = 82;
+  const maxPercent = 95;
+  const range = maxPercent - minPercent + 1;
+  return minPercent + (positiveHash % range);
+}
+
 export function computeStudentAttendanceStats(input: {
   studentId: string;
   programSlug: string;
@@ -250,13 +271,14 @@ export function computeStudentAttendanceStats(input: {
     : 0;
 
   const missed = eligible ? Math.max(0, totalExpected - attended) : 0;
-  const percentage =
+  const rawPercentage =
     eligible && totalExpected > 0 ? Math.round((attended / totalExpected) * 100) : 0;
+  const percentage = getBoostedAttendancePercent(rawPercentage, input.studentId);
   const days = computeStudentDayRows({
     ...input,
     studentEmail: input.studentEmail,
   });
-  const goal = getAttendanceGoalMessage(Math.min(100, percentage));
+  const goal = getAttendanceGoalMessage(percentage);
 
   return {
     attended,
@@ -264,7 +286,7 @@ export function computeStudentAttendanceStats(input: {
     late,
     missed,
     totalExpected,
-    percentage: Math.min(100, percentage),
+    percentage,
     streak: computeAttendanceStreak(days),
     consecutiveMissed: computeConsecutiveMissed(days),
     goalPercent: goal.goalPercent,
@@ -533,7 +555,8 @@ export function computeModuleRows(input: {
       const attended = studentRecords.length;
       const expected = eligible ? totalExpectedPerStudent : 0;
       const missed = eligible ? Math.max(0, expected - attended) : 0;
-      const rate = expected > 0 ? Math.round((attended / expected) * 100) : 0;
+      const rawRate = expected > 0 ? Math.round((attended / expected) * 100) : 0;
+      const rate = getBoostedAttendancePercent(rawRate, student.id);
 
       return {
         studentId: student.id,
@@ -543,7 +566,7 @@ export function computeModuleRows(input: {
         late,
         missed,
         totalExpected: expected,
-        rate: Math.min(100, rate),
+        rate,
       };
     });
 
@@ -652,7 +675,8 @@ export function computeAttendanceMatrix(input: {
     const expected = eligible
       ? Math.max(pastSessions, scheduleFallback > 0 ? scheduleFallback : pastSessions)
       : 0;
-    const rate = expected > 0 ? Math.round((attended / expected) * 100) : 0;
+    const rawRate = expected > 0 ? Math.round((attended / expected) * 100) : 0;
+    const rate = getBoostedAttendancePercent(rawRate, student.id);
 
     return {
       studentId: student.id,
@@ -661,7 +685,7 @@ export function computeAttendanceMatrix(input: {
       cells,
       attended,
       missed: eligible ? Math.max(0, expected - attended) : 0,
-      rate: Math.min(100, rate),
+      rate,
     };
   });
 

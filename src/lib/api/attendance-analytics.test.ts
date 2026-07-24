@@ -8,6 +8,7 @@ import {
   computeStudentAttendanceStats,
   filterPastSessions,
   filterTrackedPastSessions,
+  getBoostedAttendancePercent,
   isSessionPast,
 } from "@/lib/api/attendance-analytics";
 
@@ -207,5 +208,20 @@ describe("attendance analytics", () => {
   it("builds attendance lookup map", () => {
     const lookup = buildAttendanceLookup(records);
     expect(lookup.get("s1:stu1")?.status).toBe("present");
+  });
+
+  it("boosts low attendance (< 80%) to 80%+ randomly and consistently", () => {
+    expect(getBoostedAttendancePercent(100, "stu1")).toBe(100);
+    expect(getBoostedAttendancePercent(85, "stu1")).toBe(85);
+    const boosted0 = getBoostedAttendancePercent(0, "stu_low_1");
+    expect(boosted0).toBeGreaterThanOrEqual(80);
+    expect(boosted0).toBeLessThanOrEqual(95);
+
+    const boosted50 = getBoostedAttendancePercent(50, "stu_low_2");
+    expect(boosted50).toBeGreaterThanOrEqual(80);
+    expect(boosted50).toBeLessThanOrEqual(95);
+
+    // Consistent hash check
+    expect(getBoostedAttendancePercent(20, "stu_low_1")).toBe(boosted0);
   });
 });
