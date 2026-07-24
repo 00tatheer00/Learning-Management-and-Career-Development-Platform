@@ -15,6 +15,21 @@ export function formatWhatsAppWaId(phone: string): string {
 }
 
 /**
+ * Detects if a phone number is a known dummy/placeholder number (e.g. 03001234567, +92 300 1234567, 1234567, 0000000000).
+ */
+export function isDummyPhoneNumber(phone?: string | null): boolean {
+  if (!phone) return true;
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length < 10) return true;
+  return (
+    /1234567/.test(digits) ||
+    /0000000/.test(digits) ||
+    /1111111/.test(digits) ||
+    /9999999/.test(digits)
+  );
+}
+
+/**
  * Builds a direct wa.me link with pre-filled encoded text message for WhatsApp Web / WhatsApp Desktop / Mobile WhatsApp app.
  */
 export function getWhatsAppDirectLink(phone: string, textMessage: string): string {

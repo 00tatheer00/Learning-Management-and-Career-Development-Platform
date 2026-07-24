@@ -57,6 +57,8 @@ export async function ensureDemoStudentForPortalLogins(): Promise<string | null>
     const reviewedAt = new Date();
     const demoEmail = DEMO_PORTAL_STUDENT_EMAIL.toLowerCase();
 
+    const demoPhone = process.env.DEMO_STUDENT_WHATSAPP?.trim() || "03115969527";
+
     const studentFields = {
       name: "Demo Student",
       role: "student" as const,
@@ -65,7 +67,7 @@ export async function ensureDemoStudentForPortalLogins(): Promise<string | null>
       batch: "Batch 1",
       avatarInitials: "DS",
       isActive: true,
-      phone: "03001234567",
+      phone: demoPhone,
       passwordHash,
     };
 
@@ -113,7 +115,7 @@ export async function ensureDemoStudentForPortalLogins(): Promise<string | null>
         classSemester: "N/A",
         cnic: "4210112345671",
         email: demoEmail,
-        whatsapp: "03001234567",
+        whatsapp: demoPhone,
         fieldOfStudy: "Computer Science",
         program: "web-development",
         level: primaryLevel,

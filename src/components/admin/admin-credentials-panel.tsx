@@ -29,7 +29,11 @@ import { useAdminPermissions } from "@/components/admin/admin-permissions";
 import { OpenStudentProfileButton, AdminStudentProfileButton } from "@/components/admin/admin-student-profile-drawer";
 import type { AdminCredentialRow } from "@/lib/api/admin-credentials";
 import { revealEnrollmentPassword } from "@/lib/api/admin-client";
-import { getWhatsAppDirectLink, buildApprovalWhatsAppMessage } from "@/lib/utils/whatsapp-direct";
+import {
+  getWhatsAppDirectLink,
+  buildApprovalWhatsAppMessage,
+  isDummyPhoneNumber,
+} from "@/lib/utils/whatsapp-direct";
 
 interface CredentialsMeta {
   total: number;
@@ -195,6 +199,14 @@ export function AdminCredentialsPanel() {
   };
 
   const handleResendWhatsApp = (row: AdminCredentialRow) => {
+    if (isDummyPhoneNumber(row.whatsapp)) {
+      toast.warning(
+        "Placeholder Phone Number",
+        `Student ${row.name} has a placeholder phone number (${row.whatsapp || "N/A"}). Update to a real WhatsApp number to chat.`
+      );
+    } else {
+      toast.success("Opening WhatsApp", `Opening WhatsApp chat for ${row.name}...`);
+    }
     const text = buildApprovalWhatsAppMessage({
       studentName: row.name,
       programTitle: row.course,
@@ -203,7 +215,6 @@ export function AdminCredentialsPanel() {
     });
     const link = getWhatsAppDirectLink(row.whatsapp, text);
     window.open(link, "_blank");
-    toast.success("Opening WhatsApp", `Opening WhatsApp chat for ${row.name}...`);
   };
 
   const handleSendLoginEmail = async (row: AdminCredentialRow) => {

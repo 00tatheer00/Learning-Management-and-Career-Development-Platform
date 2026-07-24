@@ -28,7 +28,7 @@ import { Button } from "@/components/ui/button";
 import { useAdminPermissions } from "@/components/admin/admin-permissions";
 import type { AdminStudentProfile } from "@/lib/api/admin-student-profile";
 import { paymentScreenshotHref, revealEnrollmentPassword, revealStudentPassword } from "@/lib/api/admin-client";
-import { getWhatsAppDirectLink } from "@/lib/utils/whatsapp-direct";
+import { getWhatsAppDirectLink, isDummyPhoneNumber } from "@/lib/utils/whatsapp-direct";
 import { cn, formatAppliedDateTime } from "@/lib/utils";
 import { toast } from "@/lib/ui/toast";
 
@@ -305,10 +305,17 @@ function AdminStudentProfileDrawer() {
 
   const resendWhatsApp = () => {
     if (!profile) return;
+    if (isDummyPhoneNumber(profile.whatsapp)) {
+      toast.warning(
+        "Placeholder Phone Number",
+        `Student ${profile.name} has a placeholder phone number (${profile.whatsapp || "N/A"}). Update to a real WhatsApp number to chat.`
+      );
+    } else {
+      toast.success("Opening WhatsApp", `Opening WhatsApp chat for ${profile.name}...`);
+    }
     const text = `Assalam-o-Alaikum ${profile.name}! This is Emerging Edge School regarding your ${profile.course || "course"} application.`;
     const link = getWhatsAppDirectLink(profile.whatsapp, text);
     window.open(link, "_blank");
-    toast.success("Opening WhatsApp", `Opening WhatsApp chat for ${profile.name}...`);
   };
 
   const initials = (profile?.name ?? "?")

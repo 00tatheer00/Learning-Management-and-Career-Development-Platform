@@ -41,6 +41,7 @@ import {
   getWhatsAppDirectLink,
   buildApprovalWhatsAppMessage,
   buildRejectionWhatsAppMessage,
+  isDummyPhoneNumber,
 } from "@/lib/utils/whatsapp-direct";
 
 type StatusFilter = "all" | "pending" | "approved" | "rejected";
@@ -1062,6 +1063,14 @@ export function AdminEnrollmentsPanel() {
                   )}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => {
+                    if (isDummyPhoneNumber(approvedCredentials?.phone)) {
+                      toast.warning(
+                        "Placeholder Phone Number",
+                        `This student has a placeholder phone number (${approvedCredentials?.phone || "N/A"}). Update to a real WhatsApp number to chat.`
+                      );
+                    }
+                  }}
                   className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-black uppercase tracking-wider text-white shadow-md hover:bg-emerald-700 transition-all shrink-0"
                 >
                   <ChatsCircle size={18} weight="fill" />

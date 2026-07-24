@@ -1,12 +1,22 @@
 import { describe, expect, it } from "vitest";
 import {
   formatWhatsAppWaId,
+  isDummyPhoneNumber,
   getWhatsAppDirectLink,
   buildApprovalWhatsAppMessage,
   buildRejectionWhatsAppMessage,
 } from "./whatsapp-direct";
 
 describe("whatsapp-direct utility", () => {
+  it("detects placeholder and dummy phone numbers", () => {
+    expect(isDummyPhoneNumber("03001234567")).toBe(true);
+    expect(isDummyPhoneNumber("+92 300 1234567")).toBe(true);
+    expect(isDummyPhoneNumber("12345")).toBe(true);
+    expect(isDummyPhoneNumber(null)).toBe(true);
+    expect(isDummyPhoneNumber("03115969527")).toBe(false);
+    expect(isDummyPhoneNumber("+923374005515")).toBe(false);
+  });
+
   it("formats Pakistani numbers correctly for wa.me links", () => {
     expect(formatWhatsAppWaId("03115969527")).toBe("923115969527");
     expect(formatWhatsAppWaId("+923115969527")).toBe("923115969527");
