@@ -23,7 +23,7 @@ import {
   type EnrollmentFormData,
 } from "@/lib/validations/enrollment";
 import { preparePaymentScreenshot } from "@/lib/utils/payment-screenshot";
-import { PAYMENT_CONFIG, ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
+import { PAYMENT_CONFIG, ENROLLABLE_PROGRAM_SLUGS, getProgramRegistrationFee } from "@/lib/constants/payment";
 import { PaymentInfoCard } from "@/components/shared/payment-info-card";
 import { ProgramSyllabusSection } from "@/components/shared/program-syllabus-section";
 import { programs, formatModuleSchedule, programHasSyllabus } from "@/lib/data/programs";
@@ -334,6 +334,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
   });
 
   const selectedProgram = watch("program");
+  const selectedFee = getProgramRegistrationFee(selectedProgram);
   const watchedEmail = watch("email");
   const watchedCnic = watch("cnic");
   const activeProgram = programs.find((p) => p.slug === selectedProgram);
@@ -834,7 +835,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                 />
                 <FieldError id="program-error" message={errors.program?.message} />
                 <p className="text-xs text-muted mt-1.5">
-                  Currently open: Web Development &amp; Mobile App (Flutter) Development
+                  Currently open: Web Development, Mobile App (Flutter) Development &amp; Artificial Intelligence
                 </p>
               </div>
 
@@ -925,7 +926,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                 <span>📸</span> Share receipt screenshot here
               </p>
               <p className="text-xs sm:text-sm text-emerald-800 dark:text-emerald-300 leading-relaxed">
-                After approval of your payment (PKR 1,000 one-time registration per module), you will get a confirmation message on WhatsApp or an email with your portal login details!
+                After approval of your payment (PKR {selectedFee.toLocaleString()} one-time registration per module), you will get a confirmation message on WhatsApp or an email with your portal login details!
               </p>
             </div>
 
@@ -971,12 +972,12 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
               </div>
             </div>
 
-            <PaymentInfoCard compact className="mb-5" />
+            <PaymentInfoCard compact amount={selectedFee} className="mb-5" />
 
             <div>
               <RequiredLabel htmlFor="paymentScreenshot">
                 Upload Payment Receipt Screenshot — PKR{" "}
-                {PAYMENT_CONFIG.registrationFee.toLocaleString()} only
+                {selectedFee.toLocaleString()} only
               </RequiredLabel>
               <p className="text-xs text-muted mt-1 mb-2">
                 <strong>Required.</strong> Please upload a clear Easypaisa &quot;Transaction Successful&quot; receipt screenshot showing TRX ID &amp; Date. Max size{" "}

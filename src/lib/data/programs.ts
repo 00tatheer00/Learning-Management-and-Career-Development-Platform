@@ -1,6 +1,7 @@
 import type { Program, ProgramModule } from "@/types";
 import { WEB_DEV_SYLLABUS } from "@/lib/data/web-dev-syllabus";
 import { FLUTTER_SYLLABUS } from "@/lib/data/flutter-syllabus";
+import { AI_SYLLABUS } from "@/lib/data/ai-syllabus";
 
 export const MODULE_SCHEDULE = {
   daysPerWeek: 3,
@@ -118,20 +119,42 @@ export const programs: Program[] = [
     id: "ai",
     slug: "artificial-intelligence",
     title: "Artificial Intelligence",
-    category: "future",
+    category: "active",
     description:
-      "Explore machine learning, deep learning, and AI application development for real-world business solutions.",
-    duration: "Coming Soon",
-    level: "Intermediate",
+      "Master Python, Vibe Coding, Machine Learning, Deep Learning, RAG, and LLM Autonomous Agents with real production projects.",
+    duration: "~3 months · 3 modules",
+    level: "Beginner to Advanced",
     image:
       "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=900&h=560&fit=crop&q=80",
     outcomes: [
-      "Understand ML fundamentals and algorithms",
-      "Build and train neural networks",
-      "Deploy AI models to production",
-      "Apply AI to solve business problems",
+      "Master Python fundamentals and trending AI vibe-coding platforms",
+      "Build Data Analytics & Machine Learning pipelines from scratch",
+      "Develop RAG applications using Vector DBs and Hugging Face models",
+      "Architect autonomous LLM AI Agents and deploy multimodal apps",
     ],
-    modules: [],
+    modules: [
+      createProgramModule(
+        "Module 1: AI Launchpad",
+        "From Zero to Vibe-Coder — Python, AI tools, Prompt & Context Engineering",
+        "1 month",
+        MODULE_SCHEDULE,
+        [...AI_SYLLABUS["Module 1: AI Launchpad"]]
+      ),
+      createProgramModule(
+        "Module 2: Data to ML Engineer",
+        "Analytics, Statistics, Deep Learning & MLOps Deployment",
+        "1 month",
+        MODULE_SCHEDULE,
+        [...AI_SYLLABUS["Module 2: Data to ML Engineer"]]
+      ),
+      createProgramModule(
+        "Module 3: Generative AI & LLM Agent Engineer",
+        "RAG, Vector DBs, Multi-Model APIs, Autonomous Agents & Streamlit Apps",
+        "1 month",
+        MODULE_SCHEDULE,
+        [...AI_SYLLABUS["Module 3: Generative AI & LLM Agent Engineer"]]
+      ),
+    ],
   },
   {
     id: "video-editing",

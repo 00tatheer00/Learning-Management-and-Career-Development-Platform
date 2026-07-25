@@ -8,10 +8,12 @@ import { cn } from "@/lib/utils";
 interface PaymentInfoCardProps {
   className?: string;
   compact?: boolean;
+  amount?: number;
 }
 
-export function PaymentInfoCard({ className, compact = false }: PaymentInfoCardProps) {
+export function PaymentInfoCard({ className, compact = false, amount }: PaymentInfoCardProps) {
   const [copied, setCopied] = useState(false);
+  const feeAmount = amount ?? PAYMENT_CONFIG.registrationFee;
 
   const copyNumber = async () => {
     await navigator.clipboard.writeText(PAYMENT_CONFIG.easypaisa.number);
@@ -42,7 +44,7 @@ export function PaymentInfoCard({ className, compact = false }: PaymentInfoCardP
               Easypaisa Payment
             </p>
             <p className="mt-0.5 text-xs text-muted">
-              Rs {PAYMENT_CONFIG.registrationFee.toLocaleString()} · one-time registration per module
+              Rs {feeAmount.toLocaleString()} · one-time registration per module
             </p>
           </div>
         </div>

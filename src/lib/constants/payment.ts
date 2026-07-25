@@ -8,12 +8,12 @@ export const PAYMENT_CONFIG = {
   },
   headline: "Course is 100% FREE",
   registrationLabel: "One-Time Fee Per Module",
-  registrationNote: "Only Rs 1,000 per module registration — pay once per module",
-  freeNote: "Only Rs 1,000 registration fee per module. All classes & tasks in the module are free.",
+  registrationNote: "Pay registration fee per module — pay once per module",
+  freeNote: "Registration fee per module. All classes & tasks in the module are included.",
   feeNote:
-    "Pay PKR 1,000 registration fee per module. All lectures & tasks for the module are included.",
+    "Pay registration fee per module. All lectures & tasks for the module are included.",
   postRegistrationAccess: {
-    title: "What you get after you pay Rs 1,000 per module",
+    title: "What you get after payment verification",
     subtitle: "After we verify your payment, you will get:",
     items: [
       "Added to WhatsApp group",
@@ -25,7 +25,20 @@ export const PAYMENT_CONFIG = {
   },
 } as const;
 
+export const PROGRAM_FEES: Record<string, number> = {
+  "web-development": 1000,
+  "app-development": 1000,
+  "artificial-intelligence": 2000,
+};
+
+export function getProgramRegistrationFee(programSlug?: string | null): number {
+  if (!programSlug) return 1000;
+  return PROGRAM_FEES[programSlug] ?? 1000;
+}
+
 export const ENROLLABLE_PROGRAM_SLUGS = [
   "web-development",
   "app-development",
+  "artificial-intelligence",
 ] as const;
+

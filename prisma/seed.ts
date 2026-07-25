@@ -60,6 +60,17 @@ const DEFAULT_USERS = [
     avatarInitials: "TI",
   },
   {
+    id: "trainer-faiza",
+    email: "faiza@eest.com",
+    password: seedPassword("SEED_TRAINER_FAIZA_PASSWORD", "faiza@321"),
+    role: "trainer" as const,
+    name: "Faiza Ghaffar",
+    phone: "03000000000",
+    programSlug: "artificial-intelligence",
+    trainerId: "trainer-faiza",
+    avatarInitials: "FG",
+  },
+  {
     id: "student-1",
     email: "tatheerabidi00@gmail.com",
     password: seedPassword("SEED_STUDENT_PASSWORD", "student123"),
