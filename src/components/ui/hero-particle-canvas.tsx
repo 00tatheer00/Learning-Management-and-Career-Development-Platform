@@ -29,7 +29,7 @@ export function HeroParticleCanvas() {
     const mouse = {
       x: -1000,
       y: -1000,
-      radius: 140,
+      radius: 180,
     };
 
     const handleMouseMove = (e: MouseEvent) => {
@@ -58,9 +58,9 @@ export function HeroParticleCanvas() {
     }
 
     const colors = [
-      "rgba(249, 115, 22, ", // Orange
-      "rgba(245, 158, 11, ", // Amber
-      "rgba(14, 165, 233, ", // Cyan/Sky
+      "rgba(249, 115, 22, ", // Vibrant Orange
+      "rgba(245, 158, 11, ", // Bright Amber
+      "rgba(14, 165, 233, ", // Sky Blue
       "rgba(99, 102, 241, ", // Indigo
     ];
 
@@ -68,16 +68,17 @@ export function HeroParticleCanvas() {
 
     const initParticles = () => {
       particles = [];
-      const count = Math.min(Math.floor((width * height) / 18000), 45);
+      // Higher density for a prominent, rich mesh constellation
+      const count = Math.min(Math.floor((width * height) / 10000), 75);
 
       for (let i = 0; i < count; i++) {
         particles.push({
           x: Math.random() * width,
           y: Math.random() * height,
-          vx: (Math.random() - 0.5) * 0.4,
-          vy: (Math.random() - 0.5) * 0.4,
-          radius: Math.random() * 2 + 1.2,
-          baseAlpha: Math.random() * 0.35 + 0.25,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: (Math.random() - 0.5) * 0.5,
+          radius: Math.random() * 2.2 + 1.8,
+          baseAlpha: Math.random() * 0.35 + 0.45,
           color: colors[Math.floor(Math.random() * colors.length)],
         });
       }
@@ -88,18 +89,18 @@ export function HeroParticleCanvas() {
     const render = () => {
       ctx.clearRect(0, 0, width, height);
 
-      // Draw subtle background grid dots
-      const gridSpacing = 40;
-      ctx.fillStyle = "rgba(148, 163, 184, 0.06)";
+      // Draw subtle background grid dots with warm tint
+      const gridSpacing = 36;
+      ctx.fillStyle = "rgba(249, 115, 22, 0.08)";
       for (let x = 0; x < width; x += gridSpacing) {
         for (let y = 0; y < height; y += gridSpacing) {
           ctx.beginPath();
-          ctx.arc(x, y, 1, 0, Math.PI * 2);
+          ctx.arc(x, y, 1.2, 0, Math.PI * 2);
           ctx.fill();
         }
       }
 
-      // Update and draw particles & connections
+      // Update and draw particles & mesh connections
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
 
@@ -119,33 +120,33 @@ export function HeroParticleCanvas() {
         let alpha = p.baseAlpha;
         if (dist < mouse.radius) {
           const factor = 1 - dist / mouse.radius;
-          alpha += factor * 0.4;
+          alpha += factor * 0.5;
           // Gentle pull toward mouse
-          p.x += dx * 0.012;
-          p.y += dy * 0.012;
+          p.x += dx * 0.015;
+          p.y += dy * 0.015;
         }
 
-        // Draw particle dot
+        // Draw particle dot with glow
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
         ctx.fillStyle = `${p.color}${alpha.toFixed(2)})`;
         ctx.fill();
 
-        // Connect nearby particles
+        // Connect nearby particles for prominent mesh network
         for (let j = i + 1; j < particles.length; j++) {
           const p2 = particles[j];
           const pdx = p.x - p2.x;
           const pdy = p.y - p2.y;
           const pdist = Math.sqrt(pdx * pdx + pdy * pdy);
-          const maxConnectDist = 120;
+          const maxConnectDist = 160;
 
           if (pdist < maxConnectDist) {
-            const lineAlpha = (1 - pdist / maxConnectDist) * 0.18;
+            const lineAlpha = (1 - pdist / maxConnectDist) * 0.35;
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(p2.x, p2.y);
             ctx.strokeStyle = `rgba(249, 115, 22, ${lineAlpha.toFixed(2)})`;
-            ctx.lineWidth = 0.8;
+            ctx.lineWidth = 1.1;
             ctx.stroke();
           }
         }
@@ -169,7 +170,7 @@ export function HeroParticleCanvas() {
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 pointer-events-none z-[1] w-full h-full opacity-80"
+      className="absolute inset-0 pointer-events-none z-[1] w-full h-full opacity-100"
       aria-hidden="true"
     />
   );
