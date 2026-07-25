@@ -12,6 +12,9 @@ export function Hero3DCanvas() {
 
     // --- Scene, Camera, Renderer Setup ---
     const scene = new THREE.Scene();
+    
+    // Smooth white horizon fog so orange grid fades elegantly into clean white background
+    scene.fog = new THREE.FogExp2(0xffffff, 0.028);
 
     const camera = new THREE.PerspectiveCamera(
       45,
@@ -19,7 +22,7 @@ export function Hero3DCanvas() {
       0.1,
       100
     );
-    camera.position.set(0, 0, 16);
+    camera.position.set(0, 0, 15);
 
     const renderer = new THREE.WebGLRenderer({
       alpha: true,
@@ -39,23 +42,23 @@ export function Hero3DCanvas() {
     canvas.style.pointerEvents = "none";
     container.appendChild(canvas);
 
-    // --- Pure White Lighting ---
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+    // --- Bright Light Lighting ---
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
     scene.add(ambientLight);
 
-    const primaryWhiteLight = new THREE.PointLight(0xffffff, 5, 35);
-    primaryWhiteLight.position.set(4, 4, 10);
-    scene.add(primaryWhiteLight);
+    const orangeSpotLight = new THREE.PointLight(0xf97316, 6, 35);
+    orangeSpotLight.position.set(4, 5, 8);
+    scene.add(orangeSpotLight);
 
-    const secondaryWhiteLight = new THREE.PointLight(0xf8fafc, 3, 30);
-    secondaryWhiteLight.position.set(-4, -4, 8);
-    scene.add(secondaryWhiteLight);
+    const fillWhiteLight = new THREE.DirectionalLight(0xffffff, 1.0);
+    fillWhiteLight.position.set(-5, 10, 10);
+    scene.add(fillWhiteLight);
 
-    // --- Minimal & Simple 3D Mesh Plane (Pure White Lines) ---
+    // --- Clean 3D Mesh Plane (Vibrant Orange Grid) ---
     const meshWidth = 38;
-    const meshHeight = 22;
-    const widthSegs = 36;
-    const heightSegs = 22;
+    const meshHeight = 24;
+    const widthSegs = 38;
+    const heightSegs = 24;
 
     const geometry = new THREE.PlaneGeometry(meshWidth, meshHeight, widthSegs, heightSegs);
 
@@ -66,20 +69,20 @@ export function Hero3DCanvas() {
       initialZ[i] = posAttr.getZ(i);
     }
 
-    // Clean, crisp, white wireframe material
+    // Vibrant Orange Wireframe Material over Light White Background
     const material = new THREE.MeshStandardMaterial({
-      color: 0xffffff,
+      color: 0xf97316, // Vibrant Orange
       wireframe: true,
       transparent: true,
-      opacity: 0.2, // Ultra subtle pure white glow
+      opacity: 0.38, // Crisp, highly visible orange grid lines
       roughness: 0.2,
-      metalness: 0.9,
-      emissive: 0xffffff,
-      emissiveIntensity: 0.12,
+      metalness: 0.8,
+      emissive: 0xea580c,
+      emissiveIntensity: 0.2,
     });
 
     const mesh = new THREE.Mesh(geometry, material);
-    mesh.rotation.x = -Math.PI * 0.24; // Gentle slope
+    mesh.rotation.x = -Math.PI * 0.23; // Elegant perspective slope
     mesh.position.set(0, -1.8, -2);
     scene.add(mesh);
 
@@ -102,7 +105,7 @@ export function Hero3DCanvas() {
 
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
 
-    // --- Gentle & Slow Wave Render Loop ---
+    // --- Render Loop with Intersection Observer Pause ---
     let animationFrameId: number;
     const clock = new THREE.Clock();
     let isInView = true;
@@ -126,26 +129,26 @@ export function Hero3DCanvas() {
       const elapsedTime = clock.getElapsedTime();
 
       // Smooth mouse lerp
-      mouse.x += (mouse.targetX - mouse.x) * 0.03;
-      mouse.y += (mouse.targetY - mouse.y) * 0.03;
+      mouse.x += (mouse.targetX - mouse.x) * 0.04;
+      mouse.y += (mouse.targetY - mouse.y) * 0.04;
 
-      // Soft light tracking
-      primaryWhiteLight.position.x = mouse.x * 6 + 3;
-      primaryWhiteLight.position.y = mouse.y * 4 + 3;
+      // Orange spotlight tracking
+      orangeSpotLight.position.x = mouse.x * 7 + 3;
+      orangeSpotLight.position.y = mouse.y * 4 + 3;
 
-      mesh.rotation.y = mouse.x * 0.05;
-      mesh.rotation.z = mouse.y * 0.02;
+      mesh.rotation.y = mouse.x * 0.06;
+      mesh.rotation.z = mouse.y * 0.03;
 
-      // Very subtle, calm wave motion
+      // Smooth wave motion
       const pos = geometry.attributes.position;
       for (let i = 0; i < count; i++) {
         const x = pos.getX(i);
         const y = pos.getY(i);
 
-        const wave1 = Math.sin(x * 0.28 + elapsedTime * 0.8);
-        const wave2 = Math.cos(y * 0.32 + elapsedTime * 0.6);
+        const wave1 = Math.sin(x * 0.3 + elapsedTime * 1.0);
+        const wave2 = Math.cos(y * 0.35 + elapsedTime * 0.8);
 
-        const z = initialZ[i] + (wave1 + wave2) * 0.25;
+        const z = initialZ[i] + (wave1 + wave2) * 0.3;
         pos.setZ(i, z);
       }
       pos.needsUpdate = true;
@@ -193,7 +196,7 @@ export function Hero3DCanvas() {
   return (
     <div
       ref={containerRef}
-      className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none opacity-85"
+      className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none opacity-90"
       aria-hidden="true"
     />
   );

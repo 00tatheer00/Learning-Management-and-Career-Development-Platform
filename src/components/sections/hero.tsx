@@ -134,30 +134,30 @@ export function HeroSection() {
   return (
     <section
       ref={sectionRef}
-      className="hero-section relative flex flex-col justify-center min-h-screen overflow-hidden pt-24 pb-28 lg:pt-28 lg:pb-36 bg-gradient-to-b from-slate-950 via-slate-900 to-background text-slate-100"
+      className="hero-section relative flex flex-col justify-center min-h-screen overflow-hidden pt-24 pb-28 lg:pt-28 lg:pb-36 bg-gradient-to-b from-white via-slate-50 to-orange-50/30 text-slate-900"
       aria-labelledby="hero-heading"
     >
-      {/* 3D Animated WebGL Canvas Layer (3D Wave Grid Horizon, Floating Geometrics, Interactive Light Beam) */}
+      {/* 3D Animated WebGL Canvas Layer (Orange Grid over Light Background) */}
       <Hero3DCanvas />
 
-      {/* Subtle Pure White Ambient Glow Spheres */}
+      {/* Subtle Warm Orange & Light Ambient Glow Spheres */}
       <div
-        className="hero-glow pointer-events-none absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-white/[0.07] blur-[150px]"
+        className="hero-glow pointer-events-none absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-orange-500/10 blur-[150px]"
         aria-hidden="true"
       />
       <div
-        className="hero-glow pointer-events-none absolute bottom-10 right-10 w-[500px] h-[500px] rounded-full bg-slate-300/[0.05] blur-[130px]"
+        className="hero-glow pointer-events-none absolute bottom-10 right-10 w-[500px] h-[500px] rounded-full bg-amber-400/10 blur-[130px]"
         aria-hidden="true"
       />
 
       <div className="container-custom relative z-10 flex flex-col items-center px-4 sm:px-6 lg:px-8 text-center">
         <div className="w-full max-w-[1140px] flex flex-col items-center">
-          {/* 100% Responsive Glassmorphic Announcement Card */}
+          {/* 100% Responsive Clean Glassmorphic Announcement Card */}
           <motion.div
             initial={{ opacity: 0, y: -20, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="relative mb-8 w-full overflow-hidden rounded-2xl sm:rounded-[24px] border border-orange-500/30 bg-slate-900/70 backdrop-blur-xl p-3.5 sm:p-5 shadow-2xl shadow-orange-500/20 text-slate-100 transition-all duration-300 hover:border-orange-400/50 hover:shadow-orange-500/30"
+            className="relative mb-8 w-full overflow-hidden rounded-2xl sm:rounded-[24px] border border-orange-200/90 bg-white/85 backdrop-blur-xl p-3.5 sm:p-5 shadow-xl shadow-orange-500/10 text-slate-900 transition-all duration-300 hover:border-orange-300 hover:shadow-2xl hover:shadow-orange-500/15"
           >
             {/* Orange Ribbon Tag on Top-Left */}
             <div className="absolute top-0 left-3 sm:left-6 z-10">
@@ -169,40 +169,40 @@ export function HeroSection() {
             <div className="flex flex-col lg:flex-row items-center justify-between gap-4 lg:gap-6 pt-5 sm:pt-2 lg:py-1 pl-3 sm:pl-16 pr-3 sm:pr-4">
               {/* Left Title Section */}
               <div className="flex flex-col items-center sm:items-start text-center sm:text-left shrink-0">
-                <span className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-widest text-orange-400">
+                <span className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-widest text-orange-600">
                   ADMISSIONS OPEN
                 </span>
                 <div className="flex items-center gap-2.5 sm:gap-3 mt-0.5 sm:mt-1">
-                  <h2 className="text-lg sm:text-xl lg:text-2xl font-black text-white tracking-tight uppercase leading-none flex flex-row sm:flex-col gap-1 sm:gap-0">
+                  <h2 className="text-lg sm:text-xl lg:text-2xl font-black text-slate-900 tracking-tight uppercase leading-none flex flex-row sm:flex-col gap-1 sm:gap-0">
                     <span>2ND</span>
                     <span>MODULE</span>
                   </h2>
-                  <span className="font-serif italic font-extrabold text-orange-400 text-xl sm:text-2xl lg:text-3xl leading-none whitespace-nowrap">
+                  <span className="font-serif italic font-extrabold text-orange-600 text-xl sm:text-2xl lg:text-3xl leading-none whitespace-nowrap">
                     Live<span className="inline sm:hidden"> </span><br className="hidden sm:inline" />Now!
                   </span>
                 </div>
               </div>
 
               {/* Vertical Divider (Desktop) */}
-              <div className="hidden lg:block h-14 w-px bg-slate-800 mx-1" />
+              <div className="hidden lg:block h-14 w-px bg-slate-200 mx-1" />
 
               {/* Center Section: Prominent Big Timer */}
               <AdmissionsCountdownTimer />
 
               {/* Vertical Divider (Desktop) */}
-              <div className="hidden lg:block h-14 w-px bg-slate-800 mx-1" />
+              <div className="hidden lg:block h-14 w-px bg-slate-200 mx-1" />
 
               {/* Right Action Button Section */}
               <div className="flex flex-col items-center shrink-0 w-full sm:w-auto pt-1 sm:pt-0">
                 <Link
                   href="/register"
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 px-5 sm:px-6 py-2.5 text-xs font-black uppercase tracking-wider text-white shadow-lg shadow-orange-500/35 hover:scale-105 hover:shadow-orange-500/50 transition-all duration-200 w-full sm:w-auto"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 px-5 sm:px-6 py-2.5 text-xs font-black uppercase tracking-wider text-white shadow-lg shadow-orange-500/30 hover:scale-105 hover:shadow-orange-500/45 transition-all duration-200 w-full sm:w-auto"
                 >
                   <span>APPLY NOW</span>
                   <ArrowRight size={14} className="stroke-[3]" />
                 </Link>
-                <span className="text-[11px] text-slate-400 font-medium mt-1.5 text-center">
-                  Seats are <strong className="text-orange-400 font-bold">Limited!</strong>
+                <span className="text-[11px] text-slate-500 font-medium mt-1.5 text-center">
+                  Seats are <strong className="text-orange-600 font-bold">Limited!</strong>
                 </span>
               </div>
             </div>
@@ -214,11 +214,11 @@ export function HeroSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.15, ease: "easeOut" }}
-            className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.1] mb-6 text-balance text-white"
+            className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.1] mb-6 text-balance text-slate-900"
           >
             Learn Skills Online.
             <br />
-            <span className="bg-gradient-to-r from-orange-400 via-amber-300 to-cyan-400 bg-clip-text text-transparent drop-shadow-sm">
+            <span className="bg-gradient-to-r from-orange-600 via-amber-600 to-orange-500 bg-clip-text text-transparent drop-shadow-sm">
               Course is FREE.
             </span>
           </motion.h1>
@@ -228,7 +228,7 @@ export function HeroSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.3, ease: "easeOut" }}
-            className="text-lg sm:text-xl text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed font-normal"
+            className="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed font-normal"
           >
             Web, App, AI, Video Editing, Digital Marketing, Graphics &amp; UI/UX
             courses. Pay module registration fee to join live interactive classes, assignments, and portal access.
@@ -260,7 +260,7 @@ export function HeroSection() {
             <Button
               size="lg"
               variant="outline"
-              className="text-base h-14 px-9 font-semibold border-slate-700 bg-slate-900/60 text-slate-100 hover:bg-slate-800 hover:text-white backdrop-blur-md transition-all duration-200 hover:scale-[1.02]"
+              className="text-base h-14 px-9 font-semibold border-slate-300 bg-white/90 text-slate-800 hover:bg-slate-50 hover:text-slate-900 backdrop-blur-md shadow-sm transition-all duration-200 hover:scale-[1.02]"
               asChild
             >
               <Link href="/programs" prefetch>See All Courses</Link>
@@ -271,7 +271,7 @@ export function HeroSection() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.6 }}
-            className="mt-8 text-sm text-slate-400"
+            className="mt-8 text-sm text-slate-500"
           >
             Confused? Tap the green <strong className="text-[#25D366] font-bold">Need Help?</strong> button
             at the bottom right corner.
