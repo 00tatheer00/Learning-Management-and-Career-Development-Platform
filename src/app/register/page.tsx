@@ -3,7 +3,6 @@ import { BreadcrumbSchema } from "@/components/seo/json-ld";
 import { RegistrationPageContent } from "@/components/sections/registration-page-content";
 import { createMetadata } from "@/lib/seo/metadata";
 import { SITE_CONFIG } from "@/lib/constants";
-import { PAYMENT_CONFIG } from "@/lib/constants/payment";
 
 export const metadata = createMetadata({
   title: "Register",
