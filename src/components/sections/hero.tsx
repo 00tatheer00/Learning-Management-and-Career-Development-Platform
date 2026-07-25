@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { ArrowRight, Sparkles, Code2, Cpu, Palette, Rocket } from "lucide-react";
 import { motion } from "framer-motion";
