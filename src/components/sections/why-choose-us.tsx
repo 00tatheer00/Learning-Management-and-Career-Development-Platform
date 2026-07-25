@@ -104,8 +104,11 @@ export function WhyChooseUsSection() {
   const feature = features[activeIndex];
 
   return (
-    <section className="section-padding bg-surface/50" aria-labelledby="why-heading">
-      <div className="container-custom">
+    <section className="section-padding bg-slate-950 text-white relative overflow-hidden" aria-labelledby="why-heading">
+      {/* Background Glow */}
+      <div className="absolute top-1/3 left-10 w-[500px] h-[500px] bg-orange-500/10 blur-[140px] pointer-events-none" />
+
+      <div className="container-custom relative z-10">
         <SectionHeader
           label="Why Choose Us"
           title="The EEST Advantage"
@@ -129,43 +132,43 @@ export function WhyChooseUsSection() {
                   if (e.key === "Enter" || e.key === " ") setActiveIndex(index);
                 }}
                 className={cn(
-                  "group text-left p-5 rounded-xl border transition-all duration-300 cursor-pointer",
+                  "group text-left p-5 rounded-2xl border transition-all duration-300 cursor-pointer backdrop-blur-md",
                   activeIndex === index
-                    ? "bg-background border-primary/40 shadow-lg shadow-primary/10 -translate-y-0.5"
-                    : "border-border bg-background hover:border-primary/30 hover:shadow-md hover:-translate-y-1"
+                    ? "bg-slate-900 border-orange-500/50 shadow-xl shadow-orange-500/10 -translate-y-1"
+                    : "border-white/10 bg-slate-900/60 hover:border-orange-500/30 hover:bg-slate-900/90"
                 )}
               >
                 <PremiumIcon
                   icon={item.icon}
                   size="md"
                   active={activeIndex === index}
-                  className="mb-4"
+                  className="mb-3"
                 />
                 <h3
                   className={cn(
-                    "font-semibold text-sm mb-1 transition-colors duration-300",
+                    "font-bold text-sm mb-1 transition-colors duration-300",
                     activeIndex === index
-                      ? "text-primary"
-                      : "text-foreground group-hover:text-primary"
+                      ? "text-orange-400"
+                      : "text-slate-200 group-hover:text-white"
                   )}
                 >
                   {item.title}
                 </h3>
-                <p className="text-xs text-muted line-clamp-2">{item.description}</p>
+                <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">{item.description}</p>
               </motion.div>
             ))}
           </div>
 
-          <div className="rounded-2xl border border-border bg-background overflow-hidden shadow-sm hover:shadow-lg hover:shadow-primary/5 transition-shadow duration-500">
+          <div className="rounded-3xl border border-white/15 bg-slate-900/80 backdrop-blur-2xl overflow-hidden shadow-2xl transition-all duration-500 relative">
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeIndex}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -12 }}
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.96 }}
                 transition={{ duration: 0.35 }}
               >
-                <div className="relative aspect-[16/10] w-full overflow-hidden bg-surface">
+                <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-950">
                   <Image
                     src={feature.image}
                     alt={feature.imageAlt}
@@ -174,7 +177,7 @@ export function WhyChooseUsSection() {
                     sizes="(max-width: 1024px) 100vw, 50vw"
                     priority={activeIndex === 0}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
                 </div>
 
                 <div className="p-8 lg:p-10">
@@ -185,8 +188,8 @@ export function WhyChooseUsSection() {
                     interactive={false}
                     className="mb-5"
                   />
-                  <h3 className="text-2xl font-bold mb-3">{feature.title}</h3>
-                  <p className="text-muted leading-relaxed text-lg">
+                  <h3 className="text-2xl font-black mb-3 text-white">{feature.title}</h3>
+                  <p className="text-slate-300 leading-relaxed text-base sm:text-lg font-normal">
                     {feature.description}
                   </p>
                 </div>
@@ -198,3 +201,4 @@ export function WhyChooseUsSection() {
     </section>
   );
 }
+

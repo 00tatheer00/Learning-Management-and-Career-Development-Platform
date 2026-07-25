@@ -41,6 +41,8 @@ export const viewport = {
   viewportFit: "cover" as const,
 };
 
+import { SpotlightBackground } from "@/components/ui/spotlight-background";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -57,9 +59,10 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${inter.variable} ${geistMono.variable} ${plusJakarta.variable} antialiased bg-background text-foreground`}
+        className={`${inter.variable} ${geistMono.variable} ${plusJakarta.variable} antialiased bg-[#05070E] text-foreground`}
       >
         <AuthSessionProvider>
+          <SpotlightBackground />
           <LayoutSwitcher>{children}</LayoutSwitcher>
           <HelpWhatsApp />
           <ToastProvider />
