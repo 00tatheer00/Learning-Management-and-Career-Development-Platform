@@ -50,73 +50,70 @@ export function ProgramCard({ program, className }: ProgramCardProps) {
       href={`/programs/${program.slug}`}
       className={cn(
         "group relative block h-full transition-all duration-500 hover:-translate-y-2",
-        accent.glow,
         className
       )}
     >
-      <div className="flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-border/70 bg-background shadow-[0_12px_40px_-18px_rgba(15,23,42,0.35)] transition-all duration-500 group-hover:border-primary/25 group-hover:shadow-[0_28px_60px_-24px_rgba(234,88,12,0.28)]">
-        <div className="relative min-h-[220px] overflow-hidden px-6 pb-8 pt-6 sm:min-h-[240px]">
+      <div className="flex h-full flex-col overflow-hidden rounded-[2rem] border border-white/10 dark:border-white/10 bg-slate-900/80 backdrop-blur-xl shadow-xl transition-all duration-500 group-hover:border-orange-500/50 group-hover:shadow-2xl group-hover:shadow-orange-500/20">
+        <div className="relative min-h-[200px] overflow-hidden px-6 pb-6 pt-6 sm:min-h-[220px]">
           {program.image && (
             <Image
               src={program.image}
               alt=""
               fill
-              className="object-cover"
+              className="object-cover transition-transform duration-700 group-hover:scale-105"
               sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
               aria-hidden="true"
             />
           )}
           <div
             className={cn(
-              "absolute inset-0 bg-gradient-to-br",
-              program.image ? "from-black/75 via-black/55 to-black/80" : accent.gradient
+              "absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent opacity-90"
             )}
           />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,0.12),transparent_50%)]" />
           <div className="relative z-10 flex items-start justify-between gap-3">
-            <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15 text-white backdrop-blur-sm">
+            <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-500/20 text-orange-400 border border-orange-500/30 backdrop-blur-md shadow-lg">
               <Icon size={24} weight="duotone" aria-hidden="true" />
             </span>
             <span
               className={cn(
-                "rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em]",
+                "rounded-full px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.16em]",
                 isActive
-                  ? "bg-white text-slate-900"
-                  : "border border-white/25 bg-white/10 text-white backdrop-blur-sm"
+                  ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/30"
+                  : "border border-white/20 bg-white/10 text-slate-300 backdrop-blur-md"
               )}
             >
               {isActive ? "Enrolling Now" : "Coming Soon"}
             </span>
           </div>
 
-          <div className="relative z-10 mt-8">
-            <h3 className="text-2xl font-bold tracking-tight text-white">{program.title}</h3>
-            <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-white/75">
+          <div className="relative z-10 mt-6">
+            <h3 className="text-2xl font-bold tracking-tight text-white group-hover:text-orange-400 transition-colors">{program.title}</h3>
+            <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-slate-300">
               {program.description}
             </p>
           </div>
         </div>
 
-        <div className="flex flex-1 flex-col gap-5 p-5 sm:p-6">
+        <div className="flex flex-1 flex-col gap-5 p-5 sm:p-6 bg-slate-900/90 text-white">
           <div className="flex flex-wrap gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-surface/80 px-3 py-1 text-xs font-medium text-muted">
-              <CalendarDots size={14} weight="duotone" className="text-primary" aria-hidden="true" />
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-slate-300">
+              <CalendarDots size={14} weight="duotone" className="text-orange-400" aria-hidden="true" />
               {program.duration}
             </span>
             {program.modules.length > 0 && (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-surface/80 px-3 py-1 text-xs font-medium text-muted">
-                <Stack size={14} weight="duotone" className="text-primary" aria-hidden="true" />
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-slate-300">
+                <Stack size={14} weight="duotone" className="text-orange-400" aria-hidden="true" />
                 {program.modules.length} modules
               </span>
             )}
             {hasSyllabus && (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-semibold text-primary">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-orange-500/30 bg-orange-500/10 px-3 py-1 text-xs font-semibold text-orange-400">
                 <ListBullets size={14} weight="duotone" aria-hidden="true" />
                 {topicCount} topics
               </span>
             )}
             {program.modules.length > 0 && (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400">
                 <Certificate size={14} weight="duotone" aria-hidden="true" />
                 {MODULE_CERTIFICATE_SHORT}
               </span>
@@ -125,14 +122,14 @@ export function ProgramCard({ program, className }: ProgramCardProps) {
 
           {program.modules.length > 0 && (
             <div className="space-y-2">
-              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted">
+              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">
                 Modules
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {program.modules.map((mod, index) => (
                   <span
                     key={mod.name}
-                    className="rounded-lg border border-border/60 bg-background px-2.5 py-1 text-[11px] font-semibold text-foreground"
+                    className="rounded-xl border border-white/10 bg-slate-950/60 px-2.5 py-1 text-[11px] font-medium text-slate-200"
                   >
                     {index + 1}. {mod.name}
                   </span>
@@ -143,14 +140,14 @@ export function ProgramCard({ program, className }: ProgramCardProps) {
 
           <ul className="space-y-2">
             {program.outcomes.slice(0, 2).map((outcome) => (
-              <li key={outcome} className="flex items-start gap-2 text-sm text-muted">
-                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+              <li key={outcome} className="flex items-start gap-2 text-sm text-slate-300">
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400" />
                 <span className="line-clamp-2">{outcome}</span>
               </li>
             ))}
           </ul>
 
-          <div className="mt-auto flex items-center justify-between border-t border-border/60 pt-4 text-sm font-semibold text-primary">
+          <div className="mt-auto flex items-center justify-between border-t border-white/10 pt-4 text-sm font-bold text-orange-400 group-hover:text-orange-300">
             <span>{isActive ? "View Program" : "Explore Program"}</span>
             <ArrowRight
               size={18}
