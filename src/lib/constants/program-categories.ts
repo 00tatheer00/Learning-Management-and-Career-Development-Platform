@@ -34,6 +34,15 @@ export const PROGRAM_CATEGORIES: Record<
     badgeClass: "bg-primary/10 text-[#1873cc] border-primary/25",
     headerGradient: "from-[#1a4d8f] to-[#1e90ff]",
   },
+  "artificial-intelligence": {
+    slug: "artificial-intelligence",
+    title: "Artificial Intelligence",
+    shortLabel: "AI",
+    sidebarLabel: "Artificial Intelligence",
+    primaryTrainerSeedId: "trainer-faiza",
+    badgeClass: "bg-purple-500/10 text-purple-600 border-purple-500/25",
+    headerGradient: "from-[#4c1d95] to-[#7c3aed]",
+  },
 };
 
 export function isEnrollableProgramSlug(slug: string): slug is EnrollableProgramSlug {

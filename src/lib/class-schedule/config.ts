@@ -29,6 +29,15 @@ export const PROGRAM_CLASS_CONFIG: Record<EnrollableProgramSlug, ProgramClassCon
     daysLabel: "Friday · Saturday · Sunday",
     programTitle: "App Development",
   },
+  "artificial-intelligence": {
+    startDate: "2026-07-31",
+    classDays: [5, 6, 0],
+    startTime: "22:00",
+    endTime: "23:30",
+    timeLabel: "10:00 PM – 11:30 PM",
+    daysLabel: "Friday · Saturday · Sunday",
+    programTitle: "Artificial Intelligence",
+  },
 };
 
 export function isScheduledProgram(slug: string): slug is EnrollableProgramSlug {
