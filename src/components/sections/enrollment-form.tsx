@@ -25,8 +25,7 @@ import {
 import { preparePaymentScreenshot } from "@/lib/utils/payment-screenshot";
 import { PAYMENT_CONFIG, ENROLLABLE_PROGRAM_SLUGS, getProgramRegistrationFee } from "@/lib/constants/payment";
 import { PaymentInfoCard } from "@/components/shared/payment-info-card";
-import { ProgramSyllabusSection } from "@/components/shared/program-syllabus-section";
-import { programs, formatModuleSchedule, programHasSyllabus } from "@/lib/data/programs";
+import { programs, formatModuleSchedule } from "@/lib/data/programs";
 import type { ProgramModule } from "@/types";
 import { cn } from "@/lib/utils";
 import { Alert } from "@/components/ui/alert";
@@ -858,9 +857,19 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                   )}
                 />
                 <FieldError id="level-error" message={errors.level?.message} />
-                {activeProgram && programHasSyllabus(activeProgram) && (
-                  <div className="rounded-2xl border border-primary/15 bg-primary/[0.03] p-4 sm:p-5">
-                    <ProgramSyllabusSection program={activeProgram} compact />
+                {activeProgram && (
+                  <div className="mt-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 rounded-xl border border-primary/20 bg-primary/5 p-3.5 text-xs sm:text-sm">
+                    <span className="text-muted leading-tight">
+                      Want to view syllabus &amp; detailed module topics for <strong>{activeProgram.title}</strong>?
+                    </span>
+                    <a
+                      href={`/programs/${activeProgram.slug}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 font-bold text-primary hover:underline shrink-0"
+                    >
+                      View Details on Programs Page &rarr;
+                    </a>
                   </div>
                 )}
               </div>
