@@ -64,24 +64,24 @@ export function StatsSection() {
                 key={stat.label}
                 variants={cardVariants}
                 whileHover={{ y: -4 }}
-                className="rounded-2xl bg-white border border-slate-200/90 p-6 sm:p-7 shadow-sm hover:shadow-md hover:border-orange-300 transition-all duration-300 flex flex-col justify-between"
+                className="rounded-2xl bg-white border border-slate-200/90 p-6 sm:p-7 shadow-sm hover:shadow-md hover:border-orange-300 transition-all duration-300 flex flex-col items-center justify-center text-center"
               >
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className={`p-3 rounded-xl border ${meta.bg} ${meta.color} shadow-xs`}>
+                <div className="flex flex-col items-center justify-center text-center">
+                  <div className="flex items-center justify-center mb-4">
+                    <div className={`p-3 rounded-xl border ${meta.bg} ${meta.color} shadow-xs flex items-center justify-center`}>
                       <IconComponent size={22} />
                     </div>
                   </div>
 
-                  <div className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight mb-1">
+                  <div className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight mb-1 text-center">
                     <AnimatedCounter end={stat.value} suffix={stat.suffix} prefix={stat.prefix} />
                   </div>
 
-                  <h3 className="text-sm sm:text-base font-bold text-slate-900 mb-1">
+                  <h3 className="text-sm sm:text-base font-bold text-slate-900 mb-1 text-center">
                     {stat.label}
                   </h3>
 
-                  <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                  <p className="text-xs text-slate-500 font-medium leading-relaxed text-center max-w-[200px]">
                     {sublabel}
                   </p>
                 </div>
@@ -90,26 +90,26 @@ export function StatsSection() {
           })}
         </motion.div>
 
-        {/* Clean Simple Minimal Trust Bar */}
+        {/* Clean Simple Minimal Trust Bar (Center Center) */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.4 }}
-          className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 pt-4 border-t border-slate-100 text-xs sm:text-sm font-semibold text-slate-600"
+          className="flex flex-wrap items-center justify-center text-center gap-6 sm:gap-10 pt-8 border-t border-slate-100 text-xs sm:text-sm font-semibold text-slate-600 w-full"
         >
-          <div className="flex items-center gap-2">
-            <ShieldCheck size={16} className="text-emerald-600" />
+          <div className="flex items-center justify-center gap-2">
+            <ShieldCheck size={16} className="text-emerald-600 shrink-0" />
             <span>100% Practical Learning</span>
           </div>
 
-          <div className="flex items-center gap-2">
-            <CheckCircle2 size={16} className="text-sky-600" />
+          <div className="flex items-center justify-center gap-2">
+            <CheckCircle2 size={16} className="text-sky-600 shrink-0" />
             <span>Live Class Mentorship</span>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Award size={16} className="text-orange-600" />
+          <div className="flex items-center justify-center gap-2">
+            <Award size={16} className="text-orange-600 shrink-0" />
             <span>Verified Skill Certificates</span>
           </div>
         </motion.div>
