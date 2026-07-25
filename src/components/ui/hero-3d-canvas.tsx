@@ -13,8 +13,8 @@ export function Hero3DCanvas() {
     // --- Scene, Camera, Renderer Setup ---
     const scene = new THREE.Scene();
     
-    // Smooth white horizon fog so orange grid fades elegantly into clean white background
-    scene.fog = new THREE.FogExp2(0xffffff, 0.028);
+    // Smooth horizon fog so grid fades out gracefully at the top & horizon
+    scene.fog = new THREE.FogExp2(0xffffff, 0.032);
 
     const camera = new THREE.PerspectiveCamera(
       45,
@@ -42,23 +42,23 @@ export function Hero3DCanvas() {
     canvas.style.pointerEvents = "none";
     container.appendChild(canvas);
 
-    // --- Bright Light Lighting ---
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
+    // --- Soft Ambient & Point Lights ---
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.1);
     scene.add(ambientLight);
 
-    const orangeSpotLight = new THREE.PointLight(0xf97316, 6, 35);
+    const orangeSpotLight = new THREE.PointLight(0xf97316, 4, 35);
     orangeSpotLight.position.set(4, 5, 8);
     scene.add(orangeSpotLight);
 
-    const fillWhiteLight = new THREE.DirectionalLight(0xffffff, 1.0);
+    const fillWhiteLight = new THREE.DirectionalLight(0xffffff, 0.8);
     fillWhiteLight.position.set(-5, 10, 10);
     scene.add(fillWhiteLight);
 
-    // --- Clean 3D Mesh Plane (Vibrant Orange Grid) ---
+    // --- Faded 3D Mesh Grid (Subtle Orange) ---
     const meshWidth = 38;
     const meshHeight = 24;
-    const widthSegs = 38;
-    const heightSegs = 24;
+    const widthSegs = 36;
+    const heightSegs = 22;
 
     const geometry = new THREE.PlaneGeometry(meshWidth, meshHeight, widthSegs, heightSegs);
 
@@ -69,21 +69,21 @@ export function Hero3DCanvas() {
       initialZ[i] = posAttr.getZ(i);
     }
 
-    // Vibrant Orange Wireframe Material over Light White Background
+    // Faded, subtle orange wireframe material
     const material = new THREE.MeshStandardMaterial({
-      color: 0xf97316, // Vibrant Orange
+      color: 0xf97316, // Brand Orange
       wireframe: true,
       transparent: true,
-      opacity: 0.38, // Crisp, highly visible orange grid lines
-      roughness: 0.2,
-      metalness: 0.8,
+      opacity: 0.18, // Faded & elegant opacity
+      roughness: 0.3,
+      metalness: 0.7,
       emissive: 0xea580c,
-      emissiveIntensity: 0.2,
+      emissiveIntensity: 0.08,
     });
 
     const mesh = new THREE.Mesh(geometry, material);
-    mesh.rotation.x = -Math.PI * 0.23; // Elegant perspective slope
-    mesh.position.set(0, -1.8, -2);
+    mesh.rotation.x = -Math.PI * 0.23; // Gentle perspective slope
+    mesh.position.set(0, -1.5, -2);
     scene.add(mesh);
 
     // --- Mouse Parallax ---
@@ -129,26 +129,26 @@ export function Hero3DCanvas() {
       const elapsedTime = clock.getElapsedTime();
 
       // Smooth mouse lerp
-      mouse.x += (mouse.targetX - mouse.x) * 0.04;
-      mouse.y += (mouse.targetY - mouse.y) * 0.04;
+      mouse.x += (mouse.targetX - mouse.x) * 0.03;
+      mouse.y += (mouse.targetY - mouse.y) * 0.03;
 
-      // Orange spotlight tracking
-      orangeSpotLight.position.x = mouse.x * 7 + 3;
+      // Soft light tracking
+      orangeSpotLight.position.x = mouse.x * 6 + 3;
       orangeSpotLight.position.y = mouse.y * 4 + 3;
 
-      mesh.rotation.y = mouse.x * 0.06;
-      mesh.rotation.z = mouse.y * 0.03;
+      mesh.rotation.y = mouse.x * 0.05;
+      mesh.rotation.z = mouse.y * 0.02;
 
-      // Smooth wave motion
+      // Calm, smooth wave motion
       const pos = geometry.attributes.position;
       for (let i = 0; i < count; i++) {
         const x = pos.getX(i);
         const y = pos.getY(i);
 
-        const wave1 = Math.sin(x * 0.3 + elapsedTime * 1.0);
-        const wave2 = Math.cos(y * 0.35 + elapsedTime * 0.8);
+        const wave1 = Math.sin(x * 0.28 + elapsedTime * 0.9);
+        const wave2 = Math.cos(y * 0.32 + elapsedTime * 0.7);
 
-        const z = initialZ[i] + (wave1 + wave2) * 0.3;
+        const z = initialZ[i] + (wave1 + wave2) * 0.25;
         pos.setZ(i, z);
       }
       pos.needsUpdate = true;
@@ -196,7 +196,7 @@ export function Hero3DCanvas() {
   return (
     <div
       ref={containerRef}
-      className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none opacity-90"
+      className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none opacity-80"
       aria-hidden="true"
     />
   );

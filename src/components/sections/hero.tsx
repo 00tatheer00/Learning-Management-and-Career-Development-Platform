@@ -278,6 +278,12 @@ export function HeroSection() {
           </motion.p>
         </div>
       </div>
+
+      {/* Seamless Fade & Merge into Second Section */}
+      <div
+        className="absolute bottom-0 left-0 right-0 h-36 bg-gradient-to-b from-transparent via-slate-50/70 to-background pointer-events-none z-10"
+        aria-hidden="true"
+      />
     </section>
   );
 }

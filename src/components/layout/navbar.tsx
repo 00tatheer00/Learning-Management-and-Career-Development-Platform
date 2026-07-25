@@ -51,8 +51,10 @@ export function Navbar() {
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 pointer-events-auto transition-[background-color,box-shadow,backdrop-filter] duration-200",
-        isScrolled ? "glass-strong shadow-sm" : "bg-background/80 backdrop-blur-sm"
+        "fixed top-0 left-0 right-0 z-50 pointer-events-auto transition-all duration-300",
+        isScrolled
+          ? "bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200/80 dark:border-slate-800/80 shadow-sm shadow-slate-900/5"
+          : "bg-white/40 dark:bg-slate-900/40 backdrop-blur-md border-b border-slate-200/30 dark:border-slate-800/30"
       )}
     >
       <nav
