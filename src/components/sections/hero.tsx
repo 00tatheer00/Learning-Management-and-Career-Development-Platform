@@ -305,7 +305,7 @@ export function HeroSection() {
           >
             Web, App, AI, Video Editing, Digital Marketing, Graphics &amp; UI/UX
             courses. Pay module registration fee to join live interactive classes, assignments, and portal access.
-          </p>
+          </motion.p>
 
           {/* Animated Action Buttons */}
           <motion.div
