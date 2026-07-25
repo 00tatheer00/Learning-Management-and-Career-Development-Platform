@@ -72,9 +72,9 @@ export function HeroSection() {
         <motion.div
           animate={{ y: [0, -10, 0] }}
           transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-[28%] left-4 xl:left-8 flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-orange-200/60 dark:border-slate-800 shadow-lg shadow-orange-500/5 text-slate-800 dark:text-slate-200 text-xs font-bold"
+          className="absolute top-[28%] left-4 xl:left-8 flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-orange-500/15 backdrop-blur-md border border-orange-300/60 shadow-lg shadow-orange-500/10 text-orange-950 text-xs font-black"
         >
-          <div className="p-1.5 rounded-lg bg-orange-500/10 text-orange-600">
+          <div className="p-1.5 rounded-lg bg-orange-500/20 text-orange-600">
             <Code2 size={16} />
           </div>
           <span>Web &amp; App Development</span>
@@ -84,9 +84,9 @@ export function HeroSection() {
         <motion.div
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-          className="absolute top-[26%] right-4 xl:right-8 flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-sky-200/60 dark:border-slate-800 shadow-lg shadow-sky-500/5 text-slate-800 dark:text-slate-200 text-xs font-bold"
+          className="absolute top-[26%] right-4 xl:right-8 flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-orange-500/15 backdrop-blur-md border border-orange-300/60 shadow-lg shadow-orange-500/10 text-orange-950 text-xs font-black"
         >
-          <div className="p-1.5 rounded-lg bg-sky-500/10 text-sky-500">
+          <div className="p-1.5 rounded-lg bg-orange-500/20 text-orange-600">
             <Cpu size={16} />
           </div>
           <span>AI &amp; Automation</span>
@@ -96,9 +96,9 @@ export function HeroSection() {
         <motion.div
           animate={{ y: [0, -12, 0] }}
           transition={{ duration: 5.2, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          className="absolute bottom-[28%] left-6 xl:left-12 flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-indigo-200/60 dark:border-slate-800 shadow-lg shadow-indigo-500/5 text-slate-800 dark:text-slate-200 text-xs font-bold"
+          className="absolute bottom-[28%] left-6 xl:left-12 flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-orange-500/15 backdrop-blur-md border border-orange-300/60 shadow-lg shadow-orange-500/10 text-orange-950 text-xs font-black"
         >
-          <div className="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-500">
+          <div className="p-1.5 rounded-lg bg-orange-500/20 text-orange-600">
             <Palette size={16} />
           </div>
           <span>UI/UX Design</span>
@@ -108,9 +108,9 @@ export function HeroSection() {
         <motion.div
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
-          className="absolute bottom-[26%] right-6 xl:right-12 flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-emerald-200/60 dark:border-slate-800 shadow-lg shadow-emerald-500/5 text-slate-800 dark:text-slate-200 text-xs font-bold"
+          className="absolute bottom-[26%] right-6 xl:right-12 flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-orange-500/15 backdrop-blur-md border border-orange-300/60 shadow-lg shadow-orange-500/10 text-orange-950 text-xs font-black"
         >
-          <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-500">
+          <div className="p-1.5 rounded-lg bg-orange-500/20 text-orange-600">
             <Rocket size={16} />
           </div>
           <span>FullStack MERN</span>
@@ -126,21 +126,20 @@ export function HeroSection() {
         >
           {/* Sleek Top Pill Badge */}
           <motion.div variants={itemVariants} className="mb-6">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/10 dark:bg-orange-500/20 border border-orange-200 dark:border-orange-500/30 text-orange-600 dark:text-orange-400 text-xs sm:text-sm font-bold shadow-sm">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/15 border border-orange-300/70 text-orange-700 text-xs sm:text-sm font-extrabold shadow-sm">
               <Sparkles size={14} className="text-orange-500 animate-pulse" />
               <span>Emerging Edge School of Technology</span>
             </div>
           </motion.div>
 
-          {/* Animated Headline */}
+          {/* Animated Headline with Crystal Clear High Contrast */}
           <motion.h1
             variants={itemVariants}
             id="hero-heading"
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.15] mb-5 text-balance text-slate-900 dark:text-white"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.15] mb-5 text-balance"
           >
-            Learn Skills Online.
-            <br />
-            <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 bg-clip-text text-transparent drop-shadow-sm">
+            <span className="text-slate-900 block font-black">Learn Skills Online.</span>
+            <span className="bg-gradient-to-r from-orange-600 via-amber-600 to-orange-500 bg-clip-text text-transparent drop-shadow-sm font-black block mt-1">
               Course is FREE.
             </span>
           </motion.h1>
@@ -148,7 +147,7 @@ export function HeroSection() {
           {/* Animated Subtitle */}
           <motion.p
             variants={itemVariants}
-            className="text-lg sm:text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto mb-8 leading-relaxed font-normal"
+            className="text-lg sm:text-xl text-slate-700 max-w-2xl mx-auto mb-8 leading-relaxed font-semibold"
           >
             Web, App, AI, Video Editing, Digital Marketing, Graphics &amp; UI/UX
             courses. Pay module registration fee to join live interactive classes, assignments, and portal access.
