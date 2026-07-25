@@ -8,7 +8,7 @@ import { PAYMENT_CONFIG } from "@/lib/constants/payment";
 export const metadata = createMetadata({
   title: "Register",
   description:
-    "Register for Emerging Edge School of Technology. Course is 100% free — pay only PKR 1,000 one-time registration fee to join live classes, WhatsApp group, and learning resources.",
+    "Register for Emerging Edge School of Technology. Pay module registration fee to join live classes, WhatsApp group, and learning resources.",
   path: "/register",
 });
 
@@ -30,7 +30,7 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
       <PageHero
         label="Student Registration"
         title="Apply & Register Now"
-        description={`The course is completely free. Pay only ${PAYMENT_CONFIG.currency} ${PAYMENT_CONFIG.registrationFee.toLocaleString()} one-time registration to join — verified students get WhatsApp group access, live class link, recorded lectures, quizzes, assignments, and projects.`}
+        description="Apply for your course and pay module registration fee to join — verified students get WhatsApp group access, live class link, recorded lectures, quizzes, assignments, and projects."
       />
       <RegistrationPageContent defaultProgram={program} />
     </>

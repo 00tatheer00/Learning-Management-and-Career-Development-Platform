@@ -24,7 +24,7 @@ export default function AdmissionsPage() {
       <PageHero
         label="Admissions"
         title="Begin Your Journey"
-        description="Free course — pay only PKR 1,000 one-time registration to join. Progress level by level with full support."
+        description="Affordable skill-based courses — pay module registration fee to join. Progress level by level with full support."
       />
       <AdmissionsSection />
       <FAQSection />

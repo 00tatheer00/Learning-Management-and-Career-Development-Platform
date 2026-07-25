@@ -15,8 +15,8 @@ export const applicationProcess = [
   },
   {
     step: "2",
-    title: "Pay Rs 1,000",
-    desc: "Pay on Easypaisa and upload screenshot",
+    title: "Pay Module Fee",
+    desc: "Pay registration fee on Easypaisa and upload receipt screenshot",
   },
   {
     step: "3",

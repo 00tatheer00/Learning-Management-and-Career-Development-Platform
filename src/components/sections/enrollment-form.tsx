@@ -597,7 +597,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
           Complete Your Application
         </h2>
         <p className="text-muted leading-relaxed">
-          Fill in your details below and upload your PKR 1,000 registration payment
+          Fill in your details below and upload your course module registration payment
           screenshot to secure your seat. Fields marked with{" "}
           <span className="text-red-600 font-medium">*</span> are required.
         </p>
@@ -721,7 +721,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
               >
                 <p className="mb-2">
                   You can register for <strong>another course or module</strong> anytime. Each
-                  registration needs its own <strong>PKR 1,000</strong> payment.
+                  registration needs its own module payment.
                 </p>
                 <ul className="mb-3 space-y-1 text-sm">
                   {applicantHistory.previousApplications.map((item) => (

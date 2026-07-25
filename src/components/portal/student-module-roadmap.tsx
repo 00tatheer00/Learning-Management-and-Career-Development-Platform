@@ -132,7 +132,7 @@ export function StudentModuleRoadmap({
       {currentIndex >= 0 && currentIndex < allModules.length - 1 && enrolledModules.length <= 1 && (
         <p className="mt-2 text-sm text-muted rounded-xl bg-surface px-4 py-3 border border-border">
           Next up: <strong>{allModules[currentIndex + 1]?.name}</strong> — register again when you
-          finish this module and pay the next PKR 1,000 fee.
+          finish this module and pay the next module registration fee.
         </p>
       )}
     </div>

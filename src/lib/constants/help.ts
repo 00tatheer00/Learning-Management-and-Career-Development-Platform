@@ -22,8 +22,8 @@ export const SIMPLE_STEPS = [
   },
   {
     step: "2",
-    title: "Pay Rs 1,000",
-    desc: "Send money on Easypaisa and upload the payment screenshot.",
+    title: "Pay Module Fee",
+    desc: "Send registration fee on Easypaisa and upload the payment screenshot.",
   },
   {
     step: "3",
