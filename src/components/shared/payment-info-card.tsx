@@ -81,11 +81,11 @@ export function PaymentInfoCard({ className, compact = false, amount }: PaymentI
         </button>
       </div>
 
-      <div className="mt-3 rounded-lg border border-emerald-200/90 bg-emerald-50/80 p-2.5 text-xs text-emerald-900">
-        <p className="font-bold text-emerald-800 flex items-center gap-1.5">
+      <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50/90 p-3 text-xs text-slate-800 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200">
+        <p className="font-extrabold text-slate-950 dark:text-slate-100 flex items-center gap-1.5">
           <span>📸</span> Share receipt screenshot in the form below
         </p>
-        <p className="mt-1 text-emerald-700 leading-relaxed">
+        <p className="mt-1 text-slate-700 dark:text-slate-300 leading-relaxed">
           After approval of your payment, you will get a confirmation message or email with your portal access!
         </p>
       </div>
