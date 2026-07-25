@@ -210,11 +210,7 @@ export function HeroSection() {
 
           <p className="text-lg sm:text-xl text-muted max-w-2xl mx-auto mb-8 leading-relaxed">
             Web, App, AI, Video Editing, Digital Marketing, Graphics &amp; UI/UX
-            courses. Pay only{" "}
-            <strong className="text-foreground">
-              Rs {PAYMENT_CONFIG.registrationFee.toLocaleString()}
-            </strong>{" "}
-            registration fee per module to join. Classes are online on WhatsApp.
+            courses. Pay module registration fee to join live interactive classes, assignments, and portal access.
           </p>
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 max-w-md sm:max-w-none mx-auto">

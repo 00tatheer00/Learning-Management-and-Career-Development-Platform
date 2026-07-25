@@ -23,8 +23,7 @@ export function FreeCoursePromo({
         <span className="font-bold">Course is FREE</span>
         <span className="text-emerald-700">·</span>
         <span>
-          Only {PAYMENT_CONFIG.currency} {PAYMENT_CONFIG.registrationFee.toLocaleString()}{" "}
-          registration
+          Pay module registration fee to join
         </span>
       </div>
     );
@@ -50,13 +49,13 @@ export function FreeCoursePromo({
         <div className="flex flex-col justify-center">
           <div className="inline-flex w-fit items-center gap-2 rounded-full bg-emerald-500 px-4 py-1.5 text-sm font-bold uppercase tracking-wide text-white shadow-md shadow-emerald-500/30 mb-4">
             <Gift size={18} weight="fill" />
-            100% Free Course
+            Skill-Based Learning
           </div>
           <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground leading-tight mb-2">
-            {PAYMENT_CONFIG.headline}
+            Practical Online Classes
           </h3>
           <p className="text-base sm:text-lg text-muted leading-relaxed">
-            {PAYMENT_CONFIG.freeNote}
+            Pay module registration fee per module. All live classes, recorded lectures, tasks, and portal access are included.
           </p>
         </div>
 
@@ -67,15 +66,14 @@ export function FreeCoursePromo({
               {PAYMENT_CONFIG.registrationLabel}
             </span>
           </div>
-          <p className="text-4xl sm:text-5xl font-bold text-primary leading-none mb-1">
-            {PAYMENT_CONFIG.currency}{" "}
-            {PAYMENT_CONFIG.registrationFee.toLocaleString()}
+          <p className="text-2xl sm:text-3xl font-extrabold text-primary leading-tight mb-1">
+            Module Registration Fee
           </p>
           <p className="text-sm font-medium text-foreground mb-1">
             {PAYMENT_CONFIG.registrationNote}
           </p>
           <p className="text-xs text-muted leading-relaxed">
-            This is a one-time registration fee per module. You do not pay any extra monthly tuition fees for the module.
+            This is a registration fee per module. Select your course during registration to view its specific module fee.
           </p>
         </div>
       </div>
