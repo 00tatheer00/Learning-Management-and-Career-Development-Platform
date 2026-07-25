@@ -140,13 +140,13 @@ export function HeroSection() {
       {/* 3D Animated WebGL Canvas Layer (3D Wave Grid Horizon, Floating Geometrics, Interactive Light Beam) */}
       <Hero3DCanvas />
 
-      {/* Subtle Background Glow Spheres */}
+      {/* Subtle Pure White Ambient Glow Spheres */}
       <div
-        className="hero-glow pointer-events-none absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[650px] rounded-full bg-orange-500/15 blur-[140px]"
+        className="hero-glow pointer-events-none absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-white/[0.07] blur-[150px]"
         aria-hidden="true"
       />
       <div
-        className="hero-glow pointer-events-none absolute bottom-10 right-10 w-[450px] h-[450px] rounded-full bg-cyan-500/10 blur-[120px]"
+        className="hero-glow pointer-events-none absolute bottom-10 right-10 w-[500px] h-[500px] rounded-full bg-slate-300/[0.05] blur-[130px]"
         aria-hidden="true"
       />
 
