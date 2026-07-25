@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { Sparkles } from "lucide-react";
 import {
   ArrowRight,
   Brain,
@@ -16,7 +17,6 @@ import {
   ListBullets,
   Stack,
   Certificate,
-  Sparkles,
 } from "@phosphor-icons/react";
 import type { Icon } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
