@@ -9,6 +9,7 @@ import { SiteLogo } from "@/components/shared/site-logo";
 import { NAV_LINKS, REGISTRATION_OPEN } from "@/lib/constants";
 import { isNavLinkActive } from "@/lib/nav-active";
 import { cn } from "@/lib/utils";
+import { TopTickerBanner } from "@/components/layout/top-ticker-banner";
 
 function useLocationHash(pathname: string) {
   const [hash, setHash] = useState("");
@@ -55,6 +56,7 @@ export function Navbar() {
         isScrolled ? "glass-strong shadow-sm" : "bg-background/80 backdrop-blur-sm"
       )}
     >
+      <TopTickerBanner />
       <nav
         className="container-custom flex items-center justify-between h-16 lg:h-20 px-4 sm:px-6 lg:px-8"
         aria-label="Main navigation"

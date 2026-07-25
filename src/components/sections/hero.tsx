@@ -151,7 +151,7 @@ export function HeroSection() {
   return (
     <section
       ref={sectionRef}
-      className="hero-section relative flex flex-col justify-center min-h-screen overflow-x-clip pt-24 pb-28 lg:pt-28 lg:pb-36 bg-gradient-to-b from-surface via-background to-surface"
+      className="hero-section relative flex flex-col justify-center min-h-screen overflow-x-clip pt-28 pb-28 lg:pt-36 lg:pb-36 bg-gradient-to-b from-surface via-background to-surface"
       aria-labelledby="hero-heading"
     >
       {/* Interactive Lightweight Canvas Background */}
