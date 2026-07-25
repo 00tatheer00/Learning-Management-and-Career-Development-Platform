@@ -57,7 +57,7 @@ export function HeroSection() {
 
       {/* Grid Overlay & Glow Effects */}
       <div className="absolute inset-0 hero-grid-wrap pointer-events-none" aria-hidden="true">
-        <div className="absolute inset-0 hero-grid-lines opacity-65" />
+        <div className="absolute inset-0 hero-grid-lines opacity-45" />
         <div className="absolute inset-0 hero-grid-shimmer" />
       </div>
 
