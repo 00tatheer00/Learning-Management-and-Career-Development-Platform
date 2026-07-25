@@ -792,7 +792,14 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
           <FormSection title="Program Selection" step={2} mobileStep={mobileStep}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="sm:col-span-2">
-                <RequiredLabel htmlFor="program">Program Applying For</RequiredLabel>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <RequiredLabel htmlFor="program">Program Applying For</RequiredLabel>
+                  {activeProgram && (
+                    <span className="inline-flex items-center gap-1 rounded-lg border border-primary/30 bg-primary/10 px-2.5 py-1 text-xs font-extrabold text-primary shadow-xs">
+                      💰 Fee: PKR {selectedFee.toLocaleString()} / module
+                    </span>
+                  )}
+                </div>
                 <Controller
                   name="program"
                   control={control}
@@ -818,6 +825,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                       <SelectContent>
                         {programs.map((program) => {
                           const enabled = isEnrollable(program.slug);
+                          const fee = getProgramRegistrationFee(program.slug);
                           return (
                             <SelectItem
                               key={program.id}
@@ -826,7 +834,9 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                               className={!enabled ? "opacity-50" : undefined}
                             >
                               {program.title}
-                              {!enabled ? " — Coming Soon" : ""}
+                              {enabled
+                                ? ` — PKR ${fee.toLocaleString()} / module`
+                                : " — Coming Soon"}
                             </SelectItem>
                           );
                         })}
@@ -835,9 +845,23 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                   )}
                 />
                 <FieldError id="program-error" message={errors.program?.message} />
-                <p className="text-xs text-muted mt-1.5">
-                  Currently open: Web Development, Mobile App (Flutter) Development &amp; Artificial Intelligence
-                </p>
+
+                {activeProgram ? (
+                  <div className="mt-2.5 flex items-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-3.5 py-2.5 text-xs sm:text-sm font-semibold text-foreground">
+                    <span className="text-base">💳</span>
+                    <span>
+                      Course Fee for <strong>{activeProgram.title}</strong>:{" "}
+                      <strong className="text-sm sm:text-base font-black text-primary">
+                        PKR {selectedFee.toLocaleString()}
+                      </strong>{" "}
+                      per module (month)
+                    </span>
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted mt-1.5">
+                    Currently open: Web Development, Mobile App (Flutter) Development &amp; Artificial Intelligence
+                  </p>
+                )}
               </div>
 
               <div className="sm:col-span-2">
