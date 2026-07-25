@@ -704,10 +704,10 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                   {...fieldA11y("email", errors)}
                   {...register("email")}
                 />
-                <div className="mt-2.5 flex items-start gap-2.5 rounded-xl border border-blue-200 bg-blue-50/80 p-3 text-xs text-slate-800 shadow-sm dark:border-blue-900/60 dark:bg-slate-900 dark:text-slate-200">
+                <div className="mt-2.5 flex items-start gap-2.5 rounded-xl border border-blue-200 bg-blue-50 p-3 text-xs sm:text-sm text-slate-800 dark:border-blue-800 dark:bg-slate-900 dark:text-slate-200">
                   <span className="shrink-0 text-base">📩</span>
-                  <span className="leading-relaxed">
-                    <strong className="font-extrabold text-blue-950 dark:text-blue-300">Important:</strong> Please use your <strong>main active email address</strong> — your portal login details &amp; credentials will be sent directly to your email.
+                  <span className="leading-relaxed font-medium">
+                    <strong className="font-black text-blue-950 dark:text-white">Important:</strong> Please use your <strong>main active email address</strong> — your portal login details &amp; credentials will be sent directly to your email.
                   </span>
                 </div>
                 <FieldError id="email-error" message={errors.email?.message} />
@@ -932,12 +932,12 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
           </FormSection>
 
           <FormSection title="Payment Verification" step={4} mobileStep={mobileStep}>
-            <div className="rounded-2xl border border-blue-200/90 bg-gradient-to-r from-blue-50/90 via-indigo-50/30 to-blue-50/90 p-4 sm:p-5 mb-5 shadow-sm text-slate-900 dark:border-blue-900/80 dark:bg-slate-900 dark:text-slate-100">
-              <p className="text-sm font-extrabold text-blue-950 dark:text-blue-200 flex items-center gap-2 mb-1.5">
+            <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 sm:p-5 mb-5 text-slate-900 dark:border-blue-800 dark:bg-slate-900 dark:text-slate-100">
+              <p className="text-sm sm:text-base font-black text-blue-950 dark:text-white flex items-center gap-2 mb-1.5">
                 <span className="text-base">📸</span> Share receipt screenshot here
               </p>
-              <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
-                After approval of your payment (PKR <strong className="font-extrabold text-blue-900 dark:text-blue-300">{selectedFee.toLocaleString()}</strong> one-time registration per module), you will get a confirmation message on WhatsApp or an email with your portal login details!
+              <p className="text-xs sm:text-sm text-slate-800 dark:text-slate-200 font-semibold leading-relaxed">
+                After approval of your payment (PKR <strong className="font-black text-blue-700 dark:text-blue-400">{selectedFee.toLocaleString()}</strong> one-time registration per module), you will get a confirmation message on WhatsApp or an email with your portal login details!
               </p>
             </div>
 
