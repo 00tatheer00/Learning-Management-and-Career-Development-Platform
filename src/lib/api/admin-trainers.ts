@@ -29,20 +29,27 @@ function resolveProfileKey(trainer: { id: string; trainerId: string | null }) {
 
 export async function getTrainerStudentCounts(): Promise<Map<string, number>> {
   const students = await prisma.user.findMany({
-    where: { role: "student", isActive: true, trainerId: { not: null } },
-    select: { trainerId: true },
+    where: { role: "student", isActive: true },
+    select: { trainerId: true, programSlug: true },
   });
 
   const counts = new Map<string, number>();
   for (const student of students) {
-    if (!student.trainerId) continue;
-    counts.set(student.trainerId, (counts.get(student.trainerId) ?? 0) + 1);
+    let key = student.trainerId;
+    if (!key && student.programSlug) {
+      if (student.programSlug === "artificial-intelligence") key = "trainer-faiza";
+      else if (student.programSlug === "app-development") key = "trainer-talha";
+      else if (student.programSlug === "web-development") key = "trainer-tatheer";
+    }
+    if (key) {
+      counts.set(key, (counts.get(key) ?? 0) + 1);
+    }
   }
   return counts;
 }
 
 export async function getAdminTrainerRows(): Promise<AdminTrainerRow[]> {
-  const [trainers, studentCounts] = await Promise.all([
+  const [dbTrainers, studentCounts] = await Promise.all([
     prisma.user.findMany({
       where: { role: "trainer" },
       orderBy: [{ programSlug: "asc" }, { name: "asc" }],
@@ -50,12 +57,16 @@ export async function getAdminTrainerRows(): Promise<AdminTrainerRow[]> {
     getTrainerStudentCounts(),
   ]);
 
-  return trainers.map((trainer) => {
+  const staticTrainers = await import("@/lib/data/trainers").then((m) => m.trainers);
+  const rowMap = new Map<string, AdminTrainerRow>();
+
+  // 1. Add DB Trainers
+  for (const trainer of dbTrainers) {
     const profileKey = resolveProfileKey(trainer);
     const staticProfile = getStaticTrainerByKey(profileKey);
     const programSlug = trainer.programSlug ?? staticProfile?.programSlug;
 
-    return {
+    rowMap.set(profileKey, {
       id: trainer.id,
       profileKey,
       name: trainer.name,
@@ -67,7 +78,7 @@ export async function getAdminTrainerRows(): Promise<AdminTrainerRow[]> {
         trainer.designation ??
         staticProfile?.designation ??
         getTrainerDesignation(programSlug),
-      studentCount: studentCounts.get(profileKey) ?? 0,
+      studentCount: studentCounts.get(profileKey) ?? studentCounts.get(trainer.id) ?? 0,
       bio: trainer.bio ?? staticProfile?.bio ?? "",
       experience: trainer.experience ?? staticProfile?.experience,
       expertise:
@@ -77,8 +88,36 @@ export async function getAdminTrainerRows(): Promise<AdminTrainerRow[]> {
       avatarUrl: trainer.avatarUrl ?? undefined,
       imagePosition: trainer.imagePosition ?? staticProfile?.imagePosition,
       fallbackImage: staticProfile?.image,
-    };
-  });
+    });
+  }
+
+  // 2. Merge Static Trainers from catalog (ensures Faiza & all trainers appear even before seed runs)
+  for (const staticTrainer of staticTrainers) {
+    if (!rowMap.has(staticTrainer.id)) {
+      const programSlug = staticTrainer.programSlug;
+      const count = studentCounts.get(staticTrainer.id) ?? 0;
+      const defaultEmail = `${staticTrainer.id.replace("trainer-", "")}@eest.com`;
+
+      rowMap.set(staticTrainer.id, {
+        id: staticTrainer.id,
+        profileKey: staticTrainer.id,
+        name: staticTrainer.name,
+        email: defaultEmail,
+        phone: undefined,
+        programSlug,
+        courseTitle: programSlug ? getTrainerCourseTitle(programSlug) : "—",
+        designation: staticTrainer.designation ?? getTrainerDesignation(programSlug),
+        studentCount: count,
+        bio: staticTrainer.bio ?? "",
+        experience: staticTrainer.experience,
+        expertise: staticTrainer.expertise ?? [],
+        fallbackImage: staticTrainer.image,
+        imagePosition: staticTrainer.imagePosition,
+      });
+    }
+  }
+
+  return Array.from(rowMap.values());
 }
 
 export async function getDisplayTrainerProfile(
