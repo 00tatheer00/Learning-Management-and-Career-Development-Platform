@@ -42,7 +42,7 @@ export function TopTickerBanner() {
             transition={{
               repeat: Infinity,
               ease: "linear",
-              duration: 22,
+              duration: 48,
             }}
           >
             {/* Double the array for seamless infinite loop */}

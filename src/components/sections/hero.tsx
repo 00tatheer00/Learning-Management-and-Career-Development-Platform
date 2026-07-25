@@ -8,108 +8,6 @@ import { Button } from "@/components/ui/button";
 import { REGISTRATION_OPEN } from "@/lib/constants";
 import { HeroParticleCanvas } from "@/components/ui/hero-particle-canvas";
 
-function useCountdown(targetDateIso: string) {
-  const [timeLeft, setTimeLeft] = useState({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-    isExpired: false,
-  });
-
-  useEffect(() => {
-    const target = new Date(targetDateIso).getTime();
-
-    const updateTimer = () => {
-      const now = new Date().getTime();
-      const difference = target - now;
-
-      if (difference <= 0) {
-        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0, isExpired: true });
-        return;
-      }
-
-      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-
-      setTimeLeft({ days, hours, minutes, seconds, isExpired: false });
-    };
-
-    updateTimer();
-    const interval = setInterval(updateTimer, 1000);
-
-    return () => clearInterval(interval);
-  }, [targetDateIso]);
-
-  return timeLeft;
-}
-
-function AdmissionsCountdownTimer() {
-  const { days, hours, minutes, seconds, isExpired } = useCountdown("2026-07-31T23:59:59+05:00");
-
-  if (isExpired) return null;
-
-  const pad = (n: number) => String(n).padStart(2, "0");
-
-  return (
-    <div className="flex flex-col items-center justify-center my-1 sm:my-0">
-      {/* Sleek Header Badge */}
-      <div className="flex items-center gap-1.5 mb-1.5">
-        <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75" />
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-600" />
-        </span>
-        <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.18em] text-orange-600">
-          Admissions Close July 31
-        </span>
-      </div>
-
-      {/* Professional Executive Timer Cards */}
-      <div className="flex items-center gap-1.5 sm:gap-2 text-slate-900">
-        {/* Days */}
-        <div className="flex flex-col items-center">
-          <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-slate-900 text-white font-mono text-sm sm:text-lg font-black shadow-md shadow-slate-900/10 border border-slate-800">
-            {pad(days)}
-          </div>
-          <span className="text-[9px] font-extrabold tracking-wider text-slate-500 uppercase mt-1">Days</span>
-        </div>
-
-        <span className="text-slate-400 font-bold text-sm sm:text-base -mt-3.5">:</span>
-
-        {/* Hours */}
-        <div className="flex flex-col items-center">
-          <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-slate-900 text-white font-mono text-sm sm:text-lg font-black shadow-md shadow-slate-900/10 border border-slate-800">
-            {pad(hours)}
-          </div>
-          <span className="text-[9px] font-extrabold tracking-wider text-slate-500 uppercase mt-1">Hours</span>
-        </div>
-
-        <span className="text-slate-400 font-bold text-sm sm:text-base -mt-3.5">:</span>
-
-        {/* Minutes */}
-        <div className="flex flex-col items-center">
-          <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-slate-900 text-white font-mono text-sm sm:text-lg font-black shadow-md shadow-slate-900/10 border border-slate-800">
-            {pad(minutes)}
-          </div>
-          <span className="text-[9px] font-extrabold tracking-wider text-slate-500 uppercase mt-1">Mins</span>
-        </div>
-
-        <span className="text-slate-400 font-bold text-sm sm:text-base -mt-3.5">:</span>
-
-        {/* Seconds */}
-        <div className="flex flex-col items-center">
-          <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-gradient-to-b from-orange-500 to-amber-600 text-white font-mono text-sm sm:text-lg font-black shadow-md shadow-orange-500/20 border border-orange-400 animate-pulse">
-            {pad(seconds)}
-          </div>
-          <span className="text-[9px] font-extrabold tracking-wider text-orange-600 uppercase mt-1">Secs</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -226,62 +124,11 @@ export function HeroSection() {
           animate="visible"
           className="w-full max-w-[1140px] flex flex-col items-center"
         >
-          {/* 100% Responsive Premium Announcement Card with Animated Border */}
-          <motion.div variants={itemVariants} className="w-full max-w-4xl mb-8">
-            <div className="relative overflow-hidden rounded-2xl sm:rounded-[24px] border border-orange-300/80 dark:border-orange-500/30 bg-gradient-to-r from-orange-50/90 via-white to-orange-50/70 dark:from-slate-900/90 dark:via-slate-900 dark:to-slate-900/90 p-3.5 sm:p-5 shadow-xl shadow-orange-500/10 text-slate-900 dark:text-white backdrop-blur-lg transition-all duration-300 hover:shadow-2xl hover:shadow-orange-500/20">
-              
-              {/* Orange Ribbon Tag on Top-Left */}
-              <div className="absolute top-0 left-3 sm:left-6 z-10">
-                <div className="relative bg-gradient-to-b from-orange-500 to-amber-600 px-2.5 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-white shadow-md rounded-b-md flex items-center gap-1">
-                  <Sparkles size={11} className="animate-spin-slow" />
-                  <span>NEW</span>
-                </div>
-              </div>
-
-              <div className="flex flex-col lg:flex-row items-center justify-between gap-4 lg:gap-6 pt-5 sm:pt-2 lg:py-1 pl-3 sm:pl-16 pr-3 sm:pr-4">
-                
-                {/* Left Title Section */}
-                <div className="flex flex-col items-center sm:items-start text-center sm:text-left shrink-0">
-                  <span className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-widest text-orange-600 dark:text-orange-400">
-                    ADMISSIONS OPEN
-                  </span>
-                  <div className="flex items-center gap-2.5 sm:gap-3 mt-0.5 sm:mt-1">
-                    <h2 className="text-lg sm:text-xl lg:text-2xl font-black text-slate-900 dark:text-white tracking-tight uppercase leading-none flex flex-row sm:flex-col gap-1 sm:gap-0">
-                      <span>2ND</span>
-                      <span>MODULE</span>
-                    </h2>
-                    <span className="font-serif italic font-extrabold text-orange-500 text-xl sm:text-2xl lg:text-3xl leading-none whitespace-nowrap">
-                      Live<span className="inline sm:hidden"> </span><br className="hidden sm:inline" />Now!
-                    </span>
-                  </div>
-                </div>
-
-                {/* Vertical Divider (Desktop) */}
-                <div className="hidden lg:block h-14 w-px bg-slate-200/90 dark:bg-slate-800 mx-1" />
-
-                {/* Center Section: Prominent Big Timer */}
-                <AdmissionsCountdownTimer />
-
-                {/* Vertical Divider (Desktop) */}
-                <div className="hidden lg:block h-14 w-px bg-slate-200/90 dark:bg-slate-800 mx-1" />
-
-                {/* Right Action Button Section */}
-                <div className="flex flex-col items-center shrink-0 w-full sm:w-auto pt-1 sm:pt-0">
-                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
-                    <Link
-                      href="/register"
-                      className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 px-5 sm:px-6 py-2.5 text-xs font-black uppercase tracking-wider text-white shadow-lg shadow-orange-500/30 hover:shadow-orange-500/40 transition-all duration-200 w-full sm:w-auto"
-                    >
-                      <span>APPLY NOW</span>
-                      <ArrowRight size={14} className="stroke-[3]" />
-                    </Link>
-                  </motion.div>
-                  <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-1.5 text-center">
-                    Seats are <strong className="text-orange-600 dark:text-orange-400 font-bold">Limited!</strong>
-                  </span>
-                </div>
-
-              </div>
+          {/* Sleek Top Pill Badge */}
+          <motion.div variants={itemVariants} className="mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/10 dark:bg-orange-500/20 border border-orange-200 dark:border-orange-500/30 text-orange-600 dark:text-orange-400 text-xs sm:text-sm font-bold shadow-sm">
+              <Sparkles size={14} className="text-orange-500 animate-pulse" />
+              <span>Emerging Edge School of Technology</span>
             </div>
           </motion.div>
 
