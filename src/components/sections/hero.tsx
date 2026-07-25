@@ -72,9 +72,9 @@ export function HeroSection() {
         <motion.div
           animate={{ y: [0, -10, 0] }}
           transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-[28%] left-4 xl:left-8 flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-orange-500/15 backdrop-blur-md border border-orange-300/60 shadow-lg shadow-orange-500/10 text-orange-950 text-xs font-black"
+          className="absolute top-[28%] left-4 xl:left-8 flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-white/90 backdrop-blur-md border border-orange-200/80 shadow-xl shadow-orange-500/10 text-slate-900 text-xs font-black"
         >
-          <div className="p-1.5 rounded-lg bg-orange-500/20 text-orange-600">
+          <div className="p-1.5 rounded-lg bg-orange-500/10 text-orange-600">
             <Code2 size={16} />
           </div>
           <span>Web &amp; App Development</span>
@@ -84,9 +84,9 @@ export function HeroSection() {
         <motion.div
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-          className="absolute top-[26%] right-4 xl:right-8 flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-orange-500/15 backdrop-blur-md border border-orange-300/60 shadow-lg shadow-orange-500/10 text-orange-950 text-xs font-black"
+          className="absolute top-[26%] right-4 xl:right-8 flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-white/90 backdrop-blur-md border border-sky-200/80 shadow-xl shadow-sky-500/10 text-slate-900 text-xs font-black"
         >
-          <div className="p-1.5 rounded-lg bg-orange-500/20 text-orange-600">
+          <div className="p-1.5 rounded-lg bg-sky-500/10 text-sky-600">
             <Cpu size={16} />
           </div>
           <span>AI &amp; Automation</span>
@@ -96,9 +96,9 @@ export function HeroSection() {
         <motion.div
           animate={{ y: [0, -12, 0] }}
           transition={{ duration: 5.2, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          className="absolute bottom-[28%] left-6 xl:left-12 flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-orange-500/15 backdrop-blur-md border border-orange-300/60 shadow-lg shadow-orange-500/10 text-orange-950 text-xs font-black"
+          className="absolute bottom-[28%] left-6 xl:left-12 flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-white/90 backdrop-blur-md border border-indigo-200/80 shadow-xl shadow-indigo-500/10 text-slate-900 text-xs font-black"
         >
-          <div className="p-1.5 rounded-lg bg-orange-500/20 text-orange-600">
+          <div className="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-600">
             <Palette size={16} />
           </div>
           <span>UI/UX Design</span>
@@ -108,9 +108,9 @@ export function HeroSection() {
         <motion.div
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
-          className="absolute bottom-[26%] right-6 xl:right-12 flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-orange-500/15 backdrop-blur-md border border-orange-300/60 shadow-lg shadow-orange-500/10 text-orange-950 text-xs font-black"
+          className="absolute bottom-[26%] right-6 xl:right-12 flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-white/90 backdrop-blur-md border border-emerald-200/80 shadow-xl shadow-emerald-500/10 text-slate-900 text-xs font-black"
         >
-          <div className="p-1.5 rounded-lg bg-orange-500/20 text-orange-600">
+          <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-600">
             <Rocket size={16} />
           </div>
           <span>FullStack MERN</span>
