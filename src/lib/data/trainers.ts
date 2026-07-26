@@ -59,7 +59,7 @@ export const trainers: Trainer[] = [
     expertise: ["Machine Learning", "Python", "AI Tools", "Data Thinking"],
     experience: "3+ years",
     bio: "Introduces practical AI workflows, model basics, and how to apply intelligence in real products.",
-    image: "/trainers/faiza-ghaffar.jpg",
+    image: "/trainers/faiza-ghaffar.png",
     imagePosition: "center 20%",
     social: {},
   },
