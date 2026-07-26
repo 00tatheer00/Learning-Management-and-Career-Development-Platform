@@ -38,7 +38,7 @@ function formatMoney(amount: number, currency: string) {
   return `${currency} ${amount.toLocaleString("en-PK")}`;
 }
 
-function getPeriodStats(stats: AdminRevenueStats, period: RevenuePeriod) {
+function getPeriodStats(stats: AdminRevenuePhaseStats, period: RevenuePeriod) {
   if (period === "week") {
     return {
       students: stats.thisWeekApproved,
@@ -70,7 +70,7 @@ function getPeriodStats(stats: AdminRevenueStats, period: RevenuePeriod) {
 }
 
 function getCoursePeriodStats(
-  course: AdminRevenueStats["byCourse"][number],
+  course: AdminRevenueCourseStats,
   period: RevenuePeriod
 ) {
   if (period === "week") {
@@ -236,6 +236,7 @@ export function AdminRevenueSidebarCard({
 function AdminRevenueSidePanel() {
   const { open, setOpen, stats, loading, refresh } = useAdminRevenue();
   const [period, setPeriod] = useState<RevenuePeriod>("all");
+  const [selectedPhase, setSelectedPhase] = useState<"all" | "phase-1" | "phase-2">("all");
 
   useEffect(() => {
     if (!open) return;
@@ -252,7 +253,15 @@ function AdminRevenueSidePanel() {
 
   if (!open) return null;
 
-  const periodStats = stats ? getPeriodStats(stats, period) : null;
+  const activeStats: AdminRevenuePhaseStats | null = stats
+    ? selectedPhase === "phase-1"
+      ? stats.phases?.phase1 ?? stats
+      : selectedPhase === "phase-2"
+        ? stats.phases?.phase2 ?? stats
+        : stats
+    : null;
+
+  const periodStats = activeStats ? getPeriodStats(activeStats, period) : null;
 
   return (
     <div className="fixed inset-0 z-[60] flex justify-end">
@@ -272,8 +281,8 @@ function AdminRevenueSidePanel() {
         <div className="relative overflow-hidden shrink-0">
           <div className="absolute inset-0 bg-gradient-to-br from-emerald-700 via-emerald-800 to-slate-900" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(255,255,255,0.15)_0%,_transparent_60%)]" />
-          <div className="relative px-5 pt-5 pb-6 text-white">
-            <div className="flex items-start justify-between gap-3 mb-4">
+          <div className="relative px-5 pt-5 pb-5 text-white">
+            <div className="flex items-start justify-between gap-3 mb-3">
               <div className="flex items-center gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/15 backdrop-blur-sm ring-1 ring-white/20">
                   <CurrencyCircleDollar size={24} weight="duotone" />
@@ -308,12 +317,60 @@ function AdminRevenueSidePanel() {
 
             {stats && (
               <p className="text-xs text-emerald-100/90 leading-relaxed">
-                <span className="font-semibold text-white">Phase 2 Split:</span> AI (Rs 2,000 → Rs 200 Komal, Rs 1,200 Trainer, Rs 600 School) · App Dev (Rs 1,000 → Rs 200 Komal, Rs 700 Trainer, Rs 100 School)
+                <span className="font-semibold text-white">Phase 2 Split:</span> AI (Rs 2k → Rs 200 Mgmt, Rs 1,200 Trainer, Rs 600 School) · App Dev (Rs 1k → Rs 200 Mgmt, Rs 700 Trainer, Rs 100 School)
               </p>
             )}
           </div>
         </div>
 
+        {/* Phase Filter Toggle Bar */}
+        {stats && stats.phases && (
+          <div className="shrink-0 border-b border-border bg-muted/20 px-4 py-2 flex items-center justify-between gap-2">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-muted shrink-0">
+              Module Phase
+            </span>
+            <div className="flex gap-1 bg-secondary/80 p-1 rounded-xl">
+              <button
+                type="button"
+                onClick={() => setSelectedPhase("all")}
+                className={cn(
+                  "px-2.5 py-1 text-xs font-semibold rounded-lg transition-all cursor-pointer",
+                  selectedPhase === "all"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted hover:text-foreground"
+                )}
+              >
+                All ({stats.totalApproved})
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedPhase("phase-1")}
+                className={cn(
+                  "px-2.5 py-1 text-xs font-semibold rounded-lg transition-all cursor-pointer",
+                  selectedPhase === "phase-1"
+                    ? "bg-indigo-600 text-white shadow-sm"
+                    : "text-muted hover:text-foreground"
+                )}
+              >
+                Phase 1 ({stats.phases.phase1.totalApproved})
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedPhase("phase-2")}
+                className={cn(
+                  "px-2.5 py-1 text-xs font-semibold rounded-lg transition-all cursor-pointer",
+                  selectedPhase === "phase-2"
+                    ? "bg-emerald-600 text-white shadow-sm"
+                    : "text-muted hover:text-foreground"
+                )}
+              >
+                Phase 2 ({stats.phases.phase2.totalApproved})
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Time Period Filter Bar */}
         <div className="shrink-0 border-b border-border px-4 py-3 flex gap-2">
           {(
             [
@@ -327,7 +384,7 @@ function AdminRevenueSidePanel() {
               type="button"
               onClick={() => setPeriod(key)}
               className={cn(
-                "flex-1 rounded-xl py-2 text-xs font-semibold transition-all",
+                "flex-1 rounded-xl py-2 text-xs font-semibold transition-all cursor-pointer",
                 period === key
                   ? "bg-emerald-600 text-white shadow-sm"
                   : "bg-secondary text-muted hover:text-foreground"
@@ -446,7 +503,7 @@ function AdminRevenueSidePanel() {
                   Course-wise breakdown
                 </p>
                 <div className="space-y-3">
-                  {stats.byCourse.map((course) => {
+                  {activeStats.byCourse.map((course) => {
                     const cp = getCoursePeriodStats(course, period);
                     const trainerShort = course.trainerName.split(" ").slice(-1)[0];
                     return (
