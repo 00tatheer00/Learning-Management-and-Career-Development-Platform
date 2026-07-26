@@ -224,10 +224,19 @@ async function main() {
     await upsertDemoStudentEnrollments(demoStudent.password);
   }
 
-  await prisma.assignmentSubmission.deleteMany({});
-  await prisma.assignment.deleteMany({});
-  await prisma.courseMaterial.deleteMany({});
-  await prisma.liveSession.deleteMany({});
+  const isProduction = process.env.NODE_ENV === "production";
+  const forceDestructive = process.env.SEED_FORCE_DESTRUCTIVE === "true";
+
+  if (isProduction && !forceDestructive) {
+    console.log(
+      "⚠️  Skipping destructive deleteMany in production. Set SEED_FORCE_DESTRUCTIVE=true to override."
+    );
+  } else {
+    await prisma.assignmentSubmission.deleteMany({});
+    await prisma.assignment.deleteMany({});
+    await prisma.courseMaterial.deleteMany({});
+    await prisma.liveSession.deleteMany({});
+  }
 
   for (const material of DEFAULT_MATERIALS) {
     await prisma.courseMaterial.upsert({

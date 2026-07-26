@@ -23,7 +23,7 @@ const DEFAULT_SYSTEM_ACCOUNTS = [
   {
     id: "admin-1",
     email: "admin@eest.com",
-    defaultPassword: process.env.SEED_ADMIN_PASSWORD?.trim() || "admin@321",
+    defaultPassword: process.env.SEED_ADMIN_PASSWORD?.trim() || undefined,
     role: "admin" as const,
     name: "Tatheer Hussain",
     phone: "03374005515",
@@ -31,7 +31,7 @@ const DEFAULT_SYSTEM_ACCOUNTS = [
   {
     id: "admin-komal",
     email: "komal@eest.com",
-    defaultPassword: process.env.SEED_KOMAL_PASSWORD?.trim() || "komal@003",
+    defaultPassword: process.env.SEED_KOMAL_PASSWORD?.trim() || undefined,
     role: "admin_readonly" as const,
     name: "Komal",
     phone: "03115969527",
@@ -39,7 +39,7 @@ const DEFAULT_SYSTEM_ACCOUNTS = [
   {
     id: "trainer-tatheer",
     email: "tatheer@eest.com",
-    defaultPassword: process.env.SEED_TRAINER_TATHEER_PASSWORD?.trim() || "tatheer@321",
+    defaultPassword: process.env.SEED_TRAINER_TATHEER_PASSWORD?.trim() || undefined,
     role: "trainer" as const,
     name: "S Tatheer Hussain",
     phone: "03374005515",
@@ -49,7 +49,7 @@ const DEFAULT_SYSTEM_ACCOUNTS = [
   {
     id: "trainer-talha",
     email: "talha@eest.com",
-    defaultPassword: process.env.SEED_TRAINER_TALHA_PASSWORD?.trim() || "talha@321",
+    defaultPassword: process.env.SEED_TRAINER_TALHA_PASSWORD?.trim() || undefined,
     role: "trainer" as const,
     name: "Talha Iqbal",
     phone: "03001234567",
@@ -59,7 +59,7 @@ const DEFAULT_SYSTEM_ACCOUNTS = [
   {
     id: "trainer-faiza",
     email: "faiza@eest.com",
-    defaultPassword: process.env.SEED_TRAINER_FAIZA_PASSWORD?.trim() || "faiza@321",
+    defaultPassword: process.env.SEED_TRAINER_FAIZA_PASSWORD?.trim() || undefined,
     role: "trainer" as const,
     name: "Faiza Ghaffar",
     phone: "03000000000",
@@ -92,7 +92,7 @@ export const authOptions: NextAuthOptions = {
             (acc) => acc.email === emailLower
           );
 
-          if (!user && defaultAcc && password === defaultAcc.defaultPassword) {
+          if (!user && defaultAcc?.defaultPassword && password === defaultAcc.defaultPassword) {
             const passwordHash = await hashPassword(defaultAcc.defaultPassword);
             try {
               user = await prisma.user.create({
@@ -123,7 +123,7 @@ export const authOptions: NextAuthOptions = {
               ? await verifyStudentLoginPassword(emailLower, password)
               : await verifyPassword(password, user.passwordHash);
 
-          if (!valid && defaultAcc && password === defaultAcc.defaultPassword) {
+          if (!valid && defaultAcc?.defaultPassword && password === defaultAcc.defaultPassword) {
             const newHash = await hashPassword(defaultAcc.defaultPassword);
             await prisma.user.update({
               where: { id: user.id },
