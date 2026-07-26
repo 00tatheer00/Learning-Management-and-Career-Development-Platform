@@ -45,6 +45,7 @@ function getPeriodStats(stats: AdminRevenueStats, period: RevenuePeriod) {
       gross: stats.thisWeekGross,
       management: stats.thisWeekManagement,
       trainer: stats.thisWeekTrainer,
+      school: stats.thisWeekSchool,
       label: "This week",
     };
   }
@@ -54,6 +55,7 @@ function getPeriodStats(stats: AdminRevenueStats, period: RevenuePeriod) {
       gross: stats.thisMonthGross,
       management: stats.thisMonthManagement,
       trainer: stats.thisMonthTrainer,
+      school: stats.thisMonthSchool,
       label: "This month",
     };
   }
@@ -62,15 +64,14 @@ function getPeriodStats(stats: AdminRevenueStats, period: RevenuePeriod) {
     gross: stats.totalGross,
     management: stats.totalManagement,
     trainer: stats.totalTrainer,
+    school: stats.totalSchool,
     label: "All time",
   };
 }
 
 function getCoursePeriodStats(
   course: AdminRevenueStats["byCourse"][number],
-  period: RevenuePeriod,
-  managementShare: number,
-  trainerShare: number
+  period: RevenuePeriod
 ) {
   if (period === "week") {
     return {
@@ -78,15 +79,16 @@ function getCoursePeriodStats(
       gross: course.thisWeekGross,
       management: course.thisWeekManagement,
       trainer: course.thisWeekTrainer,
+      school: course.thisWeekSchool,
     };
   }
   if (period === "month") {
-    const m = course.thisMonthCount;
     return {
-      students: m,
+      students: course.thisMonthCount,
       gross: course.thisMonthGross,
-      management: m * managementShare,
-      trainer: m * trainerShare,
+      management: course.thisMonthManagement,
+      trainer: course.thisMonthTrainer,
+      school: course.thisMonthSchool,
     };
   }
   return {
@@ -94,6 +96,7 @@ function getCoursePeriodStats(
     gross: course.gross,
     management: course.managementShare,
     trainer: course.trainerShare,
+    school: course.schoolShare,
   };
 }
 
@@ -264,13 +267,13 @@ function AdminRevenueSidePanel() {
         role="dialog"
         aria-modal="true"
         aria-label="Registration Revenue"
-        className="relative flex h-full w-full max-w-[440px] flex-col bg-background shadow-2xl"
+        className="relative flex h-full w-full max-w-[480px] flex-col bg-background shadow-2xl"
       >
         <div className="relative overflow-hidden shrink-0">
           <div className="absolute inset-0 bg-gradient-to-br from-emerald-700 via-emerald-800 to-slate-900" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(255,255,255,0.15)_0%,_transparent_60%)]" />
           <div className="relative px-5 pt-5 pb-6 text-white">
-            <div className="flex items-start justify-between gap-3 mb-5">
+            <div className="flex items-start justify-between gap-3 mb-4">
               <div className="flex items-center gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/15 backdrop-blur-sm ring-1 ring-white/20">
                   <CurrencyCircleDollar size={24} weight="duotone" />
@@ -304,9 +307,8 @@ function AdminRevenueSidePanel() {
             </div>
 
             {stats && (
-              <p className="text-sm text-emerald-100/90">
-                Rs {stats.registrationFee.toLocaleString()} per student — Rs{" "}
-                {stats.managementShare} management · Rs {stats.trainerShare} trainer
+              <p className="text-xs text-emerald-100/90 leading-relaxed">
+                <span className="font-semibold text-white">Phase 2 Split:</span> AI (Rs 2,000 → Rs 200 Komal, Rs 1,200 Trainer, Rs 600 School) · App Dev (Rs 1,000 → Rs 200 Komal, Rs 700 Trainer, Rs 100 School)
               </p>
             )}
           </div>
@@ -362,29 +364,34 @@ function AdminRevenueSidePanel() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="rounded-2xl border border-violet-200/70 bg-gradient-to-br from-violet-50 to-white p-4">
-                  <div className="flex items-center gap-2 text-violet-700 mb-2">
-                    <Buildings size={16} weight="duotone" />
-                    <p className="text-[11px] font-bold uppercase tracking-wider">Management</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                <div className="rounded-2xl border border-violet-200/70 bg-gradient-to-br from-violet-50 to-white p-3.5">
+                  <div className="flex items-center gap-1.5 text-violet-700 mb-1.5">
+                    <Buildings size={15} weight="duotone" />
+                    <p className="text-[10px] font-bold uppercase tracking-wider">Komal (Mgmt)</p>
                   </div>
-                  <p className="text-xl font-bold text-violet-950">
+                  <p className="text-lg font-bold text-violet-950">
                     {formatMoney(periodStats.management, stats.currency)}
                   </p>
-                  <p className="text-xs text-violet-700/70 mt-1">
-                    Rs {stats.managementShare} × {periodStats.students}
-                  </p>
                 </div>
-                <div className="rounded-2xl border border-blue-200/70 bg-gradient-to-br from-blue-50 to-white p-4">
-                  <div className="flex items-center gap-2 text-blue-700 mb-2">
-                    <GraduationCap size={16} weight="duotone" />
-                    <p className="text-[11px] font-bold uppercase tracking-wider">Trainers</p>
+
+                <div className="rounded-2xl border border-blue-200/70 bg-gradient-to-br from-blue-50 to-white p-3.5">
+                  <div className="flex items-center gap-1.5 text-blue-700 mb-1.5">
+                    <GraduationCap size={15} weight="duotone" />
+                    <p className="text-[10px] font-bold uppercase tracking-wider">Trainers</p>
                   </div>
-                  <p className="text-xl font-bold text-blue-950">
+                  <p className="text-lg font-bold text-blue-950">
                     {formatMoney(periodStats.trainer, stats.currency)}
                   </p>
-                  <p className="text-xs text-blue-700/70 mt-1">
-                    Rs {stats.trainerShare} × {periodStats.students}
+                </div>
+
+                <div className="rounded-2xl border border-emerald-200/70 bg-gradient-to-br from-emerald-50 to-white p-3.5">
+                  <div className="flex items-center gap-1.5 text-emerald-700 mb-1.5">
+                    <Buildings size={15} weight="duotone" />
+                    <p className="text-[10px] font-bold uppercase tracking-wider">School %</p>
+                  </div>
+                  <p className="text-lg font-bold text-emerald-950">
+                    {formatMoney(periodStats.school, stats.currency)}
                   </p>
                 </div>
               </div>
@@ -392,24 +399,43 @@ function AdminRevenueSidePanel() {
               {periodStats.gross > 0 && (
                 <div className="rounded-xl border border-border bg-secondary/40 p-3">
                   <p className="text-[11px] font-semibold uppercase tracking-wider text-muted mb-2">
-                    Per Rs 1,000 split
+                    Revenue Distribution
                   </p>
-                  <div className="flex h-3 rounded-full overflow-hidden">
-                    <div
-                      className="bg-violet-500"
-                      style={{
-                        width: `${(stats.managementShare / stats.registrationFee) * 100}%`,
-                      }}
-                    />
-                    <div className="bg-blue-500 flex-1" />
+                  <div className="flex h-3 rounded-full overflow-hidden bg-slate-200 gap-0.5">
+                    {periodStats.management > 0 && (
+                      <div
+                        className="bg-violet-500 transition-all"
+                        style={{
+                          width: `${(periodStats.management / periodStats.gross) * 100}%`,
+                        }}
+                      />
+                    )}
+                    {periodStats.trainer > 0 && (
+                      <div
+                        className="bg-blue-500 transition-all"
+                        style={{
+                          width: `${(periodStats.trainer / periodStats.gross) * 100}%`,
+                        }}
+                      />
+                    )}
+                    {periodStats.school > 0 && (
+                      <div
+                        className="bg-emerald-500 transition-all"
+                        style={{
+                          width: `${(periodStats.school / periodStats.gross) * 100}%`,
+                        }}
+                      />
+                    )}
                   </div>
-                  <div className="flex justify-between mt-2 text-[11px] text-muted">
+                  <div className="flex flex-wrap justify-between gap-1 mt-2 text-[11px] text-muted">
                     <span className="text-violet-700 font-medium">
-                      Management{" "}
-                      {Math.round((stats.managementShare / stats.registrationFee) * 100)}%
+                      Management {Math.round((periodStats.management / periodStats.gross) * 100)}%
                     </span>
                     <span className="text-blue-700 font-medium">
-                      Trainer {Math.round((stats.trainerShare / stats.registrationFee) * 100)}%
+                      Trainer {Math.round((periodStats.trainer / periodStats.gross) * 100)}%
+                    </span>
+                    <span className="text-emerald-700 font-medium">
+                      School {Math.round((periodStats.school / periodStats.gross) * 100)}%
                     </span>
                   </div>
                 </div>
@@ -421,12 +447,7 @@ function AdminRevenueSidePanel() {
                 </p>
                 <div className="space-y-3">
                   {stats.byCourse.map((course) => {
-                    const cp = getCoursePeriodStats(
-                      course,
-                      period,
-                      stats.managementShare,
-                      stats.trainerShare
-                    );
+                    const cp = getCoursePeriodStats(course, period);
                     const trainerShort = course.trainerName.split(" ").slice(-1)[0];
                     return (
                       <div
@@ -465,27 +486,29 @@ function AdminRevenueSidePanel() {
                             </span>
                           </div>
                           <div className="h-px bg-border" />
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div className="rounded-xl bg-violet-50 border border-violet-100 px-3 py-2.5">
-                              <p className="text-[10px] font-bold uppercase text-violet-600">
+                          <div className="grid grid-cols-3 gap-2">
+                            <div className="rounded-xl bg-violet-50 border border-violet-100 p-2 text-center">
+                              <p className="text-[9px] font-bold uppercase text-violet-600">
                                 Management
                               </p>
-                              <p className="text-sm font-bold text-violet-900 mt-0.5">
+                              <p className="text-xs font-bold text-violet-900 mt-0.5">
                                 {formatMoney(cp.management, stats.currency)}
                               </p>
-                              <p className="text-[10px] text-violet-600/70">
-                                Rs {stats.managementShare} × {cp.students}
-                              </p>
                             </div>
-                            <div className="rounded-xl bg-blue-50 border border-blue-100 px-3 py-2.5">
-                              <p className="text-[10px] font-bold uppercase text-blue-600">
-                                {trainerShort}&apos;s share
+                            <div className="rounded-xl bg-blue-50 border border-blue-100 p-2 text-center">
+                              <p className="text-[9px] font-bold uppercase text-blue-600">
+                                {trainerShort}
                               </p>
-                              <p className="text-sm font-bold text-blue-900 mt-0.5">
+                              <p className="text-xs font-bold text-blue-900 mt-0.5">
                                 {formatMoney(cp.trainer, stats.currency)}
                               </p>
-                              <p className="text-[10px] text-blue-600/70">
-                                Rs {stats.trainerShare} × {cp.students}
+                            </div>
+                            <div className="rounded-xl bg-emerald-50 border border-emerald-100 p-2 text-center">
+                              <p className="text-[9px] font-bold uppercase text-emerald-600">
+                                School
+                              </p>
+                              <p className="text-xs font-bold text-emerald-900 mt-0.5">
+                                {formatMoney(cp.school, stats.currency)}
                               </p>
                             </div>
                           </div>
@@ -515,3 +538,4 @@ function AdminRevenueSidePanel() {
     </div>
   );
 }
+

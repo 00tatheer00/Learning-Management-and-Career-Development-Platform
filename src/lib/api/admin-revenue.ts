@@ -1,7 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
 import { excludeDemoEnrollments, isDemoPortalStudent } from "@/lib/constants/demo-student";
-import { REVENUE_SPLIT, revenueFromStudents } from "@/lib/constants/revenue-split";
+import {
+  REVENUE_SPLIT,
+  calculateTotalRevenue,
+  type RevenueSplitItem,
+} from "@/lib/constants/revenue-split";
 import { getProgramCategory } from "@/lib/constants/program-categories";
 import { getProgramBySlug } from "@/lib/data/programs";
 import { trainers } from "@/lib/data/trainers";
@@ -17,31 +21,40 @@ export interface AdminRevenueCourseStats {
   gross: number;
   managementShare: number;
   trainerShare: number;
+  schoolShare: number;
   thisWeekCount: number;
   thisWeekGross: number;
   thisWeekManagement: number;
   thisWeekTrainer: number;
+  thisWeekSchool: number;
   thisMonthCount: number;
   thisMonthGross: number;
+  thisMonthManagement: number;
+  thisMonthTrainer: number;
+  thisMonthSchool: number;
 }
 
 export interface AdminRevenueStats {
   registrationFee: number;
   managementShare: number;
   trainerShare: number;
+  schoolShare: number;
   currency: string;
   totalApproved: number;
   totalGross: number;
   totalManagement: number;
   totalTrainer: number;
+  totalSchool: number;
   thisWeekApproved: number;
   thisWeekGross: number;
   thisWeekManagement: number;
   thisWeekTrainer: number;
+  thisWeekSchool: number;
   thisMonthApproved: number;
   thisMonthGross: number;
   thisMonthManagement: number;
   thisMonthTrainer: number;
+  thisMonthSchool: number;
   byCourse: AdminRevenueCourseStats[];
 }
 
@@ -58,10 +71,6 @@ function startOfMonth(date: Date): Date {
   return new Date(date.getFullYear(), date.getMonth(), 1);
 }
 
-function splitForCount(count: number) {
-  return revenueFromStudents(count);
-}
-
 export async function getAdminRevenueStats(): Promise<AdminRevenueStats> {
   const now = new Date();
   const weekStart = startOfWeek(now);
@@ -70,7 +79,15 @@ export async function getAdminRevenueStats(): Promise<AdminRevenueStats> {
   const [approved, activeStudents] = await Promise.all([
     prisma.enrollment.findMany({
       where: { status: "approved" },
-      select: { id: true, program: true, createdAt: true, reviewedAt: true, email: true },
+      select: {
+        id: true,
+        program: true,
+        createdAt: true,
+        reviewedAt: true,
+        email: true,
+        batch: true,
+        level: true,
+      },
     }),
     prisma.user.findMany({
       where: { role: "student", isActive: true },
@@ -79,8 +96,13 @@ export async function getAdminRevenueStats(): Promise<AdminRevenueStats> {
   ]);
 
   const paidApproved = excludeDemoEnrollments(approved);
-  const dated = paidApproved.map((row) => ({
+  const dated: Array<RevenueSplitItem & { at: Date }> = paidApproved.map((row) => ({
     program: row.program,
+    programSlug: row.program,
+    createdAt: row.createdAt,
+    reviewedAt: row.reviewedAt,
+    batch: row.batch,
+    level: row.level,
     at: row.reviewedAt ?? row.createdAt,
   }));
 
@@ -88,17 +110,19 @@ export async function getAdminRevenueStats(): Promise<AdminRevenueStats> {
   const thisWeekRows = dated.filter((row) => row.at >= weekStart);
   const thisMonthRows = dated.filter((row) => row.at >= monthStart);
 
-  const totalSplit = splitForCount(totalApproved);
-  const weekSplit = splitForCount(thisWeekRows.length);
-  const monthSplit = splitForCount(thisMonthRows.length);
+  const totalSplit = calculateTotalRevenue(dated);
+  const weekSplit = calculateTotalRevenue(thisWeekRows);
+  const monthSplit = calculateTotalRevenue(thisMonthRows);
 
   const byCourse = ENROLLABLE_PROGRAM_SLUGS.map((programSlug) => {
     const category = getProgramCategory(programSlug);
-    const rows = dated.filter((row) => row.program === programSlug);
+    const rows = dated.filter((row) => row.program === programSlug || row.programSlug === programSlug);
     const weekRows = rows.filter((row) => row.at >= weekStart);
     const monthRows = rows.filter((row) => row.at >= monthStart);
-    const all = splitForCount(rows.length);
-    const week = splitForCount(weekRows.length);
+
+    const all = calculateTotalRevenue(rows);
+    const week = calculateTotalRevenue(weekRows);
+    const month = calculateTotalRevenue(monthRows);
     const trainer = trainers.find((t) => t.id === category?.primaryTrainerSeedId);
 
     const uniqueStudents = activeStudents.filter(
@@ -117,12 +141,17 @@ export async function getAdminRevenueStats(): Promise<AdminRevenueStats> {
       gross: all.gross,
       managementShare: all.management,
       trainerShare: all.trainer,
+      schoolShare: all.school,
       thisWeekCount: weekRows.length,
       thisWeekGross: week.gross,
       thisWeekManagement: week.management,
       thisWeekTrainer: week.trainer,
+      thisWeekSchool: week.school,
       thisMonthCount: monthRows.length,
-      thisMonthGross: splitForCount(monthRows.length).gross,
+      thisMonthGross: month.gross,
+      thisMonthManagement: month.management,
+      thisMonthTrainer: month.trainer,
+      thisMonthSchool: month.school,
     };
   });
 
@@ -130,19 +159,24 @@ export async function getAdminRevenueStats(): Promise<AdminRevenueStats> {
     registrationFee: REVENUE_SPLIT.registrationFee,
     managementShare: REVENUE_SPLIT.managementShare,
     trainerShare: REVENUE_SPLIT.trainerShare,
+    schoolShare: REVENUE_SPLIT.schoolShare,
     currency: REVENUE_SPLIT.currency,
     totalApproved,
     totalGross: totalSplit.gross,
     totalManagement: totalSplit.management,
     totalTrainer: totalSplit.trainer,
+    totalSchool: totalSplit.school,
     thisWeekApproved: thisWeekRows.length,
     thisWeekGross: weekSplit.gross,
     thisWeekManagement: weekSplit.management,
     thisWeekTrainer: weekSplit.trainer,
+    thisWeekSchool: weekSplit.school,
     thisMonthApproved: thisMonthRows.length,
     thisMonthGross: monthSplit.gross,
     thisMonthManagement: monthSplit.management,
     thisMonthTrainer: monthSplit.trainer,
+    thisMonthSchool: monthSplit.school,
     byCourse,
   };
 }
+

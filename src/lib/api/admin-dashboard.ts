@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { getAdminProgramStats } from "@/lib/api/admin-program-stats";
 import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
 import { excludeDemoEnrollments } from "@/lib/constants/demo-student";
-import { revenueFromStudents } from "@/lib/constants/revenue-split";
+import { calculateTotalRevenue } from "@/lib/constants/revenue-split";
 import { getRegistrationPhase } from "@/lib/constants/batch";
 
 export interface PhaseMetrics {
@@ -135,7 +135,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     programStats.approvedRegistrations - programStats.returningRegistrations;
 
   const approvedForRevenue = allEnrollments.filter((e) => e.status === "approved");
-  const revenue = revenueFromStudents(excludeDemoEnrollments(approvedForRevenue).length);
+  const revenue = calculateTotalRevenue(excludeDemoEnrollments(approvedForRevenue));
 
   const phase1Enrollments = allEnrollments.filter((e) => getRegistrationPhase(e) === "phase-1");
   const phase2Enrollments = allEnrollments.filter((e) => getRegistrationPhase(e) === "phase-2");
@@ -152,7 +152,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     const approvedEmails = new Set(approved.map((row) => row.email.toLowerCase()));
     const returning = Math.max(0, approved.length - approvedEmails.size);
     const firstTime = Math.max(0, approved.length - returning);
-    const rev = revenueFromStudents(excludeDemoEnrollments(approved).length).gross;
+    const rev = calculateTotalRevenue(excludeDemoEnrollments(approved)).gross;
     const loggedIn = studentsList.filter((s) => s.firstLoginAt).length;
     const web = studentsList.filter((s) => s.programSlug === webSlug).length;
     const app = studentsList.filter((s) => s.programSlug === appSlug).length;
