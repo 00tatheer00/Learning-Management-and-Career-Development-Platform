@@ -36,10 +36,10 @@ export async function POST(request: Request) {
 
     return NextResponse.json(
       createApiResponse(true, {
+        data: { count: result.count },
         message: `Successfully promoted ${result.count} student(s) to ${nextLevel}${
           nextBatch ? ` (${nextBatch})` : ""
         }.`,
-        count: result.count,
       })
     );
   } catch (error) {
