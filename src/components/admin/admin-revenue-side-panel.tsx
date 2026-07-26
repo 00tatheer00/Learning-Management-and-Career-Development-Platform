@@ -17,7 +17,11 @@ import {
   GraduationCap,
   CaretRight,
 } from "@phosphor-icons/react";
-import type { AdminRevenueStats } from "@/lib/api/admin-revenue";
+import type {
+  AdminRevenueStats,
+  AdminRevenuePhaseStats,
+  AdminRevenueCourseStats,
+} from "@/lib/api/admin-revenue";
 import { usePortalThemeOptional } from "@/components/portal/portal-theme-provider";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
