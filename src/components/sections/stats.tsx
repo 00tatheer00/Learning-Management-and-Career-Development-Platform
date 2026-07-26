@@ -42,7 +42,7 @@ const cardVariants: Variants = {
 export function StatsSection() {
   return (
     <section
-      className="relative py-16 sm:py-20 lg:py-24 bg-white border-y border-slate-200/80 text-slate-900 overflow-hidden"
+      className="relative py-14 sm:py-16 lg:py-20 bg-white border-y border-slate-200/80 text-slate-900 overflow-hidden"
       aria-label="Platform Statistics"
     >
       <div className="container-custom relative z-10 px-4 sm:px-6 lg:px-8">
@@ -52,7 +52,7 @@ export function StatsSection() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-40px" }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 mb-12"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 mb-8"
         >
           {stats.map((stat, index) => {
             const meta = statIcons[index % statIcons.length];
@@ -96,7 +96,7 @@ export function StatsSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.4 }}
-          className="flex flex-wrap items-center justify-center text-center gap-6 sm:gap-10 pt-8 border-t border-slate-100 text-xs sm:text-sm font-semibold text-slate-600 w-full"
+          className="flex flex-wrap items-center justify-center text-center gap-6 sm:gap-10 pt-6 border-t border-slate-100 text-xs sm:text-sm font-semibold text-slate-600 w-full"
         >
           <div className="flex items-center justify-center gap-2">
             <ShieldCheck size={16} className="text-emerald-600 shrink-0" />
