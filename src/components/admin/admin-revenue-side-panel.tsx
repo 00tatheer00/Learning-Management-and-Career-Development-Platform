@@ -507,7 +507,7 @@ function AdminRevenueSidePanel() {
                   Course-wise breakdown
                 </p>
                 <div className="space-y-3">
-                  {activeStats.byCourse.map((course) => {
+                  {activeStats?.byCourse.map((course) => {
                     const cp = getCoursePeriodStats(course, period);
                     const trainerShort = course.trainerName.split(" ").slice(-1)[0];
                     return (
