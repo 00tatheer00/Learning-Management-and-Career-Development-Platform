@@ -78,6 +78,8 @@ export async function getAdminEnrollmentRows(): Promise<AdminEnrollmentRow[]> {
         : undefined,
     }))
   );
+}
+
 export async function getAdminEnrollmentPaginated(options?: {
   page?: number;
   limit?: number;
