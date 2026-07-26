@@ -32,6 +32,7 @@ export async function generateMetadata({ params }: ProgramPageProps) {
     title: program.title,
     description: program.description,
     path: `/programs/${slug}`,
+    image: program.image || "/eest-logo.png",
   });
 }
 

@@ -7,6 +7,7 @@ interface PageSEO {
   path?: string;
   image?: string;
   noIndex?: boolean;
+  manifest?: string;
 }
 
 export function createMetadata({
@@ -15,9 +16,13 @@ export function createMetadata({
   path = "",
   image = "/eest-logo.png",
   noIndex = false,
+  manifest,
 }: PageSEO): Metadata {
   const url = `${SITE_CONFIG.url}${path}`;
   const fullTitle = title === SITE_CONFIG.name ? title : `${title} | ${SITE_CONFIG.name}`;
+  const imageUrl = image.startsWith("http")
+    ? image
+    : `${SITE_CONFIG.url}${image.startsWith("/") ? "" : "/"}${image}`;
 
   return {
     title: fullTitle,
@@ -26,6 +31,7 @@ export function createMetadata({
     alternates: {
       canonical: url,
     },
+    ...(manifest ? { manifest } : {}),
     openGraph: {
       title: fullTitle,
       description,
@@ -33,10 +39,10 @@ export function createMetadata({
       siteName: SITE_CONFIG.name,
       images: [
         {
-          url: image,
+          url: imageUrl,
           width: 1200,
           height: 630,
-          alt: SITE_CONFIG.name,
+          alt: fullTitle,
         },
       ],
       locale: "en_US",
@@ -46,7 +52,8 @@ export function createMetadata({
       card: "summary_large_image",
       title: fullTitle,
       description,
-      images: [image],
+      images: [imageUrl],
+      creator: "@emergingedge",
     },
     robots: noIndex
       ? { index: false, follow: false }
