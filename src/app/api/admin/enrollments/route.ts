@@ -12,14 +12,37 @@ import {
   rejectEnrollment,
   deleteEnrollmentRegistration,
 } from "@/lib/api/admin-enrollment-actions";
-import { getAdminEnrollmentRows } from "@/lib/api/admin-enrollments";
+import {
+  getAdminEnrollmentRows,
+  getAdminEnrollmentPaginated,
+} from "@/lib/api/admin-enrollments";
 import { z } from "zod";
 
 export const maxDuration = 60;
 
-export async function GET() {
+export async function GET(request: Request) {
   const user = await getAdminUser();
   if (!user) return unauthorizedAdminResponse();
+
+  const { searchParams } = new URL(request.url);
+  const hasPaginationParams =
+    searchParams.has("page") || searchParams.has("limit") || searchParams.has("status");
+
+  if (hasPaginationParams) {
+    const page = parseInt(searchParams.get("page") ?? "1", 10);
+    const limit = parseInt(searchParams.get("limit") ?? "50", 10);
+    const status = searchParams.get("status") ?? "all";
+
+    const result = await getAdminEnrollmentPaginated({ page, limit, status });
+    return NextResponse.json(
+      createApiResponse(true, {
+        data: result.rows,
+        totalCount: result.totalCount,
+        page: result.page,
+        totalPages: result.totalPages,
+      })
+    );
+  }
 
   const enrollments = await getAdminEnrollmentRows();
   return NextResponse.json(createApiResponse(true, { data: enrollments }));

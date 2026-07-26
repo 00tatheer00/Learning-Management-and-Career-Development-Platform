@@ -33,12 +33,14 @@ export const metadata: Metadata = createMetadata({
   title: SITE_CONFIG.name,
   description: SITE_CONFIG.description,
   path: "/",
+  manifest: "/manifest.json",
 });
 
 export const viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover" as const,
+  themeColor: "#ea580c",
 };
 
 export default function RootLayout({

@@ -78,6 +78,91 @@ export async function getAdminEnrollmentRows(): Promise<AdminEnrollmentRow[]> {
         : undefined,
     }))
   );
+export async function getAdminEnrollmentPaginated(options?: {
+  page?: number;
+  limit?: number;
+  status?: string;
+}): Promise<{
+  rows: AdminEnrollmentRow[];
+  totalCount: number;
+  page: number;
+  totalPages: number;
+}> {
+  const page = Math.max(1, options?.page ?? 1);
+  const limit = Math.max(1, Math.min(100, options?.limit ?? 50));
+  const skip = (page - 1) * limit;
+
+  const where =
+    options?.status && options.status !== "all"
+      ? { status: options.status as "pending" | "approved" | "rejected" }
+      : undefined;
+
+  const [records, totalCount] = await Promise.all([
+    prisma.enrollment.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      skip,
+      take: limit,
+    }),
+    prisma.enrollment.count({ where }),
+  ]);
+
+  const reviewerIds = [
+    ...new Set(records.map((record) => record.reviewedBy).filter(Boolean)),
+  ] as string[];
+
+  const reviewers =
+    reviewerIds.length > 0
+      ? await prisma.user.findMany({
+          where: { id: { in: reviewerIds } },
+          select: { id: true, name: true },
+        })
+      : [];
+
+  const reviewerNameById = new Map(reviewers.map((user) => [user.id, user.name]));
+
+  const rows = enrichRowsWithApplicationMeta(
+    records.map((record) => ({
+      id: record.id,
+      fullName: record.fullName,
+      fatherName: record.fatherName,
+      institution: record.institution,
+      classSemester: record.classSemester,
+      cnic: record.cnic,
+      email: record.email,
+      whatsapp: record.whatsapp,
+      fieldOfStudy: record.fieldOfStudy,
+      program: record.program,
+      level: record.level,
+      batch: record.batch ?? DEFAULT_BATCH_NAME,
+      learningMode: record.learningMode,
+      hasLaptop: record.hasLaptop as "yes" | "no",
+      internetAvailable: record.internetAvailable as "yes" | "no",
+      confirmInfoCorrect: record.confirmInfoCorrect,
+      agreeToPolicies: record.agreeToPolicies,
+      hasPaymentScreenshot: Boolean(record.paymentScreenshot || record.paymentScreenshotPublicId),
+      status: record.status,
+      reviewedAt: record.reviewedAt?.toISOString(),
+      reviewedBy: record.reviewedBy ?? undefined,
+      adminNotes: record.adminNotes ?? undefined,
+      approvalEmailSent: record.approvalEmailSent,
+      approvalEmailError: record.approvalEmailError ?? undefined,
+      approvalWhatsAppSent: record.approvalWhatsAppSent,
+      approvalWhatsAppError: record.approvalWhatsAppError ?? undefined,
+      createdAt: record.createdAt.toISOString(),
+      courseTitle: getProgramBySlug(record.program)?.title ?? record.program,
+      reviewerName: record.reviewedBy
+        ? reviewerNameById.get(record.reviewedBy) ?? "Admin"
+        : undefined,
+    }))
+  );
+
+  return {
+    rows,
+    totalCount,
+    page,
+    totalPages: Math.ceil(totalCount / limit) || 1,
+  };
 }
 
 function escapeCsv(value: string) {
