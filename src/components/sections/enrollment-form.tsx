@@ -36,6 +36,7 @@ import { formatCnicInput, formatWhatsappInput } from "@/components/enrollment/en
 import { EnrollmentDropzone } from "@/components/enrollment/enrollment-dropzone";
 import { EnrollmentFeeSummary } from "@/components/enrollment/enrollment-fee-summary";
 import { useEnrollmentDraft } from "@/components/enrollment/use-enrollment-draft";
+import { EnrollmentSuccessView } from "@/components/enrollment/enrollment-success-view";
 
 function FormSection({
   title,
@@ -422,28 +423,21 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
 
   if (isSuccess) {
     return (
-      <motion.div
-        id="register-form-panel"
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="rounded-2xl border border-border bg-background p-8 lg:p-10 shadow-sm text-center min-h-[320px] flex flex-col items-center justify-center"
-        aria-live="polite"
-        tabIndex={-1}
-      >
-        <CheckCircle2 className="w-16 h-16 text-primary mx-auto mb-4" aria-hidden="true" />
-        <h2 className="text-2xl font-bold mb-2">
-          {submittedApplicationNumber > 1
-            ? `Application #${submittedApplicationNumber} Submitted!`
-            : "Registration Submitted!"}
-        </h2>
-        <p className="text-muted mb-6 leading-relaxed max-w-md mx-auto">
-          Thank you for registering
-          {submittedApplicationNumber > 1 ? " again" : ""}. Our team will verify your{" "}
-          <strong>new payment screenshot</strong> within 2–3 business days. Once approved, your
-          portal login details will be sent to your <strong>WhatsApp</strong>.
-        </p>
-        <Button onClick={() => setIsSuccess(false)}>Submit Another Registration</Button>
-      </motion.div>
+      <div id="register-form-panel">
+        <EnrollmentSuccessView
+          applicationNumber={submittedApplicationNumber}
+          fullName={watch("fullName") || "Student"}
+          programSlug={watch("program") || "web-development"}
+          levelName={watch("level") || "Module 1"}
+          email={watch("email") || ""}
+          whatsapp={watch("whatsapp") || ""}
+        />
+        <div className="text-center pt-6">
+          <Button variant="ghost" size="sm" onClick={() => setIsSuccess(false)} className="text-xs font-bold text-muted hover:text-foreground">
+            Submit Another Registration &rarr;
+          </Button>
+        </div>
+      </div>
     );
   }
 

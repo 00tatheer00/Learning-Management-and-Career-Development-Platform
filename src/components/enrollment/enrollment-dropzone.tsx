@@ -2,7 +2,7 @@
 
 import { useState, useRef, type DragEvent } from "react";
 import Image from "next/image";
-import { UploadCloud, FileImage, X, CheckCircle2, AlertTriangle } from "lucide-react";
+import { UploadCloud, X, CheckCircle2, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface EnrollmentDropzoneProps {

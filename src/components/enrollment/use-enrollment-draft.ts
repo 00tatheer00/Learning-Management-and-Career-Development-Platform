@@ -15,9 +15,10 @@ export function useEnrollmentDraft(form: UseFormReturn<EnrollmentFormData>) {
         const parsed = JSON.parse(saved);
         if (parsed && typeof parsed === "object") {
           Object.entries(parsed).forEach(([key, val]) => {
-            if (val && typeof val === "string") {
-              form.setValue(key as keyof EnrollmentFormData, val as any);
-            }
+              form.setValue(
+                key as keyof EnrollmentFormData,
+                val as unknown as EnrollmentFormData[keyof EnrollmentFormData]
+              );
           });
           toast.info("Restored your registration draft");
         }

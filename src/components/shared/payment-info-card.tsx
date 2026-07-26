@@ -89,6 +89,18 @@ export function PaymentInfoCard({ className, compact = false, amount }: PaymentI
           After approval of your payment, you will get a confirmation message or email with your portal access!
         </p>
       </div>
+
+      <div className="mt-3 pt-2 border-t border-emerald-200/60 flex items-center justify-between text-xs">
+        <span className="text-muted font-medium">Need payment help?</span>
+        <a
+          href="https://wa.me/923374005515?text=Hello%20EEST%20Team%2C%20I%20need%20help%20with%20my%20registration%20payment."
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 font-bold text-emerald-700 dark:text-emerald-300 hover:underline"
+        >
+          <span>WhatsApp Support &rarr;</span>
+        </a>
+      </div>
     </div>
   );
 }

@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { formatModuleSchedule } from "@/lib/data/programs";
 import type { ProgramModule } from "@/types";
-import { Clock, CalendarDots } from "@phosphor-icons/react";
+import { CalendarDots } from "@phosphor-icons/react";
 
 export function RequiredLabel({
   htmlFor,

@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, ShieldCheck, Sparkles, Video, Award, Users } from "lucide-react";
+import { Sparkles, Video, Award, Users } from "lucide-react";
 import { getProgramRegistrationFee } from "@/lib/constants/payment";
 import { getProgramBySlug } from "@/lib/data/programs";
 
