@@ -80,9 +80,11 @@ export function EnrollmentModulePicker({
                   </span>
                 </div>
 
-                <p className="mt-1 text-xs sm:text-sm text-muted leading-relaxed">
-                  {mod.description}
-                </p>
+                {mod.subtitle && (
+                  <p className="mt-1 text-xs sm:text-sm text-muted leading-relaxed">
+                    {mod.subtitle}
+                  </p>
+                )}
 
                 {mod.schedule ? (
                   <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-primary font-medium">
@@ -97,7 +99,7 @@ export function EnrollmentModulePicker({
                   </div>
                 ) : (
                   <p className="mt-2 text-xs text-primary font-medium">
-                    {formatModuleSchedule(mod.name)}
+                    {formatModuleSchedule(mod)}
                   </p>
                 )}
               </div>
