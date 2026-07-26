@@ -1,122 +1,138 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { X, ChevronRight } from "lucide-react";
+import { X, ChevronRight, Zap } from "lucide-react";
 import { REGISTRATION_OPEN } from "@/lib/constants";
 
 const tickerItems = [
-  "🔥 Admissions Open — 2nd Module",
-  "⚡ Live Interactive Classes & Assignments",
+  "🔥 Admissions Open — 2nd Module Now Enrolling",
+  "⚡ Live Interactive Classes & Weekly Assignments",
   "🚀 Limited Seats — Apply Before July 31",
-  "💻 Web · App · AI · Graphics · UI/UX",
-  "🎓 100% Free Course · Minimal Registration Fee Only",
+  "💻 Web Development · App Dev · AI · Graphics · UI/UX",
+  "🎓 100% Free Course — Only Minimal Registration Fee",
+  "🏆 Hands-On Projects · Real-World Skills · Certified Trainers",
 ];
-
-// Repeated for seamless infinite loop
-const repeated = [...tickerItems, ...tickerItems, ...tickerItems];
 
 export function TopTickerBanner() {
   const [isVisible, setIsVisible] = useState(true);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [duration, setDuration] = useState(60);
+
+  useEffect(() => {
+    if (trackRef.current) {
+      const width = trackRef.current.scrollWidth;
+      // ~100px per second
+      setDuration(Math.max(40, width / 100));
+    }
+  }, []);
 
   if (!isVisible || !REGISTRATION_OPEN) return null;
 
+  // Triple for seamless loop
+  const loopItems = [...tickerItems, ...tickerItems, ...tickerItems];
+
   return (
     <div
-      className="relative z-50 overflow-hidden text-white"
+      className="relative z-50 overflow-hidden"
       style={{
-        background:
-          "linear-gradient(90deg, #0f0f0f 0%, #1a1a1a 30%, #111111 70%, #0f0f0f 100%)",
-        borderBottom: "1px solid rgba(255,255,255,0.06)",
+        background: "linear-gradient(135deg, #fff7ed 0%, #ffedd5 40%, #fef3c7 70%, #fff7ed 100%)",
+        borderBottom: "1px solid rgba(234,88,12,0.15)",
+        boxShadow: "0 1px 8px rgba(234,88,12,0.08)",
       }}
     >
-      {/* Subtle top accent line */}
+      {/* Top orange accent line */}
       <div
         style={{
           position: "absolute",
           top: 0,
           left: 0,
           right: 0,
-          height: "1px",
-          background:
-            "linear-gradient(90deg, transparent 0%, #f97316 30%, #fb923c 50%, #f97316 70%, transparent 100%)",
-          opacity: 0.7,
+          height: "2px",
+          background: "linear-gradient(90deg, transparent 0%, #ea580c 20%, #f97316 50%, #fb923c 70%, transparent 100%)",
         }}
       />
 
-      <div className="flex items-center h-9">
-        {/* Left: LIVE badge */}
+      <div className="flex items-stretch h-9">
+
+        {/* LEFT: Live badge */}
         <div
-          className="shrink-0 flex items-center gap-2 px-4 h-full"
-          style={{ borderRight: "1px solid rgba(255,255,255,0.06)" }}
+          className="shrink-0 flex items-center gap-2 px-4"
+          style={{
+            borderRight: "1px solid rgba(234,88,12,0.12)",
+            background: "linear-gradient(90deg, rgba(234,88,12,0.06) 0%, transparent 100%)",
+          }}
         >
-          <span className="relative flex h-1.5 w-1.5">
+          {/* Pulse dot */}
+          <span className="relative flex h-2 w-2 shrink-0">
             <span
               className="animate-ping absolute inline-flex h-full w-full rounded-full"
-              style={{ backgroundColor: "#f97316", opacity: 0.75 }}
+              style={{ backgroundColor: "#f97316", opacity: 0.6 }}
             />
             <span
-              className="relative inline-flex rounded-full h-1.5 w-1.5"
-              style={{ backgroundColor: "#fb923c" }}
+              className="relative inline-flex h-2 w-2 rounded-full"
+              style={{ backgroundColor: "#ea580c" }}
             />
           </span>
+          <Zap
+            size={10}
+            fill="#ea580c"
+            strokeWidth={0}
+          />
           <span
-            className="text-[10px] font-bold uppercase tracking-[0.18em]"
-            style={{ color: "#fb923c", letterSpacing: "0.18em" }}
+            className="text-[10px] font-black uppercase tracking-[0.15em] whitespace-nowrap"
+            style={{ color: "#ea580c" }}
           >
-            Latest
+            Live News
           </span>
         </div>
 
-        {/* Center: Scrolling Ticker */}
-        <div className="flex-1 overflow-hidden relative h-full flex items-center">
-          {/* Left fade */}
+        {/* CENTER: Infinite scrolling ticker */}
+        <div className="relative flex-1 overflow-hidden flex items-center">
+          {/* Left fade mask */}
           <div
             className="absolute left-0 top-0 bottom-0 z-10 pointer-events-none"
             style={{
-              width: "40px",
-              background:
-                "linear-gradient(to right, #111111 0%, transparent 100%)",
+              width: "48px",
+              background: "linear-gradient(to right, #ffedd5 0%, transparent 100%)",
             }}
           />
-          {/* Right fade */}
+          {/* Right fade mask */}
           <div
             className="absolute right-0 top-0 bottom-0 z-10 pointer-events-none"
             style={{
-              width: "40px",
-              background:
-                "linear-gradient(to left, #111111 0%, transparent 100%)",
+              width: "48px",
+              background: "linear-gradient(to left, #ffedd5 0%, transparent 100%)",
             }}
           />
 
           <div
+            ref={trackRef}
             className="flex items-center whitespace-nowrap"
             style={{
-              animation: "ticker-scroll 55s linear infinite",
+              animation: `ticker-scroll-ltr ${duration}s linear infinite`,
+              willChange: "transform",
             }}
           >
-            {repeated.map((item, idx) => (
-              <span
-                key={idx}
-                className="inline-flex items-center"
-                style={{ padding: "0 2.5rem" }}
-              >
+            {loopItems.map((item, idx) => (
+              <span key={idx} className="inline-flex items-center">
                 <span
-                  className="text-[11px] font-medium tracking-wide"
-                  style={{ color: "rgba(255,255,255,0.78)" }}
+                  className="text-[11.5px] font-semibold tracking-wide px-7"
+                  style={{ color: "#7c2d12" }}
                 >
                   {item}
                 </span>
-                {/* Separator dot */}
+                {/* Orange diamond separator */}
                 <span
-                  className="ml-10"
                   style={{
-                    width: "3px",
-                    height: "3px",
-                    borderRadius: "50%",
-                    backgroundColor: "#f97316",
-                    opacity: 0.5,
                     display: "inline-block",
+                    width: "4px",
+                    height: "4px",
+                    borderRadius: "1px",
+                    transform: "rotate(45deg)",
+                    backgroundColor: "#f97316",
+                    opacity: 0.55,
+                    flexShrink: 0,
                   }}
                 />
               </span>
@@ -124,41 +140,47 @@ export function TopTickerBanner() {
           </div>
         </div>
 
-        {/* Right: CTA + Close */}
+        {/* RIGHT: CTA + Close */}
         <div
-          className="shrink-0 flex items-center gap-2 px-3 h-full"
-          style={{ borderLeft: "1px solid rgba(255,255,255,0.06)" }}
+          className="shrink-0 flex items-center gap-2 px-3"
+          style={{
+            borderLeft: "1px solid rgba(234,88,12,0.12)",
+            background: "linear-gradient(90deg, transparent 0%, rgba(234,88,12,0.05) 100%)",
+          }}
         >
           <Link
             href="/register"
-            className="hidden sm:inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest transition-all duration-200 hover:opacity-80"
+            className="hidden sm:inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-white transition-all duration-200 hover:shadow-lg hover:-translate-y-px active:translate-y-0"
             style={{
-              background: "linear-gradient(135deg, #f97316, #fb923c)",
-              color: "#fff",
-              padding: "3px 12px",
+              background: "linear-gradient(135deg, #ea580c 0%, #f97316 100%)",
+              padding: "4px 13px 4px 12px",
               borderRadius: "999px",
-              letterSpacing: "0.12em",
+              boxShadow: "0 2px 8px rgba(234,88,12,0.35), inset 0 1px 0 rgba(255,255,255,0.15)",
+              letterSpacing: "0.1em",
             }}
           >
             <span>Apply Now</span>
-            <ChevronRight size={10} className="stroke-[3]" />
+            <ChevronRight size={10} strokeWidth={3} />
           </Link>
+
           <button
             onClick={() => setIsVisible(false)}
             className="flex items-center justify-center rounded-full transition-all duration-200"
             style={{
               width: "22px",
               height: "22px",
-              background: "rgba(255,255,255,0.06)",
-              color: "rgba(255,255,255,0.45)",
+              background: "rgba(234,88,12,0.08)",
+              color: "#b45309",
+              border: "1px solid rgba(234,88,12,0.12)",
+              flexShrink: 0,
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = "rgba(255,255,255,0.12)";
-              e.currentTarget.style.color = "rgba(255,255,255,0.85)";
+              e.currentTarget.style.background = "rgba(234,88,12,0.16)";
+              e.currentTarget.style.color = "#ea580c";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = "rgba(255,255,255,0.06)";
-              e.currentTarget.style.color = "rgba(255,255,255,0.45)";
+              e.currentTarget.style.background = "rgba(234,88,12,0.08)";
+              e.currentTarget.style.color = "#b45309";
             }}
             aria-label="Close notification ticker"
           >
@@ -167,10 +189,10 @@ export function TopTickerBanner() {
         </div>
       </div>
 
-      {/* CSS Keyframes */}
+      {/* Keyframes */}
       <style>{`
-        @keyframes ticker-scroll {
-          0% { transform: translateX(0); }
+        @keyframes ticker-scroll-ltr {
+          0%   { transform: translateX(0); }
           100% { transform: translateX(-33.333%); }
         }
       `}</style>
