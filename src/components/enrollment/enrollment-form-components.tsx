@@ -86,22 +86,10 @@ export function EnrollmentModulePicker({
                   </p>
                 )}
 
-                {mod.schedule ? (
-                  <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-primary font-medium">
-                    <span className="flex items-center gap-1">
-                      <CalendarDots size={14} className="shrink-0" />
-                      {mod.schedule.days.join(", ")}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Clock size={14} className="shrink-0" />
-                      {mod.schedule.time}
-                    </span>
-                  </div>
-                ) : (
-                  <p className="mt-2 text-xs text-primary font-medium">
-                    {formatModuleSchedule(mod)}
-                  </p>
-                )}
+                <p className="mt-2 text-xs text-primary font-medium flex items-center gap-1">
+                  <CalendarDots size={14} className="shrink-0" />
+                  {formatModuleSchedule(mod)}
+                </p>
               </div>
             </div>
           </button>
