@@ -3,6 +3,7 @@ import { faqs } from "@/lib/data/faqs";
 import { HeroSection } from "@/components/sections/hero";
 import { StatsSection } from "@/components/sections/stats";
 import { ProgramsSection } from "@/components/sections/programs";
+import { StudentProjectsSection } from "@/components/sections/student-projects";
 import { WhyChooseUsSection } from "@/components/sections/why-choose-us";
 import { LearningJourneySection } from "@/components/sections/learning-journey";
 import { TrainersSection } from "@/components/sections/trainers";
@@ -19,6 +20,7 @@ export default function HomePage() {
       <AdmissionsSection />
       <TrainersSection />
       <ProgramsSection />
+      <StudentProjectsSection />
       <WhyChooseUsSection />
       <LearningJourneySection />
       <FAQSection />

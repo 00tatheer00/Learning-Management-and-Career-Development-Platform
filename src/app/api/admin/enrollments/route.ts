@@ -34,14 +34,14 @@ export async function GET(request: Request) {
     const status = searchParams.get("status") ?? "all";
 
     const result = await getAdminEnrollmentPaginated({ page, limit, status });
-    return NextResponse.json(
-      createApiResponse(true, {
-        data: result.rows,
+    return NextResponse.json({
+      ...createApiResponse(true, { data: result.rows }),
+      pagination: {
         totalCount: result.totalCount,
         page: result.page,
         totalPages: result.totalPages,
-      })
-    );
+      },
+    });
   }
 
   const enrollments = await getAdminEnrollmentRows();
