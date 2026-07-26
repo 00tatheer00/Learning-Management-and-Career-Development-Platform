@@ -45,34 +45,34 @@ export function FreeCoursePromo({
         aria-hidden="true"
       />
 
-      <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-6 p-6 lg:p-8">
+      <div className="relative flex flex-col gap-5 p-5 sm:p-6">
         <div className="flex flex-col justify-center">
-          <div className="inline-flex w-fit items-center gap-2 rounded-full bg-emerald-500 px-4 py-1.5 text-sm font-bold uppercase tracking-wide text-white shadow-md shadow-emerald-500/30 mb-4">
-            <Gift size={18} weight="fill" />
+          <div className="inline-flex w-fit items-center gap-2 rounded-full bg-emerald-500 px-3.5 py-1 text-xs sm:text-sm font-bold uppercase tracking-wide text-white shadow-md shadow-emerald-500/30 mb-3">
+            <Gift size={16} weight="fill" />
             Skill-Based Learning
           </div>
-          <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground leading-tight mb-2">
+          <h3 className="text-xl sm:text-2xl font-bold text-foreground leading-tight mb-2">
             Practical Online Classes
           </h3>
-          <p className="text-base sm:text-lg text-muted leading-relaxed">
+          <p className="text-xs sm:text-sm text-muted leading-relaxed">
             Pay module registration fee per module. All live classes, recorded lectures, tasks, and portal access are included.
           </p>
         </div>
 
-        <div className="flex flex-col justify-center rounded-xl border-2 border-primary/30 bg-white p-5 lg:p-6 shadow-sm">
-          <div className="flex items-center gap-2 text-primary mb-2">
-            <CurrencyCircleDollar size={24} weight="duotone" />
-            <span className="text-sm font-semibold uppercase tracking-wider">
+        <div className="flex flex-col justify-center rounded-xl border border-primary/20 bg-white/90 p-4 sm:p-5 shadow-xs">
+          <div className="flex items-center gap-2 text-primary mb-1.5">
+            <CurrencyCircleDollar size={20} weight="duotone" />
+            <span className="text-xs font-bold uppercase tracking-wider">
               {PAYMENT_CONFIG.registrationLabel}
             </span>
           </div>
-          <p className="text-2xl sm:text-3xl font-extrabold text-primary leading-tight mb-1">
+          <p className="text-lg sm:text-xl font-black text-primary leading-snug mb-1.5 break-words">
             Module Registration Fee
           </p>
-          <p className="text-sm font-medium text-foreground mb-1">
+          <p className="text-xs font-semibold text-foreground mb-1">
             {PAYMENT_CONFIG.registrationNote}
           </p>
-          <p className="text-xs text-muted leading-relaxed">
+          <p className="text-[11px] text-muted leading-relaxed">
             This is a registration fee per module. Select your course during registration to view its specific module fee.
           </p>
         </div>
