@@ -2,8 +2,8 @@ import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
 
 export const DEFAULT_BATCH_NAME = "Batch 1";
 
-// Date when 2nd Module admissions officially opened
-export const PHASE_2_START_ISO = "2026-07-24T00:00:00.000Z";
+// Date when Phase 2 admissions officially opened (24th July 2026 00:00 PKT)
+export const PHASE_2_START_ISO = "2026-07-23T19:00:00.000Z";
 
 export type RegistrationPhase = "phase-1" | "phase-2";
 
@@ -31,19 +31,7 @@ export function getRegistrationPhase(item: {
     return "phase-2";
   }
 
-  // 2. 2nd Module / Advanced topics (React, Advanced, Module 2, Flutter Advanced, AI, etc.)
-  const levelStr = String(item.level || item.module || "").toLowerCase();
-  if (
-    levelStr.includes("react") ||
-    levelStr.includes("module 2") ||
-    levelStr.includes("advanced") ||
-    levelStr.includes("2nd") ||
-    levelStr.includes("ai")
-  ) {
-    return "phase-2";
-  }
-
-  // 3. Applications / Accounts created on or after Phase 2 start date (July 24, 2026)
+  // 2. Strictly check applications / accounts created on or after Phase 2 start date (July 24, 2026)
   const dateVal = item.createdAt || item.appliedAt;
   if (dateVal) {
     const createdDate = new Date(dateVal);
