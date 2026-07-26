@@ -4,9 +4,14 @@ import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { ArrowRight, Sparkles, Code2, Cpu, Palette, Rocket } from "lucide-react";
 import { motion, type Variants } from "framer-motion";
+import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import { REGISTRATION_OPEN } from "@/lib/constants";
-import { HeroParticleCanvas } from "@/components/ui/hero-particle-canvas";
+
+const HeroParticleCanvas = dynamic(
+  () => import("@/components/ui/hero-particle-canvas").then((m) => m.HeroParticleCanvas),
+  { ssr: false }
+);
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
