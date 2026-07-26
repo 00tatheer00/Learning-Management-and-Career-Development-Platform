@@ -1,8 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ExternalLink, Code2, Sparkles, Layers, ArrowUpRight, Trophy } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Sparkles, ArrowUpRight, Trophy } from "lucide-react";
 
 interface StudentProject {
   title: string;

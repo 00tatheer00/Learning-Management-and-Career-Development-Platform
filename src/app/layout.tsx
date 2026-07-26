@@ -29,12 +29,14 @@ const plusJakarta = Plus_Jakarta_Sans({
   display: "swap",
 });
 
-export const metadata: Metadata = createMetadata({
-  title: SITE_CONFIG.name,
-  description: SITE_CONFIG.description,
-  path: "/",
+export const metadata: Metadata = {
+  ...createMetadata({
+    title: SITE_CONFIG.name,
+    description: SITE_CONFIG.description,
+    path: "/",
+  }),
   manifest: "/manifest.json",
-});
+};
 
 export const viewport = {
   width: "device-width",
