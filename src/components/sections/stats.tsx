@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import { Users, BookOpen, Briefcase, Award, ShieldCheck, CheckCircle2 } from "lucide-react";
 import { AnimatedCounter } from "@/components/shared/animated-counter";
 import { stats } from "@/lib/data/stats";
@@ -19,7 +19,7 @@ const statSublabels = [
   "Senior software engineers & experts",
 ];
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -30,7 +30,7 @@ const containerVariants = {
   },
 };
 
-const cardVariants = {
+const cardVariants: Variants = {
   hidden: { opacity: 0, y: 16 },
   visible: {
     opacity: 1,
