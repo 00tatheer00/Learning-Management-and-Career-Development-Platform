@@ -32,6 +32,10 @@ import { Alert } from "@/components/ui/alert";
 import { toast } from "@/lib/ui/toast";
 
 import { RequiredLabel, EnrollmentModulePicker } from "@/components/enrollment/enrollment-form-components";
+import { formatCnicInput, formatWhatsappInput } from "@/components/enrollment/enrollment-utils";
+import { EnrollmentDropzone } from "@/components/enrollment/enrollment-dropzone";
+import { EnrollmentFeeSummary } from "@/components/enrollment/enrollment-fee-summary";
+import { useEnrollmentDraft } from "@/components/enrollment/use-enrollment-draft";
 
 function FormSection({
   title,
@@ -186,16 +190,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
     });
   }, [isSuccess]);
 
-  const {
-    register,
-    handleSubmit,
-    control,
-    setValue,
-    watch,
-    reset,
-    trigger,
-    formState: { errors },
-  } = useForm<EnrollmentFormData>({
+  const formReturn = useForm<EnrollmentFormData>({
     resolver: zodResolver(enrollmentSchema),
     defaultValues: {
       fullName: "",
@@ -215,6 +210,19 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
       agreeToPolicies: false,
     },
   });
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    setValue,
+    watch,
+    reset,
+    trigger,
+    formState: { errors },
+  } = formReturn;
+
+  const { saveDraft, clearDraft } = useEnrollmentDraft(formReturn);
 
   const selectedProgram = watch("program");
   const selectedFee = getProgramRegistrationFee(selectedProgram);
@@ -260,8 +268,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
     return () => window.clearTimeout(timer);
   }, [watchedEmail, watchedCnic]);
 
-  const handleScreenshotChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const handleFileSelected = (file: File | null) => {
     setScreenshotError(null);
     if (screenshotPreview) URL.revokeObjectURL(screenshotPreview);
 
@@ -399,6 +406,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
         result.message ?? "We will verify your payment and contact you within 2–3 business days."
       );
       reset();
+      clearDraft();
       setApplicantHistory(null);
       setScreenshotFile(null);
       setScreenshotPreview(null);
@@ -546,17 +554,23 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
               </div>
 
               <div>
-                <RequiredLabel htmlFor="cnic">CNIC (13 digits)</RequiredLabel>
+                <RequiredLabel htmlFor="cnic">CNIC / B-Form</RequiredLabel>
                 <Input
                   id="cnic"
                   inputMode="numeric"
-                  placeholder="1234512345678"
-                  maxLength={13}
-                  className="mt-2"
+                  placeholder="35202-1234567-8"
+                  maxLength={15}
+                  className="mt-2 font-mono"
                   required
                   aria-required="true"
                   {...fieldA11y("cnic", errors)}
-                  {...register("cnic")}
+                  {...register("cnic", {
+                    onChange: (e) => {
+                      const formatted = formatCnicInput(e.target.value);
+                      setValue("cnic", formatted, { shouldValidate: true });
+                      saveDraft(watch());
+                    },
+                  })}
                 />
                 <FieldError id="cnic-error" message={errors.cnic?.message} />
               </div>
@@ -566,12 +580,18 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                 <Input
                   id="whatsapp"
                   type="tel"
-                  placeholder="03001234567"
-                  className="mt-2"
+                  placeholder="0300-1234567"
+                  className="mt-2 font-mono"
                   required
                   aria-required="true"
                   {...fieldA11y("whatsapp", errors)}
-                  {...register("whatsapp")}
+                  {...register("whatsapp", {
+                    onChange: (e) => {
+                      const formatted = formatWhatsappInput(e.target.value);
+                      setValue("whatsapp", formatted, { shouldValidate: true });
+                      saveDraft(watch());
+                    },
+                  })}
                 />
                 <FieldError id="whatsapp-error" message={errors.whatsapp?.message} />
               </div>
@@ -891,42 +911,24 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
               </div>
             </div>
 
-            <PaymentInfoCard compact amount={selectedFee} className="mb-5" />
-
-            <div>
-              <RequiredLabel htmlFor="paymentScreenshot">
-                Upload Payment Receipt Screenshot — PKR{" "}
-                {selectedFee.toLocaleString()} only
-              </RequiredLabel>
-              <p className="text-xs text-muted mt-1 mb-2">
-                <strong>Required.</strong> Please upload a clear Easypaisa &quot;Transaction Successful&quot; receipt screenshot showing TRX ID &amp; Date. Max size{" "}
-                4MB.
-              </p>
-              <div className="mt-1 max-w-full overflow-hidden">
-              <Input
-                id="paymentScreenshot"
-                ref={fileInputRef}
-                type="file"
-                accept="image/*,.heic,.heif"
-                aria-required="true"
-                {...fieldA11y("paymentScreenshot", errors, screenshotError ?? undefined)}
-                className="mt-1 w-full max-w-full cursor-pointer file:mr-2 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-2 file:text-xs sm:file:text-sm file:font-medium file:text-primary-foreground hover:file:bg-accent"
-                onChange={handleScreenshotChange}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+              <PaymentInfoCard compact amount={selectedFee} />
+              <EnrollmentFeeSummary
+                programSlug={selectedProgram ?? "web-development"}
+                moduleLevel={watch("level")}
               />
-              </div>
-              <FieldError id="paymentScreenshot-error" message={screenshotError ?? undefined} />
+            </div>
 
-              {screenshotPreview && (
-                <div className="mt-4 relative w-full max-w-xs aspect-[3/4] rounded-lg overflow-hidden border border-border">
-                  <Image
-                    src={screenshotPreview}
-                    alt="Payment screenshot preview"
-                    fill
-                    className="object-cover"
-                    unoptimized
-                  />
-                </div>
-              )}
+            <div id="paymentScreenshot" className="space-y-2">
+              <RequiredLabel htmlFor="paymentScreenshot">
+                Upload Payment Receipt Screenshot — PKR {selectedFee.toLocaleString()} only
+              </RequiredLabel>
+              <EnrollmentDropzone
+                file={screenshotFile}
+                previewUrl={screenshotPreview}
+                onFileSelect={handleFileSelected}
+                error={screenshotError ?? undefined}
+              />
             </div>
           </FormSection>
 
