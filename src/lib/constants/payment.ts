@@ -7,11 +7,11 @@ export const PAYMENT_CONFIG = {
     accountName: "Fouzia Bibi",
   },
   headline: "Course is 100% FREE",
-  registrationLabel: "One-Time Fee Per Module",
-  registrationNote: "Pay registration fee per module — pay once per module",
-  freeNote: "Registration fee per module. All classes & tasks in the module are included.",
+  registrationLabel: "One-Time Fee Per Month",
+  registrationNote: "Pay registration fee per month — pay once per month",
+  freeNote: "Registration fee per month. All classes & tasks for the month are included.",
   feeNote:
-    "Pay registration fee per module. All lectures & tasks for the module are included.",
+    "Pay registration fee per month. All lectures & tasks for the month are included.",
   postRegistrationAccess: {
     title: "What you get after payment verification",
     subtitle: "After we verify your payment, you will get:",

@@ -716,7 +716,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                   <RequiredLabel htmlFor="program">Program Applying For</RequiredLabel>
                   {activeProgram && (
                     <span className="inline-flex items-center gap-1 rounded-lg border border-primary/30 bg-primary/10 px-2.5 py-1 text-xs font-extrabold text-primary shadow-xs">
-                      💰 Fee: PKR {selectedFee.toLocaleString()} / module
+                      💰 Fee: PKR {selectedFee.toLocaleString()} / month
                     </span>
                   )}
                 </div>
@@ -755,7 +755,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                             >
                               {program.title}
                               {enabled
-                                ? ` — PKR ${fee.toLocaleString()} / module`
+                                ? ` — PKR ${fee.toLocaleString()} / month`
                                 : " — Coming Soon"}
                             </SelectItem>
                           );
@@ -774,7 +774,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                       <strong className="text-sm sm:text-base font-black text-primary">
                         PKR {selectedFee.toLocaleString()}
                       </strong>{" "}
-                      per module (month)
+                      per month
                     </span>
                   </div>
                 ) : (
@@ -881,7 +881,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                 <span className="text-base">📸</span> Share receipt screenshot here
               </p>
               <p className="text-xs sm:text-sm text-slate-800 dark:text-slate-200 font-semibold leading-relaxed">
-                After approval of your payment (PKR <strong className="font-black text-blue-700 dark:text-blue-400">{selectedFee.toLocaleString()}</strong> one-time registration per module), you will get a confirmation message on WhatsApp or an email with your portal login details!
+                After approval of your payment (PKR <strong className="font-black text-blue-700 dark:text-blue-400">{selectedFee.toLocaleString()}</strong> registration fee per month), you will get a confirmation message on WhatsApp or an email with your portal login details!
               </p>
             </div>
 

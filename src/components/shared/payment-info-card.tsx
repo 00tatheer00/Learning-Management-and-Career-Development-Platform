@@ -44,7 +44,7 @@ export function PaymentInfoCard({ className, compact = false, amount }: PaymentI
               Easypaisa Payment
             </p>
             <p className="mt-0.5 text-xs text-muted">
-              Rs {feeAmount.toLocaleString()} · one-time registration per module
+              Rs {feeAmount.toLocaleString()} · registration fee per month
             </p>
           </div>
         </div>

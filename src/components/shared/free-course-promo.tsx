@@ -55,7 +55,7 @@ export function FreeCoursePromo({
             Practical Online Classes
           </h3>
           <p className="text-xs sm:text-sm text-muted leading-relaxed">
-            All courses (Web Dev, App Dev &amp; AI) are 100% free! Pay only a one-time registration fee of PKR 1,000 per module to unlock live classes, recorded lectures, tasks, and portal access.
+            All courses (Web Dev, App Dev &amp; AI) are 100% free! Pay only a registration fee of PKR 1,000 per month to unlock live classes, recorded lectures, tasks, and portal access.
           </p>
         </div>
 
@@ -67,13 +67,13 @@ export function FreeCoursePromo({
             </span>
           </div>
           <p className="text-lg sm:text-xl font-black text-primary leading-snug mb-1.5 break-words">
-            PKR 1,000 / Module Only
+            PKR 1,000 / Month Only
           </p>
           <p className="text-xs font-semibold text-foreground mb-1">
-            One-time registration fee per module across all courses (including AI).
+            Registration fee per month across all courses (including AI).
           </p>
           <p className="text-[11px] text-muted leading-relaxed">
-            All live classes, assignments, projects, and certificates in the module are fully included.
+            All live classes, assignments, projects, and certificates are fully included.
           </p>
         </div>
       </div>

@@ -120,7 +120,7 @@ export function ProgramCard({ program, className }: ProgramCardProps) {
             {isActive && (
               <span className="inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-xs font-bold text-orange-800">
                 <CurrencyCircleDollar size={14} weight="duotone" className="text-orange-600" aria-hidden="true" />
-                PKR {getProgramRegistrationFee(program.slug).toLocaleString()} / module
+                PKR {getProgramRegistrationFee(program.slug).toLocaleString()} / month
               </span>
             )}
             {program.modules.length > 0 && (
