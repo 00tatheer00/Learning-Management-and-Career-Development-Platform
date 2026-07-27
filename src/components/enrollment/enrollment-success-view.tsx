@@ -1,9 +1,10 @@
 "use client";
 
-import { CheckCircle2, Download, MessageSquare, ShieldCheck, ArrowRight, Printer, Sparkles } from "lucide-react";
+import { CheckCircle2, Download, MessageSquare, ShieldCheck, Printer, Sparkles, QrCode, Award, Check, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getProgramBySlug } from "@/lib/data/programs";
-import { getOfficialWhatsAppUrl } from "@/lib/constants/contact";
+import { getProgramRegistrationFee } from "@/lib/constants/payment";
+import { getOfficialWhatsAppUrl, BUSINESS_WHATSAPP_DISPLAY } from "@/lib/constants/contact";
 
 interface EnrollmentSuccessViewProps {
   applicationNumber: number;
@@ -22,85 +23,219 @@ export function EnrollmentSuccessView({
   email,
   whatsapp,
 }: EnrollmentSuccessViewProps) {
-  const programTitle = getProgramBySlug(programSlug)?.title ?? programSlug.replace("-", " ");
+  const program = getProgramBySlug(programSlug);
+  const programTitle = program?.title ?? programSlug.replace("-", " ");
+  const feeAmount = getProgramRegistrationFee(programSlug);
+  const receiptNumber = `EEST-2026-REG-${String(applicationNumber).padStart(4, "0")}`;
+  const currentDateStr = new Date().toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+
+  const waMessage = `Assalam-o-Alaikum! My name is ${fullName}. I have registered for ${programTitle} (${levelName}), Application #${receiptNumber}. Please verify my payment receipt & activate my portal password.`;
+  const officialWaUrl = getOfficialWhatsAppUrl(waMessage);
+
+  const verificationQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(officialWaUrl)}`;
+
   const handlePrintSlip = () => {
     window.print();
   };
 
   return (
-    <div className="space-y-6 text-center max-w-2xl mx-auto py-4">
-      {/* Top Success Badge & Icon */}
-      <div className="relative inline-flex items-center justify-center">
-        <div className="absolute inset-0 rounded-full bg-emerald-500/20 blur-xl animate-pulse" />
-        <div className="relative h-20 w-20 rounded-full bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/30">
-          <CheckCircle2 size={44} />
+    <div className="space-y-6 max-w-3xl mx-auto py-2">
+      {/* Print-Only Custom CSS to format clean A4 PDF */}
+      <style jsx global>{`
+        @media print {
+          body {
+            background: #ffffff !important;
+            color: #0f172a !important;
+          }
+          #register-form-panel > *:not(.printable-receipt-container) {
+            display: none !important;
+          }
+          .printable-receipt-container {
+            border: 2px solid #0284c7 !important;
+            box-shadow: none !important;
+            border-radius: 12px !important;
+            padding: 24px !important;
+            background: #ffffff !important;
+            color: #0f172a !important;
+          }
+          .print\\:hidden {
+            display: none !important;
+          }
+        }
+      `}</style>
+
+      {/* Screen Success Banner */}
+      <div className="text-center space-y-3 print:hidden">
+        <div className="relative inline-flex items-center justify-center">
+          <div className="absolute inset-0 rounded-full bg-emerald-500/20 blur-xl animate-pulse" />
+          <div className="relative h-16 w-16 rounded-full bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/30">
+            <CheckCircle2 size={38} />
+          </div>
+        </div>
+
+        <div>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs font-black mb-2">
+            <Sparkles size={14} /> Application Submitted Successfully
+          </span>
+
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
+            Welcome to EEST, {fullName}! 🎉
+          </h2>
+
+          <p className="mt-1 text-xs sm:text-sm text-muted font-medium leading-relaxed max-w-lg mx-auto">
+            Your application <strong className="text-primary font-black">#{receiptNumber}</strong> is logged. Your official fee receipt is generated below.
+          </p>
         </div>
       </div>
 
-      <div>
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs font-black mb-3">
-          <Sparkles size={14} /> Application Submitted Successfully
-        </span>
-
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
-          Welcome to EEST, {fullName}! 🎉
-        </h2>
-
-        <p className="mt-2 text-sm text-muted font-medium leading-relaxed max-w-lg mx-auto">
-          Your enrollment application <strong className="text-primary font-black">#{applicationNumber}</strong> has been received and logged in our system.
-        </p>
-      </div>
-
-      {/* Printable Slip Preview Card */}
-      <div className="rounded-2xl border border-emerald-500/30 bg-card p-6 shadow-sm text-left space-y-4 print:border-none print:shadow-none">
-        <div className="flex items-center justify-between border-b border-border pb-3">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-wider text-muted">Official Registration Slip</p>
-            <h3 className="text-base font-extrabold text-foreground">Emerging Edge School of Technology</h3>
-          </div>
-          <span className="text-sm font-black text-primary">App #{applicationNumber}</span>
+      {/* OFFICIAL ACADEMIC & FINANCIAL FEE RECEIPT SLIP */}
+      <div className="printable-receipt-container rounded-2xl border-2 border-sky-500/40 bg-card p-6 sm:p-8 shadow-lg text-left space-y-6 relative overflow-hidden bg-gradient-to-b from-sky-50/30 via-background to-background dark:from-slate-900/40">
+        {/* Background Watermark Stamp Effect */}
+        <div className="absolute -right-12 -bottom-12 opacity-5 dark:opacity-10 pointer-events-none select-none">
+          <Award size={280} className="text-sky-600" />
         </div>
 
-        <div className="grid grid-cols-2 gap-4 text-xs">
-          <div>
-            <span className="text-muted font-medium">Applicant Name:</span>
-            <p className="font-bold text-foreground text-sm">{fullName}</p>
+        {/* Header Branding & Receipt Serial */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-2 border-sky-500/20 pb-5">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <div className="h-7 w-7 rounded-lg bg-sky-600 text-white font-black flex items-center justify-center text-sm shadow-sm">
+                E
+              </div>
+              <h3 className="text-lg font-black tracking-tight text-foreground uppercase">
+                Emerging Edge School of Technology
+              </h3>
+            </div>
+            <p className="text-[11px] font-bold text-sky-600 dark:text-sky-400 uppercase tracking-widest pl-9">
+              Official Academic Registration &amp; Fee Payment Receipt
+            </p>
           </div>
 
-          <div>
-            <span className="text-muted font-medium">Program / Module:</span>
-            <p className="font-bold text-foreground text-sm">{programTitle} ({levelName})</p>
-          </div>
-
-          <div>
-            <span className="text-muted font-medium">Email Address:</span>
-            <p className="font-semibold text-foreground">{email}</p>
-          </div>
-
-          <div>
-            <span className="text-muted font-medium">WhatsApp:</span>
-            <p className="font-semibold text-foreground">{whatsapp}</p>
+          <div className="text-left sm:text-right bg-sky-500/10 border border-sky-500/30 rounded-xl px-3.5 py-2 shrink-0">
+            <p className="text-[10px] font-black uppercase tracking-wider text-sky-700 dark:text-sky-300">Receipt Reference</p>
+            <p className="text-sm font-black font-mono text-primary">{receiptNumber}</p>
+            <p className="text-[10px] text-muted font-medium mt-0.5">Date: {currentDateStr}</p>
           </div>
         </div>
 
-        <div className="pt-2 flex items-center justify-between border-t border-border/80 text-[11px] text-muted">
-          <span>Status: <strong className="text-amber-600 dark:text-amber-400 font-bold">Pending Payment Verification</strong></span>
-          <span>Submitted on: {new Date().toLocaleDateString("en-GB")}</span>
+        {/* Student & Program Profile Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs bg-surface/80 rounded-xl p-4 border border-border/80">
+          <div>
+            <span className="text-[10px] uppercase font-bold text-muted tracking-wider">Student Name:</span>
+            <p className="font-extrabold text-foreground text-sm mt-0.5">{fullName}</p>
+          </div>
+
+          <div>
+            <span className="text-[10px] uppercase font-bold text-muted tracking-wider">Enrolled Course:</span>
+            <p className="font-extrabold text-sky-600 dark:text-sky-400 text-sm mt-0.5">{programTitle}</p>
+          </div>
+
+          <div>
+            <span className="text-[10px] uppercase font-bold text-muted tracking-wider">Starting Module:</span>
+            <p className="font-bold text-foreground text-xs mt-0.5">{levelName || "Module 1"}</p>
+          </div>
+
+          <div>
+            <span className="text-[10px] uppercase font-bold text-muted tracking-wider">Academic Batch:</span>
+            <p className="font-bold text-foreground text-xs mt-0.5">Batch 1 (Phase 2 - 2nd Module)</p>
+          </div>
+
+          <div>
+            <span className="text-[10px] uppercase font-bold text-muted tracking-wider">Student Email:</span>
+            <p className="font-semibold text-foreground text-xs mt-0.5 font-mono">{email}</p>
+          </div>
+
+          <div>
+            <span className="text-[10px] uppercase font-bold text-muted tracking-wider">WhatsApp Number:</span>
+            <p className="font-semibold text-foreground text-xs mt-0.5 font-mono">{whatsapp}</p>
+          </div>
+        </div>
+
+        {/* Financial Breakdown Table */}
+        <div className="space-y-2">
+          <p className="text-[11px] font-extrabold uppercase tracking-wider text-muted flex items-center gap-1.5">
+            <FileText size={14} className="text-sky-500" />
+            Financial Breakdown &amp; Fee Details
+          </p>
+
+          <div className="overflow-hidden rounded-xl border border-border text-xs">
+            <table className="w-full text-left border-collapse">
+              <thead className="bg-surface border-b border-border text-[11px] font-bold uppercase text-muted">
+                <tr>
+                  <th className="py-2.5 px-3.5">Fee Category</th>
+                  <th className="py-2.5 px-3.5">Payment Method</th>
+                  <th className="py-2.5 px-3.5 text-right">Amount (PKR)</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border font-medium text-foreground">
+                <tr>
+                  <td className="py-2.5 px-3.5 font-semibold">Course Tuition Fee (100% Free Scholarship)</td>
+                  <td className="py-2.5 px-3.5 text-emerald-600 font-bold">SPONSORED BY EEST</td>
+                  <td className="py-2.5 px-3.5 text-right font-mono text-emerald-600 font-bold">PKR 0</td>
+                </tr>
+                <tr>
+                  <td className="py-2.5 px-3.5 font-semibold">Module Registration Fee ({levelName || "Module 1"})</td>
+                  <td className="py-2.5 px-3.5 font-semibold">Easypaisa Online Transfer</td>
+                  <td className="py-2.5 px-3.5 text-right font-mono font-bold text-foreground">PKR {feeAmount.toLocaleString()}</td>
+                </tr>
+              </tbody>
+              <tfoot className="bg-sky-500/10 border-t-2 border-sky-500/30 font-bold">
+                <tr>
+                  <td colSpan={2} className="py-3 px-3.5 text-xs font-black uppercase text-foreground">Total Fee Paid</td>
+                  <td className="py-3 px-3.5 text-right font-mono text-base font-black text-primary">PKR {feeAmount.toLocaleString()}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+
+        {/* Verification Status Footer & QR Code Stamp */}
+        <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-border/80 text-xs">
+          {/* Status & Registrar Seal */}
+          <div className="space-y-1.5 text-center sm:text-left">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-700 dark:text-amber-300 font-extrabold text-[11px]">
+                ● Pending Payment Verification
+              </span>
+            </div>
+            <p className="text-[11px] text-muted leading-snug max-w-sm">
+              Official seal of Emerging Edge School of Technology. Receipt valid upon verification of Easypaisa TRX ID.
+            </p>
+          </div>
+
+          {/* Verification QR Code */}
+          <div className="flex items-center gap-3 bg-surface p-2.5 rounded-xl border border-border shrink-0">
+            <img
+              src={verificationQrUrl}
+              alt="Scan to Verify Receipt"
+              width={64}
+              height={64}
+              className="rounded-lg border border-border"
+            />
+            <div className="text-[10px] text-muted font-medium">
+              <p className="font-black text-foreground uppercase tracking-wider text-[11px]">Scan QR to Verify</p>
+              <p className="text-sky-600 dark:text-sky-400 font-bold mt-0.5">Admissions Helpline</p>
+              <p className="font-mono text-[10.5px] mt-0.5">{BUSINESS_WHATSAPP_DISPLAY}</p>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Primary Action: Student Initiated Chat (Prevents WhatsApp Account Restrictions) */}
       <div className="rounded-2xl border border-emerald-500/40 bg-emerald-50/60 dark:bg-emerald-950/30 p-4 text-center space-y-2.5 print:hidden">
-        <p className="text-xs font-black text-emerald-800 dark:text-emerald-200">
-          ⚡ Speed Up Your Payment Verification &amp; Password Activation:
+        <p className="text-xs font-black text-emerald-800 dark:text-emerald-200 flex items-center justify-center gap-1.5">
+          <Sparkles size={16} className="text-emerald-600" />
+          Speed Up Your Payment Verification &amp; Password Activation:
         </p>
-        <p className="text-[11.5px] text-emerald-900/80 dark:text-emerald-300 font-medium">
+        <p className="text-[11.5px] text-emerald-900/80 dark:text-emerald-300 font-medium max-w-md mx-auto">
           Send a quick message to our Admissions Support on WhatsApp so your payment is verified immediately.
         </p>
         <a
-          href={getOfficialWhatsAppUrl(
-            `Assalam-o-Alaikum! My name is ${fullName}. I have submitted registration #${applicationNumber} for ${programTitle} (${levelName}). Please verify my payment receipt & activate my portal password.`
-          )}
+          href={officialWaUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-xs font-black text-white shadow-md hover:bg-emerald-700 transition-all"
@@ -109,25 +244,25 @@ export function EnrollmentSuccessView({
         </a>
       </div>
 
-      {/* Secondary Action Buttons */}
+      {/* Action Buttons: PDF Download & Group Join */}
       <div className="flex flex-wrap items-center justify-center gap-3 print:hidden">
-        <Button onClick={handlePrintSlip} variant="outline" size="sm" className="gap-2 font-bold text-xs">
-          <Printer size={14} /> Print / Save Slip PDF
+        <Button onClick={handlePrintSlip} variant="outline" size="sm" className="gap-2 font-bold text-xs border-primary/30 hover:bg-primary/5">
+          <Printer size={15} /> Download Official PDF Receipt
         </Button>
 
-        <Button asChild size="sm" className="gap-2 font-bold text-xs bg-emerald-700 hover:bg-emerald-800 text-white">
+        <Button asChild size="sm" className="gap-2 font-bold text-xs bg-emerald-700 hover:bg-emerald-800 text-white shadow-sm">
           <a
             href="https://chat.whatsapp.com/EN0h0aFkQ6YJ6FwE93M01W"
             target="_blank"
             rel="noopener noreferrer"
           >
-            <MessageSquare size={14} /> Join Official Batch WhatsApp Group
+            <MessageSquare size={15} /> Join Official Batch WhatsApp Group
           </a>
         </Button>
       </div>
 
       {/* What Happens Next Timeline */}
-      <div className="rounded-2xl border border-border bg-surface/50 p-5 text-left space-y-3">
+      <div className="rounded-2xl border border-border bg-surface/50 p-5 text-left space-y-3 print:hidden">
         <h4 className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5">
           <ShieldCheck size={16} className="text-emerald-500" />
           What Happens Next? (3 Simple Steps)
@@ -162,3 +297,4 @@ export function EnrollmentSuccessView({
     </div>
   );
 }
+

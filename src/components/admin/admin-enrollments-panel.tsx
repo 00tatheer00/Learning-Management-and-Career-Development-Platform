@@ -21,7 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
 import { ImageLightbox } from "@/components/ui/image-lightbox";
 import { PortalPageHeader } from "@/components/portal/portal-ui";
-import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
+import { ENROLLABLE_PROGRAM_SLUGS, getProgramRegistrationFee } from "@/lib/constants/payment";
 import { ADMIN_REJECT_PRESETS } from "@/lib/constants/admin-reject-reasons";
 import { getProgramCategory } from "@/lib/constants/program-categories";
 import { formatAppliedDate, formatAppliedDateTime, formatAppliedTime, cn } from "@/lib/utils";
@@ -656,6 +656,22 @@ export function AdminEnrollmentsPanel() {
                         />
                       </div>
                       <p className="mt-1 text-sm text-muted">Father: {enrollment.fatherName}</p>
+
+                      <div className="mt-3 flex items-center justify-between rounded-xl bg-sky-50 dark:bg-slate-900 border border-sky-200 dark:border-slate-800 px-3 py-2 text-xs">
+                        <div className="flex items-center gap-2">
+                          <span className="font-extrabold text-sky-800 dark:text-sky-300">💳 Easypaisa Payment Proof:</span>
+                          {enrollment.hasPaymentScreenshot ? (
+                            <span className="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                              <CheckCircle size={14} /> Uploaded &amp; Ready
+                            </span>
+                          ) : (
+                            <span className="font-bold text-amber-600">No Screenshot</span>
+                          )}
+                        </div>
+                        <span className="font-black font-mono text-primary text-xs sm:text-sm">
+                          PKR {getProgramRegistrationFee(enrollment.program).toLocaleString()}
+                        </span>
+                      </div>
 
                       <div className="mt-4 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
                         <Field label="Email" value={enrollment.email} />
