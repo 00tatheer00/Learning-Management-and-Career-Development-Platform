@@ -20,10 +20,10 @@ export function FreeCoursePromo({
         )}
       >
         <Gift size={18} weight="duotone" className="text-emerald-600" />
-        <span className="font-bold">Course is FREE</span>
+        <span className="font-bold">Course is 100% FREE</span>
         <span className="text-emerald-700">·</span>
         <span>
-          Pay module registration fee to join
+          Only One-Time Registration Fee: <strong className="text-orange-600">PKR 1,000</strong>
         </span>
       </div>
     );
@@ -49,13 +49,13 @@ export function FreeCoursePromo({
         <div className="flex flex-col justify-center">
           <div className="inline-flex w-fit items-center gap-2 rounded-full bg-emerald-500 px-3.5 py-1 text-xs sm:text-sm font-bold uppercase tracking-wide text-white shadow-md shadow-emerald-500/30 mb-3">
             <Gift size={16} weight="fill" />
-            Skill-Based Learning
+            100% Free Course Tuition
           </div>
           <h3 className="text-xl sm:text-2xl font-bold text-foreground leading-tight mb-2">
             Practical Online Classes
           </h3>
           <p className="text-xs sm:text-sm text-muted leading-relaxed">
-            Pay module registration fee per module. All live classes, recorded lectures, tasks, and portal access are included.
+            All courses (Web Dev, App Dev &amp; AI) are 100% free! Pay only a one-time registration fee of PKR 1,000 per module to unlock live classes, recorded lectures, tasks, and portal access.
           </p>
         </div>
 
@@ -67,13 +67,13 @@ export function FreeCoursePromo({
             </span>
           </div>
           <p className="text-lg sm:text-xl font-black text-primary leading-snug mb-1.5 break-words">
-            Module Registration Fee
+            PKR 1,000 / Module Only
           </p>
           <p className="text-xs font-semibold text-foreground mb-1">
-            {PAYMENT_CONFIG.registrationNote}
+            One-time registration fee per module across all courses (including AI).
           </p>
           <p className="text-[11px] text-muted leading-relaxed">
-            This is a registration fee per module. Select your course during registration to view its specific module fee.
+            All live classes, assignments, projects, and certificates in the module are fully included.
           </p>
         </div>
       </div>

@@ -15,12 +15,14 @@ import {
   ListBullets,
   Stack,
   Certificate,
+  CurrencyCircleDollar,
 } from "@phosphor-icons/react";
 import type { Icon } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { getProgramAccent } from "@/lib/constants/program-accents";
 import { getProgramTopicCount, programHasSyllabus } from "@/lib/data/programs";
 import { MODULE_CERTIFICATE_SHORT } from "@/lib/constants/program-marketing";
+import { getProgramRegistrationFee } from "@/lib/constants/payment";
 import type { Program } from "@/types";
 
 const PROGRAM_ICONS: Record<string, Icon> = {
@@ -113,6 +115,12 @@ export function ProgramCard({ program, className }: ProgramCardProps) {
               <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-semibold text-primary">
                 <ListBullets size={14} weight="duotone" aria-hidden="true" />
                 {topicCount} topics
+              </span>
+            )}
+            {isActive && (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-xs font-bold text-orange-800">
+                <CurrencyCircleDollar size={14} weight="duotone" className="text-orange-600" aria-hidden="true" />
+                PKR {getProgramRegistrationFee(program.slug).toLocaleString()} / module
               </span>
             )}
             {program.modules.length > 0 && (

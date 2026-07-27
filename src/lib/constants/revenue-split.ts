@@ -41,10 +41,10 @@ export function getRevenueSplitForItem(item: RevenueSplitItem): SingleRevenueSpl
   if (phase === "phase-2") {
     if (program === "artificial-intelligence") {
       return {
-        gross: 2000,
+        gross: 1000,
         management: 200,
-        trainer: 1200,
-        school: 600,
+        trainer: 800,
+        school: 0,
       };
     }
     if (program === "app-development") {

@@ -214,11 +214,21 @@ export function HeroSection() {
           {/* Animated Subtitle */}
           <motion.p
             variants={itemVariants}
-            className="text-lg sm:text-xl text-slate-700 max-w-2xl mx-auto mb-8 leading-relaxed font-semibold"
+            className="text-lg sm:text-xl text-slate-700 max-w-2xl mx-auto mb-6 leading-relaxed font-semibold"
           >
             Web, App, AI, Video Editing, Digital Marketing, Graphics &amp; UI/UX
-            courses. Pay module registration fee to join live interactive classes, assignments, and portal access.
+            courses. All courses include live interactive classes, assignments, and portal access.
           </motion.p>
+
+          {/* Pricing Highlight Pill - Prominent Main Page Pricing */}
+          <motion.div variants={itemVariants} className="mb-8">
+            <div className="inline-flex flex-wrap items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-emerald-500/10 border-2 border-emerald-500/30 backdrop-blur-xs text-slate-900 font-bold text-sm sm:text-base shadow-lg shadow-emerald-500/5">
+              <span className="flex h-3 w-3 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Course Tuition: <span className="text-emerald-600 font-black uppercase">100% FREE</span></span>
+              <span className="text-slate-300 font-normal">|</span>
+              <span>One-Time Registration: <span className="text-orange-600 font-black">PKR 1,000</span> / module</span>
+            </div>
+          </motion.div>
 
           {/* Animated Action Buttons */}
           <motion.div
