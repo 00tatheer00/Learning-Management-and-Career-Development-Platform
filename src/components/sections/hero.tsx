@@ -226,7 +226,7 @@ export function HeroSection() {
               <span className="flex h-3 w-3 rounded-full bg-emerald-500 animate-pulse" />
               <span>Course Tuition: <span className="text-emerald-600 font-black uppercase">100% FREE</span></span>
               <span className="text-slate-300 font-normal">|</span>
-              <span><span className="text-orange-600 font-black">Reg PKR 1,000</span></span>
+              <span><span className="text-orange-600 font-black">Registration: 1000</span></span>
             </div>
           </motion.div>
 
