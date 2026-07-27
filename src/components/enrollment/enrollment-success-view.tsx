@@ -33,10 +33,11 @@ export function EnrollmentSuccessView({
     year: "numeric",
   });
 
-  const waMessage = `Assalam-o-Alaikum! My name is ${fullName}. I have registered for ${programTitle} (${levelName}), Application #${receiptNumber}. Please verify my payment receipt & activate my portal password.`;
+  const waMessage = `Assalam-o-Alaikum! My name is ${fullName}. App #${receiptNumber} for ${programTitle} (${levelName}). Please verify my payment receipt & activate my portal password.`;
   const officialWaUrl = getOfficialWhatsAppUrl(waMessage);
 
-  const verificationQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(officialWaUrl)}`;
+  // Direct WhatsApp Scan QR Code for instant mobile chat opening
+  const whatsappQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(officialWaUrl)}`;
 
   const handlePrintSlip = () => {
     window.print();
@@ -44,26 +45,36 @@ export function EnrollmentSuccessView({
 
   return (
     <div className="space-y-6 max-w-3xl mx-auto py-2">
-      {/* Print-Only Custom CSS to format clean A4 PDF */}
+      {/* Strict Print CSS Isolation: Only print the official receipt slip */}
       <style jsx global>{`
         @media print {
+          @page {
+            size: A4 portrait;
+            margin: 10mm;
+          }
           body {
             background: #ffffff !important;
             color: #0f172a !important;
           }
-          #register-form-panel > *:not(.printable-receipt-container) {
-            display: none !important;
+          body * {
+            visibility: hidden !important;
+          }
+          .printable-receipt-container,
+          .printable-receipt-container * {
+            visibility: visible !important;
           }
           .printable-receipt-container {
-            border: 2px solid #0284c7 !important;
-            box-shadow: none !important;
-            border-radius: 12px !important;
+            position: fixed !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            margin: 0 !important;
             padding: 24px !important;
+            border: 2px solid #0284c7 !important;
+            border-radius: 12px !important;
             background: #ffffff !important;
             color: #0f172a !important;
-          }
-          .print\\:hidden {
-            display: none !important;
+            box-shadow: none !important;
           }
         }
       `}</style>
@@ -207,19 +218,21 @@ export function EnrollmentSuccessView({
             </p>
           </div>
 
-          {/* Verification QR Code */}
+          {/* Direct WhatsApp Chat QR Code */}
           <div className="flex items-center gap-3 bg-surface p-2.5 rounded-xl border border-border shrink-0">
             <img
-              src={verificationQrUrl}
-              alt="Scan to Verify Receipt"
-              width={64}
-              height={64}
-              className="rounded-lg border border-border"
+              src={whatsappQrUrl}
+              alt="Scan QR to Chat on WhatsApp"
+              width={72}
+              height={72}
+              className="rounded-lg border border-border bg-white p-0.5"
             />
             <div className="text-[10px] text-muted font-medium">
-              <p className="font-black text-foreground uppercase tracking-wider text-[11px]">Scan QR to Verify</p>
-              <p className="text-sky-600 dark:text-sky-400 font-bold mt-0.5">Admissions Helpline</p>
-              <p className="font-mono text-[10.5px] mt-0.5">{BUSINESS_WHATSAPP_DISPLAY}</p>
+              <p className="font-black text-foreground uppercase tracking-wider text-[11px]">Scan QR to Chat</p>
+              <p className="text-emerald-600 dark:text-emerald-400 font-bold mt-0.5 flex items-center gap-1">
+                💬 WhatsApp Helpline
+              </p>
+              <p className="font-mono text-[10.5px] mt-0.5 font-bold text-foreground">{BUSINESS_WHATSAPP_DISPLAY}</p>
             </div>
           </div>
         </div>
