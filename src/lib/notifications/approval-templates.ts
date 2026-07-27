@@ -190,22 +190,23 @@ export function buildStudentLoginWhatsAppMessage({
   const firstName = studentName.split(" ")[0];
 
   return [
-    `Assalam o Alaikum ${firstName}!`,
+    `*Assalam-o-Alaikum ${firstName}!* \u{1F389}`,
     "",
-    "Your EEST student portal login details:",
+    "Congratulations! Your registration at Emerging Edge School of Technology has been *APPROVED* \u{2705}",
     "",
-    `Login ID: ${email}`,
-    `Password: ${password}`,
-    `Portal: ${loginUrl}`,
+    `\u{1F4D1} *Confirmed Course:* ${courseName}`,
+    `\u{1F4D8} *Confirmed Module:* ${module}`,
+    `\u{1F3AF} *Program Level:* ${level}`,
     "",
-    `Course: ${courseName}`,
-    `Module: ${module}`,
-    `Level: ${level}`,
+    "\u{1F511} *Your EEST Student Portal Login Details:*",
+    `\u{1F4E7} *Username:* ${email}`,
+    `\u{1F512} *Password:* ${password}`,
+    `\u{1F517} *Portal URL:* ${loginUrl}`,
     "",
-    "Keep these private. Change your password after first login if you wish.",
+    "Keep these credentials private. Log in to access your live interactive classes, lecture recordings, and module assignments.",
     "",
-    "Welcome to your batch!",
-    "— EEST Team",
+    "Welcome aboard! \u{1F680}",
+    "— Emerging Edge School of Technology Team",
   ].join("\n");
 }
 

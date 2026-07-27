@@ -44,23 +44,28 @@ export function getWhatsAppDirectLink(phone: string, textMessage: string): strin
 export function buildApprovalWhatsAppMessage(data: {
   studentName: string;
   programTitle: string;
+  moduleLevel?: string;
   email?: string;
   portalLoginUrl?: string;
 }): string {
   const name = data.studentName.trim();
   const program = data.programTitle.trim();
+  const level = data.moduleLevel?.trim();
   const email = data.email?.trim();
   const loginUrl = data.portalLoginUrl || "https://emergingedgeschool.com/login";
 
-  return `*Assalam-o-Alaikum ${name}!* 🎉
+  const moduleInfo = level ? ` (${level})` : "";
 
-Congratulations! Your registration for *${program}* at Emerging Edge School of Technology has been *APPROVED* ✅
+  return `*Assalam-o-Alaikum ${name}!* \u{1F389}
 
-${email ? `📧 Your portal login details have been sent to your email: *${email}*\n` : ""}
-🔗 *Student Portal Login:*
+Congratulations! Your registration for *${program}${moduleInfo}* at Emerging Edge School of Technology has been *APPROVED* \u{2705}
+
+\u{1F4D1} *Confirmed Course:* ${program}
+${level ? `\u{1F4D8} *Confirmed Module:* ${level}\n` : ""}${email ? `\u{1F4E7} *Registered Email:* ${email}\n` : ""}
+\u{1F517} *Student Portal Login:*
 ${loginUrl}
 
-If you have any questions, feel free to reply to this message. Welcome aboard! 🚀`;
+Please log in to your student portal to access your live classes, recordings, and assignments. Welcome aboard! \u{1F680}`;
 }
 
 /**
@@ -69,15 +74,19 @@ If you have any questions, feel free to reply to this message. Welcome aboard! �
 export function buildRejectionWhatsAppMessage(data: {
   studentName: string;
   programTitle: string;
+  moduleLevel?: string;
   reason?: string;
 }): string {
   const name = data.studentName.trim();
   const program = data.programTitle.trim();
+  const level = data.moduleLevel?.trim();
   const reason = data.reason?.trim();
+
+  const moduleInfo = level ? ` (${level})` : "";
 
   return `*Assalam-o-Alaikum ${name},*
 
-This is regarding your application for *${program}* at Emerging Edge School of Technology.
+This is regarding your application for *${program}${moduleInfo}* at Emerging Edge School of Technology.
 
 Unfortunately, your application could not be approved at this time.${reason ? `\n\n*Reason:* ${reason}` : ""}
 

@@ -28,14 +28,16 @@ describe("whatsapp-direct utility", () => {
     expect(link).toBe("https://wa.me/923115969527?text=Hello%20Ali!");
   });
 
-  it("generates approval whatsapp message template", () => {
+  it("generates approval whatsapp message template with module level", () => {
     const msg = buildApprovalWhatsAppMessage({
       studentName: "Ali Raza",
       programTitle: "Web Development",
+      moduleLevel: "HTML & CSS",
       email: "ali@example.com",
     });
     expect(msg).toContain("Assalam-o-Alaikum Ali Raza!");
     expect(msg).toContain("APPROVED");
+    expect(msg).toContain("HTML & CSS");
     expect(msg).toContain("ali@example.com");
   });
 
@@ -43,9 +45,11 @@ describe("whatsapp-direct utility", () => {
     const msg = buildRejectionWhatsAppMessage({
       studentName: "Sara Khan",
       programTitle: "App Development",
+      moduleLevel: "Module 1",
       reason: "Blurry payment screenshot",
     });
     expect(msg).toContain("Assalam-o-Alaikum Sara Khan");
+    expect(msg).toContain("Module 1");
     expect(msg).toContain("Blurry payment screenshot");
   });
 });

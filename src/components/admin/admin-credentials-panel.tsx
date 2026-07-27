@@ -210,6 +210,7 @@ export function AdminCredentialsPanel() {
     const text = buildApprovalWhatsAppMessage({
       studentName: row.name,
       programTitle: row.course,
+      moduleLevel: row.module,
       email: row.email,
       portalLoginUrl: row.loginUrl,
     });

@@ -670,15 +670,17 @@ export function AdminEnrollmentsPanel() {
                                 ? buildApprovalWhatsAppMessage({
                                     studentName: enrollment.fullName,
                                     programTitle: enrollment.courseTitle,
+                                    moduleLevel: enrollment.level,
                                     email: enrollment.email,
                                   })
                                 : enrollment.status === "rejected"
                                   ? buildRejectionWhatsAppMessage({
                                       studentName: enrollment.fullName,
                                       programTitle: enrollment.courseTitle,
+                                      moduleLevel: enrollment.level,
                                       reason: enrollment.adminNotes || undefined,
                                     })
-                                  : `Assalam-o-Alaikum ${enrollment.fullName}! This is Emerging Edge School regarding your ${enrollment.courseTitle} application.`
+                                  : `Assalam-o-Alaikum ${enrollment.fullName}! This is Emerging Edge School regarding your ${enrollment.courseTitle} (${enrollment.level}) application.`
                             )}
                             target="_blank"
                             rel="noopener noreferrer"
