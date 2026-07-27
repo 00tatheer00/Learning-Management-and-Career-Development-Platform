@@ -29,6 +29,7 @@ import { useAdminPermissions } from "@/components/admin/admin-permissions";
 import type { AdminStudentProfile } from "@/lib/api/admin-student-profile";
 import { paymentScreenshotHref, revealEnrollmentPassword, revealStudentPassword } from "@/lib/api/admin-client";
 import { getWhatsAppDirectLink, isDummyPhoneNumber } from "@/lib/utils/whatsapp-direct";
+import { copyToClipboard } from "@/lib/utils/clipboard";
 import { cn, formatAppliedDateTime } from "@/lib/utils";
 import { toast } from "@/lib/ui/toast";
 
@@ -301,6 +302,25 @@ function AdminStudentProfileDrawer() {
     }
 
     setShowPassword(true);
+  };
+
+  const copyWhatsAppMessage = async () => {
+    if (!profile) return;
+    const text = `*Assalam-o-Alaikum ${profile.name}!* \u{1F389}
+
+This is Emerging Edge School of Technology regarding your *${profile.course || "course"}${profile.module ? ` (${profile.module})` : ""}* application.
+
+\u{1F4D1} *Course:* ${profile.course || "Course Module"}
+${profile.module ? `\u{1F4D8} *Module:* ${profile.module}\n` : ""}\u{1F4E7} *Email:* ${profile.email}
+
+If you need any help with your registration or portal access, feel free to reply to this message! \u{1F680}`;
+
+    const copied = await copyToClipboard(text);
+    if (copied) {
+      toast.success("WhatsApp Message Copied! 📋", `Message for ${profile.name} copied to clipboard.`);
+    } else {
+      toast.error("Could not copy message");
+    }
   };
 
   const resendWhatsApp = () => {

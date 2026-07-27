@@ -198,6 +198,25 @@ export function AdminCredentialsPanel() {
     );
   };
 
+  const handleCopyWhatsAppMessage = async (row: AdminCredentialRow) => {
+    const password = row.password ?? undefined;
+    const text = buildStudentLoginWhatsAppMessage({
+      studentName: row.name,
+      email: row.email,
+      password: password || "[Stored in Portal Vault]",
+      courseName: row.course,
+      module: row.module,
+      level: row.module,
+      loginUrl: row.loginUrl,
+    });
+    const copied = await copyToClipboard(text);
+    if (copied) {
+      toast.success("WhatsApp Message Copied! 📋", `Full WhatsApp login message for ${row.name} copied to clipboard. Paste in WhatsApp to send.`);
+    } else {
+      toast.error("Could not copy WhatsApp message");
+    }
+  };
+
   const handleResendWhatsApp = (row: AdminCredentialRow) => {
     if (isDummyPhoneNumber(row.whatsapp)) {
       toast.warning(
@@ -915,15 +934,24 @@ export function AdminCredentialsPanel() {
                                 <EnvelopeSimple size={14} weight="fill" />
                               </button>
                               {!row.isDemo && (
-                                <button
-                                  type="button"
-                                  title="Send login via WhatsApp (student must message +92 321 5919502 first)"
-                                  disabled={!row.hasStoredPassword || loadingId === row.id}
-                                  onClick={() => void handleResendWhatsApp(row)}
-                                  className="rounded border border-[#25D366]/40 bg-[#25D366]/10 p-1.5 text-[#128C7E] hover:bg-[#25D366]/20 disabled:opacity-40"
-                                >
-                                  <ChatsCircle size={14} weight="fill" />
-                                </button>
+                                <>
+                                  <button
+                                    type="button"
+                                    title="Copy formatted WhatsApp login message to paste manually"
+                                    onClick={() => void handleCopyWhatsAppMessage(row)}
+                                    className="rounded border border-[#25D366]/40 bg-[#25D366]/10 p-1.5 text-[#128C7E] hover:bg-[#25D366]/20"
+                                  >
+                                    <Copy size={14} />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    title="Open WhatsApp chat with pre-filled message"
+                                    onClick={() => void handleResendWhatsApp(row)}
+                                    className="rounded border border-[#25D366]/40 bg-[#25D366]/10 p-1.5 text-[#128C7E] hover:bg-[#25D366]/20 disabled:opacity-40"
+                                  >
+                                    <ChatsCircle size={14} weight="fill" />
+                                  </button>
+                                </>
                               )}
                               <button
                                 type="button"
