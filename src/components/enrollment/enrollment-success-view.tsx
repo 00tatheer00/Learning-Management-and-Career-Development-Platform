@@ -2,6 +2,7 @@
 
 import { CheckCircle2, Download, MessageSquare, ShieldCheck, ArrowRight, Printer, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getProgramBySlug } from "@/lib/data/programs";
 
 interface EnrollmentSuccessViewProps {
   applicationNumber: number;
@@ -20,6 +21,7 @@ export function EnrollmentSuccessView({
   email,
   whatsapp,
 }: EnrollmentSuccessViewProps) {
+  const programTitle = getProgramBySlug(programSlug)?.title ?? programSlug.replace("-", " ");
   const handlePrintSlip = () => {
     window.print();
   };
@@ -66,7 +68,7 @@ export function EnrollmentSuccessView({
 
           <div>
             <span className="text-muted font-medium">Program / Module:</span>
-            <p className="font-bold text-foreground text-sm capitalize">{programSlug.replace("-", " ")} ({levelName})</p>
+            <p className="font-bold text-foreground text-sm">{programTitle} ({levelName})</p>
           </div>
 
           <div>

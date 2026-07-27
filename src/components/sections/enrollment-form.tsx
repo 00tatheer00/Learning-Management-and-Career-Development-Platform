@@ -182,6 +182,13 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
   const [mobileStep, setMobileStep] = useState(0);
+  const [submittedDetails, setSubmittedDetails] = useState<{
+    fullName: string;
+    programSlug: string;
+    levelName: string;
+    email: string;
+    whatsapp: string;
+  } | null>(null);
 
   useEffect(() => {
     if (!isSuccess) return;
@@ -398,6 +405,13 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
         );
       }
 
+      setSubmittedDetails({
+        fullName: data.fullName,
+        programSlug: data.program,
+        levelName: data.level,
+        email: data.email,
+        whatsapp: data.whatsapp,
+      });
       setSubmittedApplicationNumber(result.data?.applicationNumber ?? 1);
       setIsSuccess(true);
       toast.success(
@@ -421,19 +435,27 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
     }
   };
 
-  if (isSuccess) {
+  if (isSuccess && submittedDetails) {
     return (
       <div id="register-form-panel">
         <EnrollmentSuccessView
           applicationNumber={submittedApplicationNumber}
-          fullName={watch("fullName") || "Student"}
-          programSlug={watch("program") || "web-development"}
-          levelName={watch("level") || "Module 1"}
-          email={watch("email") || ""}
-          whatsapp={watch("whatsapp") || ""}
+          fullName={submittedDetails.fullName}
+          programSlug={submittedDetails.programSlug}
+          levelName={submittedDetails.levelName}
+          email={submittedDetails.email}
+          whatsapp={submittedDetails.whatsapp}
         />
         <div className="text-center pt-6">
-          <Button variant="ghost" size="sm" onClick={() => setIsSuccess(false)} className="text-xs font-bold text-muted hover:text-foreground">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setIsSuccess(false);
+              setSubmittedDetails(null);
+            }}
+            className="text-xs font-bold text-muted hover:text-foreground"
+          >
             Submit Another Registration &rarr;
           </Button>
         </div>

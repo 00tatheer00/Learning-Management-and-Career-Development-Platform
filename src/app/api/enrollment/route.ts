@@ -49,7 +49,7 @@ function friendlyValidationMessage(issue: z.ZodIssue | undefined): string {
   if (field === "whatsapp") {
     return "WhatsApp number must start with 03 and be 11 digits (e.g. 03001234567).";
   }
-  if (field === "program") return "Please select Web Development or App Development.";
+  if (field === "program") return "Please select a valid program (Web Development, App Development, or Artificial Intelligence).";
   if (field === "level") return "Please choose your starting module.";
   if (field === "confirmInfoCorrect") return "Please confirm your details are correct.";
   if (field === "agreeToPolicies") return "Please agree to the class rules.";

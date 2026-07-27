@@ -1,8 +1,8 @@
 import { isDemoPortalStudent } from "@/lib/constants/demo-student";
 import type { PortalUser } from "@/types/portal";
 
-/** Demo student sees both active scheduled programs in the portal. */
-export const DEMO_STUDENT_PROGRAM_SLUGS = ["web-development", "app-development"] as const;
+/** Demo student sees active scheduled programs in the portal. */
+export const DEMO_STUDENT_PROGRAM_SLUGS = ["web-development", "app-development", "artificial-intelligence"] as const;
 
 export function getStudentPortalProgramSlugs(
   user: Pick<PortalUser, "email" | "programSlug">
