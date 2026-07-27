@@ -3,6 +3,7 @@
 import { CheckCircle2, Download, MessageSquare, ShieldCheck, ArrowRight, Printer, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getProgramBySlug } from "@/lib/data/programs";
+import { getOfficialWhatsAppUrl } from "@/lib/constants/contact";
 
 interface EnrollmentSuccessViewProps {
   applicationNumber: number;
@@ -88,13 +89,33 @@ export function EnrollmentSuccessView({
         </div>
       </div>
 
-      {/* Action Buttons */}
+      {/* Primary Action: Student Initiated Chat (Prevents WhatsApp Account Restrictions) */}
+      <div className="rounded-2xl border border-emerald-500/40 bg-emerald-50/60 dark:bg-emerald-950/30 p-4 text-center space-y-2.5 print:hidden">
+        <p className="text-xs font-black text-emerald-800 dark:text-emerald-200">
+          ⚡ Speed Up Your Payment Verification &amp; Password Activation:
+        </p>
+        <p className="text-[11.5px] text-emerald-900/80 dark:text-emerald-300 font-medium">
+          Send a quick message to our Admissions Support on WhatsApp so your payment is verified immediately.
+        </p>
+        <a
+          href={getOfficialWhatsAppUrl(
+            `Assalam-o-Alaikum! My name is ${fullName}. I have submitted registration #${applicationNumber} for ${programTitle} (${levelName}). Please verify my payment receipt & activate my portal password.`
+          )}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-xs font-black text-white shadow-md hover:bg-emerald-700 transition-all"
+        >
+          <MessageSquare size={16} /> Send WhatsApp Message to Admissions (Instant Verification)
+        </a>
+      </div>
+
+      {/* Secondary Action Buttons */}
       <div className="flex flex-wrap items-center justify-center gap-3 print:hidden">
         <Button onClick={handlePrintSlip} variant="outline" size="sm" className="gap-2 font-bold text-xs">
           <Printer size={14} /> Print / Save Slip PDF
         </Button>
 
-        <Button asChild size="sm" className="gap-2 font-bold text-xs bg-emerald-600 hover:bg-emerald-700 text-white">
+        <Button asChild size="sm" className="gap-2 font-bold text-xs bg-emerald-700 hover:bg-emerald-800 text-white">
           <a
             href="https://chat.whatsapp.com/EN0h0aFkQ6YJ6FwE93M01W"
             target="_blank"
