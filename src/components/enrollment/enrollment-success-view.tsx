@@ -45,36 +45,58 @@ export function EnrollmentSuccessView({
 
   return (
     <div className="space-y-6 max-w-3xl mx-auto py-2">
-      {/* Strict Print CSS Isolation: Only print the official receipt slip */}
+      {/* Strict Print CSS Isolation: Force EXACTLY 1 PAGE PDF export */}
       <style jsx global>{`
         @media print {
           @page {
             size: A4 portrait;
-            margin: 10mm;
+            margin: 6mm;
           }
-          body {
+          html, body {
             background: #ffffff !important;
             color: #0f172a !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            height: 100% !important;
+            max-height: 100% !important;
+            overflow: hidden !important;
           }
+          /* Collapse all hidden body children to 0 height so print engine sees 1 page only */
           body * {
             visibility: hidden !important;
+            height: 0 !important;
+            overflow: hidden !important;
           }
+          /* Make receipt container and all its elements visible and auto height */
           .printable-receipt-container,
           .printable-receipt-container * {
             visibility: visible !important;
+            height: auto !important;
+            overflow: visible !important;
           }
           .printable-receipt-container {
-            position: fixed !important;
+            position: absolute !important;
             left: 0 !important;
             top: 0 !important;
             width: 100% !important;
+            max-width: 100% !important;
             margin: 0 !important;
-            padding: 24px !important;
+            padding: 16px !important;
             border: 2px solid #0284c7 !important;
             border-radius: 12px !important;
             background: #ffffff !important;
             color: #0f172a !important;
             box-shadow: none !important;
+            page-break-before: avoid !important;
+            page-break-after: avoid !important;
+            page-break-inside: avoid !important;
+            break-before: avoid !important;
+            break-after: avoid !important;
+            break-inside: avoid !important;
+          }
+          .print\\:hidden {
+            display: none !important;
+            height: 0 !important;
           }
         }
       `}</style>
