@@ -67,6 +67,9 @@ model User {
 
   submissions AssignmentSubmission[] @relation("StudentSubmissions")
   attendance  ClassAttendance[]        @relation("StudentAttendance")
+
+  @@index([role])
+  @@index([programSlug])
 }
 
 model Enrollment {
@@ -103,6 +106,10 @@ model Enrollment {
   approvalWhatsAppError     String?
   portalWelcomeShownAt      DateTime?
   createdAt                 DateTime         @default(now())
+
+  @@index([status])
+  @@index([email])
+  @@index([program])
 }
 
 model CourseMaterial {

@@ -15,7 +15,6 @@ import {
   TrendUp,
   Buildings,
   GraduationCap,
-  CaretRight,
 } from "@phosphor-icons/react";
 import type {
   AdminRevenueStats,

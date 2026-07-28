@@ -253,6 +253,7 @@ export function EnrollmentSuccessView({
           <div className="flex items-center gap-3 bg-surface p-3 rounded-xl border border-sky-500/30 shrink-0 shadow-sm">
             <div className="h-20 w-20 bg-white rounded-lg border border-border p-1 flex items-center justify-center shrink-0">
               {qrDataUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={qrDataUrl}
                   alt="Scan QR to Chat on WhatsApp"

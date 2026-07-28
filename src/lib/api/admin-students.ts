@@ -3,7 +3,7 @@ import { getUserById } from "@/lib/auth/users";
 import { deleteCloudinaryImage } from "@/lib/cloudinary";
 import { getProgramBySlug } from "@/lib/data/programs";
 import { DEFAULT_BATCH_NAME } from "@/lib/constants/batch";
-import { formatAppliedDate, formatAppliedDateTime } from "@/lib/utils";
+import { formatAppliedDateTime } from "@/lib/utils";
 
 export interface AdminStudentRow {
   /** Approved enrollment id (unique row key). */

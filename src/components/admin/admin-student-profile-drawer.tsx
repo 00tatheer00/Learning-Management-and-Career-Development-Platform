@@ -304,6 +304,7 @@ function AdminStudentProfileDrawer() {
     setShowPassword(true);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const copyWhatsAppMessage = async () => {
     if (!profile) return;
     const text = `*Assalam-o-Alaikum ${profile.name}!* \u{1F389}

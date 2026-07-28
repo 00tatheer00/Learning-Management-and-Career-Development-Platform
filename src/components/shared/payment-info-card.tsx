@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Wallet, Copy, Check, ArrowRight } from "@phosphor-icons/react";
+import { Wallet, Copy, Check } from "@phosphor-icons/react";
 import { PAYMENT_CONFIG } from "@/lib/constants/payment";
 import { cn } from "@/lib/utils";
 

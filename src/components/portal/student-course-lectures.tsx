@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Play, Clock, ArrowRight, X, FilmStrip, PlayCircle } from "@phosphor-icons/react";
+import { Check, Play, Clock, ArrowRight, X, FilmStrip } from "@phosphor-icons/react";
 import { VideoPlayer } from "./video-player";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";

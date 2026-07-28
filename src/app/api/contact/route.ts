@@ -6,7 +6,6 @@ import { createApiResponse } from "@/lib/api/enrollment";
 import {
   formatResendError,
   getEmailFromAddress,
-  getEmailReplyTo,
 } from "@/lib/notifications/email-config";
 import { escapeHtml } from "@/lib/security/escape-html";
 import { rateLimitByIp } from "@/lib/security/rate-limit";

@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import { requireAdminRead, isNextResponse } from "@/lib/auth/admin-access";
 import { getWhatsAppCloudConfig } from "@/lib/whatsapp/config";
 import { graphWhatsAppFetch } from "@/lib/whatsapp/cloud-api/graph";

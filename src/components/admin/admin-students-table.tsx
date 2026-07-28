@@ -94,7 +94,7 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
         .toLowerCase()
         .includes(query);
     });
-  }, [students, search, courseFilter, selectedCourse, selectedModule, statusFilter, phaseFilter, browseView]);
+  }, [students, search, courseFilter, selectedCourse, selectedModule, statusFilter, phaseFilter]);
 
   const runAction = async (
     id: string,

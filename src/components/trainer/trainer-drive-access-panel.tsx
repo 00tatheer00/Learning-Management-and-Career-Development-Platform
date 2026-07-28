@@ -81,8 +81,8 @@ export function TrainerDriveAccessPanel({
   const safeBatchIndex = Math.min(activeBatchIndex, Math.max(0, emailBatches.length - 1));
   const activeBatchEmails = emailBatches[safeBatchIndex] ?? [];
   const emailBlob = useMemo(
-    () => formatEmailsForDriveShare(activeBatchEmails),
-    [activeBatchEmails]
+    () => formatEmailsForDriveShare(emailBatches[safeBatchIndex] ?? []),
+    [emailBatches, safeBatchIndex]
   );
 
   const copyEmails = useCallback(async (key: string, emails: string[], successDetail?: string) => {

@@ -1,12 +1,11 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import Image from "next/image";
 import { useForm, Controller, type FieldErrors } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
-import { Loader2, CheckCircle2 } from "lucide-react";
-import { GlobeHemisphereWest, DeviceMobile, WifiHigh, Clock, CalendarDots } from "@phosphor-icons/react";
+import { Loader2 } from "lucide-react";
+import { GlobeHemisphereWest, DeviceMobile, WifiHigh } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,8 +24,7 @@ import {
 import { preparePaymentScreenshot } from "@/lib/utils/payment-screenshot";
 import { PAYMENT_CONFIG, ENROLLABLE_PROGRAM_SLUGS, getProgramRegistrationFee } from "@/lib/constants/payment";
 import { PaymentInfoCard } from "@/components/shared/payment-info-card";
-import { programs, formatModuleSchedule } from "@/lib/data/programs";
-import type { ProgramModule } from "@/types";
+import { programs } from "@/lib/data/programs";
 import { cn } from "@/lib/utils";
 import { Alert } from "@/components/ui/alert";
 import { toast } from "@/lib/ui/toast";
