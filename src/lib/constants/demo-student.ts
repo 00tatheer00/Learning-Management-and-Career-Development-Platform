@@ -17,8 +17,7 @@ export function isDemoEnrollment(row: {
   email?: string | null;
   id?: string | null;
 }): boolean {
-  if (row.id?.startsWith("enrollment-demo-")) return true;
-  return isDemoPortalStudent(row.email);
+  return Boolean(row.id?.startsWith("enrollment-demo-"));
 }
 
 export function excludeDemoEnrollments<T extends { email?: string | null; id?: string | null }>(

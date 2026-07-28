@@ -37,27 +37,27 @@ export async function getAdminStudentRows(): Promise<AdminStudentRow[]> {
 
   if (enrollments.length === 0) return [];
 
-  const emails = [...new Set(enrollments.map((entry) => entry.email.toLowerCase()))];
   const students = await prisma.user.findMany({
-    where: { role: "student", email: { in: emails } },
+    where: { role: "student" },
   });
-  const studentByEmail = new Map(students.map((student) => [student.email.toLowerCase(), student]));
+  const studentByEmail = new Map(
+    students.map((student) => [student.email.trim().toLowerCase(), student])
+  );
 
   const rows: AdminStudentRow[] = [];
 
   for (const enrollment of enrollments) {
-    const student = studentByEmail.get(enrollment.email.toLowerCase());
-    if (!student) continue;
+    const student = studentByEmail.get(enrollment.email.trim().toLowerCase());
 
     const programSlug = enrollment.program;
     const course = getProgramBySlug(programSlug)?.title ?? programSlug;
 
     rows.push({
       id: enrollment.id,
-      studentId: student.id,
-      name: enrollment.fullName || student.name,
-      email: student.email,
-      whatsapp: student.phone ?? enrollment.whatsapp ?? "—",
+      studentId: student?.id ?? enrollment.id,
+      name: enrollment.fullName || student?.name || "Student",
+      email: student?.email ?? enrollment.email,
+      whatsapp: student?.phone ?? enrollment.whatsapp ?? "—",
       fatherName: enrollment.fatherName ?? "—",
       cnic: enrollment.cnic ?? "—",
       institution: enrollment.institution ?? "—",
@@ -69,8 +69,8 @@ export async function getAdminStudentRows(): Promise<AdminStudentRow[]> {
       batch: enrollment.batch ?? DEFAULT_BATCH_NAME,
       hasLaptop: enrollment.hasLaptop ?? "—",
       internetAvailable: enrollment.internetAvailable ?? "—",
-      isActive: student.isActive,
-      joinedAt: student.createdAt.toISOString(),
+      isActive: student?.isActive ?? true,
+      joinedAt: student?.createdAt.toISOString() ?? enrollment.createdAt.toISOString(),
       appliedAt: enrollment.createdAt.toISOString(),
     });
   }

@@ -47,27 +47,26 @@ export async function getAdminCredentialRows(): Promise<AdminCredentialRow[]> {
     return isPrimaryDemoEnrollment(enrollment);
   });
 
-  const emails = [...new Set(displayEnrollments.map((entry) => entry.email.toLowerCase()))];
   const students = await prisma.user.findMany({
-    where: { role: "student", email: { in: emails } },
+    where: { role: "student" },
   });
-  const studentByEmail = new Map(students.map((student) => [student.email.toLowerCase(), student]));
+  const studentByEmail = new Map(
+    students.map((student) => [student.email.trim().toLowerCase(), student])
+  );
 
   const rows: AdminCredentialRow[] = [];
 
   for (const enrollment of displayEnrollments) {
     const demo = isDemoEnrollment(enrollment);
-    const student = studentByEmail.get(enrollment.email.toLowerCase());
-
-    if (!student && !demo) continue;
+    const student = studentByEmail.get(enrollment.email.trim().toLowerCase());
 
     const programSlug = enrollment.program;
     const course = getProgramBySlug(programSlug)?.title ?? programSlug;
 
     rows.push({
       id: enrollment.id,
-      studentId: student?.id ?? demoUserId ?? DEMO_STUDENT_USER_ID,
-      name: enrollment.fullName || student?.name || "Demo Student",
+      studentId: student?.id ?? (demo ? (demoUserId ?? DEMO_STUDENT_USER_ID) : enrollment.id),
+      name: enrollment.fullName || student?.name || "Student",
       email: student?.email ?? enrollment.email,
       whatsapp: student?.phone ?? enrollment.whatsapp ?? "—",
       course,
