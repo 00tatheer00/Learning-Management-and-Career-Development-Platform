@@ -1,6 +1,8 @@
 "use client";
 
-import { CheckCircle2, Download, MessageSquare, ShieldCheck, Printer, Sparkles, QrCode, Award, Check, FileText } from "lucide-react";
+import { useEffect, useState } from "react";
+import { CheckCircle2, MessageSquare, ShieldCheck, Printer, Sparkles, Award, FileText, QrCode } from "lucide-react";
+import QRCode from "qrcode";
 import { Button } from "@/components/ui/button";
 import { getProgramBySlug } from "@/lib/data/programs";
 import { getProgramRegistrationFee } from "@/lib/constants/payment";
@@ -23,6 +25,7 @@ export function EnrollmentSuccessView({
   email,
   whatsapp,
 }: EnrollmentSuccessViewProps) {
+  const [qrDataUrl, setQrDataUrl] = useState<string>("");
   const program = getProgramBySlug(programSlug);
   const programTitle = program?.title ?? programSlug.replace("-", " ");
   const feeAmount = getProgramRegistrationFee(programSlug);
@@ -36,8 +39,26 @@ export function EnrollmentSuccessView({
   const waMessage = `Assalam-o-Alaikum! My name is ${fullName}. App #${receiptNumber} for ${programTitle} (${levelName}). Please verify my payment receipt & activate my portal password.`;
   const officialWaUrl = getOfficialWhatsAppUrl(waMessage);
 
-  // Direct WhatsApp Scan QR Code for instant mobile chat opening
-  const whatsappQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(officialWaUrl)}`;
+  useEffect(() => {
+    let isMounted = true;
+    QRCode.toDataURL(officialWaUrl, {
+      margin: 1,
+      width: 220,
+      color: {
+        dark: "#0f172a",
+        light: "#ffffff",
+      },
+    })
+      .then((url) => {
+        if (isMounted) setQrDataUrl(url);
+      })
+      .catch((err) => {
+        console.error("QR Code generation error:", err);
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, [officialWaUrl]);
 
   const handlePrintSlip = () => {
     window.print();
@@ -45,43 +66,35 @@ export function EnrollmentSuccessView({
 
   return (
     <div className="space-y-6 max-w-3xl mx-auto py-2">
-      {/* Strict Print CSS Isolation: Force EXACTLY 1 PAGE PDF export */}
+      {/* Print CSS Isolation: Force EXACTLY 1 PAGE PDF export without collapsing parents */}
       <style jsx global>{`
         @media print {
           @page {
             size: A4 portrait;
-            margin: 6mm;
+            margin: 8mm;
           }
-          html, body {
+          header, footer, nav, .print\\:hidden {
+            display: none !important;
+          }
+          html, body, #__next, main, section, #register-form-panel {
             background: #ffffff !important;
             color: #0f172a !important;
             margin: 0 !important;
             padding: 0 !important;
-            height: 100% !important;
-            max-height: 100% !important;
-            overflow: hidden !important;
-          }
-          /* Collapse all hidden body children to 0 height so print engine sees 1 page only */
-          body * {
-            visibility: hidden !important;
-            height: 0 !important;
-            overflow: hidden !important;
-          }
-          /* Make receipt container and all its elements visible and auto height */
-          .printable-receipt-container,
-          .printable-receipt-container * {
-            visibility: visible !important;
+            width: 100% !important;
             height: auto !important;
             overflow: visible !important;
           }
           .printable-receipt-container {
-            position: absolute !important;
+            display: block !important;
+            visibility: visible !important;
+            position: relative !important;
             left: 0 !important;
             top: 0 !important;
             width: 100% !important;
             max-width: 100% !important;
-            margin: 0 !important;
-            padding: 16px !important;
+            margin: 0 auto !important;
+            padding: 20px !important;
             border: 2px solid #0284c7 !important;
             border-radius: 12px !important;
             background: #ffffff !important;
@@ -93,10 +106,6 @@ export function EnrollmentSuccessView({
             break-before: avoid !important;
             break-after: avoid !important;
             break-inside: avoid !important;
-          }
-          .print\\:hidden {
-            display: none !important;
-            height: 0 !important;
           }
         }
       `}</style>
@@ -226,7 +235,7 @@ export function EnrollmentSuccessView({
           </div>
         </div>
 
-        {/* Verification Status Footer & QR Code Stamp */}
+        {/* Verification Status Footer & Direct QR Code Card */}
         <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-border/80 text-xs">
           {/* Status & Registrar Seal */}
           <div className="space-y-1.5 text-center sm:text-left">
@@ -240,21 +249,34 @@ export function EnrollmentSuccessView({
             </p>
           </div>
 
-          {/* Direct WhatsApp Chat QR Code */}
-          <div className="flex items-center gap-3 bg-surface p-2.5 rounded-xl border border-border shrink-0">
-            <img
-              src={whatsappQrUrl}
-              alt="Scan QR to Chat on WhatsApp"
-              width={72}
-              height={72}
-              className="rounded-lg border border-border bg-white p-0.5"
-            />
-            <div className="text-[10px] text-muted font-medium">
-              <p className="font-black text-foreground uppercase tracking-wider text-[11px]">Scan QR to Chat</p>
-              <p className="text-emerald-600 dark:text-emerald-400 font-bold mt-0.5 flex items-center gap-1">
-                💬 WhatsApp Helpline
+          {/* Direct WhatsApp Verification QR Code Card with Phone Number */}
+          <div className="flex items-center gap-3 bg-surface p-3 rounded-xl border border-sky-500/30 shrink-0 shadow-sm">
+            <div className="h-20 w-20 bg-white rounded-lg border border-border p-1 flex items-center justify-center shrink-0">
+              {qrDataUrl ? (
+                <img
+                  src={qrDataUrl}
+                  alt="Scan QR to Chat on WhatsApp"
+                  width={72}
+                  height={72}
+                  className="rounded object-contain"
+                />
+              ) : (
+                <div className="text-center text-muted p-1">
+                  <QrCode size={36} className="mx-auto text-sky-600 animate-pulse" />
+                </div>
+              )}
+            </div>
+            <div className="text-left space-y-0.5">
+              <p className="font-black text-foreground uppercase tracking-wider text-[11px]">
+                Scan QR to Verify
               </p>
-              <p className="font-mono text-[10.5px] mt-0.5 font-bold text-foreground">{BUSINESS_WHATSAPP_DISPLAY}</p>
+              <p className="text-emerald-600 dark:text-emerald-400 font-extrabold text-xs flex items-center gap-1">
+                💬 WhatsApp Support
+              </p>
+              <p className="font-mono text-xs font-black text-sky-700 dark:text-sky-300 mt-1">
+                {BUSINESS_WHATSAPP_DISPLAY}
+              </p>
+              <p className="text-[9.5px] text-muted font-medium">Scan code or message helpline</p>
             </div>
           </div>
         </div>
@@ -267,7 +289,7 @@ export function EnrollmentSuccessView({
           Speed Up Your Payment Verification &amp; Password Activation:
         </p>
         <p className="text-[11.5px] text-emerald-900/80 dark:text-emerald-300 font-medium max-w-md mx-auto">
-          Send a quick message to our Admissions Support on WhatsApp so your payment is verified immediately.
+          Send a quick message to our Admissions Support on WhatsApp ({BUSINESS_WHATSAPP_DISPLAY}) so your payment is verified immediately.
         </p>
         <a
           href={officialWaUrl}
@@ -332,4 +354,3 @@ export function EnrollmentSuccessView({
     </div>
   );
 }
-
