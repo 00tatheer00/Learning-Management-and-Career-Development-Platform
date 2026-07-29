@@ -22,7 +22,7 @@ const DEFAULT_USERS = [
   {
     id: "admin-1",
     email: "admin@eest.com",
-    password: seedPassword("SEED_ADMIN_PASSWORD", "admin@321"),
+    password: seedPassword("SEED_ADMIN_PASSWORD", "Admin@tatheer321"),
     role: "admin" as const,
     name: "Tatheer Hussain",
     phone: "03374005515",
