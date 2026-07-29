@@ -39,8 +39,8 @@ export function useAdminPermissions() {
 }
 
 export function AdminReadOnlyBanner() {
-  const { isLimitedAdmin } = useAdminPermissions();
-  if (!isLimitedAdmin) return null;
+  const { isLimitedAdmin, canApproveReject } = useAdminPermissions();
+  if (!isLimitedAdmin || canApproveReject) return null;
 
   return (
     <div className="portal-readonly-banner mb-4 rounded-xl border px-4 py-3 text-sm">

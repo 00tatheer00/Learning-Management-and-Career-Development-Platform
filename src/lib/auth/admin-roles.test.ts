@@ -18,8 +18,9 @@ describe("admin roles", () => {
     expect(canAdminWrite("trainer")).toBe(false);
   });
 
-  it("restricts approve/reject to super admin only", () => {
+  it("allows approve/reject for admin and admin_readonly", () => {
     expect(canAdminApproveReject("admin")).toBe(true);
-    expect(canAdminApproveReject("admin_readonly")).toBe(false);
+    expect(canAdminApproveReject("admin_readonly")).toBe(true);
+    expect(canAdminApproveReject("trainer")).toBe(false);
   });
 });

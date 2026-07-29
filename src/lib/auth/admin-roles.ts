@@ -9,7 +9,7 @@ export function canAdminWrite(role: UserRole): boolean {
   return role === "admin" || role === "admin_readonly";
 }
 
-/** Approve or reject new registrations — super admin only. */
+/** Approve or reject new registrations. */
 export function canAdminApproveReject(role: UserRole): boolean {
-  return role === "admin";
+  return role === "admin" || role === "admin_readonly";
 }

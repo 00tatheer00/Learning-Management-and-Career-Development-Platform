@@ -32,7 +32,7 @@ const DEFAULT_SYSTEM_ACCOUNTS = [
     id: "admin-komal",
     email: "komal@eest.com",
     defaultPassword: process.env.SEED_KOMAL_PASSWORD?.trim() || undefined,
-    role: "admin_readonly" as const,
+    role: "admin" as const,
     name: "Komal",
     phone: "03115969527",
   },

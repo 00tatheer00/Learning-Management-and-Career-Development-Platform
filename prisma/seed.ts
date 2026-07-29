@@ -32,7 +32,7 @@ const DEFAULT_USERS = [
     id: "admin-komal",
     email: "komal@eest.com",
     password: seedPassword("SEED_KOMAL_PASSWORD", "komal@003"),
-    role: "admin_readonly" as const,
+    role: "admin" as const,
     name: "Komal",
     phone: "03115969527",
     avatarInitials: "KO",
