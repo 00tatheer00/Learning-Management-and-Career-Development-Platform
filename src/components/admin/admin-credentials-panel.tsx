@@ -211,7 +211,7 @@ export function AdminCredentialsPanel() {
     });
     const copied = await copyToClipboard(text);
     if (copied) {
-      toast.success("WhatsApp Message Copied! 📋", `Full WhatsApp login message for ${row.name} copied to clipboard. Paste in WhatsApp to send.`);
+      toast.success("WhatsApp Message Copied", `Full WhatsApp login message for ${row.name} copied to clipboard. Paste in WhatsApp to send.`);
     } else {
       toast.error("Could not copy WhatsApp message");
     }

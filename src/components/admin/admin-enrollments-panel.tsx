@@ -94,6 +94,7 @@ export function AdminEnrollmentsPanel() {
     enrollmentId: string;
     phone?: string;
     courseTitle?: string;
+    moduleLevel?: string;
     studentId?: string;
     emailSent?: boolean;
     emailError?: string;
@@ -279,6 +280,7 @@ export function AdminEnrollmentsPanel() {
           enrollmentId: id,
           phone: enrollment?.whatsapp,
           courseTitle: enrollment?.courseTitle,
+          moduleLevel: enrollment?.level,
           studentId: data.notification?.studentId,
           emailSent: data.notification?.emailSent,
           emailError: data.notification?.emailError,
@@ -702,7 +704,7 @@ export function AdminEnrollmentsPanel() {
                                       : `Assalam-o-Alaikum ${enrollment.fullName}! This is Emerging Edge School regarding your ${enrollment.courseTitle} (${enrollment.level}) application.`;
                                 const copied = await copyToClipboard(msg);
                                 if (copied) {
-                                  toast.success("WhatsApp Message Copied! 📋", "Paste it directly in WhatsApp chat to send to student.");
+                                  toast.success("WhatsApp Message Copied", "Paste it directly in WhatsApp chat to send to student.");
                                 } else {
                                   toast.error("Failed to copy message");
                                 }
@@ -1111,12 +1113,14 @@ export function AdminEnrollmentsPanel() {
                       const msg = buildApprovalWhatsAppMessage({
                         studentName: approvedCredentials.name,
                         programTitle: approvedCredentials.courseTitle || "Course Module",
+                        moduleLevel: approvedCredentials.moduleLevel,
                         email: approvedCredentials.loginId,
+                        password: approvedCredentials.password,
                         portalLoginUrl: approvedCredentials.loginUrl,
                       });
                       const copied = await copyToClipboard(msg);
                       if (copied) {
-                        toast.success("WhatsApp Message Copied! 📋", `Message for ${approvedCredentials.name} copied. Paste in WhatsApp to send.`);
+                        toast.success("WhatsApp Message Copied", `Message for ${approvedCredentials.name} copied. Paste in WhatsApp to send.`);
                       } else {
                         toast.error("Failed to copy message");
                       }
@@ -1133,7 +1137,9 @@ export function AdminEnrollmentsPanel() {
                       buildApprovalWhatsAppMessage({
                         studentName: approvedCredentials.name,
                         programTitle: approvedCredentials.courseTitle || "Course Module",
+                        moduleLevel: approvedCredentials.moduleLevel,
                         email: approvedCredentials.loginId,
+                        password: approvedCredentials.password,
                         portalLoginUrl: approvedCredentials.loginUrl,
                       })
                     )}

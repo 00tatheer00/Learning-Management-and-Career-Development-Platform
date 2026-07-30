@@ -187,27 +187,43 @@ export function buildStudentLoginWhatsAppMessage({
   level,
   loginUrl,
 }: StudentLoginWhatsAppParams): string {
-  const firstName = studentName.split(" ")[0];
+  const name = studentName.trim();
+  const course = courseName.trim();
+  const mod = (module || level || "").trim();
+  const moduleText = mod ? ` (${mod})` : "";
 
-  return [
-    `*Assalam-o-Alaikum ${firstName}!* \u{1F389}`,
+  const lines = [
+    `Assalam-o-Alaikum ${name}!`,
     "",
-    "Congratulations! Your registration at Emerging Edge School of Technology has been *APPROVED* \u{2705}",
+    `Congratulations! Your registration for *${course}${moduleText}* at Emerging Edge School of Technology has been *APPROVED*.`,
     "",
-    `\u{1F4D1} *Confirmed Course:* ${courseName}`,
-    `\u{1F4D8} *Confirmed Module:* ${module}`,
-    `\u{1F3AF} *Program Level:* ${level}`,
+    "*Registration Details:*",
+    `- Student Name: ${name}`,
+    `- Course: ${course}`,
+  ];
+
+  if (mod) {
+    lines.push(`- Module: ${mod}`);
+  }
+  if (email) {
+    lines.push(`- Registered Email: ${email}`);
+  }
+
+  lines.push(
     "",
-    "\u{1F511} *Your EEST Student Portal Login Details:*",
-    `\u{1F4E7} *Username:* ${email}`,
-    `\u{1F512} *Password:* ${password}`,
-    `\u{1F517} *Portal URL:* ${loginUrl}`,
+    "*Student Portal Login Credentials:*",
+    `- Username: ${email}`,
+    `- Password: ${password}`,
+    `- Portal URL: ${loginUrl}`,
     "",
-    "Keep these credentials private. Log in to access your live interactive classes, lecture recordings, and module assignments.",
+    "Please log in to your student portal to access your live interactive classes, lecture recordings, and module assignments.",
+    "Keep your login credentials secure.",
     "",
-    "Welcome aboard! \u{1F680}",
-    "— Emerging Edge School of Technology Team",
-  ].join("\n");
+    "Welcome aboard!",
+    "— Emerging Edge School of Technology Team"
+  );
+
+  return lines.join("\n");
 }
 
 /** @deprecated Use buildStudentLoginWhatsAppMessage — kept for imports during transition */

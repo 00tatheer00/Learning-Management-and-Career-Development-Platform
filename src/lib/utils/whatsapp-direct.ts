@@ -46,26 +46,56 @@ export function buildApprovalWhatsAppMessage(data: {
   programTitle: string;
   moduleLevel?: string;
   email?: string;
+  password?: string;
   portalLoginUrl?: string;
 }): string {
   const name = data.studentName.trim();
   const program = data.programTitle.trim();
-  const level = data.moduleLevel?.trim();
-  const email = data.email?.trim();
+  const level = data.moduleLevel?.trim() || "";
+  const email = data.email?.trim() || "";
+  const password = data.password?.trim() || "";
   const loginUrl = data.portalLoginUrl || "https://emergingedgeschool.com/login";
 
-  const moduleInfo = level ? ` (${level})` : "";
+  const moduleText = level ? ` (${level})` : "";
 
-  return `*Assalam-o-Alaikum ${name}!* \u{1F389}
+  const lines = [
+    `Assalam-o-Alaikum ${name}!`,
+    "",
+    `Congratulations! Your registration for *${program}${moduleText}* at Emerging Edge School of Technology has been *APPROVED*.`,
+    "",
+    "*Registration Details:*",
+    `- Student Name: ${name}`,
+    `- Course: ${program}`,
+  ];
 
-Congratulations! Your registration for *${program}${moduleInfo}* at Emerging Edge School of Technology has been *APPROVED* \u{2705}
+  if (level) {
+    lines.push(`- Module: ${level}`);
+  }
+  if (email) {
+    lines.push(`- Registered Email: ${email}`);
+  }
 
-\u{1F4D1} *Confirmed Course:* ${program}
-${level ? `\u{1F4D8} *Confirmed Module:* ${level}\n` : ""}${email ? `\u{1F4E7} *Registered Email:* ${email}\n` : ""}
-\u{1F517} *Student Portal Login:*
-${loginUrl}
+  lines.push(
+    "",
+    "*Student Portal Login Credentials:*",
+    `- Username: ${email || name}`
+  );
 
-Please log in to your student portal to access your live classes, recordings, and assignments. Welcome aboard! \u{1F680}`;
+  if (password) {
+    lines.push(`- Password: ${password}`);
+  }
+
+  lines.push(
+    `- Portal URL: ${loginUrl}`,
+    "",
+    "Please log in to your student portal to access your live interactive classes, lecture recordings, and module assignments.",
+    "Keep your login credentials secure.",
+    "",
+    "Welcome aboard!",
+    "— Emerging Edge School of Technology Team"
+  );
+
+  return lines.join("\n");
 }
 
 /**
@@ -84,11 +114,14 @@ export function buildRejectionWhatsAppMessage(data: {
 
   const moduleInfo = level ? ` (${level})` : "";
 
-  return `*Assalam-o-Alaikum ${name},*
+  return `Assalam-o-Alaikum ${name},
 
 This is regarding your application for *${program}${moduleInfo}* at Emerging Edge School of Technology.
 
 Unfortunately, your application could not be approved at this time.${reason ? `\n\n*Reason:* ${reason}` : ""}
 
-If you believe there was an error with your payment receipt, please reply here with a clear screenshot of your payment receipt so our team can assist you. Thank you!`;
+If you believe there was an error with your payment receipt, please reply here with a clear screenshot of your payment receipt so our team can assist you.
+
+Thank you,
+— Emerging Edge School of Technology Team`;
 }

@@ -307,18 +307,21 @@ function AdminStudentProfileDrawer() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const copyWhatsAppMessage = async () => {
     if (!profile) return;
-    const text = `*Assalam-o-Alaikum ${profile.name}!* \u{1F389}
+    const text = `Assalam-o-Alaikum ${profile.name}!
 
 This is Emerging Edge School of Technology regarding your *${profile.course || "course"}${profile.module ? ` (${profile.module})` : ""}* application.
 
-\u{1F4D1} *Course:* ${profile.course || "Course Module"}
-${profile.module ? `\u{1F4D8} *Module:* ${profile.module}\n` : ""}\u{1F4E7} *Email:* ${profile.email}
+- Course: ${profile.course || "Course Module"}
+${profile.module ? `- Module: ${profile.module}\n` : ""}- Email: ${profile.email}
 
-If you need any help with your registration or portal access, feel free to reply to this message! \u{1F680}`;
+If you need any help with your registration or portal access, feel free to reply to this message!
+
+Thank you,
+— Emerging Edge School of Technology Team`;
 
     const copied = await copyToClipboard(text);
     if (copied) {
-      toast.success("WhatsApp Message Copied! 📋", `Message for ${profile.name} copied to clipboard.`);
+      toast.success("WhatsApp Message Copied", `Message for ${profile.name} copied to clipboard.`);
     } else {
       toast.error("Could not copy message");
     }
