@@ -12,7 +12,7 @@
     "test:watch": "vitest",
     "postinstall": "prisma generate",
     "db:push": "dotenv -e .env.local -- prisma db push",
-    "db:seed": "dotenv -e .env.local -- tsx prisma/seed.ts"
+    "db:seed": "dotenv -e .env.local -- tsx -r ./scripts/suppress-server-only.cjs prisma/seed.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
