@@ -71,70 +71,37 @@ export function AdminEnrollmentsPanel() {
   const [phaseFilter, setPhaseFilter] = useState<PhaseFilter>("all");
   const [programFilter, setProgramFilter] = useState<string>("all");
 
+  const statusCounts = useMemo(() => {
+    const base = enrollments.filter((e) => {
+      if (programFilter !== "all" && e.program !== programFilter) return false;
+      if (phaseFilter !== "all" && getRegistrationPhase(e) !== phaseFilter) return false;
+      return true;
+    });
+    return {
+      pending: base.filter((e) => e.status === "pending").length,
+      approved: base.filter((e) => e.status === "approved").length,
+      rejected: base.filter((e) => e.status === "rejected").length,
+      all: base.length,
+    };
+  }, [enrollments, programFilter, phaseFilter]);
+
   const phaseCounts = useMemo(() => {
-    const phase1 = enrollments.filter((e) => getRegistrationPhase(e) === "phase-1").length;
-    const phase2 = enrollments.filter((e) => getRegistrationPhase(e) === "phase-2").length;
-    return { all: enrollments.length, phase1, phase2 };
-  }, [enrollments]);
-  const [quickFilter, setQuickFilter] = useState<QuickFilter>("all");
-  const [search, setSearch] = useState("");
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
-  const [rejectReason, setRejectReason] = useState("");
-  const [deleteTarget, setDeleteTarget] = useState<{
-    id: string;
-    name: string;
-    status: string;
-  } | null>(null);
-  const [approvedCredentials, setApprovedCredentials] = useState<{
-    name: string;
-    loginId: string;
-    password: string;
-    loginUrl: string;
-    enrollmentId: string;
-    phone?: string;
-    courseTitle?: string;
-    moduleLevel?: string;
-    studentId?: string;
-    emailSent?: boolean;
-    emailError?: string;
-    whatsappSent?: boolean;
-    whatsappError?: string;
-  } | null>(null);
-  const [resendLoading, setResendLoading] = useState<"email" | "whatsapp" | null>(null);
-  const [zoomScreenshot, setZoomScreenshot] = useState<{ url: string; caption: string } | null>(
-    null
-  );
-  const [bulkConfirmOpen, setBulkConfirmOpen] = useState(false);
-
-  const load = async () => {
-    setFetchError("");
-    try {
-      const res = await fetch("/api/admin/enrollments");
-      const data = await res.json();
-      if (data.success) {
-        setEnrollments(data.data ?? []);
-      } else {
-        const err = data.error ?? "Failed to load registrations";
-        setFetchError(err);
-        toast.error("Could not load registrations", err);
-      }
-    } catch {
-      setFetchError("Failed to load registrations");
-      toast.error("Could not load registrations");
-    } finally {
-      setInitialLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    load();
-  }, []);
+    const base = enrollments.filter((e) => {
+      if (statusFilter !== "all" && e.status !== statusFilter) return false;
+      if (programFilter !== "all" && e.program !== programFilter) return false;
+      return true;
+    });
+    const phase1 = base.filter((e) => getRegistrationPhase(e) === "phase-1").length;
+    const phase2 = base.filter((e) => getRegistrationPhase(e) === "phase-2").length;
+    return { all: base.length, phase1, phase2 };
+  }, [enrollments, statusFilter, programFilter]);
 
   const programCounts = useMemo(() => {
-    const base = enrollments.filter((enrollment) =>
-      statusFilter === "all" ? true : enrollment.status === statusFilter
-    );
+    const base = enrollments.filter((enrollment) => {
+      if (statusFilter !== "all" && enrollment.status !== statusFilter) return false;
+      if (phaseFilter !== "all" && getRegistrationPhase(enrollment) !== phaseFilter) return false;
+      return true;
+    });
 
     const all = base.length;
     const perProgram: Record<string, number> = {};
@@ -142,8 +109,8 @@ export function AdminEnrollmentsPanel() {
       perProgram[slug] = base.filter((enrollment) => enrollment.program === slug).length;
     }
 
-    return { all, perProgram };
-  }, [enrollments, statusFilter]);
+    return { all, perProgram, overallTotal: enrollments.length };
+  }, [enrollments, statusFilter, phaseFilter]);
 
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -486,18 +453,23 @@ export function AdminEnrollmentsPanel() {
         </div>
 
         <div className="flex flex-wrap gap-2">
-          {(["pending", "approved", "rejected", "all"] as const).map((filter) => (
+          {[
+            { id: "pending", label: "Pending", count: statusCounts.pending },
+            { id: "approved", label: "Approved", count: statusCounts.approved },
+            { id: "rejected", label: "Rejected", count: statusCounts.rejected },
+            { id: "all", label: "All", count: statusCounts.all },
+          ].map((item) => (
             <button
-              key={filter}
+              key={item.id}
               type="button"
-              onClick={() => setStatusFilter(filter)}
+              onClick={() => setStatusFilter(item.id as StatusFilter)}
               className={`rounded-full px-4 py-2 text-sm font-semibold capitalize transition-colors ${
-                statusFilter === filter
+                statusFilter === item.id
                   ? "bg-primary text-white"
                   : "bg-secondary text-muted hover:text-foreground"
               }`}
             >
-              {filter} {filter === "pending" && pendingCount > 0 ? `(${pendingCount})` : ""}
+              {item.label} ({item.count})
             </button>
           ))}
         </div>
