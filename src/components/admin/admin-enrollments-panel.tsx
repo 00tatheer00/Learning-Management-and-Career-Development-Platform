@@ -125,10 +125,11 @@ export function AdminEnrollmentsPanel() {
     load();
   }, []);
 
+  // Status Counts: shows status breakdown for selected Phase & Program
   const statusCounts = useMemo(() => {
     const base = enrollments.filter((e) => {
-      if (programFilter !== "all" && e.program !== programFilter) return false;
       if (phaseFilter !== "all" && getRegistrationPhase(e) !== phaseFilter) return false;
+      if (programFilter !== "all" && e.program !== programFilter) return false;
       return true;
     });
     return {
@@ -137,22 +138,22 @@ export function AdminEnrollmentsPanel() {
       rejected: base.filter((e) => e.status === "rejected").length,
       all: base.length,
     };
-  }, [enrollments, programFilter, phaseFilter]);
+  }, [enrollments, phaseFilter, programFilter]);
 
+  // Phase Counts: shows total applications submitted per phase across all statuses
   const phaseCounts = useMemo(() => {
     const base = enrollments.filter((e) => {
-      if (statusFilter !== "all" && e.status !== statusFilter) return false;
       if (programFilter !== "all" && e.program !== programFilter) return false;
       return true;
     });
     const phase1 = base.filter((e) => getRegistrationPhase(e) === "phase-1").length;
     const phase2 = base.filter((e) => getRegistrationPhase(e) === "phase-2").length;
     return { all: base.length, phase1, phase2 };
-  }, [enrollments, statusFilter, programFilter]);
+  }, [enrollments, programFilter]);
 
+  // Course / Program Counts: shows total applications per course in the selected phase
   const programCounts = useMemo(() => {
     const base = enrollments.filter((enrollment) => {
-      if (statusFilter !== "all" && enrollment.status !== statusFilter) return false;
       if (phaseFilter !== "all" && getRegistrationPhase(enrollment) !== phaseFilter) return false;
       return true;
     });
@@ -164,7 +165,7 @@ export function AdminEnrollmentsPanel() {
     }
 
     return { all, perProgram, overallTotal: enrollments.length };
-  }, [enrollments, statusFilter, phaseFilter]);
+  }, [enrollments, phaseFilter]);
 
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
