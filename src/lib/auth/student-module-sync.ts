@@ -18,15 +18,19 @@ export async function getApprovedEnrollmentLevels(
 
   const rows = await prisma.enrollment.findMany({
     where: {
-      email: email.trim().toLowerCase(),
       program: programSlug,
       status: "approved",
     },
-    select: { level: true },
+    select: { level: true, email: true },
   });
 
+  const normalizedEmail = email.trim().toLowerCase();
+  const studentRows = rows.filter(
+    (row) => row.email && row.email.trim().toLowerCase() === normalizedEmail
+  );
+
   const order = getProgramModuleNames(programSlug);
-  const levels = new Set(rows.map((row) => row.level.trim()).filter(Boolean));
+  const levels = new Set(studentRows.map((row) => row.level.trim()).filter(Boolean));
   return order.filter((moduleName) => levels.has(moduleName));
 }
 

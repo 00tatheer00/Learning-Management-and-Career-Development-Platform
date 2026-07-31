@@ -54,7 +54,16 @@ export function canStudentAccessModuleContent(
       .filter(Boolean)
   );
 
-  return enrolled.has(resolvedContent);
+  if (!enrolled.has(resolvedContent)) {
+    return false;
+  }
+
+  const activeLevel = studentLevel?.trim();
+  if (activeLevel && enrolled.has(activeLevel)) {
+    return resolvedContent === activeLevel;
+  }
+
+  return true;
 }
 
 export function filterByStudentModule<T>(
