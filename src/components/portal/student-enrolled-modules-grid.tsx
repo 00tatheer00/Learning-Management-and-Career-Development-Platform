@@ -63,17 +63,17 @@ export function StudentEnrolledModulesGrid({
     <section className="mt-8 mb-4">
       <div className="flex items-center justify-between gap-3 mb-4">
         <div className="flex items-center gap-2">
-          <GraduationCap size={22} weight="duotone" className="text-primary" />
-          <h2 className="text-lg font-bold text-pt tracking-tight">
+          <GraduationCap size={24} weight="duotone" className="text-primary" />
+          <h2 className="text-xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
             My Enrolled Modules ({modules.length})
           </h2>
         </div>
-        <span className="text-xs text-pt-muted font-medium bg-pt-subtle px-2.5 py-1 rounded-full border border-pt/40">
+        <span className="text-xs text-slate-700 dark:text-slate-300 font-bold bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full border border-slate-300 dark:border-slate-700">
           Single Portal Access
         </span>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {modules.map((moduleName, index) => {
           const isActive = moduleName === activeModule;
           const isLoading = updatingModule === moduleName;
@@ -82,45 +82,45 @@ export function StudentEnrolledModulesGrid({
             <div
               key={moduleName}
               className={cn(
-                "relative group rounded-2xl p-5 border transition-all duration-300 flex flex-col justify-between",
+                "relative group rounded-3xl p-6 border transition-all duration-300 flex flex-col justify-between",
                 isActive
-                  ? "bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border-primary/40 shadow-lg shadow-primary/5 ring-1 ring-primary/30"
-                  : "bg-pt-surface border-pt/60 hover:border-pt hover:shadow-md"
+                  ? "bg-white dark:bg-slate-900 border-primary shadow-xl ring-2 ring-primary/30"
+                  : "bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-800 shadow-md hover:shadow-xl"
               )}
             >
               <div>
                 <div className="flex items-center justify-between gap-2 mb-3">
-                  <span className="text-[10px] font-extrabold uppercase tracking-widest text-primary/80">
-                    Module {index + 1}
+                  <span className="text-xs font-extrabold uppercase tracking-wider text-primary">
+                    MODULE {index + 1}
                   </span>
                   {isActive ? (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30">
-                      <Sparkle size={12} weight="fill" className="text-emerald-500" />
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-900 border border-emerald-400 dark:bg-emerald-950 dark:text-emerald-200 dark:border-emerald-700 shadow-sm">
+                      <Sparkle size={13} weight="fill" className="text-emerald-600 dark:text-emerald-400" />
                       Active Portal
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-pt-subtle text-pt-muted border border-pt/40">
+                    <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full text-xs font-extrabold bg-slate-100 text-slate-800 border border-slate-300 dark:bg-slate-800 dark:text-slate-200">
                       Enrolled
                     </span>
                   )}
                 </div>
 
-                <h3 className="text-base font-bold text-pt group-hover:text-primary transition-colors mb-1">
+                <h3 className="text-lg font-extrabold text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors mb-1">
                   {moduleName}
                 </h3>
-                <p className="text-xs text-pt-muted line-clamp-2 mb-4 leading-relaxed">
+                <p className="text-xs text-slate-700 dark:text-slate-300 font-medium line-clamp-2 mb-4 leading-relaxed">
                   Access lectures, assignments, live session links, and recordings for this module.
                 </p>
               </div>
 
-              <div className="pt-3 border-t border-pt/40 flex items-center justify-between">
-                <span className="text-[11px] text-pt-faint font-medium">
+              <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                <span className="text-xs text-slate-700 dark:text-slate-300 font-bold">
                   {isActive ? "Currently viewing" : "Approved & Ready"}
                 </span>
 
                 {isActive ? (
-                  <span className="inline-flex items-center gap-1 text-xs font-bold text-primary">
-                    <CheckCircle size={15} weight="fill" />
+                  <span className="inline-flex items-center gap-1 text-xs font-extrabold text-primary">
+                    <CheckCircle size={16} weight="fill" />
                     Viewing
                   </span>
                 ) : (

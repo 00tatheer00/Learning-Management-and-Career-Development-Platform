@@ -69,10 +69,11 @@ export function StudentDashboardHero({
                 : `${schedule.headline} · ${schedule.daysLabel}`}
             </p>
             {moduleName && (
-              <p className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-white/95">
-                <GraduationCap size={14} weight="duotone" className="text-white" />
-                {programTitle} · {moduleName}
-              </p>
+              <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-white/15 border border-white/30 backdrop-blur-md shadow-sm">
+                <Sparkle size={15} weight="fill" className="text-amber-300 animate-pulse" />
+                <span className="text-[11px] uppercase tracking-wider font-extrabold text-white/80">Active Module:</span>
+                <span className="text-xs font-extrabold text-white">{programTitle} · {moduleName}</span>
+              </div>
             )}
           </div>
 
