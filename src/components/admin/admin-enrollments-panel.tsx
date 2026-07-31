@@ -884,6 +884,23 @@ export function AdminEnrollmentsPanel() {
 
                   {canWrite && !isPending && (
                     <div className="mt-5 flex flex-wrap gap-3 border-t border-border pt-5">
+                      {enrollment.status === "rejected" && canApproveReject && (
+                        <Button
+                          size="lg"
+                          className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
+                          disabled={loadingId === enrollment.id || bulkLoading}
+                          onClick={() =>
+                            setPendingAction({
+                              id: enrollment.id,
+                              type: "approved",
+                              name: enrollment.fullName,
+                            })
+                          }
+                        >
+                          <CheckCircle size={20} weight="duotone" />
+                          Re-Approve &amp; Restore Account
+                        </Button>
+                      )}
                       <Button
                         size="lg"
                         variant="secondary"

@@ -40,8 +40,8 @@ export async function approveEnrollmentAndCreateAccount(
   if (!existing) {
     return { enrollment: null, message: "", error: "Enrollment not found" };
   }
-  if (existing.status !== "pending") {
-    return { enrollment: null, message: "", error: "Enrollment is not pending" };
+  if (existing.status === "approved") {
+    return { enrollment: null, message: "", error: "Enrollment is already approved" };
   }
 
   const enrollment = await updateEnrollmentStatus(
