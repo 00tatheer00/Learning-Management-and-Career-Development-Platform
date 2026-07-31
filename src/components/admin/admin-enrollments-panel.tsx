@@ -70,6 +70,60 @@ export function AdminEnrollmentsPanel() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("pending");
   const [phaseFilter, setPhaseFilter] = useState<PhaseFilter>("all");
   const [programFilter, setProgramFilter] = useState<string>("all");
+  const [quickFilter, setQuickFilter] = useState<QuickFilter>("all");
+  const [search, setSearch] = useState("");
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
+  const [rejectReason, setRejectReason] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<{
+    id: string;
+    name: string;
+    status: string;
+  } | null>(null);
+  const [approvedCredentials, setApprovedCredentials] = useState<{
+    name: string;
+    loginId: string;
+    password: string;
+    loginUrl: string;
+    enrollmentId: string;
+    phone?: string;
+    courseTitle?: string;
+    moduleLevel?: string;
+    studentId?: string;
+    emailSent?: boolean;
+    emailError?: string;
+    whatsappSent?: boolean;
+    whatsappError?: string;
+  } | null>(null);
+  const [resendLoading, setResendLoading] = useState<"email" | "whatsapp" | null>(null);
+  const [zoomScreenshot, setZoomScreenshot] = useState<{ url: string; caption: string } | null>(
+    null
+  );
+  const [bulkConfirmOpen, setBulkConfirmOpen] = useState(false);
+
+  const load = async () => {
+    setFetchError("");
+    try {
+      const res = await fetch("/api/admin/enrollments");
+      const data = await res.json();
+      if (data.success) {
+        setEnrollments(data.data ?? []);
+      } else {
+        const err = data.error ?? "Failed to load registrations";
+        setFetchError(err);
+        toast.error("Could not load registrations", err);
+      }
+    } catch {
+      setFetchError("Failed to load registrations");
+      toast.error("Could not load registrations");
+    } finally {
+      setInitialLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
 
   const statusCounts = useMemo(() => {
     const base = enrollments.filter((e) => {
