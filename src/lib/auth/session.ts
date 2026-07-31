@@ -9,7 +9,10 @@ import { isActiveSession } from "@/lib/auth/session-control";
 import { getPortalHome } from "@/lib/auth/portal-routes";
 import { prisma } from "@/lib/prisma";
 import type { PortalUser, UserRole } from "@/types/portal";
-import { syncStudentActiveModuleFromEnrollments } from "@/lib/auth/student-module-sync";
+import {
+  getApprovedEnrollmentLevels,
+  syncStudentActiveModuleFromEnrollments,
+} from "@/lib/auth/student-module-sync";
 
 export { getPortalHome };
 
@@ -88,6 +91,11 @@ async function buildPortalUser(
       ? (await syncStudentActiveModuleFromEnrollments(user.id)) ?? user.level
       : user.level;
 
+  const approvedLevels =
+    user.role === "student" && user.email
+      ? await getApprovedEnrollmentLevels(user.email, user.programSlug ?? "web-development")
+      : undefined;
+
   return {
     id: user.id,
     email: user.email,
@@ -96,6 +104,7 @@ async function buildPortalUser(
     phone: user.phone ?? undefined,
     programSlug: user.programSlug ?? undefined,
     level: level ?? undefined,
+    approvedLevels,
     trainerId: user.trainerId ?? undefined,
     avatarInitials: user.avatarInitials ?? undefined,
     avatarUrl: user.avatarUrl ?? undefined,

@@ -102,6 +102,7 @@ export interface PortalUser {
   phone?: string;
   programSlug?: string;
   level?: string;
+  approvedLevels?: string[];
   batch?: string;
   trainerId?: string;
   avatarInitials?: string;

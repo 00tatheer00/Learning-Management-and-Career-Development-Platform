@@ -61,7 +61,8 @@ export async function approveEnrollmentAndCreateAccount(
   }
 
   const user = await getUserByEmail(enrollment.email);
-  const plainPassword = generateStudentPassword();
+  const isExistingUser = !!user;
+  const plainPassword = isExistingUser ? "" : generateStudentPassword();
 
   const avatarInitials = enrollment.fullName
     .split(" ")
@@ -81,7 +82,7 @@ export async function approveEnrollmentAndCreateAccount(
     enrollment.program
   );
   const activeLevel =
-    resolveActiveStudentModule(enrollment.program, enrollment.level, approvedLevels) ??
+    resolveActiveStudentModule(enrollment.program, user?.level || enrollment.level, approvedLevels) ??
     assignment.level;
 
   if (!user) {
@@ -103,7 +104,7 @@ export async function approveEnrollmentAndCreateAccount(
       name: enrollment.fullName,
       phone: enrollment.whatsapp,
       programSlug: assignment.programSlug,
-      level: activeLevel,
+      level: user.level || activeLevel,
       batch: assignment.batch,
       trainerId: assignment.trainerId,
       isActive: true,
@@ -116,12 +117,15 @@ export async function approveEnrollmentAndCreateAccount(
     return { enrollment, message: "Registration approved but student account missing.", error: "Student account missing" };
   }
 
-  const passwordIssue = await issueEnrollmentLoginPassword({
-    studentId: student.id,
-    enrollmentId,
-    plainPassword,
-    syncAccountHash: true,
-  });
+  const passwordIssue = isExistingUser
+    ? { ok: true, error: undefined }
+    : await issueEnrollmentLoginPassword({
+        studentId: student.id,
+        enrollmentId,
+        plainPassword,
+        syncAccountHash: true,
+      });
+
   const passwordSaved = passwordIssue.ok;
   if (!passwordSaved) {
     console.warn(
@@ -136,7 +140,7 @@ export async function approveEnrollmentAndCreateAccount(
     whatsapp: enrollmentRecord.whatsapp,
     program: enrollmentRecord.program,
     level: enrollmentRecord.level,
-    password: plainPassword,
+    password: isExistingUser ? "Use your existing portal password" : plainPassword,
   });
 
   const emailError = notifications.emailSent

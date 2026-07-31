@@ -14,14 +14,19 @@ export function resolveActiveStudentModule(
   userLevel: string | null | undefined,
   approvedLevels: string[]
 ): string | null {
-  const order = getProgramModuleNames(programSlug);
-  if (order.length === 0) {
-    return userLevel?.trim() || approvedLevels[0] || null;
+  const trimmedUserLevel = userLevel?.trim();
+  const normalizedApproved = approvedLevels.map((l) => l.trim()).filter(Boolean);
+
+  if (trimmedUserLevel && normalizedApproved.includes(trimmedUserLevel)) {
+    return trimmedUserLevel;
   }
 
-  const enrolled = new Set(
-    [...approvedLevels, userLevel ?? ""].map((level) => level.trim()).filter(Boolean)
-  );
+  const order = getProgramModuleNames(programSlug);
+  if (order.length === 0) {
+    return trimmedUserLevel || normalizedApproved[0] || null;
+  }
+
+  const enrolled = new Set(normalizedApproved);
 
   for (const moduleName of order) {
     if (enrolled.has(moduleName)) {
@@ -29,7 +34,7 @@ export function resolveActiveStudentModule(
     }
   }
 
-  return userLevel?.trim() || approvedLevels[0] || null;
+  return trimmedUserLevel || normalizedApproved[0] || null;
 }
 
 export function isFirstModuleStudent(programSlug: string, level?: string | null): boolean {

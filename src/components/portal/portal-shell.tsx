@@ -38,6 +38,7 @@ import {
   usePortalTheme,
 } from "@/components/portal/portal-theme-provider";
 import { PortalThemeToggle } from "@/components/portal/portal-theme-toggle";
+import { StudentModuleSwitcher } from "@/components/portal/student-module-switcher";
 import type { PortalUser, UserRole } from "@/types/portal";
 import { cn } from "@/lib/utils";
 
@@ -203,6 +204,14 @@ function PortalShellInner({ user, children }: PortalShellProps) {
                 {headerTitle}
               </p>
             </div>
+            {isStudent && user.approvedLevels && user.approvedLevels.length > 0 && (
+              <StudentModuleSwitcher
+                currentModule={user.level || null}
+                approvedModules={user.approvedLevels}
+                programSlug={user.programSlug || "web-development"}
+                className="hidden sm:inline-block"
+              />
+            )}
           </div>
           <div className="flex items-center gap-1 sm:gap-2 shrink-0">
             {isAdmin && (
