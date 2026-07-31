@@ -83,10 +83,7 @@ export default async function StudentClassesPage() {
       })}
 
       {sessions.length === 0 ? (
-        <EmptyState
-          title="Class link coming soon"
-          description="Your trainer will add the next session. Check back before class time."
-        />
+        <ModuleStartsSoonNotice programSlug={primaryProgramSlug} studentModule={user.level} />
       ) : (
         <div className="space-y-3">
           {sessions.map((session) => (

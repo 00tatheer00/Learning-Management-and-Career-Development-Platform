@@ -46,13 +46,15 @@ export default async function StudentRecordingsPage() {
         eyebrow="On demand"
         title="Class Recordings"
         description={
-          canAccess
-            ? "Rewatch completed classes for your module. New recordings appear after your trainer uploads them."
-            : "Recordings for your module will appear here when your batch starts."
+          canAccess && recordings.length > 0
+            ? `Rewatch completed classes for ${user.level || "your module"}. New recordings appear after your trainer uploads them.`
+            : `Recordings for ${user.level || "your module"} will appear here when your module classes begin.`
         }
       />
-      {!canAccess ? (
-        <ModuleStartsSoonNotice programSlug={primaryProgramSlug} studentModule={user.level} />
+      {!canAccess || recordings.length === 0 ? (
+        <div className="space-y-4">
+          <ModuleStartsSoonNotice programSlug={primaryProgramSlug} studentModule={user.level} />
+        </div>
       ) : (
         <StudentRecordingsContent programSlug={primaryProgramSlug} recordings={recordings} />
       )}

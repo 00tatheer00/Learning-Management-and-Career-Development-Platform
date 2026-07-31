@@ -31,6 +31,7 @@ export interface PortalNavItem {
 export const PORTAL_NAV: Record<UserRole, PortalNavItem[]> = {
   student: [
     { href: "/student/dashboard", label: "Home", icon: House, description: "Your dashboard" },
+    { href: "/student/modules", label: "My Modules", icon: GraduationCap, description: "Your enrolled & locked modules" },
     { href: "/student/course", label: "My Course", icon: BookOpen, description: "Lessons & syllabus" },
     { href: "/student/classes", label: "Live Classes", icon: VideoCamera, description: "Join online class" },
     { href: "/student/recordings", label: "Recordings", icon: FilmStrip, description: "Rewatch past classes" },
