@@ -43,7 +43,7 @@ export default async function StudentDashboardPage() {
   const user = await getCurrentUser();
   if (!user) return null;
 
-  const programSlugs = getStudentPortalProgramSlugs(user);
+  const programSlugs = await getStudentPortalProgramSlugs(user);
   const primaryProgramSlug = user.programSlug ?? "web-development";
   const moduleContext = await getStudentModuleContentContext(user);
   const [allMaterials, allAssignments, allSessions] = await Promise.all([
@@ -55,8 +55,11 @@ export default async function StudentDashboardPage() {
   const assignments = filterByStudentModule(allAssignments, moduleContext, (item) => item.level);
   const sessions = filterByStudentModule(allSessions, moduleContext, (session) => session.level);
   const enrolledModules = moduleContext.approvedLevels;
+  // Aggregate module enrollments across all enrolled programs
   const moduleEnrollments = user.email
-    ? await getStudentModuleEnrollmentViews(user.email, primaryProgramSlug)
+    ? (await Promise.all(
+        programSlugs.map((slug) => getStudentModuleEnrollmentViews(user.email, slug))
+      )).flat()
     : [];
   const nextSession = findNextUpcomingSession(sessions, primaryProgramSlug);
   const canJoinLive = studentHasLiveClassAccess(

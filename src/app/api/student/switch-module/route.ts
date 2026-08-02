@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
 import { isDemoPortalStudent } from "@/lib/constants/demo-student";
 import { getApprovedEnrollmentLevels } from "@/lib/auth/student-module-sync";
+import { getApprovedProgramSlugs } from "@/lib/student-portal/program-scope";
 
 export async function POST(req: Request) {
   try {
@@ -23,12 +24,26 @@ export async function POST(req: Request) {
 
     const targetProgram = programSlug || user.programSlug || "web-development";
 
-    // Verify student is approved for this module
+    // Verify student is approved for this module in any enrolled program
     if (!isDemoPortalStudent(user.email)) {
+      // First check the specified program
       const approved = await getApprovedEnrollmentLevels(user.email, targetProgram);
-      const isApproved = approved.some(
+      let isApproved = approved.some(
         (l) => l.trim().toLowerCase() === moduleName.trim().toLowerCase()
       );
+
+      // If not found in the target program, check all enrolled programs
+      if (!isApproved) {
+        const allSlugs = await getApprovedProgramSlugs(user.email);
+        for (const slug of allSlugs) {
+          if (slug === targetProgram) continue; // already checked
+          const levels = await getApprovedEnrollmentLevels(user.email, slug);
+          if (levels.some((l) => l.trim().toLowerCase() === moduleName.trim().toLowerCase())) {
+            isApproved = true;
+            break;
+          }
+        }
+      }
 
       if (!isApproved) {
         return NextResponse.json(

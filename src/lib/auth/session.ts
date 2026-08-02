@@ -11,8 +11,10 @@ import { prisma } from "@/lib/prisma";
 import type { PortalUser, UserRole } from "@/types/portal";
 import {
   getApprovedEnrollmentLevels,
+  getApprovedEnrollmentLevelsAllPrograms,
   syncStudentActiveModuleFromEnrollments,
 } from "@/lib/auth/student-module-sync";
+import { getApprovedProgramSlugs } from "@/lib/student-portal/program-scope";
 
 export { getPortalHome };
 
@@ -91,9 +93,17 @@ async function buildPortalUser(
       ? (await syncStudentActiveModuleFromEnrollments(user.id)) ?? user.level
       : user.level;
 
+  // Derive all enrolled program slugs and cross-program approved levels
+  const programSlugs =
+    user.role === "student" && user.email
+      ? await getApprovedProgramSlugs(user.email)
+      : undefined;
+
   const approvedLevels =
     user.role === "student" && user.email
-      ? await getApprovedEnrollmentLevels(user.email, user.programSlug ?? "web-development")
+      ? programSlugs && programSlugs.length > 1
+        ? await getApprovedEnrollmentLevelsAllPrograms(user.email, programSlugs)
+        : await getApprovedEnrollmentLevels(user.email, user.programSlug ?? "web-development")
       : undefined;
 
   return {
@@ -103,6 +113,7 @@ async function buildPortalUser(
     name: user.name,
     phone: user.phone ?? undefined,
     programSlug: user.programSlug ?? undefined,
+    programSlugs: programSlugs && programSlugs.length > 0 ? programSlugs : undefined,
     level: level ?? undefined,
     approvedLevels,
     trainerId: user.trainerId ?? undefined,

@@ -18,7 +18,7 @@ export async function GET() {
   }
 
   const context = await getStudentModuleContentContext(user);
-  const programSlugs = getStudentPortalProgramSlugs(user);
+  const programSlugs = await getStudentPortalProgramSlugs(user);
   const [allAssignments, submissions] = await Promise.all([
     fetchMergedByProgram(programSlugs, getAssignments),
     getSubmissions(user.id),

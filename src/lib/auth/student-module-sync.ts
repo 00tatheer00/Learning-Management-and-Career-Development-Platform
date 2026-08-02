@@ -34,6 +34,25 @@ export async function getApprovedEnrollmentLevels(
   return order.filter((moduleName) => levels.has(moduleName));
 }
 
+/**
+ * Returns approved enrollment levels across ALL programs for a student.
+ * Used when the student is enrolled in multiple programs and we need
+ * a combined view of all their approved modules.
+ */
+export async function getApprovedEnrollmentLevelsAllPrograms(
+  email: string,
+  programSlugs: string[]
+): Promise<string[]> {
+  if (isDemoPortalStudent(email)) {
+    return DEMO_STUDENT_PROGRAM_SLUGS.flatMap((slug) => getProgramModuleNames(slug));
+  }
+
+  const results = await Promise.all(
+    programSlugs.map((slug) => getApprovedEnrollmentLevels(email, slug))
+  );
+  return results.flat();
+}
+
 export async function syncStudentActiveModuleFromEnrollments(
   userId: string
 ): Promise<string | null> {

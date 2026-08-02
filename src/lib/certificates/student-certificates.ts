@@ -27,14 +27,16 @@ export function certificatesEnabledForStudent(email?: string | null): boolean {
   return isDemoPortalStudent(email);
 }
 
-export function getStudentCertificateModules(user: Pick<PortalUser, "id" | "email" | "name" | "programSlug">): StudentCertificateModuleView[] {
+export async function getStudentCertificateModules(
+  user: Pick<PortalUser, "id" | "email" | "name" | "programSlug" | "programSlugs">
+): Promise<StudentCertificateModuleView[]> {
   if (!certificatesEnabledForStudent(user.email)) {
     return [];
   }
 
   const issuedAt = new Date("2026-07-11T00:00:00.000Z");
   const issuedLabel = formatCertificateDate(issuedAt);
-  const programSlugs = getStudentPortalProgramSlugs(user);
+  const programSlugs = await getStudentPortalProgramSlugs(user);
   const views: StudentCertificateModuleView[] = [];
 
   for (const programSlug of programSlugs) {
@@ -64,22 +66,23 @@ export function getStudentCertificateModules(user: Pick<PortalUser, "id" | "emai
   return views;
 }
 
-export function canDownloadCertificate(
-  user: Pick<PortalUser, "id" | "email" | "name" | "programSlug">,
+export async function canDownloadCertificate(
+  user: Pick<PortalUser, "id" | "email" | "name" | "programSlug" | "programSlugs">,
   programSlug: string,
   moduleName: string
-): boolean {
+): Promise<boolean> {
   if (!certificatesEnabledForStudent(user.email)) return false;
   if (!isDemoIssuedModule(programSlug, moduleName)) return false;
-  return getStudentPortalProgramSlugs(user).includes(programSlug);
+  const slugs = await getStudentPortalProgramSlugs(user);
+  return slugs.includes(programSlug);
 }
 
-export function getCertificateRenderPayload(
-  user: Pick<PortalUser, "id" | "email" | "name" | "programSlug">,
+export async function getCertificateRenderPayload(
+  user: Pick<PortalUser, "id" | "email" | "name" | "programSlug" | "programSlugs">,
   programSlug: string,
   moduleName: string
 ) {
-  if (!canDownloadCertificate(user, programSlug, moduleName)) {
+  if (!(await canDownloadCertificate(user, programSlug, moduleName))) {
     return null;
   }
 

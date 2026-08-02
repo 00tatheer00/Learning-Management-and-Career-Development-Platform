@@ -25,11 +25,13 @@ export default async function StudentClassesPage() {
   const user = await getCurrentUser();
   if (!user) return null;
 
-  const programSlugs = getStudentPortalProgramSlugs(user);
+  const programSlugs = await getStudentPortalProgramSlugs(user);
   const primaryProgramSlug = user.programSlug ?? "web-development";
   const moduleContext = await getStudentModuleContentContext(user);
   const moduleEnrollments = user.email
-    ? await getStudentModuleEnrollmentViews(user.email, primaryProgramSlug)
+    ? (await Promise.all(
+        programSlugs.map((slug) => getStudentModuleEnrollmentViews(user.email, slug))
+      )).flat()
     : [];
   const allSessions = await fetchMergedByProgram(programSlugs, getLiveSessionsPreview);
   const sessions = sortLiveSessionsForDisplay(

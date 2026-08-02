@@ -46,10 +46,10 @@ async function getSeenAt(userId: string, section: "assignments" | "classes"): Pr
 }
 
 export async function getStudentPortalBadgeCounts(
-  user: Pick<PortalUser, "id" | "email" | "programSlug" | "level">
+  user: Pick<PortalUser, "id" | "email" | "programSlug" | "programSlugs" | "level">
 ): Promise<StudentPortalBadgeCounts> {
   try {
-    const programSlugs = getStudentPortalProgramSlugs(user);
+    const programSlugs = await getStudentPortalProgramSlugs(user);
     const context = await getStudentModuleContentContext(user);
     const [assignmentsSeenAt, classesSeenAt, allAssignments, allSessions] = await Promise.all([
       getSeenAt(user.id, "assignments"),

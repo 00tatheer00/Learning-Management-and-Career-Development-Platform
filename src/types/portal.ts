@@ -101,6 +101,8 @@ export interface PortalUser {
   name: string;
   phone?: string;
   programSlug?: string;
+  /** All program slugs the student is approved for (derived from Enrollments). */
+  programSlugs?: string[];
   level?: string;
   approvedLevels?: string[];
   batch?: string;

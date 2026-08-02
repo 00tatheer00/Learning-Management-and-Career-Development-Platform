@@ -21,7 +21,7 @@ export async function GET() {
   }
 
   const context = await getStudentModuleContentContext(user);
-  const programSlugs = getStudentPortalProgramSlugs(user);
+  const programSlugs = await getStudentPortalProgramSlugs(user);
   const primaryProgramSlug = context.programSlug;
   const sessions = await fetchMergedByProgram(programSlugs, getLiveSessionsPreview);
   const canAccess = studentHasModuleLiveContent(context, sessions);

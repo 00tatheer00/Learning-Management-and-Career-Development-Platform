@@ -22,7 +22,7 @@ export async function GET() {
     createApiResponse(true, {
       data: {
         enabled: true,
-        modules: getStudentCertificateModules(user),
+        modules: await getStudentCertificateModules(user),
       },
     })
   );

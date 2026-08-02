@@ -26,7 +26,7 @@ export default async function StudentCoursePage() {
   const user = await getCurrentUser();
   if (!user) return null;
 
-  const programSlugs = getStudentPortalProgramSlugs(user);
+  const programSlugs = await getStudentPortalProgramSlugs(user);
   const isDemo = isDemoPortalStudent(user.email);
   const moduleContext = await getStudentModuleContentContext(user);
   const allMaterials = await fetchMergedByProgram(programSlugs, getMaterials);

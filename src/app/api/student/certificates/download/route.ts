@@ -19,7 +19,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Missing program or module" }, { status: 400 });
   }
 
-  const payload = getCertificateRenderPayload(user, programSlug, moduleName);
+  const payload = await getCertificateRenderPayload(user, programSlug, moduleName);
   if (!payload) {
     return NextResponse.json({ error: "Certificate not available" }, { status: 403 });
   }

@@ -100,13 +100,16 @@ export async function approveEnrollmentAndCreateAccount(
       avatarInitials,
     });
   } else {
+    // Don't overwrite programSlug if user already has one —
+    // multi-program access is derived from approved Enrollment records.
+    const keepProgramSlug = user.programSlug || assignment.programSlug;
     await updateUser(user.id, {
       name: enrollment.fullName,
       phone: enrollment.whatsapp,
-      programSlug: assignment.programSlug,
+      programSlug: keepProgramSlug,
       level: user.level || activeLevel,
       batch: assignment.batch,
-      trainerId: assignment.trainerId,
+      trainerId: user.trainerId || assignment.trainerId,
       isActive: true,
       avatarInitials,
     });

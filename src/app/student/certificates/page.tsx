@@ -26,7 +26,7 @@ export default async function StudentCertificatesPage() {
     );
   }
 
-  const modules = getStudentCertificateModules(user);
+  const modules = await getStudentCertificateModules(user);
 
   return (
     <div>

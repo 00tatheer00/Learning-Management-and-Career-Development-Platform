@@ -5,6 +5,7 @@ import { PortalPageHeader, PortalSurfaceCard } from "@/components/portal/portal-
 import { ProgramCategoryBadge } from "@/components/portal/program-category-badge";
 import { StudentModuleEnrollmentsCard } from "@/components/portal/student-module-enrollments-card";
 import { getStudentModuleEnrollmentViews } from "@/lib/api/student-module-enrollments";
+import { getStudentPortalProgramSlugs } from "@/lib/student-portal/program-scope";
 import { UserCircle, Envelope, Phone, BookOpen, GraduationCap, ChalkboardTeacher } from "@phosphor-icons/react/ssr";
 import { getTrainersByProgramSlug } from "@/lib/data/trainers";
 import { cn } from "@/lib/utils";
@@ -19,10 +20,13 @@ export default async function StudentProfilePage() {
     ? getTrainersByProgramSlug(user.programSlug).find((t) => t.id === user.trainerId) ??
       getTrainersByProgramSlug(user.programSlug).find((t) => t.featured)
     : null;
-  const moduleEnrollments =
-    user.programSlug && user.email
-      ? await getStudentModuleEnrollmentViews(user.email, user.programSlug)
-      : [];
+  // Aggregate module enrollments across all enrolled programs
+  const programSlugs = await getStudentPortalProgramSlugs(user);
+  const moduleEnrollments = user.email
+    ? (await Promise.all(
+        programSlugs.map((slug) => getStudentModuleEnrollmentViews(user.email, slug))
+      )).flat()
+    : [];
 
   const fields = [
     { icon: UserCircle, label: "Full Name", value: user.name },

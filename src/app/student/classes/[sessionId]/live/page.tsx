@@ -22,7 +22,7 @@ export default async function StudentLiveClassPage({
     redirect("/student/classes");
   }
 
-  if (!canStudentAccessProgram(user, session.programSlug)) {
+  if (!(await canStudentAccessProgram(user, session.programSlug))) {
     redirect("/student/classes");
   }
 

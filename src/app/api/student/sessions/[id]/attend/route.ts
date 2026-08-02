@@ -29,7 +29,7 @@ export async function POST(
     });
   }
 
-  if (!canStudentAccessProgram(user, session.programSlug)) {
+  if (!(await canStudentAccessProgram(user, session.programSlug))) {
     return NextResponse.json(createApiResponse(false, { error: STUDENT_UR.api.unauthorized }), {
       status: 403,
     });

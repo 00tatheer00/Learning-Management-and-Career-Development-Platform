@@ -33,7 +33,7 @@ export async function GET(
 
     // Verify enrollment if user is a student
     if (user.role === "student") {
-      const isEnrolled = canStudentAccessProgram(user, lecture.programSlug);
+      const isEnrolled = await canStudentAccessProgram(user, lecture.programSlug);
       if (!isEnrolled) {
         return NextResponse.json(
           createApiResponse(false, { error: "Forbidden: You are not enrolled in this course" }),
