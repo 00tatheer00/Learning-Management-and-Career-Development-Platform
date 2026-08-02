@@ -21,6 +21,7 @@ import { parseSessionDateTime } from "@/lib/sessions/join-window";
 import { formatHoursUntilClass } from "@/lib/api/attendance-insights";
 import { cn } from "@/lib/utils";
 import { lateThresholdDescription, ATTENDANCE_TRACKING_START_DATE, ATTENDANCE_GOAL_PERCENT } from "@/lib/constants/attendance";
+import { fetchMergedByProgram, getStudentPortalProgramSlugs } from "@/lib/student-portal/program-scope";
 
 interface StudentAttendanceProgressCardProps {
   programSlug: string;
@@ -140,9 +141,10 @@ export async function StudentAttendancePageContent() {
   const user = await getCurrentUser();
   if (!user) return null;
 
-  const programSlug = user.programSlug ?? "web-development";
+  const programSlugs = await getStudentPortalProgramSlugs(user);
   const moduleContext = await getStudentModuleContentContext(user);
-  const allSessions = await getLiveSessionsPreview(programSlug);
+  const primaryProgramSlug = moduleContext.programSlug ?? user.programSlug ?? "web-development";
+  const allSessions = await fetchMergedByProgram(programSlugs, getLiveSessionsPreview);
   const canTrack = studentHasModuleLiveContent(moduleContext, allSessions);
   const sessions = filterByStudentModule(allSessions, moduleContext, (session) => session.level);
 
@@ -153,13 +155,13 @@ export async function StudentAttendancePageContent() {
           title="My Attendance"
           description="Attendance tracking starts when your module goes live."
         />
-        <ModuleStartsSoonNotice programSlug={programSlug} studentModule={user.level} />
+        <ModuleStartsSoonNotice programSlug={primaryProgramSlug} studentModule={user.level} />
       </div>
     );
   }
 
-  const stats = await getStudentAttendanceSummary(user.id, programSlug);
-  const nextSession = findNextUpcomingSession(sessions, programSlug);
+  const stats = await getStudentAttendanceSummary(user.id, primaryProgramSlug);
+  const nextSession = findNextUpcomingSession(sessions, primaryProgramSlug);
   const nextSessionAt = nextSession
     ? parseSessionDateTime(nextSession.date, nextSession.time)
     : null;
@@ -184,7 +186,7 @@ export async function StudentAttendancePageContent() {
       />
 
       <StudentAttendanceMissedAlert
-        programSlug={programSlug}
+        programSlug={primaryProgramSlug}
         studentId={user.id}
         studentLevel={user.level}
         studentEmail={user.email}

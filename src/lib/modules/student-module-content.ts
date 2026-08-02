@@ -1,6 +1,7 @@
 import { isDemoPortalStudent } from "@/lib/constants/demo-student";
 import {
   getFirstModuleName,
+  isFirstModuleStudent,
   resolveActiveStudentModule,
 } from "@/lib/modules/student-module-access";
 import {
@@ -83,8 +84,27 @@ export function filterByStudentModule<T>(
 
 export function studentHasModuleLiveContent(
   context: StudentModuleContentContext,
-  sessions: Array<{ level?: string | null }>
+  sessions?: Array<{ level?: string | null }>
 ): boolean {
   if (isDemoPortalStudent(context.email)) return true;
-  return filterByStudentModule(sessions, context, (session) => session.level).length > 0;
+
+  const activeLevel = context.studentLevel?.trim();
+  if (!activeLevel) return true;
+
+  // Module 1 (e.g. HTML & CSS) is always active/live for enrolled students
+  if (isFirstModuleStudent(context.programSlug, activeLevel)) {
+    return true;
+  }
+
+  // Any module the student is approved for has tracking & access enabled
+  const normalizedApproved = (context.approvedLevels ?? []).map((l) => l.trim().toLowerCase());
+  if (normalizedApproved.length > 0 && normalizedApproved.includes(activeLevel.toLowerCase())) {
+    return true;
+  }
+
+  if (sessions?.length) {
+    return filterByStudentModule(sessions, context, (session) => session.level).length > 0;
+  }
+
+  return false;
 }

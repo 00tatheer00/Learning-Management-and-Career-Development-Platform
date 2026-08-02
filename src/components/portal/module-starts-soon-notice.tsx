@@ -1,5 +1,4 @@
 import { CalendarBlank } from "@phosphor-icons/react/ssr";
-import { getFirstModuleName, MODULE_ONE_ACTIVE_NOTE, MODULE_STARTS_SOON_MESSAGE } from "@/lib/modules/student-module-access";
 import { cn } from "@/lib/utils";
 
 interface ModuleStartsSoonNoticeProps {
