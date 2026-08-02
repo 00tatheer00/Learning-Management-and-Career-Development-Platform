@@ -39,6 +39,16 @@ export async function ensureScheduledLiveSessions(now = new Date()): Promise<{
     keyof typeof PROGRAM_CLASS_CONFIG
   >) {
     const config = PROGRAM_CLASS_CONFIG[programSlug];
+
+    // Cleanup any auto-generated sessions scheduled before the official start date
+    await prisma.liveSession.deleteMany({
+      where: {
+        programSlug,
+        date: { lt: config.startDate },
+        id: { startsWith: "scheduled-" },
+      },
+    });
+
     if (date < config.startDate || !config.classDays.includes(dayOfWeek)) {
       skipped += 1;
       continue;

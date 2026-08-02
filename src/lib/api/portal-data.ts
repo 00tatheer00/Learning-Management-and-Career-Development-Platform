@@ -12,6 +12,7 @@ import {
 import { getAdminProgramStats } from "@/lib/api/admin-program-stats";
 import { DEFAULT_BATCH_NAME } from "@/lib/constants/batch";
 import { getTodayYmdInPakistan } from "@/lib/utils/pakistan-time";
+import { ensureScheduledLiveSessions } from "@/lib/sessions/ensure-scheduled-sessions";
 import type {
   Assignment,
   AssignmentSubmission,
@@ -302,6 +303,7 @@ export async function updateSubmission(
 }
 
 export async function getLiveSessions(programSlug?: string): Promise<LiveSessionPublic[]> {
+  await ensureScheduledLiveSessions().catch(() => null);
   const sessions = await prisma.liveSession.findMany({
     where: programSlug ? { programSlug } : undefined,
     orderBy: [{ startsAt: "asc" }, { date: "asc" }],

@@ -30,7 +30,7 @@ export const PROGRAM_CLASS_CONFIG: Record<EnrollableProgramSlug, ProgramClassCon
     programTitle: "App Development",
   },
   "artificial-intelligence": {
-    startDate: "2026-07-31",
+    startDate: "2026-08-07",
     classDays: [5, 6, 0],
     startTime: "22:00",
     endTime: "23:30",

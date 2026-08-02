@@ -13,9 +13,14 @@ export function ModuleStartsSoonNotice({
   studentModule,
   compact = false,
 }: ModuleStartsSoonNoticeProps) {
-  const firstModule = getFirstModuleName(programSlug);
+  const isAI = programSlug.includes("ai") || programSlug.includes("artificial");
   const isAppDev = programSlug.includes("app") || programSlug.includes("flutter");
-  const startDateText = isAppDev ? "7 August" : "10 August";
+  const startDateText = isAI || isAppDev ? "7 August 2026" : "10 August 2026";
+  const programLabel = isAI
+    ? "Artificial Intelligence"
+    : isAppDev
+      ? "App Development"
+      : "Web Development (Module 2 — JavaScript)";
 
   return (
     <div
@@ -30,10 +35,10 @@ export function ModuleStartsSoonNotice({
         </span>
         <div>
           <p className={cn("font-bold text-pt", compact ? "text-sm" : "text-base")}>
-            Module Classes Starting Soon — {startDateText}
+            Classes Starting Soon — {startDateText}
           </p>
           <p className={cn("mt-1.5 text-pt-muted leading-relaxed", compact ? "text-xs" : "text-sm")}>
-            Next module starting on <strong className="text-primary font-bold">{startDateText}</strong> for {isAppDev ? "App Development" : "Web Development"}. We will notify you on WhatsApp as soon as your batch begins.
+            First class starting on <strong className="text-primary font-bold">{startDateText}</strong> for {programLabel}. We will notify you on WhatsApp as soon as live links open.
           </p>
           {studentModule && (
             <div className="mt-3 flex items-center gap-2">
