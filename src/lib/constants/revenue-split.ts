@@ -4,8 +4,8 @@ import { getRegistrationPhase } from "@/lib/constants/batch";
 export const REVENUE_SPLIT = {
   registrationFee: PAYMENT_CONFIG.registrationFee,
   managementShare: 200,
-  trainerShare: 800,
-  schoolShare: 0,
+  trainerShare: 700,
+  schoolShare: 100,
   currency: PAYMENT_CONFIG.currency,
 } as const;
 
@@ -36,31 +36,13 @@ export function getRevenueSplitForItem(item: RevenueSplitItem): SingleRevenueSpl
     module: item.module,
   });
 
-  const program = item.program || item.programSlug || "";
-
   if (phase === "phase-2") {
-    if (program === "artificial-intelligence") {
-      return {
-        gross: 1000,
-        management: 200,
-        trainer: 800,
-        school: 0,
-      };
-    }
-    if (program === "app-development") {
-      return {
-        gross: 1000,
-        management: 200,
-        trainer: 700,
-        school: 100,
-      };
-    }
-    // Default Phase 2 (e.g. web-development)
+    // Phase 2 & onwards: 700 Trainer / 100 School / 200 Management for all courses
     return {
       gross: 1000,
       management: 200,
-      trainer: 800,
-      school: 0,
+      trainer: 700,
+      school: 100,
     };
   }
 
