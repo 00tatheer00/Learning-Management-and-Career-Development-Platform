@@ -13,11 +13,11 @@ export { MODULE_CONTENT_LOCKED_MESSAGE, MODULE_CONTENT_LOCKED_SHORT };
 
 export interface StudentModuleContentContext {
   programSlug: string;
-  programSlugs: string[];
+  programSlugs?: string[];
   studentLevel: string | null;
   approvedLevels: string[];
   /** Approved levels keyed by programSlug for per-program filtering. */
-  approvedLevelsByProgram: Record<string, string[]>;
+  approvedLevelsByProgram?: Record<string, string[]>;
   email?: string | null;
 }
 
@@ -79,7 +79,9 @@ export function filterByStudentModule<T>(
   if (isDemoPortalStudent(context.email)) return items;
 
   const enrolledSlugs = new Set(
-    context.programSlugs.length > 0 ? context.programSlugs : [context.programSlug]
+    context.programSlugs && context.programSlugs.length > 0
+      ? context.programSlugs
+      : [context.programSlug]
   );
 
   return items.filter((item) => {
@@ -92,7 +94,7 @@ export function filterByStudentModule<T>(
     // Use program-specific approved levels for the item's program
     const programForLevels = itemProgram ?? context.programSlug;
     const programApprovedLevels =
-      context.approvedLevelsByProgram[programForLevels] ?? context.approvedLevels;
+      context.approvedLevelsByProgram?.[programForLevels] ?? context.approvedLevels;
 
     return canStudentAccessModuleContent(
       programForLevels,
