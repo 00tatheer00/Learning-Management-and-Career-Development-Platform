@@ -40,7 +40,7 @@ export function StudentNextClassCard({
   );
 
   useEffect(() => {
-    const id = window.setInterval(() => setNow(new Date()), 30_000);
+    const id = window.setInterval(() => setNow(new Date()), 1_000);
     return () => window.clearInterval(id);
   }, []);
 
@@ -61,7 +61,7 @@ export function StudentNextClassCard({
     if (!at) return;
     const tick = () => setCountdown(getSessionCountdownParts(at));
     tick();
-    const id = window.setInterval(tick, 30_000);
+    const id = window.setInterval(tick, 1_000);
     return () => window.clearInterval(id);
   }, [session.date, session.time]);
 

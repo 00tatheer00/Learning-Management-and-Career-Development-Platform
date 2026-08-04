@@ -9,15 +9,18 @@ export function getSessionCountdownParts(target: Date, now = new Date()) {
     return { diffMs: 0, label: "Starting now", isPast: true, isSoon: true };
   }
 
-  const totalMinutes = Math.floor(diffMs / 60000);
+  const totalSeconds = Math.floor(diffMs / 1000);
+  const totalMinutes = Math.floor(totalSeconds / 60);
   const days = Math.floor(totalMinutes / (60 * 24));
   const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
   const minutes = totalMinutes % 60;
+  const seconds = totalSeconds % 60;
 
   let label: string;
-  if (days > 0) label = `${days} day${days === 1 ? "" : "s"}, ${hours}h ${minutes}m`;
-  else if (hours > 0) label = `${hours}h ${minutes}m`;
-  else label = `${minutes} min`;
+  if (days > 0) label = `${days}d ${hours}h ${minutes}m`;
+  else if (hours > 0) label = `${hours}h ${minutes}m ${seconds.toString().padStart(2, "0")}s`;
+  else if (minutes > 0) label = `${minutes}m ${seconds.toString().padStart(2, "0")}s`;
+  else label = `${seconds}s`;
 
   return {
     diffMs,

@@ -32,6 +32,9 @@ export default function StudentAssignmentsPage() {
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
 
+  const [programSlug, setProgramSlug] = useState<string | null>(null);
+  const [studentLevel, setStudentLevel] = useState<string | null>(null);
+
   useEffect(() => {
     fetch("/api/student/data")
       .then((r) => r.json())
@@ -39,6 +42,8 @@ export default function StudentAssignmentsPage() {
         if (d.success) {
           setAssignments(d.data.assignments ?? []);
           setSubmissions(d.data.submissions ?? []);
+          setProgramSlug(d.data.programSlug ?? null);
+          setStudentLevel(d.data.level ?? null);
         } else {
           toast.error(STUDENT_UR.toasts.serverError);
         }
@@ -82,6 +87,10 @@ export default function StudentAssignmentsPage() {
     }
   };
 
+  const showGoogleClassroom =
+    (!programSlug || programSlug === "web-development") &&
+    (!studentLevel || studentLevel.trim() === "HTML & CSS");
+
   return (
     <div className="space-y-6">
       <StudentMarkSectionSeen section="assignments" />
@@ -91,31 +100,33 @@ export default function StudentAssignmentsPage() {
         description="Read the task, write your answer, and submit. Your trainer will review it."
       />
 
-      {/* Google Classroom Banner */}
-      <div className="portal-card rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-5 sm:p-6 mb-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-start gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary">
-              <GraduationCap size={28} weight="duotone" />
+      {/* Google Classroom Banner - Only for Web Development Module 1 */}
+      {showGoogleClassroom && (
+        <div className="portal-card rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-5 sm:p-6 mb-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-start gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary">
+                <GraduationCap size={28} weight="duotone" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-pt">Google Classroom</h2>
+                <p className="text-sm text-pt-muted mt-1 max-w-xl leading-relaxed">
+                  Access your class assignments, view course tasks, and submit your homework directly on Google Classroom.
+                </p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-lg font-bold text-pt">Google Classroom</h2>
-              <p className="text-sm text-pt-muted mt-1 max-w-xl leading-relaxed">
-                Access your class assignments, view course tasks, and submit your homework directly on Google Classroom.
-              </p>
-            </div>
+            <a
+              href="https://classroom.google.com/c/ODcwODkwODU5Mjk2?cjc=wikqarqt"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:bg-primary/90 hover:shadow-md"
+            >
+              Go to Google Classroom
+              <ArrowSquareOut size={18} weight="bold" />
+            </a>
           </div>
-          <a
-            href="https://classroom.google.com/c/ODcwODkwODU5Mjk2?cjc=wikqarqt"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:bg-primary/90 hover:shadow-md"
-          >
-            Go to Google Classroom
-            <ArrowSquareOut size={18} weight="bold" />
-          </a>
         </div>
-      </div>
+      )}
 
       {pageLoading ? (
         <div className="space-y-3">
