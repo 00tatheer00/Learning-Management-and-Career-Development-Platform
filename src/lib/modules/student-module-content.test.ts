@@ -34,8 +34,10 @@ describe("student module content", () => {
       items,
       {
         programSlug: "web-development",
+        programSlugs: ["web-development"],
         studentLevel: "JavaScript",
         approvedLevels: ["JavaScript"],
+        approvedLevelsByProgram: { "web-development": ["JavaScript"] },
       },
       (item) => item.level
     );

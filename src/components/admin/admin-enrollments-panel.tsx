@@ -204,7 +204,6 @@ export function AdminEnrollmentsPanel() {
     const enrollment = enrollments.find((item) => item.id === id);
     return enrollment?.status === "pending";
   }).length;
-  const pendingCount = enrollments.filter((e) => e.status === "pending").length;
   const pendingFilteredIds = filtered.filter((e) => e.status === "pending").map((e) => e.id);
   const allPendingSelected =
     pendingFilteredIds.length > 0 &&

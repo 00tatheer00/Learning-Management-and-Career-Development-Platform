@@ -2,7 +2,6 @@ import "server-only";
 
 import {
   getApprovedEnrollmentLevels,
-  getApprovedEnrollmentLevelsAllPrograms,
 } from "@/lib/auth/student-module-sync";
 import { getApprovedProgramSlugs } from "@/lib/student-portal/program-scope";
 import type { StudentModuleContentContext } from "@/lib/modules/student-module-content";
@@ -10,8 +9,8 @@ import type { PortalUser } from "@/types/portal";
 
 /**
  * Builds the module content context for a student.
- * Now aggregates approved levels across ALL enrolled programs
- * so content filtering works correctly for multi-program students.
+ * Uses per-program approved levels so content filtering is scoped
+ * correctly — a Flutter student only sees Flutter content, etc.
  */
 export async function getStudentModuleContentContext(
   user: Pick<PortalUser, "email" | "programSlug" | "level" | "programSlugs">
@@ -24,18 +23,29 @@ export async function getStudentModuleContentContext(
       ? user.programSlugs
       : await getApprovedProgramSlugs(user.email);
 
-  // If enrolled in multiple programs, aggregate levels across all of them
-  const approvedLevels =
-    allProgramSlugs.length > 1
-      ? await getApprovedEnrollmentLevelsAllPrograms(user.email, allProgramSlugs)
-      : user.email
-        ? await getApprovedEnrollmentLevels(user.email, programSlug)
-        : [];
+  // Build per-program approved levels map
+  const approvedLevelsByProgram: Record<string, string[]> = {};
+  if (user.email) {
+    const results = await Promise.all(
+      allProgramSlugs.map(async (slug) => ({
+        slug,
+        levels: await getApprovedEnrollmentLevels(user.email, slug),
+      }))
+    );
+    for (const { slug, levels } of results) {
+      approvedLevelsByProgram[slug] = levels;
+    }
+  }
+
+  // Flat list for backward compatibility
+  const approvedLevels = Object.values(approvedLevelsByProgram).flat();
 
   return {
     programSlug,
+    programSlugs: allProgramSlugs,
     studentLevel: user.level?.trim() || null,
     approvedLevels,
+    approvedLevelsByProgram,
     email: user.email,
   };
 }

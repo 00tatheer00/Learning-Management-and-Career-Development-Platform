@@ -51,9 +51,9 @@ export default async function StudentDashboardPage() {
     fetchMergedByProgram(programSlugs, getAssignments),
     fetchMergedByProgram(programSlugs, getLiveSessionsPreview),
   ]);
-  const materials = filterByStudentModule(allMaterials, moduleContext, (item) => item.level);
-  const assignments = filterByStudentModule(allAssignments, moduleContext, (item) => item.level);
-  const sessions = filterByStudentModule(allSessions, moduleContext, (session) => session.level);
+  const materials = filterByStudentModule(allMaterials, moduleContext, (item) => item.level, (item) => item.programSlug);
+  const assignments = filterByStudentModule(allAssignments, moduleContext, (item) => item.level, (item) => item.programSlug);
+  const sessions = filterByStudentModule(allSessions, moduleContext, (session) => session.level, (session) => session.programSlug);
   const enrolledModules = moduleContext.approvedLevels;
   // Aggregate module enrollments across all enrolled programs
   const moduleEnrollments = user.email

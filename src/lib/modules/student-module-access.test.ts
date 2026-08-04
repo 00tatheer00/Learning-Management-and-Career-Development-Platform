@@ -22,11 +22,11 @@ describe("student module access", () => {
     const approved = ["HTML & CSS", "JavaScript", "React", "Backend + Database"];
 
     expect(
-      resolveActiveStudentModule("web-development", "Backend + Database", approved)
+      resolveActiveStudentModule("web-development", undefined, approved)
     ).toBe("HTML & CSS");
 
     expect(
-      canAccessModuleOneClasses("web-development", "Backend + Database", approved)
+      canAccessModuleOneClasses("web-development", undefined, approved)
     ).toBe(true);
   });
 

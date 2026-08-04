@@ -24,7 +24,12 @@ export async function GET() {
     getSubmissions(user.id),
   ]);
 
-  const assignments = filterByStudentModule(allAssignments, context, (item) => item.level);
+  const assignments = filterByStudentModule(
+    allAssignments,
+    context,
+    (item) => item.level,
+    (item) => item.programSlug
+  );
   const assignmentIds = new Set(assignments.map((item) => item.id));
   const filteredSubmissions = submissions.filter((item) => assignmentIds.has(item.assignmentId));
 

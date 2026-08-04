@@ -22,7 +22,6 @@ export default async function StudentModulesPage() {
         currentModule={user.level || null}
         approvedModules={moduleContext.approvedLevels}
         primaryProgramSlug={primaryProgramSlug}
-        userEmail={user.email}
       />
     </div>
   );

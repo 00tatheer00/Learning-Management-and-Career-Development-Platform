@@ -40,7 +40,7 @@ export default async function StudentRecordingsPage() {
   const allRecordings = canAccess
     ? await fetchMergedByProgram(programSlugs, getClassRecordings)
     : [];
-  const recordings = filterByStudentModule(allRecordings, moduleContext, (item) => item.level);
+  const recordings = filterByStudentModule(allRecordings, moduleContext, (item) => item.level, (item) => item.programSlug);
 
   return (
     <div>

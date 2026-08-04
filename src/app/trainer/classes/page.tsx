@@ -21,6 +21,7 @@ interface LiveSession {
   meetLink: string;
   roomType: "portal" | "meet";
   programSlug: string;
+  level?: string;
   notes?: string;
 }
 
@@ -28,6 +29,8 @@ interface TrainerInfo {
   programSlug: string;
   courseTitle: string;
   designation: string;
+  modules: string[];
+  currentLevel: string | null;
 }
 
 const emptyForm = {
@@ -36,6 +39,7 @@ const emptyForm = {
   time: "07:00 PM",
   meetLink: "",
   notes: "",
+  level: "",
 };
 
 export default function TrainerClassesPage() {
@@ -48,13 +52,12 @@ export default function TrainerClassesPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editLink, setEditLink] = useState("");
   const [now, setNow] = useState(() => new Date());
+  const [selectedModule, setSelectedModule] = useState<string>("all");
 
   useEffect(() => {
     const id = window.setInterval(() => setNow(new Date()), 30_000);
     return () => window.clearInterval(id);
   }, []);
-
-  const sortedSessions = sortLiveSessionsForDisplay(sessions, now);
 
   const load = () =>
     fetch("/api/trainer/data")
@@ -63,6 +66,9 @@ export default function TrainerClassesPage() {
         if (d.success) {
           setSessions(d.data.sessions ?? []);
           setTrainer(d.data.trainer ?? null);
+          if (d.data.trainer?.modules?.length > 0 && form.level === "") {
+            setForm((prev) => ({ ...prev, level: d.data.trainer.currentLevel ?? d.data.trainer.modules[0] }));
+          }
         } else {
           toast.error("Could not load classes");
         }
@@ -72,7 +78,16 @@ export default function TrainerClassesPage() {
 
   useEffect(() => {
     void load();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Filter sessions by selected module
+  const filteredSessions = selectedModule === "all"
+    ? sessions
+    : sessions.filter((s) => s.level === selectedModule);
+  const sortedSessions = sortLiveSessionsForDisplay(filteredSessions, now);
+
+  const hasModules = trainer && trainer.modules.length > 1;
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,16 +98,21 @@ export default function TrainerClassesPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...form,
+          title: form.title,
+          date: form.date,
+          time: form.time,
+          meetLink: form.meetLink,
           roomType: "meet",
           programSlug: trainer.programSlug,
+          level: form.level || undefined,
+          notes: form.notes || undefined,
         }),
       });
       const data = await res.json();
       if (data.success) {
         toast.success("Class scheduled!", "Students can join from their portal at class time.");
         setShowForm(false);
-        setForm(emptyForm);
+        setForm({ ...emptyForm, level: trainer.modules[0] ?? "" });
         load();
       } else {
         toast.error(data.message || data.error || "Failed to create class.");
@@ -143,9 +163,23 @@ export default function TrainerClassesPage() {
             : "Schedule live classes for your students."
         }
       >
-        <Button size="lg" onClick={() => setShowForm(!showForm)}>
-          {showForm ? "Cancel" : "+ Schedule Class"}
-        </Button>
+        <div className="flex items-center gap-2">
+          {hasModules && (
+            <select
+              value={selectedModule}
+              onChange={(e) => setSelectedModule(e.target.value)}
+              className="h-10 rounded-xl border border-border bg-background px-3 text-sm font-medium"
+            >
+              <option value="all">All Modules</option>
+              {trainer.modules.map((mod) => (
+                <option key={mod} value={mod}>{mod}</option>
+              ))}
+            </select>
+          )}
+          <Button size="lg" onClick={() => setShowForm(!showForm)}>
+            {showForm ? "Cancel" : "+ Schedule Class"}
+          </Button>
+        </div>
       </PortalPageHeader>
 
       <p className="mb-6 text-sm rounded-xl border border-primary/20 bg-primary/5 p-4 text-muted">
@@ -164,6 +198,23 @@ export default function TrainerClassesPage() {
           <p className="text-sm text-muted">Course: {trainer.courseTitle}</p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {hasModules && (
+              <div className="sm:col-span-2">
+                <Label className="text-base">Target Module</Label>
+                <select
+                  value={form.level}
+                  onChange={(e) => setForm({ ...form, level: e.target.value })}
+                  className="mt-2 w-full h-12 rounded-xl border border-border bg-background px-4 text-base"
+                >
+                  {trainer.modules.map((mod) => (
+                    <option key={mod} value={mod}>{mod}</option>
+                  ))}
+                </select>
+                <p className="text-xs text-muted mt-1.5">
+                  Only students enrolled in this module will see this class.
+                </p>
+              </div>
+            )}
             <div className="sm:col-span-2">
               <Label className="text-base">Class Title</Label>
               <Input
@@ -267,6 +318,11 @@ export default function TrainerClassesPage() {
                       >
                         {lifecycle.badgeLabel}
                       </span>
+                      {session.level && (
+                        <span className="text-[10px] font-bold uppercase tracking-wide text-muted bg-surface rounded-full px-2 py-0.5 border border-border">
+                          {session.level}
+                        </span>
+                      )}
                     </div>
                     <p className="text-muted text-sm">
                       {session.date} · {session.time}

@@ -18,6 +18,7 @@ const schema = z.object({
     .transform(normalizeMeetLink)
     .refine(isValidMeetLink, "Enter a valid Google Meet or Zoom link"),
   programSlug: z.string().optional(),
+  level: z.string().optional(),
   notes: z.string().optional(),
 });
 
@@ -57,7 +58,7 @@ export async function POST(request: Request) {
       meetLink: isPortal ? "" : parsed.data.meetLink,
       roomType: isPortal ? "portal" : "meet",
       programSlug,
-      level: user.level ?? getFirstModuleName(programSlug) ?? undefined,
+      level: parsed.data.level ?? user.level ?? getFirstModuleName(programSlug) ?? undefined,
       notes: parsed.data.notes,
       trainerId: resolveTrainerId(user),
       trainerName: user.name,

@@ -1,7 +1,7 @@
 import { getCurrentUser } from "@/lib/auth/session";
 import { getLiveSessionsPreview } from "@/lib/api/portal-data";
 import { getStudentClassSchedule } from "@/lib/constants/student-portal-ur";
-import { PortalPageHeader, EmptyState, PortalSurfaceCard } from "@/components/portal/portal-ui";
+import { PortalPageHeader, PortalSurfaceCard } from "@/components/portal/portal-ui";
 import { StudentLiveSessionCard } from "@/components/portal/student-live-session-card";
 import { ModuleStartsSoonNotice } from "@/components/portal/module-starts-soon-notice";
 import { sortLiveSessionsForDisplay } from "@/lib/sessions/join-window";
@@ -35,7 +35,7 @@ export default async function StudentClassesPage() {
     : [];
   const allSessions = await fetchMergedByProgram(programSlugs, getLiveSessionsPreview);
   const sessions = sortLiveSessionsForDisplay(
-    filterByStudentModule(allSessions, moduleContext, (session) => session.level)
+    filterByStudentModule(allSessions, moduleContext, (session) => session.level, (session) => session.programSlug)
   );
   const scheduleSlugs = isDemoPortalStudent(user.email)
     ? [...DEMO_STUDENT_PROGRAM_SLUGS]

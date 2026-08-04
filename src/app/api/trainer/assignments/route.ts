@@ -12,6 +12,7 @@ const schema = z.object({
   description: z.string().min(5),
   dueDate: z.string(),
   programSlug: z.string().optional(),
+  level: z.string().optional(),
 });
 
 export async function POST(request: Request) {
@@ -43,7 +44,7 @@ export async function POST(request: Request) {
       description: parsed.data.description,
       dueDate: parsed.data.dueDate,
       programSlug,
-      level: user.level ?? getFirstModuleName(programSlug) ?? undefined,
+      level: parsed.data.level ?? user.level ?? getFirstModuleName(programSlug) ?? undefined,
       trainerId: resolveTrainerId(user),
     });
 

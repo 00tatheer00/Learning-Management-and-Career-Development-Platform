@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  GraduationCap,
   LockKey,
   LockKeyOpen,
   CheckCircle,
@@ -21,14 +20,12 @@ interface StudentModulesHubProps {
   currentModule: string | null;
   approvedModules: string[];
   primaryProgramSlug: string;
-  userEmail: string;
 }
 
 export function StudentModulesHub({
   currentModule,
   approvedModules,
   primaryProgramSlug,
-  userEmail,
 }: StudentModulesHubProps) {
   const router = useRouter();
   const [updatingModule, setUpdatingModule] = useState<string | null>(null);

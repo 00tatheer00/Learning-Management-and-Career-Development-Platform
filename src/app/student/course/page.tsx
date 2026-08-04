@@ -2,8 +2,14 @@ import Link from "next/link";
 import { PlayCircle, LinkSimple, FileText, ArrowSquareOut } from "@phosphor-icons/react/ssr";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getMaterials } from "@/lib/api/portal-data";
+import {
+  filterLecturesForStudent,
+  getLecturesByProgram,
+  getWatchProgressMap,
+} from "@/lib/api/student-lectures";
 import { getProgramBySlug } from "@/lib/data/programs";
 import { CourseModulesSyllabus } from "@/components/portal/course-modules-syllabus";
+import { StudentCourseLectures } from "@/components/portal/student-course-lectures";
 import { PortalPageHeader, EmptyState, PortalSurfaceCard } from "@/components/portal/portal-ui";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,8 +35,16 @@ export default async function StudentCoursePage() {
   const programSlugs = await getStudentPortalProgramSlugs(user);
   const isDemo = isDemoPortalStudent(user.email);
   const moduleContext = await getStudentModuleContentContext(user);
-  const allMaterials = await fetchMergedByProgram(programSlugs, getMaterials);
-  const materials = filterByStudentModule(allMaterials, moduleContext, (item) => item.level);
+  const [allMaterials, allLectures] = await Promise.all([
+    fetchMergedByProgram(programSlugs, getMaterials),
+    fetchMergedByProgram(programSlugs, getLecturesByProgram),
+  ]);
+  const materials = filterByStudentModule(allMaterials, moduleContext, (item) => item.level, (item) => item.programSlug);
+  const lectures = filterLecturesForStudent(allLectures, moduleContext);
+  const progressMap = await getWatchProgressMap(
+    user.id,
+    lectures.map((lecture) => lecture.id)
+  );
 
   return (
     <div className="space-y-8">
@@ -66,10 +80,14 @@ export default async function StudentCoursePage() {
         );
       })}
 
+      {lectures.length > 0 && (
+        <StudentCourseLectures lectures={lectures} initialProgress={progressMap} />
+      )}
+
       <div>
         <h2 className="text-lg font-bold text-pt mb-4">Lessons &amp; Materials</h2>
 
-        {materials.length === 0 ? (
+        {materials.length === 0 && lectures.length === 0 ? (
           <EmptyState
             title="No lessons for your module yet"
             description="Your trainer will add videos for your module soon. Check WhatsApp for updates."
@@ -79,6 +97,10 @@ export default async function StudentCoursePage() {
               </Button>
             }
           />
+        ) : materials.length === 0 ? (
+          <p className="text-sm text-pt-muted">
+            Extra practice links will appear here when your trainer adds them.
+          </p>
         ) : (
           <div className="grid gap-3">
             {materials.map((material, index) => {

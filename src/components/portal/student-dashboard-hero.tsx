@@ -6,7 +6,6 @@ import {
   BookOpen,
   VideoCamera,
   CalendarBlank,
-  GraduationCap,
   Sparkle,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";

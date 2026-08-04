@@ -13,8 +13,11 @@ export { MODULE_CONTENT_LOCKED_MESSAGE, MODULE_CONTENT_LOCKED_SHORT };
 
 export interface StudentModuleContentContext {
   programSlug: string;
+  programSlugs: string[];
   studentLevel: string | null;
   approvedLevels: string[];
+  /** Approved levels keyed by programSlug for per-program filtering. */
+  approvedLevelsByProgram: Record<string, string[]>;
   email?: string | null;
 }
 
@@ -70,16 +73,37 @@ export function canStudentAccessModuleContent(
 export function filterByStudentModule<T>(
   items: T[],
   context: StudentModuleContentContext,
-  getLevel: (item: T) => string | null | undefined
+  getLevel: (item: T) => string | null | undefined,
+  getProgramSlug?: (item: T) => string | undefined
 ): T[] {
   if (isDemoPortalStudent(context.email)) return items;
 
-  return items.filter((item) =>
-    canStudentAccessModuleContent(context.programSlug, context.studentLevel, getLevel(item), {
-      email: context.email,
-      approvedLevels: context.approvedLevels,
-    })
+  const enrolledSlugs = new Set(
+    context.programSlugs.length > 0 ? context.programSlugs : [context.programSlug]
   );
+
+  return items.filter((item) => {
+    // If the item has a programSlug, it must belong to one of the student's enrolled programs
+    const itemProgram = getProgramSlug?.(item);
+    if (itemProgram && !enrolledSlugs.has(itemProgram)) {
+      return false;
+    }
+
+    // Use program-specific approved levels for the item's program
+    const programForLevels = itemProgram ?? context.programSlug;
+    const programApprovedLevels =
+      context.approvedLevelsByProgram[programForLevels] ?? context.approvedLevels;
+
+    return canStudentAccessModuleContent(
+      programForLevels,
+      context.studentLevel,
+      getLevel(item),
+      {
+        email: context.email,
+        approvedLevels: programApprovedLevels,
+      }
+    );
+  });
 }
 
 export function studentHasModuleLiveContent(

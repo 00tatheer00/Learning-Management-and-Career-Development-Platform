@@ -8,6 +8,7 @@ import {
   requireTrainerProgram,
   resolveTrainerId,
 } from "@/lib/auth/trainer-scope";
+import { getProgramModuleNames } from "@/lib/modules/student-module-access";
 import { getUsersByRole } from "@/lib/auth/users";
 import {
   getAssignments,
@@ -55,6 +56,8 @@ export async function GET() {
             programSlug,
             courseTitle: getTrainerCourseTitle(programSlug),
             designation: getTrainerDesignation(programSlug),
+            modules: getProgramModuleNames(programSlug),
+            currentLevel: user.level ?? null,
           },
           portalVideoEnabled: isPortalVideoAvailable(),
         },

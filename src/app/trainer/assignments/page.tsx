@@ -12,11 +12,13 @@ interface TrainerInfo {
   programSlug: string;
   courseTitle: string;
   designation: string;
+  modules: string[];
+  currentLevel: string | null;
 }
 
 export default function TrainerAssignmentsPage() {
   const [assignments, setAssignments] = useState<
-    Array<{ id: string; title: string; description: string; dueDate: string }>
+    Array<{ id: string; title: string; description: string; dueDate: string; level?: string }>
   >([]);
   const [submissions, setSubmissions] = useState<
     Array<{
@@ -33,8 +35,9 @@ export default function TrainerAssignmentsPage() {
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
   const [reviewingId, setReviewingId] = useState<string | null>(null);
-  const [form, setForm] = useState({ title: "", description: "", dueDate: "" });
+  const [form, setForm] = useState({ title: "", description: "", dueDate: "", level: "" });
   const [feedbackMap, setFeedbackMap] = useState<Record<string, string>>({});
+  const [selectedModule, setSelectedModule] = useState<string>("all");
 
   const load = () =>
     fetch("/api/trainer/data")
@@ -44,6 +47,9 @@ export default function TrainerAssignmentsPage() {
           setAssignments(d.data.assignments ?? []);
           setSubmissions(d.data.submissions ?? []);
           setTrainer(d.data.trainer ?? null);
+          if (d.data.trainer?.modules?.length > 0 && form.level === "") {
+            setForm((prev) => ({ ...prev, level: d.data.trainer.currentLevel ?? d.data.trainer.modules[0] }));
+          }
         } else {
           toast.error("Could not load assignments");
         }
@@ -53,6 +59,7 @@ export default function TrainerAssignmentsPage() {
 
   useEffect(() => {
     void load();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -63,13 +70,19 @@ export default function TrainerAssignmentsPage() {
       const res = await fetch("/api/trainer/assignments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, programSlug: trainer.programSlug }),
+        body: JSON.stringify({
+          title: form.title,
+          description: form.description,
+          dueDate: form.dueDate,
+          programSlug: trainer.programSlug,
+          level: form.level || undefined,
+        }),
       });
       const data = await res.json();
       if (data.success) {
         toast.success("Assignment created!", "Students can now see it in their portal.");
         setShowForm(false);
-        setForm({ title: "", description: "", dueDate: "" });
+        setForm({ title: "", description: "", dueDate: "", level: trainer.modules[0] ?? "" });
         await load();
       } else {
         toast.error(data.error || data.message || "Failed to create assignment.");
@@ -107,6 +120,7 @@ export default function TrainerAssignmentsPage() {
   };
 
   const pendingSubmissions = submissions.filter((s) => s.status === "submitted");
+  const hasModules = trainer && trainer.modules.length > 1;
 
   return (
     <div>
@@ -119,9 +133,23 @@ export default function TrainerAssignmentsPage() {
             : "Create homework for students and review their submissions."
         }
       >
-        <Button size="lg" onClick={() => setShowForm(!showForm)} disabled={pageLoading}>
-          {showForm ? "Cancel" : "+ New Assignment"}
-        </Button>
+        <div className="flex items-center gap-2">
+          {hasModules && (
+            <select
+              value={selectedModule}
+              onChange={(e) => setSelectedModule(e.target.value)}
+              className="h-10 rounded-xl border border-border bg-background px-3 text-sm font-medium"
+            >
+              <option value="all">All Modules</option>
+              {trainer.modules.map((mod) => (
+                <option key={mod} value={mod}>{mod}</option>
+              ))}
+            </select>
+          )}
+          <Button size="lg" onClick={() => setShowForm(!showForm)} disabled={pageLoading}>
+            {showForm ? "Cancel" : "+ New Assignment"}
+          </Button>
+        </div>
       </PortalPageHeader>
 
       {showForm && trainer && (
@@ -131,6 +159,23 @@ export default function TrainerAssignmentsPage() {
         >
           <h2 className="font-bold text-lg">Create Assignment</h2>
           <p className="text-sm text-muted">Course: {trainer.courseTitle}</p>
+          {hasModules && (
+            <div>
+              <Label className="text-base">Target Module</Label>
+              <select
+                value={form.level}
+                onChange={(e) => setForm({ ...form, level: e.target.value })}
+                className="mt-2 w-full h-12 rounded-xl border border-border bg-background px-4 text-base"
+              >
+                {trainer.modules.map((mod) => (
+                  <option key={mod} value={mod}>{mod}</option>
+                ))}
+              </select>
+              <p className="text-xs text-muted mt-1.5">
+                Only students enrolled in this module will see this assignment.
+              </p>
+            </div>
+          )}
           <div>
             <Label className="text-base">Title</Label>
             <Input
@@ -250,8 +295,17 @@ export default function TrainerAssignmentsPage() {
         <div className="space-y-3">
           {assignments.map((a) => (
             <div key={a.id} className="rounded-xl border border-border p-4">
-              <p className="font-semibold">{a.title}</p>
-              <p className="text-sm text-muted">Due: {a.dueDate}</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-semibold">{a.title}</p>
+                  <p className="text-sm text-muted">Due: {a.dueDate}</p>
+                </div>
+                {a.level && (
+                  <span className="text-[10px] font-bold uppercase tracking-wide text-muted bg-surface rounded-full px-2.5 py-1 border border-border">
+                    {a.level}
+                  </span>
+                )}
+              </div>
             </div>
           ))}
         </div>

@@ -63,6 +63,7 @@ export const PORTAL_NAV: Record<UserRole, PortalNavItem[]> = {
     { href: "/admin/credentials", label: "Portal Logins", icon: Key, description: "Student login IDs & passwords" },
     { href: "/admin/attendance", label: "Attendance", icon: ListChecks, description: "Day & module-wise attendance" },
     { href: "/admin/recordings", label: "Class Recordings", icon: FilmStrip, description: "Web & App class recordings" },
+    { href: "/admin/lectures", label: "Lectures", icon: FilmStrip, description: "Bunny Stream course lectures" },
     { href: "/admin/trainers", label: "Trainers", icon: Users, description: "All trainers" },
     { href: "/admin/courses", label: "Courses", icon: BookOpen, description: "Materials & content" },
     { href: "/admin/settings", label: "Settings", icon: Gear, description: "Portal settings" },
@@ -76,6 +77,7 @@ export const PORTAL_NAV: Record<UserRole, PortalNavItem[]> = {
     { href: "/admin/credentials", label: "Portal Logins", icon: Key, description: "Student login IDs" },
     { href: "/admin/attendance", label: "Attendance", icon: ListChecks, description: "Day & module-wise attendance" },
     { href: "/admin/recordings", label: "Class Recordings", icon: FilmStrip, description: "Web & App class recordings" },
+    { href: "/admin/lectures", label: "Lectures", icon: FilmStrip, description: "Bunny Stream course lectures" },
     { href: "/admin/trainers", label: "Trainers", icon: Users, description: "All trainers" },
     { href: "/admin/courses", label: "Courses", icon: BookOpen, description: "Materials & content" },
     { href: "/admin/settings", label: "Settings", icon: Gear, description: "Portal settings" },
@@ -122,6 +124,7 @@ export const PORTAL_COLORS: Record<UserRole, string> = {
 
 export const STUDENT_PAGE_TITLES: Record<string, string> = {
   "/student/dashboard": "Home",
+  "/student/modules": "My Modules",
   "/student/course": "My Course",
   "/student/classes": "Live Classes",
   "/student/recordings": "Recordings",

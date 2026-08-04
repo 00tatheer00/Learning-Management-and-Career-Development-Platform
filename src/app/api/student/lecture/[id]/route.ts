@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/session";
 import { createApiResponse } from "@/lib/api/enrollment";
 import { canStudentAccessProgram } from "@/lib/student-portal/program-scope";
+import { canStudentAccessModuleContent } from "@/lib/modules/student-module-content";
 import { generateBunnyEmbedUrl } from "@/lib/bunny";
 import { prisma } from "@/lib/prisma";
 
@@ -9,7 +10,7 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const user = await getCurrentUser();
@@ -28,10 +29,12 @@ export async function GET(
     }
 
     if (!lecture.bunnyVideoId) {
-      return NextResponse.json(createApiResponse(false, { error: "Lecture video not uploaded yet" }), { status: 400 });
+      return NextResponse.json(
+        createApiResponse(false, { error: "Lecture video not uploaded yet" }),
+        { status: 400 }
+      );
     }
 
-    // Verify enrollment if user is a student
     if (user.role === "student") {
       const isEnrolled = await canStudentAccessProgram(user, lecture.programSlug);
       if (!isEnrolled) {
@@ -40,14 +43,25 @@ export async function GET(
           { status: 403 }
         );
       }
+
+      const canAccessModule = canStudentAccessModuleContent(
+        lecture.programSlug,
+        user.level,
+        lecture.level,
+        { email: user.email }
+      );
+      if (!canAccessModule) {
+        return NextResponse.json(
+          createApiResponse(false, { error: "This lecture is for another module" }),
+          { status: 403 }
+        );
+      }
     } else if (user.role !== "admin" && user.role !== "trainer") {
       return NextResponse.json(createApiResponse(false, { error: "Forbidden" }), { status: 403 });
     }
 
-    // Generate token-authorized embed URL (valid for 5 minutes / 300 seconds)
     const playbackUrl = generateBunnyEmbedUrl(lecture.bunnyVideoId, 300);
 
-    // Retrieve any saved watch progress
     const progress = await prisma.watchProgress.findUnique({
       where: {
         userId_lectureId: {
