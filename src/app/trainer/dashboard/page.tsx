@@ -22,6 +22,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
+import { syncApprovedStudentsTrainerAssignments } from "@/lib/auth/trainer-assignment-sync";
+
 export default async function TrainerDashboardPage() {
   const user = await getCurrentUser();
   if (!user) return null;
@@ -38,6 +40,8 @@ export default async function TrainerDashboardPage() {
   const trainerId = resolveTrainerId(user);
   const courseTitle = getTrainerCourseTitle(programSlug);
   const designation = getTrainerDesignation(programSlug);
+
+  await syncApprovedStudentsTrainerAssignments();
 
   const [allStudents, allAssignments, allSessions, allSubmissions] = await Promise.all([
     getUsersByRole("student"),

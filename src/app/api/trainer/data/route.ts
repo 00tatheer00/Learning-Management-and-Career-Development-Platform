@@ -18,6 +18,8 @@ import {
 import { createApiResponse } from "@/lib/api/enrollment";
 import { isPortalVideoAvailable } from "@/lib/portal-video/config";
 
+import { syncApprovedStudentsTrainerAssignments } from "@/lib/auth/trainer-assignment-sync";
+
 export async function GET() {
   const user = await getCurrentUser();
   if (!user || user.role !== "trainer") {
@@ -29,6 +31,8 @@ export async function GET() {
   try {
     const programSlug = requireTrainerProgram(user);
     const trainerId = resolveTrainerId(user);
+
+    await syncApprovedStudentsTrainerAssignments();
 
     const [allStudents, allAssignments, allSessions, allSubmissions] = await Promise.all([
       getUsersByRole("student"),

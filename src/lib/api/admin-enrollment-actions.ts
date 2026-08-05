@@ -18,6 +18,7 @@ import { sendRejectionNotifications } from "@/lib/notifications/rejection-notice
 import { deleteCloudinaryImage } from "@/lib/cloudinary";
 import { prisma } from "@/lib/prisma";
 import { getPortalLoginUrl } from "@/lib/site-url";
+import { syncApprovedStudentsTrainerAssignments } from "@/lib/auth/trainer-assignment-sync";
 import type { EnrollmentRecord } from "@/types/portal";
 
 export async function approveEnrollmentAndCreateAccount(
@@ -100,16 +101,13 @@ export async function approveEnrollmentAndCreateAccount(
       avatarInitials,
     });
   } else {
-    // Don't overwrite programSlug if user already has one —
-    // multi-program access is derived from approved Enrollment records.
-    const keepProgramSlug = user.programSlug || assignment.programSlug;
     await updateUser(user.id, {
       name: enrollment.fullName,
       phone: enrollment.whatsapp,
-      programSlug: keepProgramSlug,
-      level: user.level || activeLevel,
+      programSlug: assignment.programSlug,
+      level: activeLevel,
       batch: assignment.batch,
-      trainerId: user.trainerId || assignment.trainerId,
+      trainerId: assignment.trainerId ?? user.trainerId,
       isActive: true,
       avatarInitials,
     });
@@ -164,6 +162,10 @@ export async function approveEnrollmentAndCreateAccount(
       approvalWhatsAppSent: notifications.whatsappSent,
       approvalWhatsAppError: whatsappError,
     },
+  });
+
+  void syncApprovedStudentsTrainerAssignments().catch((err) => {
+    console.error("Background trainer assignment sync failed:", err);
   });
 
   const parts: string[] = ["Registration approved. Student account created."];

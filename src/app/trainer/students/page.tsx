@@ -5,6 +5,8 @@ import { getUsersByRole } from "@/lib/auth/users";
 import { TrainerStudentsPanel } from "@/components/trainer/trainer-students-panel";
 import { EmptyState } from "@/components/portal/portal-ui";
 
+import { syncApprovedStudentsTrainerAssignments } from "@/lib/auth/trainer-assignment-sync";
+
 export default async function TrainerStudentsPage() {
   const user = await getCurrentUser();
   if (!user?.programSlug) {
@@ -15,6 +17,8 @@ export default async function TrainerStudentsPage() {
       />
     );
   }
+
+  await syncApprovedStudentsTrainerAssignments();
 
   const allStudents = await getUsersByRole("student");
   const students = filterStudentsByProgram(allStudents, user.programSlug).map((student) => ({
