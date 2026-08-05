@@ -32,11 +32,17 @@ export function filterByTrainerProgram<T extends { programSlug: string }>(
   return items.filter((item) => item.programSlug === programSlug);
 }
 
+import { normalizeProgramSlug } from "@/lib/auth/program-assignment";
+
 export function filterStudentsByProgram<T extends { programSlug?: string }>(
   students: T[],
   programSlug: string
 ): T[] {
-  return students.filter((s) => s.programSlug === programSlug);
+  const targetNorm = normalizeProgramSlug(programSlug);
+  return students.filter((s) => {
+    if (!s.programSlug) return true;
+    return normalizeProgramSlug(s.programSlug) === targetNorm;
+  });
 }
 
 /** Consistent trainer entity id — linked trainer profile or user account id. */

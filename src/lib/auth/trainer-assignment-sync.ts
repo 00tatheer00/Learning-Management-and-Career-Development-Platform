@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { resolveTrainerIdForProgram } from "@/lib/auth/program-assignment";
+import { resolveTrainerIdForProgram, normalizeProgramSlug } from "@/lib/auth/program-assignment";
 
 /**
  * Synchronizes and automatically assigns trainers to all students who have approved enrollments.
@@ -48,7 +48,7 @@ export async function syncApprovedStudentsTrainerAssignments(): Promise<number> 
 
       if (!student || student.role !== "student") continue;
 
-      const programSlug = enrollment.program;
+      const programSlug = normalizeProgramSlug(enrollment.program);
       if (!trainerCache.has(programSlug)) {
         const resolvedId = await resolveTrainerIdForProgram(programSlug);
         trainerCache.set(programSlug, resolvedId);
@@ -57,7 +57,7 @@ export async function syncApprovedStudentsTrainerAssignments(): Promise<number> 
 
       // Check if student user needs trainerId, programSlug, level, or batch updated
       const needsTrainerUpdate = Boolean(targetTrainerId && student.trainerId !== targetTrainerId);
-      const needsProgramUpdate = Boolean(programSlug && !student.programSlug);
+      const needsProgramUpdate = Boolean(programSlug && (student.programSlug !== programSlug || !student.programSlug));
       const needsLevelUpdate = Boolean(enrollment.level && !student.level);
       const needsBatchUpdate = Boolean(enrollment.batch && !student.batch);
 

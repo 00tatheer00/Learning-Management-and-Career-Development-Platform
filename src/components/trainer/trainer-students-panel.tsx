@@ -49,6 +49,7 @@ export function TrainerStudentsPanel({
 }: TrainerStudentsPanelProps) {
   const searchParams = useSearchParams();
   const initialModule = searchParams.get("module");
+  const initialPhase = searchParams.get("phase");
   const [moduleFilter, setModuleFilter] = useState<string>("all");
   const [phaseFilter, setPhaseFilter] = useState<"all" | RegistrationPhase>("all");
   const [search, setSearch] = useState("");
@@ -66,10 +67,14 @@ export function TrainerStudentsPanel({
   const moduleOptions = useMemo(() => getModuleFilterOptions(moduleGroups), [moduleGroups]);
 
   useEffect(() => {
-    if (!initialModule) return;
-    const match = moduleOptions.find((mod) => mod.name === initialModule);
-    if (match) setModuleFilter(match.name);
-  }, [initialModule, moduleOptions]);
+    if (initialModule) {
+      const match = moduleOptions.find((mod) => mod.name === initialModule);
+      if (match) setModuleFilter(match.name);
+    }
+    if (initialPhase && (initialPhase === "phase-1" || initialPhase === "phase-2")) {
+      setPhaseFilter(initialPhase);
+    }
+  }, [initialModule, initialPhase, moduleOptions]);
 
   const filteredGroups = useMemo(() => {
     const query = search.trim().toLowerCase();
