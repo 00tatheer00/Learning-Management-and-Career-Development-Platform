@@ -57,9 +57,9 @@ export async function syncApprovedStudentsTrainerAssignments(): Promise<number> 
 
       // Check if student user needs trainerId, programSlug, level, or batch updated
       const needsTrainerUpdate = Boolean(targetTrainerId && student.trainerId !== targetTrainerId);
-      const needsProgramUpdate = Boolean(programSlug && (student.programSlug !== programSlug || !student.programSlug));
-      const needsLevelUpdate = Boolean(enrollment.level && !student.level);
-      const needsBatchUpdate = Boolean(enrollment.batch && !student.batch);
+      const needsProgramUpdate = Boolean(programSlug && student.programSlug !== programSlug);
+      const needsLevelUpdate = Boolean(enrollment.level && student.level !== enrollment.level);
+      const needsBatchUpdate = Boolean(enrollment.batch && student.batch !== enrollment.batch);
 
       if (needsTrainerUpdate || needsProgramUpdate || needsLevelUpdate || needsBatchUpdate) {
         await prisma.user.update({
@@ -67,8 +67,8 @@ export async function syncApprovedStudentsTrainerAssignments(): Promise<number> 
           data: {
             ...(targetTrainerId ? { trainerId: targetTrainerId } : {}),
             ...(needsProgramUpdate ? { programSlug } : {}),
-            ...(needsLevelUpdate ? { level: enrollment.level } : {}),
-            ...(needsBatchUpdate ? { batch: enrollment.batch } : {}),
+            ...(enrollment.level ? { level: enrollment.level } : {}),
+            ...(enrollment.batch ? { batch: enrollment.batch } : {}),
           },
         });
         updatedCount++;

@@ -8,6 +8,8 @@ import {
 import { isDemoPortalStudent } from "@/lib/constants/demo-student";
 import { DEMO_STUDENT_PROGRAM_SLUGS } from "@/lib/student-portal/program-scope";
 
+import { normalizeProgramSlug } from "@/lib/auth/program-assignment";
+
 export async function getApprovedEnrollmentLevels(
   email: string,
   programSlug: string
@@ -16,20 +18,23 @@ export async function getApprovedEnrollmentLevels(
     return DEMO_STUDENT_PROGRAM_SLUGS.flatMap((slug) => getProgramModuleNames(slug));
   }
 
+  const normSlug = normalizeProgramSlug(programSlug);
   const rows = await prisma.enrollment.findMany({
     where: {
-      program: programSlug,
       status: "approved",
     },
-    select: { level: true, email: true },
+    select: { program: true, level: true, email: true },
   });
 
   const normalizedEmail = email.trim().toLowerCase();
   const studentRows = rows.filter(
-    (row) => row.email && row.email.trim().toLowerCase() === normalizedEmail
+    (row) =>
+      row.email &&
+      row.email.trim().toLowerCase() === normalizedEmail &&
+      normalizeProgramSlug(row.program) === normSlug
   );
 
-  const order = getProgramModuleNames(programSlug);
+  const order = getProgramModuleNames(normSlug);
   const levels = new Set(studentRows.map((row) => row.level.trim()).filter(Boolean));
   return order.filter((moduleName) => levels.has(moduleName));
 }

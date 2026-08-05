@@ -14,6 +14,20 @@ export function getBatchForProgram(programSlug: string): string {
   return DEFAULT_BATCH_NAME;
 }
 
+export function isPhase2Module(level?: string | null): boolean {
+  if (!level) return false;
+  const trimmed = level.trim().toLowerCase();
+  if (
+    trimmed === "html & css" ||
+    trimmed === "dart & oop" ||
+    trimmed.includes("launchpad") ||
+    trimmed.includes("module 1")
+  ) {
+    return false;
+  }
+  return true;
+}
+
 export function getRegistrationPhase(item: {
   createdAt?: string | Date | null;
   appliedAt?: string | Date | null;
@@ -23,15 +37,21 @@ export function getRegistrationPhase(item: {
 }): RegistrationPhase {
   if (!item) return "phase-1";
 
-  // 1. Explicit Phase 2 in batch label
+  // 1. Explicit Module 2+ level (e.g. JavaScript, React, Backend, Flutter Frontend, etc.) is Phase 2
+  if (isPhase2Module(item.level) || isPhase2Module(item.module)) {
+    return "phase-2";
+  }
+
+  // 2. Explicit Phase 2 or Batch 2 in batch label
   if (
     item.batch?.includes("Phase 2") ||
-    item.batch?.includes("2nd Module")
+    item.batch?.includes("2nd Module") ||
+    item.batch?.includes("Batch 2")
   ) {
     return "phase-2";
   }
 
-  // 2. Strictly check applications / accounts created on or after Phase 2 start date (July 24, 2026)
+  // 3. Applications / accounts created on or after Phase 2 start date (July 24, 2026)
   const dateVal = item.createdAt || item.appliedAt;
   if (dateVal) {
     const createdDate = new Date(dateVal);
