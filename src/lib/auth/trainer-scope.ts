@@ -34,14 +34,22 @@ export function filterByTrainerProgram<T extends { programSlug: string }>(
 
 import { normalizeProgramSlug } from "@/lib/auth/program-assignment";
 
-export function filterStudentsByProgram<T extends { programSlug?: string }>(
+export function filterStudentsByProgram<T extends { programSlug?: string; level?: string }>(
   students: T[],
   programSlug: string
 ): T[] {
   const targetNorm = normalizeProgramSlug(programSlug);
+  const program = getProgramBySlug(targetNorm);
+  const catalogModuleNames = new Set(program?.modules.map((m) => m.name) ?? []);
+
   return students.filter((s) => {
-    if (!s.programSlug) return true;
-    return normalizeProgramSlug(s.programSlug) === targetNorm;
+    if (s.programSlug) {
+      return normalizeProgramSlug(s.programSlug) === targetNorm;
+    }
+    if (s.level && catalogModuleNames.size > 0) {
+      return catalogModuleNames.has(s.level.trim());
+    }
+    return false;
   });
 }
 

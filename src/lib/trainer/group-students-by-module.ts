@@ -52,14 +52,6 @@ export function groupStudentsByModule<T extends { level?: string; name?: string 
     });
   }
 
-  for (const [name, list] of extras) {
-    if (list.length === 0) continue;
-    groups.push({
-      moduleName: name,
-      students: list.sort((a, b) => a.name?.localeCompare(b.name ?? "") ?? 0),
-    });
-  }
-
   const unassigned = buckets.get("__unassigned__") ?? [];
   if (unassigned.length > 0) {
     groups.push({
