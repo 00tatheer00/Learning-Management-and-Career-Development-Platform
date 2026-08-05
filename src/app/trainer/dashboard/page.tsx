@@ -46,10 +46,23 @@ export default async function TrainerDashboardPage() {
     getSubmissions(),
   ]);
 
-  const students = filterStudentsByProgram(allStudents, programSlug);
-  const moduleGroups = groupStudentsByModule(students, programSlug);
-  const assignments = allAssignments.filter((a) => a.trainerId === trainerId);
-  const sessions = allSessions.filter((s) => s.trainerId === trainerId);
+  const activeLevel = user.level?.trim();
+  const isAll = !activeLevel || activeLevel === "all";
+
+  const allProgramStudents = filterStudentsByProgram(allStudents, programSlug);
+  const students = isAll
+    ? allProgramStudents
+    : allProgramStudents.filter((st) => st.level === activeLevel);
+
+  const assignments = isAll
+    ? allAssignments.filter((a) => a.trainerId === trainerId)
+    : allAssignments.filter((a) => a.trainerId === trainerId && (!a.level || a.level === activeLevel));
+
+  const sessions = isAll
+    ? allSessions.filter((s) => s.trainerId === trainerId)
+    : allSessions.filter((s) => s.trainerId === trainerId && (!s.level || s.level === activeLevel));
+
+  const moduleGroups = groupStudentsByModule(allProgramStudents, programSlug);
   const assignmentIds = new Set(assignments.map((a) => a.id));
   const submissions = allSubmissions.filter((s) => assignmentIds.has(s.assignmentId));
 
@@ -67,6 +80,20 @@ export default async function TrainerDashboardPage() {
           <Link href="/trainer/classes">Portal Classes</Link>
         </Button>
       </PortalPageHeader>
+
+      {!isAll && (
+        <div className="flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl bg-primary/10 border border-primary/20 text-xs font-medium text-primary">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="h-2 w-2 rounded-full bg-primary animate-pulse shrink-0" />
+            <span className="truncate">
+              Active Module Scope: <strong className="font-bold text-pt">{activeLevel}</strong>
+            </span>
+          </div>
+          <span className="text-[10px] text-pt-muted uppercase tracking-wider font-semibold shrink-0">
+            {students.length} Enrolled Students
+          </span>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
         <StatCard compact label="My Students" value={students.length} accent="blue" icon={<Users size={16} weight="duotone" />} href="/trainer/students" />

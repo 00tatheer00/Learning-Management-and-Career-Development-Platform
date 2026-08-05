@@ -38,20 +38,36 @@ export async function GET() {
     ]);
 
     const assignments = allAssignments.filter((a) => a.trainerId === trainerId);
-    const assignmentIds = new Set(assignments.map((a) => a.id));
     const students = filterStudentsByProgram(allStudents, programSlug);
     const sessions = filterByTrainerProgram(allSessions, programSlug).filter(
       (s) => s.trainerId === trainerId
     );
-    const submissions = allSubmissions.filter((s) => assignmentIds.has(s.assignmentId));
+
+    const activeLevel = user.level?.trim();
+    const isAll = !activeLevel || activeLevel === "all";
+
+    const scopedAssignments = isAll
+      ? assignments
+      : assignments.filter((a) => !a.level || a.level === activeLevel);
+
+    const scopedSessions = isAll
+      ? sessions
+      : sessions.filter((s) => !s.level || s.level === activeLevel);
+
+    const scopedStudents = isAll
+      ? students
+      : students.filter((st) => st.level === activeLevel);
+
+    const scopedAssignmentIds = new Set(scopedAssignments.map((a) => a.id));
+    const scopedSubmissions = allSubmissions.filter((s) => scopedAssignmentIds.has(s.assignmentId));
 
     return NextResponse.json(
       createApiResponse(true, {
         data: {
-          assignments,
-          sessions,
-          submissions,
-          students,
+          assignments: scopedAssignments,
+          sessions: scopedSessions,
+          submissions: scopedSubmissions,
+          students: scopedStudents,
           trainer: {
             programSlug,
             courseTitle: getTrainerCourseTitle(programSlug),

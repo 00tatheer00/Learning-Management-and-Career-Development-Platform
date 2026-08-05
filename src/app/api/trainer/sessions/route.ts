@@ -58,7 +58,10 @@ export async function POST(request: Request) {
       meetLink: isPortal ? "" : parsed.data.meetLink,
       roomType: isPortal ? "portal" : "meet",
       programSlug,
-      level: parsed.data.level ?? user.level ?? getFirstModuleName(programSlug) ?? undefined,
+      level:
+        parsed.data.level ??
+        (user.level && user.level !== "all" ? user.level : getFirstModuleName(programSlug)) ??
+        undefined,
       notes: parsed.data.notes,
       trainerId: resolveTrainerId(user),
       trainerName: user.name,

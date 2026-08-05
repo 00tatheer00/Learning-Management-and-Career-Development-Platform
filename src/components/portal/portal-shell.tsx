@@ -39,6 +39,7 @@ import {
 } from "@/components/portal/portal-theme-provider";
 import { PortalThemeToggle } from "@/components/portal/portal-theme-toggle";
 import { StudentModuleSwitcher } from "@/components/portal/student-module-switcher";
+import { TrainerModuleSwitcher } from "@/components/portal/trainer-module-switcher";
 import type { PortalUser, UserRole } from "@/types/portal";
 import { cn } from "@/lib/utils";
 
@@ -208,6 +209,13 @@ function PortalShellInner({ user, children }: PortalShellProps) {
               <StudentModuleSwitcher
                 currentModule={user.level || null}
                 approvedModules={user.approvedLevels}
+                programSlug={user.programSlug || "web-development"}
+                className="hidden sm:inline-block"
+              />
+            )}
+            {user.role === "trainer" && (
+              <TrainerModuleSwitcher
+                currentModule={user.level || null}
                 programSlug={user.programSlug || "web-development"}
                 className="hidden sm:inline-block"
               />
