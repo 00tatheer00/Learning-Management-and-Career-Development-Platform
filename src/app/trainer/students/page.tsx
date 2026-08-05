@@ -18,7 +18,9 @@ export default async function TrainerStudentsPage() {
     );
   }
 
-  await syncApprovedStudentsTrainerAssignments();
+  void syncApprovedStudentsTrainerAssignments().catch((err) => {
+    console.error("Background sync error:", err);
+  });
 
   const allStudents = await getUsersByRole("student");
   const students = filterStudentsByProgram(allStudents, user.programSlug).map((student) => ({

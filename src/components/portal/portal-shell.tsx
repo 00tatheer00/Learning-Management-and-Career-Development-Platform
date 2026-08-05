@@ -40,6 +40,7 @@ import {
 import { PortalThemeToggle } from "@/components/portal/portal-theme-toggle";
 import { StudentModuleSwitcher } from "@/components/portal/student-module-switcher";
 import { TrainerModuleSwitcher } from "@/components/portal/trainer-module-switcher";
+import { OfflineDetector } from "@/components/portal/offline-detector";
 import type { PortalUser, UserRole } from "@/types/portal";
 import { cn } from "@/lib/utils";
 
@@ -131,6 +132,7 @@ function PortalShellInner({ user, children }: PortalShellProps) {
       data-portal-role={user.role}
       suppressHydrationWarning
     >
+      <OfflineDetector />
       {user.role === "student" && <StudentSingleSessionGuard />}
       {isStudent && (
         <div className="student-ambient-orbs" aria-hidden="true">

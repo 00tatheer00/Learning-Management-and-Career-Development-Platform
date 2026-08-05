@@ -42,7 +42,9 @@ export default async function TrainerDashboardPage() {
   const courseTitle = getTrainerCourseTitle(programSlug);
   const designation = getTrainerDesignation(programSlug);
 
-  await syncApprovedStudentsTrainerAssignments();
+  void syncApprovedStudentsTrainerAssignments().catch((err) => {
+    console.error("Background sync error:", err);
+  });
 
   const [allStudents, allAssignments, allSessions, allSubmissions] = await Promise.all([
     getUsersByRole("student"),

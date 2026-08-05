@@ -32,7 +32,9 @@ export async function GET() {
     const programSlug = requireTrainerProgram(user);
     const trainerId = resolveTrainerId(user);
 
-    await syncApprovedStudentsTrainerAssignments();
+    void syncApprovedStudentsTrainerAssignments().catch((err) => {
+      console.error("Background sync error:", err);
+    });
 
     const [allStudents, allAssignments, allSessions, allSubmissions] = await Promise.all([
       getUsersByRole("student"),
