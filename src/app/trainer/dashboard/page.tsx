@@ -24,6 +24,7 @@ import { cn } from "@/lib/utils";
 
 import { syncApprovedStudentsTrainerAssignments } from "@/lib/auth/trainer-assignment-sync";
 import { getRegistrationPhase } from "@/lib/constants/batch";
+import { getTrainerApprovedStudents } from "@/lib/api/trainer-students-sync";
 
 export default async function TrainerDashboardPage() {
   const user = await getCurrentUser();
@@ -46,8 +47,8 @@ export default async function TrainerDashboardPage() {
     console.error("Background sync error:", err);
   });
 
-  const [allStudents, allAssignments, allSessions, allSubmissions] = await Promise.all([
-    getUsersByRole("student"),
+  const [allProgramStudents, allAssignments, allSessions, allSubmissions] = await Promise.all([
+    getTrainerApprovedStudents(programSlug),
     getAssignments(programSlug),
     getLiveSessions(programSlug),
     getSubmissions(),
@@ -56,7 +57,6 @@ export default async function TrainerDashboardPage() {
   const activeLevel = user.level?.trim();
   const isAll = !activeLevel || activeLevel === "all";
 
-  const allProgramStudents = filterStudentsByProgram(allStudents, programSlug);
   const students = isAll
     ? allProgramStudents
     : allProgramStudents.filter((st) => st.level === activeLevel);

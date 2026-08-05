@@ -19,6 +19,7 @@ import { createApiResponse } from "@/lib/api/enrollment";
 import { isPortalVideoAvailable } from "@/lib/portal-video/config";
 
 import { syncApprovedStudentsTrainerAssignments } from "@/lib/auth/trainer-assignment-sync";
+import { getTrainerApprovedStudents } from "@/lib/api/trainer-students-sync";
 
 export async function GET() {
   const user = await getCurrentUser();
@@ -36,15 +37,14 @@ export async function GET() {
       console.error("Background sync error:", err);
     });
 
-    const [allStudents, allAssignments, allSessions, allSubmissions] = await Promise.all([
-      getUsersByRole("student"),
+    const [students, allAssignments, allSessions, allSubmissions] = await Promise.all([
+      getTrainerApprovedStudents(programSlug),
       getAssignments(programSlug),
       getLiveSessions(programSlug),
       getSubmissions(),
     ]);
 
     const assignments = allAssignments.filter((a) => a.trainerId === trainerId);
-    const students = filterStudentsByProgram(allStudents, programSlug);
     const sessions = filterByTrainerProgram(allSessions, programSlug).filter(
       (s) => s.trainerId === trainerId
     );

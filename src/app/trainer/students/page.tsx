@@ -7,6 +7,8 @@ import { EmptyState } from "@/components/portal/portal-ui";
 
 import { syncApprovedStudentsTrainerAssignments } from "@/lib/auth/trainer-assignment-sync";
 
+import { getTrainerApprovedStudents } from "@/lib/api/trainer-students-sync";
+
 export default async function TrainerStudentsPage() {
   const user = await getCurrentUser();
   if (!user?.programSlug) {
@@ -22,15 +24,7 @@ export default async function TrainerStudentsPage() {
     console.error("Background sync error:", err);
   });
 
-  const allStudents = await getUsersByRole("student");
-  const students = filterStudentsByProgram(allStudents, user.programSlug).map((student) => ({
-    id: student.id,
-    name: student.name,
-    email: student.email,
-    phone: student.phone,
-    level: student.level,
-    batch: student.batch,
-  }));
+  const students = await getTrainerApprovedStudents(user.programSlug);
 
   return (
     <Suspense fallback={<p className="text-muted p-4">Loading students…</p>}>
