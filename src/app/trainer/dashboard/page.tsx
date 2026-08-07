@@ -23,7 +23,6 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 import { syncApprovedStudentsTrainerAssignments } from "@/lib/auth/trainer-assignment-sync";
-import { getRegistrationPhase } from "@/lib/constants/batch";
 import { getTrainerApprovedStudents } from "@/lib/api/trainer-students-sync";
 
 export default async function TrainerDashboardPage() {
@@ -73,9 +72,6 @@ export default async function TrainerDashboardPage() {
   const assignmentIds = new Set(assignments.map((a) => a.id));
   const submissions = allSubmissions.filter((s) => assignmentIds.has(s.assignmentId));
 
-  const phase1Students = allProgramStudents.filter((st) => getRegistrationPhase(st) === "phase-1");
-  const phase2Students = allProgramStudents.filter((st) => getRegistrationPhase(st) === "phase-2");
-
   const pendingReviews = submissions.filter((s) => s.status === "submitted").length;
   const upcomingSessions = countUpcomingLiveSessions(sessions);
 
@@ -116,55 +112,6 @@ export default async function TrainerDashboardPage() {
         <StatCard compact label="Assignments" value={assignments.length} accent="orange" icon={<ClipboardText size={16} weight="duotone" />} href="/trainer/assignments" />
         <StatCard compact label="Upcoming Classes" value={upcomingSessions} accent="green" icon={<VideoCamera size={16} weight="duotone" />} href="/trainer/classes" />
         <StatCard compact label="To Review" value={pendingReviews} accent="slate" hint="Pending submissions" icon={<ClipboardText size={16} weight="duotone" />} href="/trainer/assignments" />
-      </div>
-
-      {/* Registration Phases Breakdown */}
-      <div>
-        <PortalSectionTitle
-          title="Students by Phase"
-          action={
-            <Button variant="outline" size="sm" asChild className="h-7 text-xs">
-              <Link href="/trainer/students">View Student Roster</Link>
-            </Button>
-          }
-        />
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-          <Link
-            href="/trainer/students?phase=phase-1"
-            className={cn(
-              portalPressable,
-              "rounded-xl border border-indigo-500/30 bg-indigo-500/10 p-3.5 shadow-sm hover:border-indigo-500 hover:shadow-md block transition-all"
-            )}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-[11px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Phase 1 (Module 1)</p>
-                <p className="text-2xl font-bold tabular-nums text-pt mt-1">{phase1Students.length} Students</p>
-              </div>
-              <span className="px-2 py-1 text-[10px] font-bold rounded-lg bg-indigo-500/20 text-indigo-700 dark:text-indigo-300">
-                Initial Admissions
-              </span>
-            </div>
-          </Link>
-
-          <Link
-            href="/trainer/students?phase=phase-2"
-            className={cn(
-              portalPressable,
-              "rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3.5 shadow-sm hover:border-emerald-500 hover:shadow-md block transition-all"
-            )}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-[11px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Phase 2 (New Phase / 2nd Module)</p>
-                <p className="text-2xl font-bold tabular-nums text-pt mt-1">{phase2Students.length} Students</p>
-              </div>
-              <span className="px-2 py-1 text-[10px] font-bold rounded-lg bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 animate-pulse">
-                New Phase Admissions
-              </span>
-            </div>
-          </Link>
-        </div>
       </div>
 
       {moduleGroups.length > 0 && (
