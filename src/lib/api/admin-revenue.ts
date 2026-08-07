@@ -9,7 +9,7 @@ import {
 import { getProgramCategory } from "@/lib/constants/program-categories";
 import { getProgramBySlug } from "@/lib/data/programs";
 import { trainers } from "@/lib/data/trainers";
-import { getRegistrationPhase } from "@/lib/constants/batch";
+import { getRegistrationPhase } from "@/lib/services/phase-service";
 
 export interface AdminRevenueCourseStats {
   programSlug: string;
@@ -80,13 +80,11 @@ function startOfMonth(date: Date): Date {
 }
 
 function buildStatsForRows(
-  rows: Array<RevenueSplitItem & { at: Date }>,
+  rows: Array<RevenueSplitItem & { at: Date; email: string }>,
   activeStudents: Array<{
     programSlug: string | null;
     email: string;
     createdAt?: Date | string | null;
-    batch?: string | null;
-    level?: string | null;
   }>,
   weekStart: Date,
   monthStart: Date
@@ -98,6 +96,12 @@ function buildStatsForRows(
   const totalSplit = calculateTotalRevenue(rows);
   const weekSplit = calculateTotalRevenue(thisWeekRows);
   const monthSplit = calculateTotalRevenue(thisMonthRows);
+
+  const phaseApprovedEmails = new Set(rows.map((r) => r.email.trim().toLowerCase()));
+
+  const phaseActiveStudents = activeStudents.filter((s) =>
+    phaseApprovedEmails.has(s.email.trim().toLowerCase())
+  );
 
   const byCourse = ENROLLABLE_PROGRAM_SLUGS.map((programSlug) => {
     const category = getProgramCategory(programSlug);
@@ -112,7 +116,7 @@ function buildStatsForRows(
     const month = calculateTotalRevenue(courseMonthRows);
     const trainer = trainers.find((t) => t.id === category?.primaryTrainerSeedId);
 
-    const uniqueStudents = activeStudents.filter(
+    const uniqueStudents = phaseActiveStudents.filter(
       (student) =>
         student.programSlug === programSlug && !isDemoPortalStudent(student.email)
     ).length;
@@ -187,25 +191,23 @@ export async function getAdminRevenueStats(): Promise<AdminRevenueStats> {
   ]);
 
   const paidApproved = excludeDemoEnrollments(approved);
-  const dated: Array<RevenueSplitItem & { at: Date }> = paidApproved.map((row) => ({
+  const dated: Array<RevenueSplitItem & { at: Date; email: string }> = paidApproved.map((row) => ({
     program: row.program,
     programSlug: row.program,
     createdAt: row.createdAt,
     reviewedAt: row.reviewedAt,
     batch: row.batch,
     level: row.level,
+    email: row.email,
     at: row.reviewedAt ?? row.createdAt,
   }));
 
-  const phase1Rows = dated.filter((row) => getRegistrationPhase(row) === "phase-1");
-  const phase2Rows = dated.filter((row) => getRegistrationPhase(row) === "phase-2");
-
-  const phase1Students = activeStudents.filter((s) => getRegistrationPhase(s) === "phase-1");
-  const phase2Students = activeStudents.filter((s) => getRegistrationPhase(s) === "phase-2");
+  const phase1Rows = dated.filter((row) => getRegistrationPhase(row.createdAt) === "phase-1");
+  const phase2Rows = dated.filter((row) => getRegistrationPhase(row.createdAt) === "phase-2");
 
   const overall = buildStatsForRows(dated, activeStudents, weekStart, monthStart);
-  const phase1 = buildStatsForRows(phase1Rows, phase1Students, weekStart, monthStart);
-  const phase2 = buildStatsForRows(phase2Rows, phase2Students, weekStart, monthStart);
+  const phase1 = buildStatsForRows(phase1Rows, activeStudents, weekStart, monthStart);
+  const phase2 = buildStatsForRows(phase2Rows, activeStudents, weekStart, monthStart);
 
   return {
     registrationFee: REVENUE_SPLIT.registrationFee,
@@ -220,5 +222,3 @@ export async function getAdminRevenueStats(): Promise<AdminRevenueStats> {
     },
   };
 }
-
-

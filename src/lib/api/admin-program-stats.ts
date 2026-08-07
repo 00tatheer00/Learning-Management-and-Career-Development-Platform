@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
 import { resolveTrainerIdForProgram } from "@/lib/auth/program-assignment";
+import { getPhaseCreatedAtFilter, type PhaseFilter } from "@/lib/services/phase-service";
 
 export interface ProgramCountPair {
   programSlug: string;
@@ -21,21 +22,31 @@ export interface AdminProgramStats {
   byProgram: ProgramCountPair[];
 }
 
-export async function getAdminProgramStats(): Promise<AdminProgramStats> {
-  const [enrollments, students] = await Promise.all([
-    prisma.enrollment.findMany({ select: { status: true, program: true, email: true } }),
-    prisma.user.findMany({
-      where: { role: "student" },
-      select: { programSlug: true, isActive: true, trainerId: true },
-    }),
-  ]);
+export async function getAdminProgramStats(phaseFilter?: PhaseFilter): Promise<AdminProgramStats> {
+  const createdAtFilter = getPhaseCreatedAtFilter(phaseFilter);
+
+  const enrollments = await prisma.enrollment.findMany({
+    where: createdAtFilter ? { createdAt: createdAtFilter } : undefined,
+    select: { status: true, program: true, email: true, createdAt: true },
+  });
 
   const approved = enrollments.filter((row) => row.status === "approved");
+  const approvedEmails = Array.from(new Set(approved.map((row) => row.email.trim().toLowerCase())));
+
+  const students = approvedEmails.length > 0
+    ? await prisma.user.findMany({
+        where: {
+          role: "student",
+          email: { in: approvedEmails },
+        },
+        select: { programSlug: true, isActive: true, trainerId: true, email: true },
+      })
+    : [];
+
   const activeStudents = students.filter((row) => row.isActive);
   const inactiveStudents = students.length - activeStudents.length;
 
-  const approvedEmails = new Set(approved.map((row) => row.email.toLowerCase()));
-  const returningRegistrations = Math.max(0, approved.length - approvedEmails.size);
+  const returningRegistrations = Math.max(0, approved.length - approvedEmails.length);
 
   const byProgram = ENROLLABLE_PROGRAM_SLUGS.map((programSlug) => {
     const registrations = approved.filter((row) => row.program === programSlug).length;

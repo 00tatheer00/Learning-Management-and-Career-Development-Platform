@@ -25,15 +25,16 @@ export async function GET(request: Request) {
   if (!user) return unauthorizedAdminResponse();
 
   const { searchParams } = new URL(request.url);
+  const phase = (searchParams.get("phase") as "all" | "phase-1" | "phase-2") ?? "all";
   const hasPaginationParams =
-    searchParams.has("page") || searchParams.has("limit") || searchParams.has("status");
+    searchParams.has("page") || searchParams.has("limit") || searchParams.has("status") || searchParams.has("phase");
 
   if (hasPaginationParams) {
     const page = parseInt(searchParams.get("page") ?? "1", 10);
     const limit = parseInt(searchParams.get("limit") ?? "50", 10);
     const status = searchParams.get("status") ?? "all";
 
-    const result = await getAdminEnrollmentPaginated({ page, limit, status });
+    const result = await getAdminEnrollmentPaginated({ page, limit, status, phase });
     return NextResponse.json({
       ...createApiResponse(true, { data: result.rows }),
       pagination: {
@@ -44,7 +45,7 @@ export async function GET(request: Request) {
     });
   }
 
-  const enrollments = await getAdminEnrollmentRows();
+  const enrollments = await getAdminEnrollmentRows({ phase });
   return NextResponse.json(createApiResponse(true, { data: enrollments }));
 }
 

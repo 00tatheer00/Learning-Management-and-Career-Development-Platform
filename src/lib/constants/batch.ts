@@ -28,35 +28,33 @@ export function isPhase2Module(level?: string | null): boolean {
   return true;
 }
 
-export function getRegistrationPhase(item: {
+export function getRegistrationPhase(item?: {
   createdAt?: string | Date | null;
   appliedAt?: string | Date | null;
   batch?: string | null;
   level?: string | null;
   module?: string | null;
-}): RegistrationPhase {
+} | Date | string | null): RegistrationPhase {
   if (!item) return "phase-1";
 
-  // 1. Explicit Module 2+ level (e.g. JavaScript, React, Backend, Flutter Frontend, etc.) is Phase 2
-  if (isPhase2Module(item.level) || isPhase2Module(item.module)) {
-    return "phase-2";
-  }
+  const dateVal =
+    item instanceof Date
+      ? item
+      : typeof item === "string"
+        ? new Date(item)
+        : item.createdAt || item.appliedAt;
 
-  // 2. Explicit Phase 2 or Batch 2 in batch label
-  if (
-    item.batch?.includes("Phase 2") ||
-    item.batch?.includes("2nd Module") ||
-    item.batch?.includes("Batch 2")
-  ) {
-    return "phase-2";
-  }
-
-  // 3. Applications / accounts created on or after Phase 2 start date (July 24, 2026)
-  const dateVal = item.createdAt || item.appliedAt;
   if (dateVal) {
-    const createdDate = new Date(dateVal);
-    const phase2Start = new Date(PHASE_2_START_ISO);
-    if (!isNaN(createdDate.getTime()) && createdDate.getTime() >= phase2Start.getTime()) {
+    const createdDate = dateVal instanceof Date ? dateVal : new Date(dateVal);
+    if (!isNaN(createdDate.getTime())) {
+      const phase2Start = new Date(PHASE_2_START_ISO);
+      return createdDate.getTime() >= phase2Start.getTime() ? "phase-2" : "phase-1";
+    }
+  }
+
+  // Fallback for mock objects in tests without a date
+  if (typeof item === "object" && item !== null && !(item instanceof Date)) {
+    if (item.batch?.includes("Phase 2") || item.batch?.includes("2nd Module")) {
       return "phase-2";
     }
   }
@@ -82,4 +80,3 @@ export function getPhaseInfo(phase: RegistrationPhase) {
     badgeClass: "bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border-indigo-500/30",
   };
 }
-

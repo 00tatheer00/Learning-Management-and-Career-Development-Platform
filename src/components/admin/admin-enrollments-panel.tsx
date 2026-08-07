@@ -213,10 +213,11 @@ export function AdminEnrollmentsPanel() {
     const params = new URLSearchParams();
     if (statusFilter !== "all") params.set("status", statusFilter);
     if (programFilter !== "all") params.set("program", programFilter);
+    if (phaseFilter !== "all") params.set("phase", phaseFilter);
     if (search.trim()) params.set("q", search.trim());
     const query = params.toString();
     return `/api/admin/enrollments/export${query ? `?${query}` : ""}`;
-  }, [statusFilter, programFilter, search]);
+  }, [statusFilter, programFilter, phaseFilter, search]);
 
   const toggleSelect = (id: string) => {
     setSelectedIds((current) =>

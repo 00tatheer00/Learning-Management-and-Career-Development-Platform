@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button";
 import { getProgramCategory } from "@/lib/constants/program-categories";
 import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
 
-function exportHref(program: string, activeOnly = false) {
+function exportHref(program: string, activeOnly = false, phase?: string) {
   const params = new URLSearchParams();
   if (program !== "all") params.set("program", program);
+  if (phase && phase !== "all") params.set("phase", phase);
   if (activeOnly) params.set("active", "1");
   const query = params.toString();
   return `/api/admin/students/export${query ? `?${query}` : ""}`;
@@ -15,8 +16,10 @@ function exportHref(program: string, activeOnly = false) {
 
 export function AdminStudentsExportBar({
   counts,
+  phase,
 }: {
   counts: Record<string, number>;
+  phase?: string;
 }) {
   const total = Object.values(counts).reduce((sum, n) => sum + n, 0);
 
@@ -32,7 +35,7 @@ export function AdminStudentsExportBar({
           </p>
         </div>
         <Button asChild variant="secondary" size="sm" className="shrink-0 gap-2">
-          <a href={exportHref("all")} download>
+          <a href={exportHref("all", false, phase)} download>
             <DownloadSimple size={16} weight="duotone" />
             All ({total})
           </a>
@@ -49,7 +52,7 @@ export function AdminStudentsExportBar({
           return (
             <a
               key={slug}
-              href={exportHref(slug)}
+              href={exportHref(slug, false, phase)}
               download
               className="flex items-center justify-between gap-3 rounded-xl border border-pt-subtle bg-pt-muted/40 px-4 py-3.5 transition-colors hover:border-primary/30 hover:bg-pt-muted"
             >

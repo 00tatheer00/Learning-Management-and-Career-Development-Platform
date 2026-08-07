@@ -426,7 +426,14 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
           </select>
         </div>
         <Button asChild variant="secondary" className="gap-2 shrink-0">
-          <a href="/api/admin/students/export" download>
+          <a
+            href={`/api/admin/students/export?${new URLSearchParams({
+              ...(phaseFilter !== "all" ? { phase: phaseFilter } : {}),
+              ...(courseFilter !== "all" ? { program: courseFilter } : {}),
+              ...(statusFilter === "active" ? { active: "1" } : {}),
+            }).toString()}`}
+            download
+          >
             <DownloadSimple size={18} weight="duotone" />
             Export CSV
           </a>

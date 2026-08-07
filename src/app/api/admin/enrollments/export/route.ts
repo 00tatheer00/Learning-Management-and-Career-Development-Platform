@@ -5,6 +5,7 @@ import {
   buildEnrollmentsExportFilename,
   getAdminEnrollmentRows,
 } from "@/lib/api/admin-enrollments";
+import type { PhaseFilter } from "@/lib/services/phase-service";
 
 export async function GET(request: Request) {
   const user = await getAdminUser();
@@ -15,13 +16,10 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const status = searchParams.get("status") ?? "all";
   const program = searchParams.get("program") ?? "all";
+  const phase = (searchParams.get("phase") as PhaseFilter) ?? "all";
   const query = searchParams.get("q")?.trim().toLowerCase() ?? "";
 
-  let rows = await getAdminEnrollmentRows();
-
-  if (status !== "all") {
-    rows = rows.filter((row) => row.status === status);
-  }
+  let rows = await getAdminEnrollmentRows({ phase, status: status === "all" ? undefined : status });
 
   if (program !== "all") {
     rows = rows.filter((row) => row.program === program);
@@ -44,7 +42,7 @@ export async function GET(request: Request) {
   }
 
   const csv = buildEnrollmentsCsv(rows);
-  const filename = buildEnrollmentsExportFilename(status);
+  const filename = buildEnrollmentsExportFilename(status, phase);
 
   return new NextResponse(csv, {
     status: 200,

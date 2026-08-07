@@ -4,6 +4,7 @@ import { deleteCloudinaryImage } from "@/lib/cloudinary";
 import { getProgramBySlug } from "@/lib/data/programs";
 import { DEFAULT_BATCH_NAME } from "@/lib/constants/batch";
 import { formatAppliedDateTime } from "@/lib/utils";
+import { getPhaseCreatedAtFilter, type PhaseFilter } from "@/lib/services/phase-service";
 
 export interface AdminStudentRow {
   /** Approved enrollment id (unique row key). */
@@ -29,17 +30,33 @@ export interface AdminStudentRow {
   appliedAt: string;
 }
 
-export async function getAdminStudentRows(): Promise<AdminStudentRow[]> {
+export async function getAdminStudentRows(options?: {
+  phase?: PhaseFilter;
+  program?: string;
+  activeOnly?: boolean;
+}): Promise<AdminStudentRow[]> {
+  const createdAtFilter = getPhaseCreatedAtFilter(options?.phase);
+
+  const where: Record<string, unknown> = { status: "approved" };
+  if (createdAtFilter) where.createdAt = createdAtFilter;
+  if (options?.program && options.program !== "all") where.program = options.program;
+
   const enrollments = await prisma.enrollment.findMany({
-    where: { status: "approved" },
+    where,
     orderBy: [{ reviewedAt: "desc" }, { createdAt: "desc" }],
   });
 
   if (enrollments.length === 0) return [];
 
+  const emails = Array.from(new Set(enrollments.map((e) => e.email.trim().toLowerCase())));
+
   const students = await prisma.user.findMany({
-    where: { role: "student" },
+    where: {
+      role: "student",
+      email: { in: emails },
+    },
   });
+
   const studentByEmail = new Map(
     students.map((student) => [student.email.trim().toLowerCase(), student])
   );
@@ -48,6 +65,10 @@ export async function getAdminStudentRows(): Promise<AdminStudentRow[]> {
 
   for (const enrollment of enrollments) {
     const student = studentByEmail.get(enrollment.email.trim().toLowerCase());
+
+    if (options?.activeOnly && student && !student.isActive) {
+      continue;
+    }
 
     const programSlug = enrollment.program;
     const course = getProgramBySlug(programSlug)?.title ?? programSlug;
@@ -131,11 +152,12 @@ export function buildStudentsCsv(rows: AdminStudentRow[]) {
   return `\uFEFF${headers.join(",")}\n${lines.join("\n")}`;
 }
 
-export function buildStudentsExportFilename(programSlug?: string) {
+export function buildStudentsExportFilename(programSlug?: string, phase?: string) {
   const stamp = new Date().toISOString().slice(0, 10);
-  if (programSlug === "web-development") return `eest-web-students-${stamp}.csv`;
-  if (programSlug === "app-development") return `eest-app-students-${stamp}.csv`;
-  return `eest-students-all-${stamp}.csv`;
+  const phaseSuffix = phase && phase !== "all" ? `-${phase}` : "";
+  if (programSlug === "web-development") return `eest-web-students${phaseSuffix}-${stamp}.csv`;
+  if (programSlug === "app-development") return `eest-app-students${phaseSuffix}-${stamp}.csv`;
+  return `eest-students-all${phaseSuffix}-${stamp}.csv`;
 }
 
 export function filterAdminStudentRows(

@@ -3,6 +3,7 @@ import { getProgramBySlug } from "@/lib/data/programs";
 import { DEFAULT_BATCH_NAME } from "@/lib/constants/batch";
 import { formatAppliedDateTime } from "@/lib/utils";
 import { enrichRowsWithApplicationMeta } from "@/lib/api/enrollment-history";
+import { getPhaseCreatedAtFilter, type PhaseFilter } from "@/lib/services/phase-service";
 import type {
   ApplicantApplicationSummary,
   DuplicateMatchInfo,
@@ -24,8 +25,22 @@ export interface AdminEnrollmentRow extends Omit<EnrollmentRecord, "paymentScree
   hasPaymentScreenshot: boolean;
 }
 
-export async function getAdminEnrollmentRows(): Promise<AdminEnrollmentRow[]> {
+export async function getAdminEnrollmentRows(options?: {
+  phase?: PhaseFilter;
+  status?: string;
+}): Promise<AdminEnrollmentRow[]> {
+  const createdAtFilter = getPhaseCreatedAtFilter(options?.phase);
+  const statusFilter =
+    options?.status && options.status !== "all"
+      ? (options.status as "pending" | "approved" | "rejected")
+      : undefined;
+
+  const where: Record<string, unknown> = {};
+  if (createdAtFilter) where.createdAt = createdAtFilter;
+  if (statusFilter) where.status = statusFilter;
+
   const records = await prisma.enrollment.findMany({
+    where: Object.keys(where).length > 0 ? where : undefined,
     orderBy: { createdAt: "desc" },
   });
 
@@ -84,6 +99,7 @@ export async function getAdminEnrollmentPaginated(options?: {
   page?: number;
   limit?: number;
   status?: string;
+  phase?: PhaseFilter;
 }): Promise<{
   rows: AdminEnrollmentRow[];
   totalCount: number;
@@ -94,19 +110,26 @@ export async function getAdminEnrollmentPaginated(options?: {
   const limit = Math.max(1, Math.min(100, options?.limit ?? 50));
   const skip = (page - 1) * limit;
 
-  const where =
+  const createdAtFilter = getPhaseCreatedAtFilter(options?.phase);
+  const statusFilter =
     options?.status && options.status !== "all"
-      ? { status: options.status as "pending" | "approved" | "rejected" }
+      ? (options.status as "pending" | "approved" | "rejected")
       : undefined;
+
+  const where: Record<string, unknown> = {};
+  if (createdAtFilter) where.createdAt = createdAtFilter;
+  if (statusFilter) where.status = statusFilter;
+
+  const queryWhere = Object.keys(where).length > 0 ? where : undefined;
 
   const [records, totalCount] = await Promise.all([
     prisma.enrollment.findMany({
-      where,
+      where: queryWhere,
       orderBy: { createdAt: "desc" },
       skip,
       take: limit,
     }),
-    prisma.enrollment.count({ where }),
+    prisma.enrollment.count({ where: queryWhere }),
   ]);
 
   const reviewerIds = [
@@ -226,8 +249,9 @@ export function buildEnrollmentsCsv(rows: AdminEnrollmentRow[]) {
   return `\uFEFF${headers.join(",")}\n${lines.join("\n")}`;
 }
 
-export function buildEnrollmentsExportFilename(status?: string) {
+export function buildEnrollmentsExportFilename(status?: string, phase?: string) {
   const stamp = new Date().toISOString().slice(0, 10);
-  const suffix = status && status !== "all" ? `-${status}` : "";
-  return `eest-registrations${suffix}-${stamp}.csv`;
+  const phaseSuffix = phase && phase !== "all" ? `-${phase}` : "";
+  const statusSuffix = status && status !== "all" ? `-${status}` : "";
+  return `eest-registrations${phaseSuffix}${statusSuffix}-${stamp}.csv`;
 }

@@ -1,22 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { getAdminProgramStats } from "@/lib/api/admin-program-stats";
-import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
-import { excludeDemoEnrollments } from "@/lib/constants/demo-student";
-import { calculateTotalRevenue } from "@/lib/constants/revenue-split";
-import { getRegistrationPhase } from "@/lib/constants/batch";
+import { getCentralPhaseMetrics, type CentralPhaseMetrics } from "@/lib/services/phase-service";
 
-export interface PhaseMetrics {
-  totalEnrollments: number;
-  approvedEnrollments: number;
-  pendingEnrollments: number;
-  students: number;
-  firstTimeRegistrations: number;
-  returningRegistrations: number;
-  estimatedRevenue: number;
-  loggedInStudents: number;
-  webStudents: number;
-  appStudents: number;
-}
+export type PhaseMetrics = CentralPhaseMetrics;
 
 export interface AdminDashboardData {
   pendingEnrollments: number;
@@ -70,8 +56,9 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     assignments,
     sessions,
     trainers,
-    allEnrollments,
-    allStudents,
+    allMetrics,
+    phase1Metrics,
+    phase2Metrics,
     approvedThisMonth,
     approvedPrevMonth,
     pendingThisMonth,
@@ -83,13 +70,9 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     prisma.assignment.count(),
     prisma.liveSession.findMany({ select: { date: true } }),
     prisma.user.count({ where: { role: "trainer", isActive: true } }),
-    prisma.enrollment.findMany({
-      select: { id: true, status: true, program: true, email: true, createdAt: true, batch: true },
-    }),
-    prisma.user.findMany({
-      where: { role: "student", isActive: true },
-      select: { id: true, firstLoginAt: true, programSlug: true, createdAt: true, batch: true, level: true },
-    }),
+    getCentralPhaseMetrics("all"),
+    getCentralPhaseMetrics("phase-1"),
+    getCentralPhaseMetrics("phase-2"),
     prisma.enrollment.count({
       where: { status: "approved", reviewedAt: { gte: monthStart } },
     }),
@@ -123,71 +106,23 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   const today = now.toISOString().split("T")[0];
   const upcomingSessions = sessions.filter((s) => s.date >= today).length;
 
-  const loggedInStudents = allStudents.filter((s) => s.firstLoginAt).length;
-  const neverLoggedInStudents = allStudents.length - loggedInStudents;
-
-  const webSlug = ENROLLABLE_PROGRAM_SLUGS[0];
-  const appSlug = ENROLLABLE_PROGRAM_SLUGS[1];
-  const webStudents = allStudents.filter((s) => s.programSlug === webSlug).length;
-  const appStudents = allStudents.filter((s) => s.programSlug === appSlug).length;
-
-  const firstTimeRegistrations =
-    programStats.approvedRegistrations - programStats.returningRegistrations;
-
-  const approvedForRevenue = allEnrollments.filter((e) => e.status === "approved");
-  const revenue = calculateTotalRevenue(excludeDemoEnrollments(approvedForRevenue));
-
-  const phase1Enrollments = allEnrollments.filter((e) => getRegistrationPhase(e) === "phase-1");
-  const phase2Enrollments = allEnrollments.filter((e) => getRegistrationPhase(e) === "phase-2");
-
-  const phase1Students = allStudents.filter((s) => getRegistrationPhase(s) === "phase-1");
-  const phase2Students = allStudents.filter((s) => getRegistrationPhase(s) === "phase-2");
-
-  const buildPhaseMetrics = (
-    enrollmentsList: typeof allEnrollments,
-    studentsList: typeof allStudents
-  ): PhaseMetrics => {
-    const approved = enrollmentsList.filter((row) => row.status === "approved");
-    const pending = enrollmentsList.filter((row) => row.status === "pending").length;
-    const approvedEmails = new Set(approved.map((row) => row.email.toLowerCase()));
-    const returning = Math.max(0, approved.length - approvedEmails.size);
-    const firstTime = Math.max(0, approved.length - returning);
-    const rev = calculateTotalRevenue(excludeDemoEnrollments(approved)).gross;
-    const loggedIn = studentsList.filter((s) => s.firstLoginAt).length;
-    const web = studentsList.filter((s) => s.programSlug === webSlug).length;
-    const app = studentsList.filter((s) => s.programSlug === appSlug).length;
-
-    return {
-      totalEnrollments: enrollmentsList.length,
-      approvedEnrollments: approved.length,
-      pendingEnrollments: pending,
-      students: studentsList.length,
-      firstTimeRegistrations: firstTime,
-      returningRegistrations: returning,
-      estimatedRevenue: rev,
-      loggedInStudents: loggedIn,
-      webStudents: web,
-      appStudents: app,
-    };
-  };
-
   return {
-    pendingEnrollments: programStats.pendingEnrollments,
-    approvedEnrollments: programStats.approvedRegistrations,
-    totalEnrollments: programStats.totalEnrollments,
-    students: programStats.activeStudents,
+    pendingEnrollments: allMetrics.pendingEnrollments,
+    approvedEnrollments: allMetrics.approvedEnrollments,
+    totalEnrollments: allMetrics.totalEnrollments,
+    students: allMetrics.students,
     trainerAssignedStudents: programStats.trainerAssignedStudents,
     missingTrainerAssignments: programStats.missingTrainerAssignments,
-    returningRegistrations: programStats.returningRegistrations,
+    returningRegistrations: allMetrics.returningRegistrations,
     assignments,
     upcomingSessions,
     trainers,
-    estimatedRevenue: revenue.gross,
-    loggedInStudents,
-    neverLoggedInStudents,
-    firstTimeRegistrations,
-    webStudents,
-    appStudents,
+    estimatedRevenue: allMetrics.estimatedRevenue,
+    loggedInStudents: allMetrics.loggedInStudents,
+    neverLoggedInStudents: allMetrics.neverLoggedInStudents,
+    firstTimeRegistrations: allMetrics.firstTimeRegistrations,
+    webStudents: allMetrics.webStudents,
+    appStudents: allMetrics.appStudents,
     trends: {
       approved: trendLabel(percentChange(approvedThisMonth, approvedPrevMonth)),
       pending: trendLabel(percentChange(pendingThisMonth, pendingPrevMonth)),
@@ -195,8 +130,8 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
       revenue: trendLabel(percentChange(approvedThisMonth, approvedPrevMonth)),
     },
     phaseBreakdown: {
-      phase1: buildPhaseMetrics(phase1Enrollments, phase1Students),
-      phase2: buildPhaseMetrics(phase2Enrollments, phase2Students),
+      phase1: phase1Metrics,
+      phase2: phase2Metrics,
     },
   };
 }
