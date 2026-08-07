@@ -105,12 +105,22 @@ export function TrainerDashboardUI({
     setMounted(true);
   }, []);
 
-  const activeModuleName =
-    moduleGroups.length > 0
-      ? moduleGroups[0].moduleName
-      : isAll
-      ? "Full Program"
-      : `Level ${activeLevel}`;
+  const activeModuleName = (() => {
+    if (!activeLevel || activeLevel.toLowerCase() === "all" || isAll) {
+      return "All Modules (Overview)";
+    }
+    const matchedGroup = moduleGroups.find(
+      (g) => g.moduleName.toLowerCase() === activeLevel.toLowerCase()
+    );
+    if (matchedGroup) {
+      return matchedGroup.moduleName;
+    }
+    const levelNum = parseInt(activeLevel, 10);
+    if (!isNaN(levelNum) && levelNum > 0 && levelNum <= moduleGroups.length) {
+      return moduleGroups[levelNum - 1].moduleName;
+    }
+    return activeLevel;
+  })();
 
   // Calculated attendance data dynamic update
   const dynamicAttendance = [
