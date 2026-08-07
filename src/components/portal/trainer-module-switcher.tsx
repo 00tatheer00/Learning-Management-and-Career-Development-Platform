@@ -103,19 +103,8 @@ export function TrainerModuleSwitcher({
   return (
     <>
       {isLoading && (
-        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-slate-950/40 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-2xl flex flex-col items-center gap-3 max-w-xs text-center">
-            <div className="p-3 rounded-full bg-primary/10 text-primary animate-spin">
-              <SpinnerGap size={32} weight="bold" />
-            </div>
-            <div>
-              <p className="text-sm font-black text-slate-900 dark:text-white">Fetching Module Data...</p>
-              <p className="text-xs text-slate-500 mt-1 font-semibold">Loading latest records from database</p>
-            </div>
-            <div className="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden mt-1">
-              <div className="bg-primary h-full rounded-full animate-pulse w-3/4" />
-            </div>
-          </div>
+        <div className="fixed top-0 left-0 right-0 h-1 z-[99999] overflow-hidden bg-indigo-100 dark:bg-indigo-950">
+          <div className="h-full bg-gradient-to-r from-indigo-600 via-sky-500 to-indigo-600 animate-pulse w-full" />
         </div>
       )}
 
