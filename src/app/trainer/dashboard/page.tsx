@@ -90,7 +90,7 @@ export default async function TrainerDashboardPage() {
         title={`Welcome, ${welcomeName}!`}
         description={`${designation} · ${courseTitle}`}
       >
-        <Button size="sm" asChild className="h-9 px-4 text-xs font-semibold shadow-sm bg-gradient-to-r from-primary to-primary/90 hover:opacity-95 transition-all">
+        <Button size="sm" asChild className="h-9 px-4 text-xs font-semibold shadow-sm bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 transition-all">
           <Link href="/trainer/classes">
             <VideoCamera size={15} weight="duotone" className="mr-1.5" />
             Portal Classes
@@ -99,17 +99,17 @@ export default async function TrainerDashboardPage() {
       </PortalPageHeader>
 
       {!isAll && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-gradient-to-r from-amber-500/15 via-amber-500/8 to-transparent border border-amber-500/25 backdrop-blur-md shadow-sm">
-          <div className="flex items-center gap-2.5 min-w-0">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-slate-900 text-white border border-slate-800 shadow-md">
+          <div className="flex items-center gap-3 min-w-0">
             <span className="relative flex h-2.5 w-2.5 shrink-0">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500" />
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-400" />
             </span>
-            <span className="text-xs text-pt-secondary font-medium truncate">
-              Active Module Scope: <strong className="font-bold text-amber-700 dark:text-amber-300 text-sm ml-1">{activeLevel}</strong>
+            <span className="text-xs text-slate-300 font-medium truncate">
+              Active Module Scope: <strong className="font-extrabold bg-amber-400 text-slate-950 px-2.5 py-1 rounded-lg text-xs ml-2 inline-block shadow-sm">{activeLevel}</strong>
             </span>
           </div>
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/20 shrink-0">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-extrabold uppercase tracking-wider bg-slate-800 text-amber-300 border border-slate-700 shrink-0">
             {students.length} Enrolled Students
           </span>
         </div>
@@ -128,7 +128,7 @@ export default async function TrainerDashboardPage() {
         <PortalSectionTitle
           title="Students by Phase"
           action={
-            <Button variant="outline" size="sm" asChild className="h-8 text-xs font-semibold rounded-xl border-pt-subtle hover:bg-pt-surface hover:border-primary/30">
+            <Button variant="outline" size="sm" asChild className="h-8 text-xs font-semibold rounded-xl border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800">
               <Link href="/trainer/students">View Student Roster →</Link>
             </Button>
           }
@@ -138,21 +138,21 @@ export default async function TrainerDashboardPage() {
             href="/trainer/students?phase=phase-1"
             className={cn(
               portalPressable,
-              "group relative overflow-hidden rounded-2xl border border-indigo-500/25 bg-gradient-to-br from-indigo-500/10 via-indigo-500/5 to-transparent p-5 shadow-sm hover:border-indigo-500/50 hover:shadow-lg hover:shadow-indigo-500/5 block transition-all duration-300 transform hover:-translate-y-0.5"
+              "group relative overflow-hidden rounded-2xl border-2 border-indigo-200 dark:border-indigo-900/60 bg-white dark:bg-slate-900 p-5 shadow-sm hover:border-indigo-600 hover:shadow-md block transition-all duration-200 transform hover:-translate-y-0.5"
             )}
           >
             <div className="flex items-start justify-between gap-4">
               <div>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase tracking-wider bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[11px] font-extrabold uppercase tracking-wider bg-indigo-600 text-white shadow-sm">
                   Initial Admissions
                 </span>
-                <p className="text-xs font-semibold text-pt-muted mt-2.5">Phase 1 (Module 1)</p>
-                <p className="text-3xl font-extrabold tabular-nums text-pt tracking-tight mt-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                  {phase1Students.length} <span className="text-sm font-semibold text-pt-muted">Students</span>
+                <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-3">Phase 1 (Module 1)</p>
+                <p className="text-3xl font-extrabold tabular-nums text-slate-900 dark:text-slate-100 tracking-tight mt-1">
+                  {phase1Students.length} <span className="text-sm font-semibold text-slate-500 dark:text-slate-400">Students</span>
                 </p>
               </div>
-              <div className="p-3 rounded-xl bg-indigo-500/15 border border-indigo-500/20 text-indigo-600 dark:text-indigo-300 shrink-0 group-hover:scale-110 transition-transform">
-                <Users size={22} weight="duotone" />
+              <div className="p-3 rounded-xl bg-indigo-600 text-white shadow-md shrink-0 group-hover:scale-105 transition-transform">
+                <Users size={22} weight="bold" />
               </div>
             </div>
           </Link>
@@ -161,22 +161,22 @@ export default async function TrainerDashboardPage() {
             href="/trainer/students?phase=phase-2"
             className={cn(
               portalPressable,
-              "group relative overflow-hidden rounded-2xl border border-emerald-500/25 bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-transparent p-5 shadow-sm hover:border-emerald-500/50 hover:shadow-lg hover:shadow-emerald-500/5 block transition-all duration-300 transform hover:-translate-y-0.5"
+              "group relative overflow-hidden rounded-2xl border-2 border-emerald-200 dark:border-emerald-900/60 bg-white dark:bg-slate-900 p-5 shadow-sm hover:border-emerald-600 hover:shadow-md block transition-all duration-200 transform hover:-translate-y-0.5"
             )}
           >
             <div className="flex items-start justify-between gap-4">
               <div>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase tracking-wider bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[11px] font-extrabold uppercase tracking-wider bg-emerald-600 text-white shadow-sm">
+                  <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
                   New Phase Admissions
                 </span>
-                <p className="text-xs font-semibold text-pt-muted mt-2.5">Phase 2 (New Phase / 2nd Module)</p>
-                <p className="text-3xl font-extrabold tabular-nums text-pt tracking-tight mt-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                  {phase2Students.length} <span className="text-sm font-semibold text-pt-muted">Students</span>
+                <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-3">Phase 2 (New Phase / 2nd Module)</p>
+                <p className="text-3xl font-extrabold tabular-nums text-slate-900 dark:text-slate-100 tracking-tight mt-1">
+                  {phase2Students.length} <span className="text-sm font-semibold text-slate-500 dark:text-slate-400">Students</span>
                 </p>
               </div>
-              <div className="p-3 rounded-xl bg-emerald-500/15 border border-emerald-500/20 text-emerald-600 dark:text-emerald-300 shrink-0 group-hover:scale-110 transition-transform">
-                <Users size={22} weight="duotone" />
+              <div className="p-3 rounded-xl bg-emerald-600 text-white shadow-md shrink-0 group-hover:scale-105 transition-transform">
+                <Users size={22} weight="bold" />
               </div>
             </div>
           </Link>
@@ -189,48 +189,37 @@ export default async function TrainerDashboardPage() {
           <PortalSectionTitle
             title="Students by Module"
             action={
-              <Button variant="outline" size="sm" asChild className="h-8 text-xs font-semibold rounded-xl border-pt-subtle hover:bg-pt-surface hover:border-primary/30">
+              <Button variant="outline" size="sm" asChild className="h-8 text-xs font-semibold rounded-xl border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800">
                 <Link href="/trainer/students">View all →</Link>
               </Button>
             }
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-            {moduleGroups.map((group, idx) => {
-              const gradients = [
-                "from-blue-500/10 via-cyan-500/5 to-transparent border-blue-500/20 hover:border-blue-500/40 text-blue-600 dark:text-blue-400",
-                "from-violet-500/10 via-purple-500/5 to-transparent border-violet-500/20 hover:border-violet-500/40 text-violet-600 dark:text-violet-400",
-                "from-amber-500/10 via-orange-500/5 to-transparent border-amber-500/20 hover:border-amber-500/40 text-amber-600 dark:text-amber-400",
-                "from-emerald-500/10 via-teal-500/5 to-transparent border-emerald-500/20 hover:border-emerald-500/40 text-emerald-600 dark:text-emerald-400",
-              ];
-              const cardStyle = gradients[idx % gradients.length];
-
-              return (
-                <Link
-                  key={group.moduleName}
-                  href={`/trainer/students?module=${encodeURIComponent(group.moduleName)}`}
-                  className={cn(
-                    portalPressable,
-                    "group relative overflow-hidden rounded-2xl border bg-gradient-to-br p-4 shadow-sm hover:shadow-md block transition-all duration-300 transform hover:-translate-y-0.5",
-                    cardStyle
-                  )}
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-pt-surface/80 border border-pt-subtle text-pt-secondary">
-                      Module {idx + 1}
-                    </span>
-                    <span className="text-xs font-semibold text-pt-muted group-hover:text-primary transition-colors">
-                      {group.students.length} {group.students.length === 1 ? "Student" : "Students"}
-                    </span>
-                  </div>
-                  <h4 className="text-sm font-bold text-pt truncate mt-3 group-hover:text-primary transition-colors">
-                    {group.moduleName}
-                  </h4>
-                  <p className="text-2xl font-extrabold tabular-nums text-pt mt-1">
-                    {group.students.length}
-                  </p>
-                </Link>
-              );
-            })}
+            {moduleGroups.map((group, idx) => (
+              <Link
+                key={group.moduleName}
+                href={`/trainer/students?module=${encodeURIComponent(group.moduleName)}`}
+                className={cn(
+                  portalPressable,
+                  "group relative overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm hover:border-slate-400 dark:hover:border-slate-600 hover:shadow-md block transition-all duration-200 transform hover:-translate-y-0.5"
+                )}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">
+                    Module {idx + 1}
+                  </span>
+                  <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                    {group.students.length} {group.students.length === 1 ? "Student" : "Students"}
+                  </span>
+                </div>
+                <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate mt-3 group-hover:text-primary transition-colors">
+                  {group.moduleName}
+                </h4>
+                <p className="text-3xl font-extrabold tabular-nums text-slate-900 dark:text-slate-100 mt-1">
+                  {group.students.length}
+                </p>
+              </Link>
+            ))}
           </div>
         </div>
       )}
@@ -239,11 +228,11 @@ export default async function TrainerDashboardPage() {
       <div className="space-y-3 pt-2">
         <PortalSectionTitle title="Quick Access" />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          <QuickActionCard href="/trainer/students" title="View Students" description={`Students in ${courseTitle}`} icon={<Users size={20} weight="duotone" />} gradient="from-blue-500 to-indigo-500" />
-          <QuickActionCard href="/trainer/classes" title="Portal Classes" description="Free in-portal live video" icon={<VideoCamera size={20} weight="duotone" />} gradient="from-orange-500 to-amber-500" />
-          <QuickActionCard href="/trainer/assignments" title="Assignments" description="Create & review work" icon={<ClipboardText size={20} weight="duotone" />} gradient="from-violet-500 to-purple-600" />
-          <QuickActionCard href="/trainer/attendance" title="Attendance" description="Day & module-wise reports" icon={<ListChecks size={20} weight="duotone" />} gradient="from-slate-600 to-slate-800" />
-          <QuickActionCard href="/trainer/materials" title="Course Videos" description="Learning materials" icon={<BookOpen size={20} weight="duotone" />} gradient="from-emerald-500 to-teal-600" />
+          <QuickActionCard href="/trainer/students" title="View Students" description={`Students in ${courseTitle}`} icon={<Users size={20} weight="duotone" />} gradient="from-blue-600 to-indigo-600" />
+          <QuickActionCard href="/trainer/classes" title="Portal Classes" description="Free in-portal live video" icon={<VideoCamera size={20} weight="duotone" />} gradient="from-amber-600 to-orange-600" />
+          <QuickActionCard href="/trainer/assignments" title="Assignments" description="Create & review work" icon={<ClipboardText size={20} weight="duotone" />} gradient="from-purple-600 to-violet-600" />
+          <QuickActionCard href="/trainer/attendance" title="Attendance" description="Day & module-wise reports" icon={<ListChecks size={20} weight="duotone" />} gradient="from-slate-700 to-slate-900" />
+          <QuickActionCard href="/trainer/materials" title="Course Videos" description="Learning materials" icon={<BookOpen size={20} weight="duotone" />} gradient="from-emerald-600 to-teal-600" />
         </div>
       </div>
     </div>

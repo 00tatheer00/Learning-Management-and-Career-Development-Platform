@@ -64,34 +64,34 @@ interface StatCardProps {
 
 const accentStyles = {
   rose: {
-    wrap: "portal-stat-accent-rose border",
-    text: "portal-stat-text-rose",
-    icon: "bg-rose-500 text-white",
+    wrap: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:border-rose-500/40",
+    text: "text-slate-900 dark:text-slate-100",
+    icon: "bg-rose-500 text-white shadow-sm",
   },
   orange: {
-    wrap: "portal-stat-accent-orange border",
-    text: "portal-stat-text-orange",
-    icon: "bg-primary text-primary-foreground",
+    wrap: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:border-amber-500/40",
+    text: "text-slate-900 dark:text-slate-100",
+    icon: "bg-amber-500 text-white shadow-sm",
   },
   green: {
-    wrap: "portal-stat-accent-green border",
-    text: "portal-stat-text-green",
-    icon: "bg-pt-muted text-primary border border-pt",
+    wrap: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:border-emerald-500/40",
+    text: "text-slate-900 dark:text-slate-100",
+    icon: "bg-emerald-500 text-white shadow-sm",
   },
   blue: {
-    wrap: "portal-stat-accent-blue border",
-    text: "portal-stat-text-blue",
-    icon: "bg-pt-muted text-pt-secondary border border-pt",
+    wrap: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:border-blue-500/40",
+    text: "text-slate-900 dark:text-slate-100",
+    icon: "bg-blue-600 text-white shadow-sm",
   },
   sky: {
-    wrap: "portal-stat-accent-sky border",
-    text: "portal-stat-text-sky",
-    icon: "bg-pt-muted text-pt-secondary border border-pt",
+    wrap: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:border-sky-500/40",
+    text: "text-slate-900 dark:text-slate-100",
+    icon: "bg-sky-500 text-white shadow-sm",
   },
   slate: {
-    wrap: "portal-stat-accent-slate border",
-    text: "portal-stat-text-slate",
-    icon: "bg-pt-muted text-pt-muted border border-pt",
+    wrap: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:border-slate-400/40",
+    text: "text-slate-900 dark:text-slate-100",
+    icon: "bg-slate-700 text-white shadow-sm",
   },
 };
 
