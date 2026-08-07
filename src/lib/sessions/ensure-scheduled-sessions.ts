@@ -2,10 +2,11 @@ import { prisma } from "@/lib/prisma";
 
 /** Create today's live session rows from the fixed weekly class schedule (if missing). */
 /** Purge auto-generated dummy sessions so trainers create all live classes manually. */
-export async function ensureScheduledLiveSessions(): Promise<{
+export async function ensureScheduledLiveSessions(now?: Date): Promise<{
   created: number;
   skipped: number;
 }> {
+  void now;
   try {
     // Delete any previously auto-generated dummy sessions so trainer creates classes manually
     await prisma.liveSession.deleteMany({
