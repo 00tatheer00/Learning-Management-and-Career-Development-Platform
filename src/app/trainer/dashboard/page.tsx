@@ -79,11 +79,17 @@ export default async function TrainerDashboardPage() {
   const pendingReviews = submissions.filter((s) => s.status === "submitted").length;
   const upcomingSessions = countUpcomingLiveSessions(sessions);
 
+  const nameParts = user.name.trim().split(/\s+/);
+  const welcomeName =
+    nameParts.length > 1 && nameParts[0].length <= 2
+      ? `${nameParts[0]} ${nameParts[1]}`
+      : nameParts[0] || user.name;
+
   return (
     <div className="space-y-4">
       <PortalPageHeader
         eyebrow="Trainer Portal"
-        title={`Welcome, ${user.name.split(" ")[0]}!`}
+        title={`Welcome, ${welcomeName}!`}
         description={`${designation} · ${courseTitle}`}
       >
         <Button size="sm" asChild className="h-8 text-xs">

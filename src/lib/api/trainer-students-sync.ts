@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { normalizeProgramSlug } from "@/lib/auth/program-assignment";
 import { DEFAULT_BATCH_NAME } from "@/lib/constants/batch";
+import { isDemoPortalStudent } from "@/lib/constants/demo-student";
 
 export interface ApprovedTrainerStudent {
   id: string;
@@ -34,7 +35,7 @@ export async function getTrainerApprovedStudents(
         orderBy: { createdAt: "desc" },
       }),
       prisma.user.findMany({
-        where: { role: "student" },
+        where: { role: "student", isActive: true },
         select: {
           id: true,
           email: true,
@@ -42,6 +43,8 @@ export async function getTrainerApprovedStudents(
           phone: true,
           avatarUrl: true,
           avatarInitials: true,
+          programSlug: true,
+          level: true,
         },
       }),
     ]);
@@ -49,10 +52,12 @@ export async function getTrainerApprovedStudents(
     // Fast in-memory lookup for user accounts by email
     const userMap = new Map(userAccounts.map((u) => [u.email.trim().toLowerCase(), u]));
 
-    // Filter enrollments belonging to the target course program
-    const matchingEnrollments = enrollments.filter(
-      (e) => e.program && normalizeProgramSlug(e.program) === targetSlug
-    );
+    // Filter enrollments belonging explicitly to the target course program
+    const matchingEnrollments = enrollments.filter((e) => {
+      if (!e.email || isDemoPortalStudent(e.email)) return false;
+      if (!e.program || !e.program.trim()) return false;
+      return normalizeProgramSlug(e.program) === targetSlug;
+    });
 
     const studentList: ApprovedTrainerStudent[] = [];
     const processedEmails = new Set<string>();
