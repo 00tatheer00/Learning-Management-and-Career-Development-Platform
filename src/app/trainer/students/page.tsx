@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import { getCurrentUser } from "@/lib/auth/session";
-import { filterStudentsByProgram, getTrainerCourseTitle, getTrainerDesignation } from "@/lib/auth/trainer-scope";
-import { getUsersByRole } from "@/lib/auth/users";
+import { getTrainerCourseTitle, getTrainerDesignation } from "@/lib/auth/trainer-scope";
 import { TrainerStudentsPanel } from "@/components/trainer/trainer-students-panel";
 import { EmptyState } from "@/components/portal/portal-ui";
 

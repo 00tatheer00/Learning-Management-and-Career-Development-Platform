@@ -2,14 +2,12 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/session";
 import {
   filterByTrainerProgram,
-  filterStudentsByProgram,
   getTrainerCourseTitle,
   getTrainerDesignation,
   requireTrainerProgram,
   resolveTrainerId,
 } from "@/lib/auth/trainer-scope";
 import { getProgramModuleNames } from "@/lib/modules/student-module-access";
-import { getUsersByRole } from "@/lib/auth/users";
 import {
   getAssignments,
   getLiveSessions,
