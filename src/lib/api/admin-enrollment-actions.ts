@@ -19,6 +19,7 @@ import { deleteCloudinaryImage } from "@/lib/cloudinary";
 import { prisma } from "@/lib/prisma";
 import { getPortalLoginUrl } from "@/lib/site-url";
 import { syncApprovedStudentsTrainerAssignments } from "@/lib/auth/trainer-assignment-sync";
+import { recordModuleEnrollment } from "@/lib/services/module-enrollment-service";
 import type { EnrollmentRecord } from "@/types/portal";
 
 export async function approveEnrollmentAndCreateAccount(
@@ -117,6 +118,15 @@ export async function approveEnrollmentAndCreateAccount(
   if (!student) {
     return { enrollment, message: "Registration approved but student account missing.", error: "Student account missing" };
   }
+
+  void recordModuleEnrollment({
+    email: enrollment.email,
+    programSlug: assignment.programSlug,
+    moduleName: enrollment.level,
+    studentId: student.id,
+    enrollmentId,
+    status: "active",
+  });
 
   const passwordIssue = isExistingUser
     ? { ok: true, error: undefined }

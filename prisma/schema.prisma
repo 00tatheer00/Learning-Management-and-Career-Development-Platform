@@ -67,6 +67,7 @@ model User {
 
   submissions AssignmentSubmission[] @relation("StudentSubmissions")
   attendance  ClassAttendance[]        @relation("StudentAttendance")
+  moduleEnrollments ModuleEnrollment[] @relation("UserModuleEnrollments")
 
   @@index([role])
   @@index([programSlug])
@@ -106,6 +107,8 @@ model Enrollment {
   approvalWhatsAppError     String?
   portalWelcomeShownAt      DateTime?
   createdAt                 DateTime         @default(now())
+
+  moduleEnrollments ModuleEnrollment[] @relation("EnrollmentModuleEnrollments")
 
   @@index([status])
   @@index([email])
@@ -429,4 +432,25 @@ model WhatsAppWebhookEvent {
   processedAt DateTime @default(now())
 
   @@index([processedAt])
+}
+
+model ModuleEnrollment {
+  id           String    @id @map("_id")
+  studentId    String?
+  enrollmentId String?
+  email        String
+  programSlug  String
+  moduleName   String
+  status       String    @default("active")
+  enrolledAt   DateTime  @default(now())
+  completedAt  DateTime?
+  unlockedAt   DateTime  @default(now())
+
+  user       User?       @relation("UserModuleEnrollments", fields: [studentId], references: [id], onDelete: Cascade)
+  enrollment Enrollment? @relation("EnrollmentModuleEnrollments", fields: [enrollmentId], references: [id], onDelete: SetNull)
+
+  @@unique([email, programSlug, moduleName])
+  @@index([email])
+  @@index([studentId])
+  @@index([programSlug])
 }
