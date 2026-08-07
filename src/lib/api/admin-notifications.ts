@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getProgramBySlug } from "@/lib/data/programs";
+import { getCentralPhaseMetrics } from "@/lib/services/phase-service";
 
 export interface AdminRegistrationAlert {
   id: string;
@@ -14,18 +15,21 @@ export async function getAdminRegistrationNotifications(): Promise<{
   pendingCount: number;
   pending: AdminRegistrationAlert[];
 }> {
-  const records = await prisma.enrollment.findMany({
-    where: { status: "pending" },
-    orderBy: { createdAt: "desc" },
-    take: 15,
-    select: {
-      id: true,
-      fullName: true,
-      program: true,
-      level: true,
-      createdAt: true,
-    },
-  });
+  const [records, metrics] = await Promise.all([
+    prisma.enrollment.findMany({
+      where: { status: "pending" },
+      orderBy: { createdAt: "desc" },
+      take: 15,
+      select: {
+        id: true,
+        fullName: true,
+        program: true,
+        level: true,
+        createdAt: true,
+      },
+    }),
+    getCentralPhaseMetrics("all"),
+  ]);
 
   const pending = records.map((record) => ({
     id: record.id,
@@ -36,9 +40,5 @@ export async function getAdminRegistrationNotifications(): Promise<{
     courseTitle: getProgramBySlug(record.program)?.title ?? record.program,
   }));
 
-  const pendingCount = await prisma.enrollment.count({
-    where: { status: "pending" },
-  });
-
-  return { pendingCount, pending };
+  return { pendingCount: metrics.pendingEnrollments, pending };
 }

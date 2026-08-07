@@ -3,6 +3,7 @@ import "server-only";
 import { prisma } from "@/lib/prisma";
 import { getTrainerDesignation, getTrainerCourseTitle } from "@/lib/auth/trainer-scope";
 import { getStaticTrainerByKey } from "@/lib/data/trainer-profiles";
+import { getAdminStudentRows } from "@/lib/api/admin-students";
 import type { Trainer } from "@/types";
 
 export interface AdminTrainerRow {
@@ -28,14 +29,19 @@ function resolveProfileKey(trainer: { id: string; trainerId: string | null }) {
 }
 
 export async function getTrainerStudentCounts(): Promise<Map<string, number>> {
-  const students = await prisma.user.findMany({
-    where: { role: "student", isActive: true },
-    select: { trainerId: true, programSlug: true },
+  const students = await getAdminStudentRows();
+  const studentUserIds = Array.from(new Set(students.map((s) => s.studentId).filter(Boolean)));
+
+  const userRows = await prisma.user.findMany({
+    where: { id: { in: studentUserIds } },
+    select: { id: true, trainerId: true, programSlug: true },
   });
+
+  const trainerIdByUser = new Map(userRows.map((u) => [u.id, u.trainerId]));
 
   const counts = new Map<string, number>();
   for (const student of students) {
-    let key = student.trainerId;
+    let key = trainerIdByUser.get(student.studentId);
     if (!key && student.programSlug) {
       if (student.programSlug === "artificial-intelligence") key = "trainer-faiza";
       else if (student.programSlug === "app-development") key = "trainer-talha";
