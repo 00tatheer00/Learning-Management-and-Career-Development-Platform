@@ -143,25 +143,25 @@ export function TrainerDashboardUI({
 
   return (
     <div className="space-y-6">
-      {/* Top Welcome Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-6 shadow-xl border border-slate-800 relative overflow-hidden">
-        <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+      {/* Top Welcome Header (Clean White SaaS Card) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-white via-indigo-50/40 to-white border border-slate-200/90 rounded-3xl p-6 shadow-sm relative overflow-hidden">
+        <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 space-y-1">
-          <span className="text-[11px] font-black uppercase tracking-widest text-indigo-400 bg-indigo-500/20 px-3 py-1 rounded-full border border-indigo-500/30">
+          <span className="text-[11px] font-black uppercase tracking-widest text-indigo-700 bg-indigo-100/70 px-3 py-1 rounded-full border border-indigo-200">
             Trainer Portal
           </span>
-          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight mt-1">
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-1">
             Welcome, {welcomeName}!
           </h1>
-          <p className="text-xs sm:text-sm font-medium text-slate-300">
-            {designation} · <span className="text-indigo-300 font-bold">{courseTitle}</span>
+          <p className="text-xs sm:text-sm font-bold text-slate-600">
+            {designation} · <span className="text-indigo-600 font-black">{courseTitle}</span>
           </p>
         </div>
         <div className="relative z-10 shrink-0">
           <Button
             size="sm"
             asChild
-            className="bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs h-10 px-4 rounded-xl shadow-lg shadow-indigo-600/30 transition-all hover:scale-105"
+            className="bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs h-10 px-4 rounded-xl shadow-md shadow-indigo-600/20 transition-all hover:scale-105"
           >
             <Link href="/trainer/classes" className="flex items-center gap-2">
               <Video className="w-4 h-4" />
