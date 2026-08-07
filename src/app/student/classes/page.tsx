@@ -1,7 +1,6 @@
 import { getCurrentUser } from "@/lib/auth/session";
 import { getLiveSessionsPreview } from "@/lib/api/portal-data";
 import { getStudentModuleSchedule } from "@/lib/constants/course-schedule";
-import { getStudentClassSchedule } from "@/lib/constants/student-portal-ur";
 import { PortalPageHeader, PortalSurfaceCard } from "@/components/portal/portal-ui";
 import { StudentLiveSessionCard } from "@/components/portal/student-live-session-card";
 import { ModuleStartsSoonNotice } from "@/components/portal/module-starts-soon-notice";

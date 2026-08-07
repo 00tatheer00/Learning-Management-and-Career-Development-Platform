@@ -43,8 +43,7 @@ export function getTrainerAvailableModules(programSlug?: string | null): Trainer
  * Returns "all" or specific module name.
  */
 export function resolveActiveTrainerModule(
-  userLevel?: string | null,
-  programSlug?: string | null
+  userLevel?: string | null
 ): string {
   if (!userLevel || userLevel.trim() === "" || userLevel.trim().toLowerCase() === "all") {
     return "all";

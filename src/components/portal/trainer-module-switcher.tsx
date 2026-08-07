@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useEffect, useTransition } from "react";
-import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import {
   CaretDown,
@@ -37,14 +36,14 @@ export function TrainerModuleSwitcher({
   const [isPending, startTransition] = useTransition();
 
   const availableModules = getTrainerAvailableModules(programSlug);
-  const activeModuleId = resolveActiveTrainerModule(currentModule, programSlug);
+  const activeModuleId = resolveActiveTrainerModule(currentModule);
 
   const [selectedModule, setSelectedModule] = useState<string>(activeModuleId);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setSelectedModule(resolveActiveTrainerModule(currentModule, programSlug));
-  }, [currentModule, programSlug]);
+    setSelectedModule(resolveActiveTrainerModule(currentModule));
+  }, [currentModule]);
 
   // Close dropdown on click outside
   useEffect(() => {

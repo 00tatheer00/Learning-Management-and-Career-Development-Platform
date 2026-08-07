@@ -13,7 +13,6 @@ import { ProgramCategoryBadge } from "@/components/portal/program-category-badge
 import { getProgramCategory } from "@/lib/constants/program-categories";
 import { getProgramBySlug } from "@/lib/data/programs";
 import { getStudentModuleSchedule } from "@/lib/constants/course-schedule";
-import { getStudentClassSchedule } from "@/lib/constants/student-portal-ur";
 
 interface StudentDashboardHeroProps {
   name: string;
