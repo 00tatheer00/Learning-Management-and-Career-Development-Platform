@@ -1,5 +1,6 @@
 import { getCurrentUser } from "@/lib/auth/session";
 import { getLiveSessionsPreview } from "@/lib/api/portal-data";
+import { getStudentModuleSchedule } from "@/lib/constants/course-schedule";
 import { getStudentClassSchedule } from "@/lib/constants/student-portal-ur";
 import { PortalPageHeader, PortalSurfaceCard } from "@/components/portal/portal-ui";
 import { StudentLiveSessionCard } from "@/components/portal/student-live-session-card";
@@ -66,13 +67,13 @@ export default async function StudentClassesPage() {
       )}
 
       {scheduleSlugs.map((slug) => {
-        const classSchedule = getStudentClassSchedule(slug);
+        const classSchedule = getStudentModuleSchedule(slug, user.level);
         return (
           <PortalSurfaceCard key={slug} className="p-4 sm:p-5 border border-pt">
             <p className="text-xs font-semibold uppercase tracking-wider text-primary mb-1">
               {classSchedule.programLabel}
             </p>
-            <p className="font-semibold text-pt">{classSchedule.headline}</p>
+            <p className="font-semibold text-pt text-base sm:text-lg">{classSchedule.headline}</p>
             <p className="text-sm text-pt-muted mt-1">
               {classSchedule.daysLabel} · {classSchedule.subline}
             </p>

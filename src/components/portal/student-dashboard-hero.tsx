@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { ProgramCategoryBadge } from "@/components/portal/program-category-badge";
 import { getProgramCategory } from "@/lib/constants/program-categories";
 import { getProgramBySlug } from "@/lib/data/programs";
+import { getStudentModuleSchedule } from "@/lib/constants/course-schedule";
 import { getStudentClassSchedule } from "@/lib/constants/student-portal-ur";
 
 interface StudentDashboardHeroProps {
@@ -33,7 +34,7 @@ export function StudentDashboardHero({
   const firstName = name.split(" ")[0] ?? name;
   const category = getProgramCategory(programSlug);
   const programTitle = getProgramBySlug(programSlug)?.title ?? category?.title ?? "Your course";
-  const schedule = getStudentClassSchedule(programSlug);
+  const schedule = getStudentModuleSchedule(programSlug, moduleName);
 
   return (
     <motion.section

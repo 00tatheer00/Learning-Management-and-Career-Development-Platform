@@ -4,47 +4,206 @@ export interface ProgramClassSchedule {
   subline: string;
   daysLabel: string;
   startDateLabel: string;
+  isCompleted?: boolean;
+  isComingSoon?: boolean;
 }
 
-export const PROGRAM_CLASS_SCHEDULE: Record<
-  "web-development" | "app-development" | "artificial-intelligence",
-  ProgramClassSchedule
-> = {
-  "web-development": {
-    programLabel: "Web Development",
-    headline: "Module 2 (JavaScript) classes start 10th August 2026, InshAllah.",
-    daysLabel: "Monday · Tuesday · Wednesday",
-    startDateLabel: "Module 2 Starts 10th August 2026",
-    subline:
-      "Live classes on Mon, Tue & Wed (10:00 PM – 11:00 PM). Join your WhatsApp group for live session links.",
-  },
-  "app-development": {
-    programLabel: "App Development",
-    headline: "Module 2 (Flutter) classes start 7th August 2026, InshAllah.",
-    daysLabel: "Friday · Saturday · Sunday",
-    startDateLabel: "Module 2 Starts 7th August 2026",
-    subline:
-      "Live classes on Fri, Sat & Sun (8:00 PM – 9:30 PM). Join your WhatsApp group for live session links.",
-  },
-  "artificial-intelligence": {
-    programLabel: "Artificial Intelligence",
-    headline: "First class starts 7th August 2026, InshAllah.",
-    daysLabel: "Friday · Saturday · Sunday",
-    startDateLabel: "Starting 7th August 2026",
-    subline:
-      "Live classes on Fri, Sat & Sun from 10:00 PM to 11:30 PM (PKT). Join your WhatsApp group for class timing and live session links.",
-  },
-};
+export function getStudentModuleSchedule(
+  programSlug?: string | null,
+  userLevel?: string | null
+): ProgramClassSchedule {
+  const slug = (programSlug || "web-development").toLowerCase().trim();
+  const lvl = (userLevel || "").toLowerCase().trim();
+
+  // 1. WEB DEVELOPMENT
+  if (slug.includes("web")) {
+    // Module 1 (HTML & CSS)
+    if (
+      lvl.includes("html") ||
+      lvl.includes("css") ||
+      lvl === "1" ||
+      lvl.includes("level 1") ||
+      lvl.includes("module 1")
+    ) {
+      return {
+        programLabel: "Web Development",
+        headline: "Module 1 completed Alhamdulillah",
+        subline:
+          "Module 1 (HTML & CSS) has completed. Module 2 (JavaScript) starts on 10th August at 10:00 PM.",
+        daysLabel: "Monday · Tuesday · Wednesday",
+        startDateLabel: "Completed",
+        isCompleted: true,
+      };
+    }
+
+    // Module 2 (JavaScript)
+    if (
+      lvl.includes("javascript") ||
+      lvl.includes("js") ||
+      lvl === "2" ||
+      lvl.includes("level 2") ||
+      lvl.includes("module 2")
+    ) {
+      return {
+        programLabel: "Web Development",
+        headline: "Starting 2nd module JavaScript, 10th August, 10:00 PM",
+        subline:
+          "Live classes on Mon, Tue, and Wed at 10:00 PM (PKT). Check the portal for the exact time and join link.",
+        daysLabel: "Monday · Tuesday · Wednesday",
+        startDateLabel: "10th August, 10:00 PM",
+      };
+    }
+
+    // Module 3 (React) & Module 4 (Backend + Database)
+    if (
+      lvl.includes("react") ||
+      lvl.includes("backend") ||
+      lvl.includes("database") ||
+      lvl === "3" ||
+      lvl === "4" ||
+      lvl.includes("level 3") ||
+      lvl.includes("level 4") ||
+      lvl.includes("module 3") ||
+      lvl.includes("module 4")
+    ) {
+      return {
+        programLabel: "Web Development",
+        headline: "Coming Soon",
+        subline:
+          "Classes for this advanced module will be announced soon. Join your WhatsApp group for updates.",
+        daysLabel: "Schedule to be announced",
+        startDateLabel: "Coming Soon",
+        isComingSoon: true,
+      };
+    }
+
+    // Default fallback for Web Development (JavaScript 2nd module active batch)
+    return {
+      programLabel: "Web Development",
+      headline: "Starting 2nd module JavaScript, 10th August, 10:00 PM",
+      subline:
+        "Live classes on Mon, Tue, and Wed at 10:00 PM (PKT). Check the portal for the exact time and join link.",
+      daysLabel: "Monday · Tuesday · Wednesday",
+      startDateLabel: "10th August, 10:00 PM",
+    };
+  }
+
+  // 2. APP DEVELOPMENT
+  if (slug.includes("app") || slug.includes("flutter")) {
+    // Module 1 (Dart & OOP)
+    if (
+      lvl.includes("dart") ||
+      lvl.includes("oop") ||
+      lvl === "1" ||
+      lvl.includes("level 1") ||
+      lvl.includes("module 1")
+    ) {
+      return {
+        programLabel: "App Development",
+        headline: "Module 1 completed Alhamdulillah",
+        subline:
+          "Module 1 (Dart & OOP) has completed. Module 2 (Flutter Frontend) starts on 7th August at 8:00 PM.",
+        daysLabel: "Friday · Saturday · Sunday",
+        startDateLabel: "Completed",
+        isCompleted: true,
+      };
+    }
+
+    // Module 2 (Flutter Frontend)
+    if (
+      lvl.includes("flutter") ||
+      lvl.includes("frontend") ||
+      lvl === "2" ||
+      lvl.includes("level 2") ||
+      lvl.includes("module 2")
+    ) {
+      return {
+        programLabel: "App Development",
+        headline: "Classes start from 7th August, 8:00 PM",
+        subline:
+          "Live classes on Fri, Sat, and Sun at 8:00 PM (PKT). Check the portal for class timing and live session links.",
+        daysLabel: "Friday · Saturday · Sunday",
+        startDateLabel: "7th August, 8:00 PM",
+      };
+    }
+
+    // Module 3 (Firebase & APIs)
+    if (
+      lvl.includes("firebase") ||
+      lvl.includes("api") ||
+      lvl === "3" ||
+      lvl.includes("level 3") ||
+      lvl.includes("module 3")
+    ) {
+      return {
+        programLabel: "App Development",
+        headline: "Coming Soon",
+        subline:
+          "Classes for Module 3 (Firebase & APIs) will start after Module 2 completion. Stay tuned!",
+        daysLabel: "Schedule to be announced",
+        startDateLabel: "Coming Soon",
+        isComingSoon: true,
+      };
+    }
+
+    // Default fallback for App Development
+    return {
+      programLabel: "App Development",
+      headline: "Classes start from 7th August, 8:00 PM",
+      subline:
+        "Live classes on Fri, Sat, and Sun at 8:00 PM (PKT). Check the portal for class timing and live session links.",
+      daysLabel: "Friday · Saturday · Sunday",
+      startDateLabel: "7th August, 8:00 PM",
+    };
+  }
+
+  // 3. ARTIFICIAL INTELLIGENCE
+  if (slug.includes("ai") || slug.includes("artificial") || slug.includes("python")) {
+    // Module 1 (AI Fundamentals / Python)
+    if (
+      lvl.includes("fund") ||
+      lvl.includes("python") ||
+      lvl.includes("ai") ||
+      lvl === "1" ||
+      lvl === "" ||
+      lvl.includes("level 1") ||
+      lvl.includes("module 1")
+    ) {
+      return {
+        programLabel: "Artificial Intelligence",
+        headline: "Classes start from Friday, 14th August, 10:00 PM",
+        subline:
+          "Live classes on Fri, Sat, and Sun from 10:00 PM to 11:30 PM (PKT). Check your WhatsApp group for class timing and live session links.",
+        daysLabel: "Friday · Saturday · Sunday",
+        startDateLabel: "Friday, 14th August, 10:00 PM",
+      };
+    }
+
+    // Module 2 & Module 3
+    return {
+      programLabel: "Artificial Intelligence",
+      headline: "Coming Soon",
+      subline:
+        "Classes for this advanced AI module will be announced soon. Stay tuned on WhatsApp!",
+      daysLabel: "Schedule to be announced",
+      startDateLabel: "Coming Soon",
+      isComingSoon: true,
+    };
+  }
+
+  return {
+    programLabel: "Emerging Edge Course",
+    headline: "Classes Starting Soon",
+    subline: "Check portal and WhatsApp group for live session schedules.",
+    daysLabel: "Weekly Live Sessions",
+    startDateLabel: "Starting Soon",
+  };
+}
 
 export function getProgramClassSchedule(
-  programSlug?: string | null
+  programSlug?: string | null,
+  userLevel?: string | null
 ): ProgramClassSchedule {
-  if (programSlug === "app-development") {
-    return PROGRAM_CLASS_SCHEDULE["app-development"];
-  }
-  if (programSlug === "artificial-intelligence") {
-    return PROGRAM_CLASS_SCHEDULE["artificial-intelligence"];
-  }
-  return PROGRAM_CLASS_SCHEDULE["web-development"];
+  return getStudentModuleSchedule(programSlug, userLevel);
 }
 

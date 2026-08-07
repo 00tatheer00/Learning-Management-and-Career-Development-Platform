@@ -1,5 +1,6 @@
 import { CalendarBlank } from "@phosphor-icons/react/ssr";
 import { cn } from "@/lib/utils";
+import { getStudentModuleSchedule } from "@/lib/constants/course-schedule";
 
 interface ModuleStartsSoonNoticeProps {
   programSlug: string;
@@ -12,14 +13,7 @@ export function ModuleStartsSoonNotice({
   studentModule,
   compact = false,
 }: ModuleStartsSoonNoticeProps) {
-  const isAI = programSlug.includes("ai") || programSlug.includes("artificial");
-  const isAppDev = programSlug.includes("app") || programSlug.includes("flutter");
-  const startDateText = isAI || isAppDev ? "7 August 2026" : "10 August 2026";
-  const programLabel = isAI
-    ? "Artificial Intelligence"
-    : isAppDev
-      ? "App Development"
-      : "Web Development (Module 2 — JavaScript)";
+  const schedule = getStudentModuleSchedule(programSlug, studentModule);
 
   return (
     <div
@@ -34,10 +28,10 @@ export function ModuleStartsSoonNotice({
         </span>
         <div>
           <p className={cn("font-bold text-pt", compact ? "text-sm" : "text-base")}>
-            Classes Starting Soon — {startDateText}
+            {schedule.headline}
           </p>
           <p className={cn("mt-1.5 text-pt-muted leading-relaxed", compact ? "text-xs" : "text-sm")}>
-            First class starting on <strong className="text-primary font-bold">{startDateText}</strong> for {programLabel}. We will notify you on WhatsApp as soon as live links open.
+            {schedule.subline}
           </p>
           {studentModule && (
             <div className="mt-3 flex items-center gap-2">
