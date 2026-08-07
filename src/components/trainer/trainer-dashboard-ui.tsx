@@ -171,17 +171,17 @@ export function TrainerDashboardUI({
         </div>
       </div>
 
-      {/* Top Banner - Active Module Scope */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-5 py-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/25 text-amber-950 dark:text-amber-200 shadow-xs hover:border-amber-500/40 transition-all">
+      {/* Top Banner - Active Module Scope (Full High Contrast Text) */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-5 py-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-950 shadow-xs hover:border-amber-500/50 transition-all">
         <div className="flex items-center gap-2.5">
-          <div className="p-1.5 rounded-lg bg-amber-500/20 text-amber-700 dark:text-amber-300">
+          <div className="p-1.5 rounded-lg bg-amber-600 text-white shadow-xs">
             <Award className="w-4 h-4" />
           </div>
-          <span className="text-xs font-black uppercase tracking-wide text-amber-900/90 dark:text-amber-200">
-            Active Module Scope: <span className="text-amber-600 dark:text-amber-400 underline decoration-amber-500/50 underline-offset-4">{activeModuleName}</span>
+          <span className="text-xs font-black uppercase tracking-wide text-amber-950">
+            Active Module Scope: <span className="text-amber-900 font-black underline decoration-amber-600 underline-offset-4">{activeModuleName}</span>
           </span>
         </div>
-        <div className="shrink-0 bg-amber-500/20 border border-amber-500/30 text-amber-900 dark:text-amber-200 font-black uppercase px-3.5 py-1 rounded-full text-[11px] tracking-wider shadow-xs">
+        <div className="shrink-0 bg-amber-800 text-white font-black uppercase px-4 py-1 rounded-full text-xs tracking-wider shadow-xs">
           {studentsCount} ENROLLED STUDENTS
         </div>
       </div>
