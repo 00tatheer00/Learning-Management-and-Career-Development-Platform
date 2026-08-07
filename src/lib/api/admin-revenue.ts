@@ -199,7 +199,7 @@ export async function getAdminRevenueStats(): Promise<AdminRevenueStats> {
     batch: row.batch,
     level: row.level,
     email: row.email,
-    at: row.reviewedAt ?? row.createdAt,
+    at: row.createdAt,
   }));
 
   const phase1Rows = dated.filter((row) => getRegistrationPhase(row.createdAt) === "phase-1");
