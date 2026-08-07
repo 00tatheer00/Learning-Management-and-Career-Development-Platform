@@ -64,34 +64,34 @@ interface StatCardProps {
 
 const accentStyles = {
   rose: {
-    wrap: "bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-rose-300",
-    text: "text-slate-950 dark:text-white font-extrabold",
-    icon: "bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300",
+    wrap: "portal-tone-rose border hover:border-rose-500 hover:shadow-md transition-all duration-200",
+    text: "text-slate-900 dark:text-slate-100 font-extrabold",
+    icon: "portal-tone-icon portal-tone-icon-rose",
   },
   orange: {
-    wrap: "bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-amber-300",
-    text: "text-slate-950 dark:text-white font-extrabold",
-    icon: "bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300",
+    wrap: "portal-tone-amber border hover:border-amber-500 hover:shadow-md transition-all duration-200",
+    text: "text-slate-900 dark:text-slate-100 font-extrabold",
+    icon: "portal-tone-icon portal-tone-icon-amber",
   },
   green: {
-    wrap: "bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-emerald-300",
-    text: "text-slate-950 dark:text-white font-extrabold",
-    icon: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300",
+    wrap: "portal-tone-emerald border hover:border-emerald-500 hover:shadow-md transition-all duration-200",
+    text: "text-slate-900 dark:text-slate-100 font-extrabold",
+    icon: "portal-tone-icon portal-tone-icon-emerald",
   },
   blue: {
-    wrap: "bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-blue-300",
-    text: "text-slate-950 dark:text-white font-extrabold",
-    icon: "bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300",
+    wrap: "portal-tone-indigo border hover:border-indigo-500 hover:shadow-md transition-all duration-200",
+    text: "text-slate-900 dark:text-slate-100 font-extrabold",
+    icon: "portal-tone-icon portal-tone-icon-indigo",
   },
   sky: {
-    wrap: "bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-sky-300",
-    text: "text-slate-950 dark:text-white font-extrabold",
-    icon: "bg-sky-100 text-sky-800 dark:bg-sky-950/60 dark:text-sky-300",
+    wrap: "portal-tone-sky border hover:border-sky-500 hover:shadow-md transition-all duration-200",
+    text: "text-slate-900 dark:text-slate-100 font-extrabold",
+    icon: "portal-tone-icon portal-tone-icon-sky",
   },
   slate: {
-    wrap: "bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-slate-300",
-    text: "text-slate-950 dark:text-white font-extrabold",
-    icon: "bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300",
+    wrap: "portal-tone-slate border hover:border-slate-400 hover:shadow-md transition-all duration-200",
+    text: "text-slate-900 dark:text-slate-100 font-extrabold",
+    icon: "portal-tone-icon portal-tone-icon-slate",
   },
 };
 

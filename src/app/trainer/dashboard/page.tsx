@@ -118,14 +118,14 @@ export default async function TrainerDashboardPage() {
         <StatCard label="To Review" value={pendingReviews} accent="slate" hint="Pending submissions" icon={<ClipboardText size={18} weight="duotone" />} href="/trainer/assignments" />
       </div>
 
-      {/* Trainer Performance Analytics (Soft Light Tinted Cards with Dark Text) */}
+      {/* Trainer Performance Analytics (Executive Tones with Saturated Hover Border) */}
       <div className="space-y-3 pt-1">
         <PortalSectionTitle title="Course & Performance Analytics" />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {/* Attendance Rate */}
-          <div className="rounded-2xl border-2 border-sky-300/80 bg-sky-50/80 dark:bg-sky-950/30 p-4 shadow-xs">
+          <div className="portal-tone-sky rounded-2xl border p-4 shadow-xs hover:border-sky-500 hover:shadow-md transition-all duration-200">
             <div className="flex items-center justify-between gap-2">
-              <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-sky-700 text-white shadow-xs">
+              <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-sky-600 text-white shadow-xs">
                 Class Attendance
               </span>
               <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Rate %</span>
@@ -137,9 +137,9 @@ export default async function TrainerDashboardPage() {
           </div>
 
           {/* Submission Rate */}
-          <div className="rounded-2xl border-2 border-purple-300/80 bg-purple-50/80 dark:bg-purple-950/30 p-4 shadow-xs">
+          <div className="portal-tone-violet rounded-2xl border p-4 shadow-xs hover:border-violet-500 hover:shadow-md transition-all duration-200">
             <div className="flex items-center justify-between gap-2">
-              <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-purple-700 text-white shadow-xs">
+              <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-violet-600 text-white shadow-xs">
                 Submissions
               </span>
               <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Completion</span>
@@ -151,9 +151,9 @@ export default async function TrainerDashboardPage() {
           </div>
 
           {/* Completed Classes */}
-          <div className="rounded-2xl border-2 border-emerald-300/80 bg-emerald-50/80 dark:bg-emerald-950/30 p-4 shadow-xs">
+          <div className="portal-tone-emerald rounded-2xl border p-4 shadow-xs hover:border-emerald-500 hover:shadow-md transition-all duration-200">
             <div className="flex items-center justify-between gap-2">
-              <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-emerald-700 text-white shadow-xs">
+              <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-emerald-600 text-white shadow-xs">
                 Live Classes
               </span>
               <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Conducted</span>
@@ -165,9 +165,9 @@ export default async function TrainerDashboardPage() {
           </div>
 
           {/* Active Student Roster */}
-          <div className="rounded-2xl border-2 border-amber-300/80 bg-amber-50/80 dark:bg-amber-950/30 p-4 shadow-xs">
+          <div className="portal-tone-amber rounded-2xl border p-4 shadow-xs hover:border-amber-500 hover:shadow-md transition-all duration-200">
             <div className="flex items-center justify-between gap-2">
-              <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-amber-700 text-white shadow-xs">
+              <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-amber-600 text-white shadow-xs">
                 Active Roster
               </span>
               <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Enrolled</span>
@@ -180,7 +180,7 @@ export default async function TrainerDashboardPage() {
         </div>
       </div>
 
-      {/* Module Wise Breakdown (Uniform White Cards) */}
+      {/* Module Wise Breakdown */}
       {moduleGroups.length > 0 && (
         <div className="space-y-3">
           <PortalSectionTitle
@@ -198,7 +198,7 @@ export default async function TrainerDashboardPage() {
                 href={`/trainer/students?module=${encodeURIComponent(group.moduleName)}`}
                 className={cn(
                   portalPressable,
-                  "rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs hover:border-primary/40 hover:shadow-md block transition-all"
+                  "portal-tone-slate rounded-2xl border p-4 shadow-xs hover:border-indigo-500 hover:shadow-md block transition-all duration-200"
                 )}
               >
                 <div className="flex items-center justify-between">
