@@ -186,26 +186,26 @@ export function TrainerDashboardUI({
         </div>
       </div>
 
-      {/* Main KPI Cards Row (4 Cards with Mini Sparklines & Soft Watermarks) */}
+      {/* Main KPI Cards Row (4 Cards with Thicker Colored Borders & 5XL Numbers) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: My Students */}
         <Link
           href="/trainer/students"
-          className="group bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-sm hover:shadow-md hover:border-indigo-500/60 transition-all duration-300 flex items-center justify-between relative overflow-hidden"
+          className="group bg-gradient-to-br from-indigo-50/50 via-white to-white dark:from-indigo-950/20 dark:via-slate-900 dark:to-slate-900 border-2 border-indigo-200 dark:border-indigo-800/80 rounded-2xl p-4 shadow-sm hover:shadow-md hover:border-indigo-600 transition-all duration-300 flex items-center justify-between relative overflow-hidden"
         >
           <div className="relative z-10 space-y-1">
             <div className="flex items-center gap-2">
               <div className="p-2 rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/30">
-                <Users className="w-4 h-4" />
+                <Users className="w-4.5 h-4.5" />
               </div>
-              <span className="text-[11px] font-black text-indigo-900/80 dark:text-indigo-200/80 uppercase tracking-wider">
+              <span className="text-xs font-black text-indigo-950 dark:text-indigo-200 uppercase tracking-wider">
                 MY STUDENTS
               </span>
             </div>
-            <p className="text-4xl font-black tabular-nums text-indigo-950 dark:text-indigo-100 opacity-100 mt-2">
+            <p className="text-5xl font-black tabular-nums text-indigo-950 dark:text-indigo-100 opacity-100 mt-2">
               {studentsCount}
             </p>
-            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Total enrolled students</p>
+            <p className="text-xs font-black text-slate-800 dark:text-slate-200">Total enrolled students</p>
           </div>
           {mounted && (
             <div className="w-24 h-14 relative z-10 opacity-90 group-hover:scale-105 transition-transform">
@@ -227,91 +227,91 @@ export function TrainerDashboardUI({
         {/* Card 2: Assignments */}
         <Link
           href="/trainer/assignments"
-          className="group bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-sm hover:shadow-md hover:border-amber-500/60 transition-all duration-300 flex items-center justify-between relative overflow-hidden"
+          className="group bg-gradient-to-br from-amber-50/50 via-white to-white dark:from-amber-950/20 dark:via-slate-900 dark:to-slate-900 border-2 border-amber-200 dark:border-amber-800/80 rounded-2xl p-4 shadow-sm hover:shadow-md hover:border-amber-600 transition-all duration-300 flex items-center justify-between relative overflow-hidden"
         >
           <div className="relative z-10 space-y-1">
             <div className="flex items-center gap-2">
               <div className="p-2 rounded-xl bg-amber-600 text-white shadow-md shadow-amber-600/30">
-                <ClipboardList className="w-4 h-4" />
+                <ClipboardList className="w-4.5 h-4.5" />
               </div>
-              <span className="text-[11px] font-black text-amber-900/80 dark:text-amber-200/80 uppercase tracking-wider">
+              <span className="text-xs font-black text-amber-950 dark:text-amber-200 uppercase tracking-wider">
                 ASSIGNMENTS
               </span>
             </div>
-            <p className="text-4xl font-black tabular-nums text-amber-950 dark:text-amber-100 opacity-100 mt-2">
+            <p className="text-5xl font-black tabular-nums text-amber-950 dark:text-amber-100 opacity-100 mt-2">
               {assignmentsCount}
             </p>
-            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Pending to grade</p>
+            <p className="text-xs font-black text-slate-800 dark:text-slate-200">Pending to grade</p>
           </div>
-          <ClipboardCheck className="w-20 h-20 opacity-10 text-amber-600 dark:text-amber-400 absolute -right-2 -bottom-2 group-hover:scale-110 transition-transform pointer-events-none" />
+          <ClipboardCheck className="w-20 h-20 opacity-15 text-amber-600 dark:text-amber-400 absolute -right-2 -bottom-2 group-hover:scale-110 transition-transform pointer-events-none" />
         </Link>
 
         {/* Card 3: Upcoming Classes */}
         <Link
           href="/trainer/classes"
-          className="group bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-sm hover:shadow-md hover:border-emerald-500/60 transition-all duration-300 flex items-center justify-between relative overflow-hidden"
+          className="group bg-gradient-to-br from-emerald-50/50 via-white to-white dark:from-emerald-950/20 dark:via-slate-900 dark:to-slate-900 border-2 border-emerald-200 dark:border-emerald-800/80 rounded-2xl p-4 shadow-sm hover:shadow-md hover:border-emerald-600 transition-all duration-300 flex items-center justify-between relative overflow-hidden"
         >
           <div className="relative z-10 space-y-1">
             <div className="flex items-center gap-2">
               <div className="p-2 rounded-xl bg-emerald-600 text-white shadow-md shadow-emerald-600/30">
-                <Video className="w-4 h-4" />
+                <Video className="w-4.5 h-4.5" />
               </div>
-              <span className="text-[11px] font-black text-emerald-900/80 dark:text-emerald-200/80 uppercase tracking-wider">
+              <span className="text-xs font-black text-emerald-950 dark:text-emerald-200 uppercase tracking-wider">
                 UPCOMING CLASSES
               </span>
             </div>
-            <p className="text-4xl font-black tabular-nums text-emerald-950 dark:text-emerald-100 opacity-100 mt-2">
+            <p className="text-5xl font-black tabular-nums text-emerald-950 dark:text-emerald-100 opacity-100 mt-2">
               {upcomingSessionsCount}
             </p>
-            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Scheduled sessions</p>
+            <p className="text-xs font-black text-slate-800 dark:text-slate-200">Scheduled sessions</p>
           </div>
-          <Calendar className="w-20 h-20 opacity-10 text-emerald-600 dark:text-emerald-400 absolute -right-2 -bottom-2 group-hover:scale-110 transition-transform pointer-events-none" />
+          <Calendar className="w-20 h-20 opacity-15 text-emerald-600 dark:text-emerald-400 absolute -right-2 -bottom-2 group-hover:scale-110 transition-transform pointer-events-none" />
         </Link>
 
         {/* Card 4: To Review */}
         <Link
           href="/trainer/assignments"
-          className="group bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-sm hover:shadow-md hover:border-slate-500/60 transition-all duration-300 flex items-center justify-between relative overflow-hidden"
+          className="group bg-gradient-to-br from-slate-100/50 via-white to-white dark:from-slate-800/30 dark:via-slate-900 dark:to-slate-900 border-2 border-slate-300 dark:border-slate-700 rounded-2xl p-4 shadow-sm hover:shadow-md hover:border-slate-600 transition-all duration-300 flex items-center justify-between relative overflow-hidden"
         >
           <div className="relative z-10 space-y-1">
             <div className="flex items-center gap-2">
               <div className="p-2 rounded-xl bg-slate-700 text-white shadow-md shadow-slate-700/30">
-                <FileCheck className="w-4 h-4" />
+                <FileCheck className="w-4.5 h-4.5" />
               </div>
-              <span className="text-[11px] font-black text-slate-900/80 dark:text-slate-200/80 uppercase tracking-wider">
+              <span className="text-xs font-black text-slate-950 dark:text-slate-100 uppercase tracking-wider">
                 TO REVIEW
               </span>
             </div>
-            <p className="text-4xl font-black tabular-nums text-slate-950 dark:text-slate-100 opacity-100 mt-2">
+            <p className="text-5xl font-black tabular-nums text-slate-950 dark:text-slate-100 opacity-100 mt-2">
               {pendingReviewsCount}
             </p>
-            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Pending submissions</p>
+            <p className="text-xs font-black text-slate-800 dark:text-slate-200">Pending submissions</p>
           </div>
-          <CheckCircle2 className="w-20 h-20 opacity-10 text-slate-600 dark:text-slate-400 absolute -right-2 -bottom-2 group-hover:scale-110 transition-transform pointer-events-none" />
+          <CheckCircle2 className="w-20 h-20 opacity-15 text-slate-600 dark:text-slate-400 absolute -right-2 -bottom-2 group-hover:scale-110 transition-transform pointer-events-none" />
         </Link>
       </div>
 
-      {/* Course & Performance Analytics Section (4 Recharts Cards Grid) */}
+      {/* Course & Performance Analytics Section (4 High-Contrast Recharts Cards Grid) */}
       <div className="space-y-4 pt-2">
         <div className="flex items-center justify-between">
-          <h2 className="text-xs font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">
+          <h2 className="text-xs font-black uppercase tracking-widest text-slate-800 dark:text-slate-200">
             Course & Performance Analytics
           </h2>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Card 1: Class Attendance (Area Chart) */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-3">
+          <div className="bg-gradient-to-br from-sky-50/40 via-white to-white dark:from-sky-950/20 dark:via-slate-900 dark:to-slate-900 border-2 border-sky-300/90 dark:border-sky-800 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-3">
             <div>
               <div className="flex items-center justify-between gap-2">
-                <span className="text-[11px] font-black text-sky-900/80 dark:text-sky-200/80 uppercase tracking-wider">
+                <span className="text-xs font-black text-sky-950 dark:text-sky-200 uppercase tracking-wider">
                   CLASS ATTENDANCE
                 </span>
-                <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-sky-500/15 text-sky-700 dark:text-sky-300">
+                <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-sky-600 text-white shadow-xs">
                   RATE %
                 </span>
               </div>
-              <p className="text-4xl font-black tabular-nums text-sky-950 dark:text-sky-100 mt-2">
+              <p className="text-5xl font-black tabular-nums text-sky-950 dark:text-sky-100 mt-2">
                 {attendanceRatePct}%
               </p>
             </div>
@@ -323,36 +323,36 @@ export function TrainerDashboardUI({
                   <AreaChart data={dynamicAttendance} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
                     <defs>
                       <linearGradient id="attendanceGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#0284c7" stopOpacity={0.4} />
-                        <stop offset="100%" stopColor="#0284c7" stopOpacity={0.02} />
+                        <stop offset="0%" stopColor="#0284c7" stopOpacity={0.45} />
+                        <stop offset="100%" stopColor="#0284c7" stopOpacity={0.05} />
                       </linearGradient>
                     </defs>
-                    <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: "#94a3b8" }} />
-                    <YAxis domain={[0, 100]} ticks={[0, 25, 50, 75, 100]} tickFormatter={(v) => `${v}%`} tickLine={false} axisLine={false} tick={{ fontSize: 9, fill: "#94a3b8" }} />
+                    <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fontSize: 11, fontWeight: 800, fill: "#1e293b" }} />
+                    <YAxis domain={[0, 100]} ticks={[0, 25, 50, 75, 100]} tickFormatter={(v) => `${v}%`} tickLine={false} axisLine={false} tick={{ fontSize: 10, fontWeight: 800, fill: "#1e293b" }} />
                     <Tooltip content={<CustomTooltip unit="%" />} />
-                    <Area type="monotone" dataKey="rate" stroke="#0284c7" strokeWidth={2.5} fill="url(#attendanceGrad)" dot={{ r: 3, fill: "#0284c7" }} />
+                    <Area type="monotone" dataKey="rate" stroke="#0284c7" strokeWidth={3} fill="url(#attendanceGrad)" dot={{ r: 4, fill: "#0284c7" }} />
                   </AreaChart>
                 </ResponsiveContainer>
               )}
             </div>
 
-            <p className="text-[11px] font-extrabold text-sky-900/80 dark:text-sky-200/80 pt-1 border-t border-slate-100 dark:border-slate-800">
+            <p className="text-xs font-black text-sky-950 dark:text-sky-200 pt-1 border-t border-sky-200/60 dark:border-sky-900/50">
               Average student presence
             </p>
           </div>
 
           {/* Card 2: Submissions (Bar Chart) */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-3">
+          <div className="bg-gradient-to-br from-violet-50/40 via-white to-white dark:from-violet-950/20 dark:via-slate-900 dark:to-slate-900 border-2 border-violet-300/90 dark:border-violet-800 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-3">
             <div>
               <div className="flex items-center justify-between gap-2">
-                <span className="text-[11px] font-black text-violet-900/80 dark:text-violet-200/80 uppercase tracking-wider">
+                <span className="text-xs font-black text-violet-950 dark:text-violet-200 uppercase tracking-wider">
                   SUBMISSIONS
                 </span>
-                <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-violet-500/15 text-violet-700 dark:text-violet-300">
+                <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-violet-600 text-white shadow-xs">
                   COMPLETION
                 </span>
               </div>
-              <p className="text-4xl font-black tabular-nums text-violet-950 dark:text-violet-100 mt-2">
+              <p className="text-5xl font-black tabular-nums text-violet-950 dark:text-violet-100 mt-2">
                 {submissionRatePct}%
               </p>
             </div>
@@ -362,8 +362,8 @@ export function TrainerDashboardUI({
               {mounted && (
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={dynamicSubmission} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
-                    <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: "#94a3b8" }} />
-                    <YAxis domain={[0, 100]} ticks={[0, 25, 50, 75, 100]} tickFormatter={(v) => `${v}%`} tickLine={false} axisLine={false} tick={{ fontSize: 9, fill: "#94a3b8" }} />
+                    <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fontSize: 11, fontWeight: 800, fill: "#1e293b" }} />
+                    <YAxis domain={[0, 100]} ticks={[0, 25, 50, 75, 100]} tickFormatter={(v) => `${v}%`} tickLine={false} axisLine={false} tick={{ fontSize: 10, fontWeight: 800, fill: "#1e293b" }} />
                     <Tooltip content={<CustomTooltip unit="%" />} />
                     <Bar dataKey="completion" fill="#7c3aed" radius={[4, 4, 0, 0]} />
                   </BarChart>
@@ -371,23 +371,23 @@ export function TrainerDashboardUI({
               )}
             </div>
 
-            <p className="text-[11px] font-extrabold text-violet-900/80 dark:text-violet-200/80 pt-1 border-t border-slate-100 dark:border-slate-800">
+            <p className="text-xs font-black text-violet-950 dark:text-violet-200 pt-1 border-t border-violet-200/60 dark:border-violet-900/50">
               {totalSubmissionsCount} Total turned in
             </p>
           </div>
 
           {/* Card 3: Live Classes (Step Line Chart) */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-3">
+          <div className="bg-gradient-to-br from-emerald-50/40 via-white to-white dark:from-emerald-950/20 dark:via-slate-900 dark:to-slate-900 border-2 border-emerald-300/90 dark:border-emerald-800 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-3">
             <div>
               <div className="flex items-center justify-between gap-2">
-                <span className="text-[11px] font-black text-emerald-900/80 dark:text-emerald-200/80 uppercase tracking-wider">
+                <span className="text-xs font-black text-emerald-950 dark:text-emerald-200 uppercase tracking-wider">
                   LIVE CLASSES
                 </span>
-                <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">
+                <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-emerald-600 text-white shadow-xs">
                   CONDUCTED
                 </span>
               </div>
-              <p className="text-4xl font-black tabular-nums text-emerald-950 dark:text-emerald-100 mt-2">
+              <p className="text-5xl font-black tabular-nums text-emerald-950 dark:text-emerald-100 mt-2">
                 {completedSessionsCount}
               </p>
             </div>
@@ -397,32 +397,32 @@ export function TrainerDashboardUI({
               {mounted && (
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={dynamicClasses} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
-                    <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: "#94a3b8" }} />
-                    <YAxis domain={[0, 12]} ticks={[0, 4, 8, 12]} tickLine={false} axisLine={false} tick={{ fontSize: 9, fill: "#94a3b8" }} />
+                    <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fontSize: 11, fontWeight: 800, fill: "#1e293b" }} />
+                    <YAxis domain={[0, 12]} ticks={[0, 4, 8, 12]} tickLine={false} axisLine={false} tick={{ fontSize: 10, fontWeight: 800, fill: "#1e293b" }} />
                     <Tooltip content={<CustomTooltip />} />
-                    <Line type="stepAfter" dataKey="classes" stroke="#059669" strokeWidth={2.5} dot={{ r: 4, fill: "#059669" }} />
+                    <Line type="stepAfter" dataKey="classes" stroke="#059669" strokeWidth={3} dot={{ r: 4, fill: "#059669" }} />
                   </LineChart>
                 </ResponsiveContainer>
               )}
             </div>
 
-            <p className="text-[11px] font-extrabold text-emerald-900/80 dark:text-emerald-200/80 pt-1 border-t border-slate-100 dark:border-slate-800">
+            <p className="text-xs font-black text-emerald-950 dark:text-emerald-200 pt-1 border-t border-emerald-200/60 dark:border-emerald-900/50">
               Sessions completed
             </p>
           </div>
 
           {/* Card 4: Active Roster (Area Chart) */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-3">
+          <div className="bg-gradient-to-br from-amber-50/40 via-white to-white dark:from-amber-950/20 dark:via-slate-900 dark:to-slate-900 border-2 border-amber-300/90 dark:border-amber-800 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-3">
             <div>
               <div className="flex items-center justify-between gap-2">
-                <span className="text-[11px] font-black text-amber-900/80 dark:text-amber-200/80 uppercase tracking-wider">
+                <span className="text-xs font-black text-amber-950 dark:text-amber-200 uppercase tracking-wider">
                   ACTIVE ROSTER
                 </span>
-                <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300">
+                <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-amber-600 text-white shadow-xs">
                   ENROLLED
                 </span>
               </div>
-              <p className="text-4xl font-black tabular-nums text-amber-950 dark:text-amber-100 mt-2">
+              <p className="text-5xl font-black tabular-nums text-amber-950 dark:text-amber-100 mt-2">
                 {studentsCount}
               </p>
             </div>
@@ -434,20 +434,20 @@ export function TrainerDashboardUI({
                   <AreaChart data={dynamicRoster} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
                     <defs>
                       <linearGradient id="rosterGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#d97706" stopOpacity={0.4} />
-                        <stop offset="100%" stopColor="#d97706" stopOpacity={0.02} />
+                        <stop offset="0%" stopColor="#d97706" stopOpacity={0.45} />
+                        <stop offset="100%" stopColor="#d97706" stopOpacity={0.05} />
                       </linearGradient>
                     </defs>
-                    <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: "#94a3b8" }} />
-                    <YAxis domain={[0, 100]} ticks={[0, 25, 50, 75, 100]} tickLine={false} axisLine={false} tick={{ fontSize: 9, fill: "#94a3b8" }} />
+                    <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fontSize: 11, fontWeight: 800, fill: "#1e293b" }} />
+                    <YAxis domain={[0, 100]} ticks={[0, 25, 50, 75, 100]} tickLine={false} axisLine={false} tick={{ fontSize: 10, fontWeight: 800, fill: "#1e293b" }} />
                     <Tooltip content={<CustomTooltip />} />
-                    <Area type="monotone" dataKey="students" stroke="#d97706" strokeWidth={2.5} fill="url(#rosterGrad)" dot={{ r: 3, fill: "#d97706" }} />
+                    <Area type="monotone" dataKey="students" stroke="#d97706" strokeWidth={3} fill="url(#rosterGrad)" dot={{ r: 4, fill: "#d97706" }} />
                   </AreaChart>
                 </ResponsiveContainer>
               )}
             </div>
 
-            <p className="text-[11px] font-extrabold text-amber-900/80 dark:text-amber-200/80 pt-1 border-t border-slate-100 dark:border-slate-800">
+            <p className="text-xs font-black text-amber-950 dark:text-amber-200 pt-1 border-t border-amber-200/60 dark:border-amber-900/50">
               Students in active scope
             </p>
           </div>
@@ -458,10 +458,10 @@ export function TrainerDashboardUI({
       {moduleGroups.length > 0 && (
         <div className="space-y-4 pt-2">
           <div className="flex items-center justify-between">
-            <h2 className="text-xs font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">
+            <h2 className="text-xs font-black uppercase tracking-widest text-slate-800 dark:text-slate-200">
               Students by Module
             </h2>
-            <Button variant="ghost" size="sm" asChild className="h-7 text-xs font-bold text-slate-600 hover:text-indigo-600 gap-1">
+            <Button variant="ghost" size="sm" asChild className="h-7 text-xs font-black text-slate-800 hover:text-indigo-600 gap-1">
               <Link href="/trainer/students">
                 <span>View all</span>
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -472,10 +472,10 @@ export function TrainerDashboardUI({
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
             {moduleGroups.map((group, idx) => {
               const themeStyles = [
-                { badge: "bg-indigo-600", text: "text-indigo-950 dark:text-indigo-100", stroke: "#4f46e5", gradId: "modInd", border: "hover:border-indigo-500/60" },
-                { badge: "bg-amber-600", text: "text-amber-950 dark:text-amber-100", stroke: "#d97706", gradId: "modAmb", border: "hover:border-amber-500/60" },
-                { badge: "bg-emerald-600", text: "text-emerald-950 dark:text-emerald-100", stroke: "#059669", gradId: "modEme", border: "hover:border-emerald-500/60" },
-                { badge: "bg-teal-600", text: "text-teal-950 dark:text-teal-100", stroke: "#0d9488", gradId: "modTeal", border: "hover:border-teal-500/60" },
+                { badge: "bg-indigo-600", text: "text-indigo-950 dark:text-indigo-100", stroke: "#4f46e5", gradId: "modInd", border: "border-2 border-indigo-300 dark:border-indigo-800 hover:border-indigo-600 bg-gradient-to-br from-indigo-50/40 via-white to-white" },
+                { badge: "bg-amber-600", text: "text-amber-950 dark:text-amber-100", stroke: "#d97706", gradId: "modAmb", border: "border-2 border-amber-300 dark:border-amber-800 hover:border-amber-600 bg-gradient-to-br from-amber-50/40 via-white to-white" },
+                { badge: "bg-emerald-600", text: "text-emerald-950 dark:text-emerald-100", stroke: "#059669", gradId: "modEme", border: "border-2 border-emerald-300 dark:border-emerald-800 hover:border-emerald-600 bg-gradient-to-br from-emerald-50/40 via-white to-white" },
+                { badge: "bg-teal-600", text: "text-teal-950 dark:text-teal-100", stroke: "#0d9488", gradId: "modTeal", border: "border-2 border-teal-300 dark:border-teal-800 hover:border-teal-600 bg-gradient-to-br from-teal-50/40 via-white to-white" },
               ];
               const theme = themeStyles[idx % themeStyles.length];
               const sparkData = moduleSparklines[idx % moduleSparklines.length];
@@ -486,23 +486,23 @@ export function TrainerDashboardUI({
                   key={group.moduleName}
                   href={`/trainer/students?module=${encodeURIComponent(group.moduleName)}`}
                   className={cn(
-                    "group bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between relative overflow-hidden",
+                    "group rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between relative overflow-hidden",
                     theme.border
                   )}
                 >
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className={cn("text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md text-white shadow-xs", theme.badge)}>
+                      <span className={cn("text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-md text-white shadow-xs", theme.badge)}>
                         MODULE {idx + 1}
                       </span>
-                      <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                      <span className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">
                         {group.students.length} STUDENTS
                       </span>
                     </div>
-                    <p className="text-sm font-bold text-slate-700 dark:text-slate-300 truncate pt-1">
+                    <p className="text-sm font-black text-slate-900 dark:text-slate-100 truncate pt-1">
                       {group.moduleName}
                     </p>
-                    <p className={cn("text-4xl font-black tabular-nums", theme.text)}>
+                    <p className={cn("text-5xl font-black tabular-nums", theme.text)}>
                       {group.students.length}
                     </p>
                   </div>
@@ -514,25 +514,25 @@ export function TrainerDashboardUI({
                         <AreaChart data={sparkData} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
                           <defs>
                             <linearGradient id={theme.gradId} x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stopColor={theme.stroke} stopOpacity={0.35} />
+                              <stop offset="0%" stopColor={theme.stroke} stopOpacity={0.4} />
                               <stop offset="100%" stopColor={theme.stroke} stopOpacity={0} />
                             </linearGradient>
                           </defs>
-                          <Area type="monotone" dataKey="v" stroke={theme.stroke} strokeWidth={2.5} fill={`url(#${theme.gradId})`} />
+                          <Area type="monotone" dataKey="v" stroke={theme.stroke} strokeWidth={3} fill={`url(#${theme.gradId})`} />
                         </AreaChart>
                       </ResponsiveContainer>
                     )}
                   </div>
 
                   {/* Bottom Progress Fill Line */}
-                  <div className="space-y-1 pt-1 border-t border-slate-100 dark:border-slate-800">
-                    <div className="h-1.5 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                  <div className="space-y-1 pt-1 border-t border-slate-200/80 dark:border-slate-800">
+                    <div className="h-2 w-full rounded-full bg-slate-200/80 dark:bg-slate-800 overflow-hidden">
                       <div
                         className={cn("h-full rounded-full transition-all duration-500", theme.badge)}
                         style={{ width: `${Math.min(100, Math.max(8, pctOfTotal))}%` }}
                       />
                     </div>
-                    <p className="text-[10px] font-black text-right text-slate-500 dark:text-slate-400">
+                    <p className="text-[11px] font-black text-right text-slate-800 dark:text-slate-200">
                       {pctOfTotal}% of total roster
                     </p>
                   </div>
@@ -544,44 +544,44 @@ export function TrainerDashboardUI({
       )}
 
       {/* Overall Progress Bottom Banner */}
-      <div className="bg-gradient-to-r from-white via-indigo-50/40 to-white dark:from-slate-900 dark:via-indigo-950/20 dark:to-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row items-center justify-between gap-5">
+      <div className="bg-gradient-to-r from-indigo-50/70 via-white to-indigo-50/70 dark:from-slate-900 dark:via-indigo-950/20 dark:to-slate-900 border-2 border-indigo-200/90 dark:border-indigo-800 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row items-center justify-between gap-5">
         <div className="flex items-center gap-3.5">
-          <div className="p-3 rounded-2xl bg-indigo-600/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
+          <div className="p-3 rounded-2xl bg-indigo-600 text-white shadow-md shadow-indigo-600/30">
             <GraduationCap className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
+            <h3 className="text-xs font-black uppercase tracking-wider text-indigo-950 dark:text-white">
               OVERALL PROGRESS
             </h3>
-            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+            <p className="text-xs font-black text-slate-700 dark:text-slate-300">
               All modules combined
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-4 w-full md:w-auto">
-          <div className="relative flex items-center justify-center w-12 h-12 rounded-full border-4 border-indigo-600/20 border-t-indigo-600 text-xs font-black text-indigo-600 dark:text-indigo-400">
+          <div className="relative flex items-center justify-center w-14 h-14 rounded-full border-4 border-indigo-600/30 border-t-indigo-600 text-sm font-black text-indigo-950 dark:text-indigo-300 bg-white dark:bg-slate-900 shadow-sm">
             68%
           </div>
           <div className="space-y-1 min-w-[140px]">
-            <p className="text-[11px] font-bold text-slate-600 dark:text-slate-400">Average completion</p>
-            <div className="h-2 w-full rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+            <p className="text-xs font-black text-slate-900 dark:text-slate-100">Average completion</p>
+            <div className="h-2.5 w-full rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden border border-slate-300/50">
               <div className="h-full bg-indigo-600 rounded-full w-[68%]" />
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-6 text-xs font-bold text-slate-700 dark:text-slate-300">
+        <div className="flex items-center gap-6 text-xs font-black text-slate-900 dark:text-slate-100">
           <div className="flex items-center gap-2">
-            <Users className="w-4 h-4 text-indigo-600" />
+            <Users className="w-4.5 h-4.5 text-indigo-600" />
             <span>
-              <strong className="text-sm font-black text-slate-900 dark:text-white">{studentsCount}</strong> Total active
+              <strong className="text-base font-black text-indigo-950 dark:text-white">{studentsCount}</strong> Total active
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4 text-indigo-600" />
+            <Clock className="w-4.5 h-4.5 text-indigo-600" />
             <span>
-              <strong className="text-sm font-black text-slate-900 dark:text-white">{upcomingSessionsCount}</strong> Classes this week
+              <strong className="text-base font-black text-indigo-950 dark:text-white">{upcomingSessionsCount}</strong> Classes this week
             </span>
           </div>
         </div>
