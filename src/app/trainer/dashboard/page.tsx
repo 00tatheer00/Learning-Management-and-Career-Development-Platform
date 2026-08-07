@@ -118,64 +118,64 @@ export default async function TrainerDashboardPage() {
         <StatCard label="To Review" value={pendingReviews} accent="slate" hint="Pending submissions" icon={<ClipboardText size={18} weight="duotone" />} href="/trainer/assignments" />
       </div>
 
-      {/* Trainer Performance Analytics (Executive Tones with Saturated Hover Border) */}
+      {/* Trainer Performance Analytics (Executive Tones with Saturated Hover Border & Prominent Matching Text) */}
       <div className="space-y-3 pt-1">
         <PortalSectionTitle title="Course & Performance Analytics" />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {/* Attendance Rate */}
-          <div className="portal-tone-sky rounded-2xl border p-4 shadow-xs hover:border-sky-500 hover:shadow-md transition-all duration-200">
+          <div className="portal-tone-sky rounded-2xl border-2 border-sky-300/80 p-4 shadow-xs hover:border-sky-600 hover:shadow-md transition-all duration-200">
             <div className="flex items-center justify-between gap-2">
               <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-sky-600 text-white shadow-xs">
                 Class Attendance
               </span>
-              <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Rate %</span>
+              <span className="text-xs font-bold text-sky-900 dark:text-sky-200">Rate %</span>
             </div>
-            <p className="text-3xl font-black tabular-nums text-slate-950 dark:text-white mt-2">
+            <p className="text-3.5xl font-black tabular-nums text-sky-950 dark:text-sky-100 mt-2">
               {attendanceRatePct}%
             </p>
-            <p className="text-[11px] font-bold text-slate-700 dark:text-slate-300 mt-1">Average student presence</p>
+            <p className="text-[11px] font-bold text-sky-900 dark:text-sky-200 mt-1">Average student presence</p>
           </div>
 
           {/* Submission Rate */}
-          <div className="portal-tone-violet rounded-2xl border p-4 shadow-xs hover:border-violet-500 hover:shadow-md transition-all duration-200">
+          <div className="portal-tone-violet rounded-2xl border-2 border-violet-300/80 p-4 shadow-xs hover:border-violet-600 hover:shadow-md transition-all duration-200">
             <div className="flex items-center justify-between gap-2">
               <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-violet-600 text-white shadow-xs">
                 Submissions
               </span>
-              <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Completion</span>
+              <span className="text-xs font-bold text-violet-900 dark:text-violet-200">Completion</span>
             </div>
-            <p className="text-3xl font-black tabular-nums text-slate-950 dark:text-white mt-2">
+            <p className="text-3.5xl font-black tabular-nums text-violet-950 dark:text-violet-100 mt-2">
               {submissionRatePct}%
             </p>
-            <p className="text-[11px] font-bold text-slate-700 dark:text-slate-300 mt-1">{submissions.length} Total turned in</p>
+            <p className="text-[11px] font-bold text-violet-900 dark:text-violet-200 mt-1">{submissions.length} Total turned in</p>
           </div>
 
           {/* Completed Classes */}
-          <div className="portal-tone-emerald rounded-2xl border p-4 shadow-xs hover:border-emerald-500 hover:shadow-md transition-all duration-200">
+          <div className="portal-tone-emerald rounded-2xl border-2 border-emerald-300/80 p-4 shadow-xs hover:border-emerald-600 hover:shadow-md transition-all duration-200">
             <div className="flex items-center justify-between gap-2">
               <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-emerald-600 text-white shadow-xs">
                 Live Classes
               </span>
-              <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Conducted</span>
+              <span className="text-xs font-bold text-emerald-900 dark:text-emerald-200">Conducted</span>
             </div>
-            <p className="text-3xl font-black tabular-nums text-slate-950 dark:text-white mt-2">
+            <p className="text-3.5xl font-black tabular-nums text-emerald-950 dark:text-emerald-100 mt-2">
               {completedSessions}
             </p>
-            <p className="text-[11px] font-bold text-slate-700 dark:text-slate-300 mt-1">Sessions completed</p>
+            <p className="text-[11px] font-bold text-emerald-900 dark:text-emerald-200 mt-1">Sessions completed</p>
           </div>
 
           {/* Active Student Roster */}
-          <div className="portal-tone-amber rounded-2xl border p-4 shadow-xs hover:border-amber-500 hover:shadow-md transition-all duration-200">
+          <div className="portal-tone-amber rounded-2xl border-2 border-amber-300/80 p-4 shadow-xs hover:border-amber-600 hover:shadow-md transition-all duration-200">
             <div className="flex items-center justify-between gap-2">
               <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-amber-600 text-white shadow-xs">
                 Active Roster
               </span>
-              <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Enrolled</span>
+              <span className="text-xs font-bold text-amber-900 dark:text-amber-200">Enrolled</span>
             </div>
-            <p className="text-3xl font-black tabular-nums text-slate-950 dark:text-white mt-2">
+            <p className="text-3.5xl font-black tabular-nums text-amber-950 dark:text-amber-100 mt-2">
               {students.length}
             </p>
-            <p className="text-[11px] font-bold text-slate-700 dark:text-slate-300 mt-1">Students in active scope</p>
+            <p className="text-[11px] font-bold text-amber-900 dark:text-amber-200 mt-1">Students in active scope</p>
           </div>
         </div>
       </div>
@@ -192,27 +192,38 @@ export default async function TrainerDashboardPage() {
             }
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-            {moduleGroups.map((group, idx) => (
-              <Link
-                key={group.moduleName}
-                href={`/trainer/students?module=${encodeURIComponent(group.moduleName)}`}
-                className={cn(
-                  portalPressable,
-                  "portal-tone-slate rounded-2xl border p-4 shadow-xs hover:border-indigo-500 hover:shadow-md block transition-all duration-200"
-                )}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-600 dark:text-slate-400">
-                    Module {idx + 1}
-                  </span>
-                  <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                    {group.students.length} Students
-                  </span>
-                </div>
-                <p className="text-sm font-extrabold text-slate-950 dark:text-white truncate mt-2">{group.moduleName}</p>
-                <p className="text-2xl font-black tabular-nums text-slate-950 dark:text-white mt-0.5">{group.students.length}</p>
-              </Link>
-            ))}
+            {moduleGroups.map((group, idx) => {
+              const moduleStyles = [
+                { wrap: "portal-tone-indigo border-2 border-indigo-300/80 hover:border-indigo-600", badge: "bg-indigo-600", text: "text-indigo-950 dark:text-indigo-100", label: "text-indigo-900 dark:text-indigo-200" },
+                { wrap: "portal-tone-amber border-2 border-amber-300/80 hover:border-amber-600", badge: "bg-amber-600", text: "text-amber-950 dark:text-amber-100", label: "text-amber-900 dark:text-amber-200" },
+                { wrap: "portal-tone-emerald border-2 border-emerald-300/80 hover:border-emerald-600", badge: "bg-emerald-600", text: "text-emerald-950 dark:text-emerald-100", label: "text-emerald-900 dark:text-emerald-200" },
+                { wrap: "portal-tone-teal border-2 border-teal-300/80 hover:border-teal-600", badge: "bg-teal-600", text: "text-teal-950 dark:text-teal-100", label: "text-teal-900 dark:text-teal-200" },
+              ];
+              const modStyle = moduleStyles[idx % moduleStyles.length];
+
+              return (
+                <Link
+                  key={group.moduleName}
+                  href={`/trainer/students?module=${encodeURIComponent(group.moduleName)}`}
+                  className={cn(
+                    portalPressable,
+                    "rounded-2xl p-4 shadow-xs hover:shadow-md block transition-all duration-200",
+                    modStyle.wrap
+                  )}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className={cn("text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md text-white shadow-xs", modStyle.badge)}>
+                      Module {idx + 1}
+                    </span>
+                    <span className={cn("text-xs font-bold", modStyle.label)}>
+                      {group.students.length} Students
+                    </span>
+                  </div>
+                  <p className={cn("text-sm font-extrabold truncate mt-2", modStyle.text)}>{group.moduleName}</p>
+                  <p className={cn("text-3xl font-black tabular-nums mt-0.5", modStyle.text)}>{group.students.length}</p>
+                </Link>
+              );
+            })}
           </div>
         </div>
       )}
