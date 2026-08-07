@@ -118,7 +118,7 @@ export default async function TrainerDashboardPage() {
         <StatCard label="To Review" value={pendingReviews} accent="slate" hint="Pending submissions" icon={<ClipboardText size={18} weight="duotone" />} href="/trainer/assignments" />
       </div>
 
-      {/* Trainer Performance Analytics (Executive Tones with Saturated Hover Border & Ultra Prominent Text) */}
+      {/* Trainer Performance Analytics (Executive Tones with 100% Prominent Values & 80% Opacity Titles) */}
       <div className="space-y-3 pt-1">
         <PortalSectionTitle title="Course & Performance Analytics" />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -128,12 +128,12 @@ export default async function TrainerDashboardPage() {
               <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-sky-600 text-white shadow-xs">
                 Class Attendance
               </span>
-              <span className="text-xs font-black text-sky-800 dark:text-sky-200 uppercase tracking-wide">Rate %</span>
+              <span className="text-xs font-extrabold text-sky-900/80 dark:text-sky-200/80 uppercase tracking-wide opacity-80">Rate %</span>
             </div>
-            <p className="text-4xl font-black tabular-nums text-sky-700 dark:text-sky-300 mt-2">
+            <p className="text-4.5xl font-black tabular-nums text-sky-950 dark:text-sky-100 opacity-100 mt-2">
               {attendanceRatePct}%
             </p>
-            <p className="text-[11px] font-black text-sky-800 dark:text-sky-200 mt-1">Average student presence</p>
+            <p className="text-[11px] font-extrabold text-sky-900/80 dark:text-sky-200/80 opacity-80 mt-1">Average student presence</p>
           </div>
 
           {/* Submission Rate */}
@@ -142,12 +142,12 @@ export default async function TrainerDashboardPage() {
               <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-violet-600 text-white shadow-xs">
                 Submissions
               </span>
-              <span className="text-xs font-black text-violet-800 dark:text-violet-200 uppercase tracking-wide">Completion</span>
+              <span className="text-xs font-extrabold text-violet-900/80 dark:text-violet-200/80 uppercase tracking-wide opacity-80">Completion</span>
             </div>
-            <p className="text-4xl font-black tabular-nums text-violet-700 dark:text-violet-300 mt-2">
+            <p className="text-4.5xl font-black tabular-nums text-violet-950 dark:text-violet-100 opacity-100 mt-2">
               {submissionRatePct}%
             </p>
-            <p className="text-[11px] font-black text-violet-800 dark:text-violet-200 mt-1">{submissions.length} Total turned in</p>
+            <p className="text-[11px] font-extrabold text-violet-900/80 dark:text-violet-200/80 opacity-80 mt-1">{submissions.length} Total turned in</p>
           </div>
 
           {/* Completed Classes */}
@@ -156,12 +156,12 @@ export default async function TrainerDashboardPage() {
               <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-emerald-600 text-white shadow-xs">
                 Live Classes
               </span>
-              <span className="text-xs font-black text-emerald-800 dark:text-emerald-200 uppercase tracking-wide">Conducted</span>
+              <span className="text-xs font-extrabold text-emerald-900/80 dark:text-emerald-200/80 uppercase tracking-wide opacity-80">Conducted</span>
             </div>
-            <p className="text-4xl font-black tabular-nums text-emerald-700 dark:text-emerald-300 mt-2">
+            <p className="text-4.5xl font-black tabular-nums text-emerald-950 dark:text-emerald-100 opacity-100 mt-2">
               {completedSessions}
             </p>
-            <p className="text-[11px] font-black text-emerald-800 dark:text-emerald-200 mt-1">Sessions completed</p>
+            <p className="text-[11px] font-extrabold text-emerald-900/80 dark:text-emerald-200/80 opacity-80 mt-1">Sessions completed</p>
           </div>
 
           {/* Active Student Roster */}
@@ -170,12 +170,12 @@ export default async function TrainerDashboardPage() {
               <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-amber-600 text-white shadow-xs">
                 Active Roster
               </span>
-              <span className="text-xs font-black text-amber-800 dark:text-amber-200 uppercase tracking-wide">Enrolled</span>
+              <span className="text-xs font-extrabold text-amber-900/80 dark:text-amber-200/80 uppercase tracking-wide opacity-80">Enrolled</span>
             </div>
-            <p className="text-4xl font-black tabular-nums text-amber-700 dark:text-amber-300 mt-2">
+            <p className="text-4.5xl font-black tabular-nums text-amber-950 dark:text-amber-100 opacity-100 mt-2">
               {students.length}
             </p>
-            <p className="text-[11px] font-black text-amber-800 dark:text-amber-200 mt-1">Students in active scope</p>
+            <p className="text-[11px] font-extrabold text-amber-900/80 dark:text-amber-200/80 opacity-80 mt-1">Students in active scope</p>
           </div>
         </div>
       </div>
@@ -194,10 +194,10 @@ export default async function TrainerDashboardPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
             {moduleGroups.map((group, idx) => {
               const moduleStyles = [
-                { wrap: "portal-tone-indigo border-2 border-indigo-300/80 hover:border-indigo-600", badge: "bg-indigo-600", text: "text-indigo-700 dark:text-indigo-300", label: "text-indigo-800 dark:text-indigo-200" },
-                { wrap: "portal-tone-amber border-2 border-amber-300/80 hover:border-amber-600", badge: "bg-amber-600", text: "text-amber-700 dark:text-amber-300", label: "text-amber-800 dark:text-amber-200" },
-                { wrap: "portal-tone-emerald border-2 border-emerald-300/80 hover:border-emerald-600", badge: "bg-emerald-600", text: "text-emerald-700 dark:text-emerald-300", label: "text-emerald-800 dark:text-emerald-200" },
-                { wrap: "portal-tone-teal border-2 border-teal-300/80 hover:border-teal-600", badge: "bg-teal-600", text: "text-teal-700 dark:text-teal-300", label: "text-teal-800 dark:text-teal-200" },
+                { wrap: "portal-tone-indigo border-2 border-indigo-300/80 hover:border-indigo-600", badge: "bg-indigo-600", text: "text-indigo-950 dark:text-indigo-100 opacity-100 font-black", label: "text-indigo-900/80 dark:text-indigo-200/80 font-extrabold opacity-80" },
+                { wrap: "portal-tone-amber border-2 border-amber-300/80 hover:border-amber-600", badge: "bg-amber-600", text: "text-amber-950 dark:text-amber-100 opacity-100 font-black", label: "text-amber-900/80 dark:text-amber-200/80 font-extrabold opacity-80" },
+                { wrap: "portal-tone-emerald border-2 border-emerald-300/80 hover:border-emerald-600", badge: "bg-emerald-600", text: "text-emerald-950 dark:text-emerald-100 opacity-100 font-black", label: "text-emerald-900/80 dark:text-emerald-200/80 font-extrabold opacity-80" },
+                { wrap: "portal-tone-teal border-2 border-teal-300/80 hover:border-teal-600", badge: "bg-teal-600", text: "text-teal-950 dark:text-teal-100 opacity-100 font-black", label: "text-teal-900/80 dark:text-teal-200/80 font-extrabold opacity-80" },
               ];
               const modStyle = moduleStyles[idx % moduleStyles.length];
 
@@ -215,12 +215,12 @@ export default async function TrainerDashboardPage() {
                     <span className={cn("text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md text-white shadow-xs", modStyle.badge)}>
                       Module {idx + 1}
                     </span>
-                    <span className={cn("text-xs font-black uppercase tracking-wider", modStyle.label)}>
+                    <span className={cn("text-xs uppercase tracking-wider", modStyle.label)}>
                       {group.students.length} Students
                     </span>
                   </div>
-                  <p className={cn("text-sm font-black truncate mt-2", modStyle.text)}>{group.moduleName}</p>
-                  <p className={cn("text-3.5xl font-black tabular-nums mt-0.5", modStyle.text)}>{group.students.length}</p>
+                  <p className={cn("text-sm truncate mt-2", modStyle.label)}>{group.moduleName}</p>
+                  <p className={cn("text-4xl tabular-nums mt-0.5", modStyle.text)}>{group.students.length}</p>
                 </Link>
               );
             })}
