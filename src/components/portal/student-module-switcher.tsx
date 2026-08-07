@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   CaretDown,
@@ -27,6 +27,8 @@ export function StudentModuleSwitcher({
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isPending, startTransition] = useTransition();
+
   const [selectedModule, setSelectedModule] = useState<string | null>(
     currentModule || approvedModules[0] || null
   );
@@ -62,9 +64,10 @@ export function StudentModuleSwitcher({
   }
 
   const activeModuleName = selectedModule || modules[0];
+  const isLoading = isUpdating || isPending;
 
   const handleSelectModule = async (moduleName: string) => {
-    if (moduleName === activeModuleName || isUpdating) {
+    if (moduleName === activeModuleName || isLoading) {
       setIsOpen(false);
       return;
     }
@@ -84,7 +87,9 @@ export function StudentModuleSwitcher({
       });
 
       if (res.ok) {
-        router.refresh();
+        startTransition(() => {
+          router.refresh();
+        });
       } else {
         console.error("Failed to switch active module");
         setSelectedModule(currentModule);
@@ -115,106 +120,125 @@ export function StudentModuleSwitcher({
   }
 
   return (
-    <div className={cn("relative inline-block text-left", className)} ref={dropdownRef}>
-      <button
-        type="button"
-        onClick={() => setIsOpen((prev) => !prev)}
-        disabled={isUpdating}
-        className={cn(
-          "group inline-flex items-center justify-between gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-200",
-          "bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 hover:from-primary/20 hover:to-primary/20",
-          "text-primary border border-primary/25 hover:border-primary/40 shadow-sm hover:shadow",
-          "focus:outline-none focus:ring-2 focus:ring-primary/30",
-          isUpdating && "opacity-75 cursor-not-allowed"
-        )}
-        aria-expanded={isOpen}
-        aria-haspopup="true"
-      >
-        <div className="flex items-center gap-1.5 min-w-0">
-          {isUpdating ? (
-            <SpinnerGap size={14} className="animate-spin text-primary shrink-0" />
-          ) : (
-            <Sparkle size={14} weight="fill" className="text-primary shrink-0 animate-pulse" />
-          )}
-          <span className="text-[10px] uppercase tracking-wider text-primary/70 font-bold hidden sm:inline">
-            Active:
-          </span>
-          <span className="truncate max-w-[130px] sm:max-w-[190px] font-bold text-pt">
-            {activeModuleName}
-          </span>
-        </div>
-        <div className="flex items-center gap-1">
-          <span className="px-1.5 py-0.5 rounded-md bg-primary/15 text-[10px] font-bold text-primary">
-            {modules.length} Modules
-          </span>
-          <CaretDown
-            size={13}
-            weight="bold"
-            className={cn(
-              "text-primary transition-transform duration-200 shrink-0",
-              isOpen && "rotate-180"
-            )}
-          />
-        </div>
-      </button>
-
-      {isOpen && (
-        <div
-          className={cn(
-            "absolute left-0 sm:right-0 sm:left-auto mt-2 w-72 sm:w-80 rounded-2xl bg-pt-surface border border-pt/60 shadow-2xl z-50 overflow-hidden",
-            "animate-in fade-in slide-in-from-top-2 duration-150"
-          )}
-        >
-          <div className="p-3 bg-pt-subtle/50 border-b border-pt/40 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <GraduationCap size={18} weight="duotone" className="text-primary" />
-              <div>
-                <p className="text-xs font-bold text-pt">Enrolled Modules</p>
-                <p className="text-[10px] text-pt-muted">Switch active view</p>
-              </div>
+    <>
+      {isLoading && (
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-slate-950/40 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-2xl flex flex-col items-center gap-3 max-w-xs text-center">
+            <div className="p-3 rounded-full bg-primary/10 text-primary animate-spin">
+              <SpinnerGap size={32} weight="bold" />
             </div>
-            <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-              1 Account Portal
-            </span>
-          </div>
-
-          <div className="p-1.5 space-y-1 max-h-64 overflow-y-auto">
-            {modules.map((mod) => {
-              const isActive = mod === activeModuleName;
-              return (
-                <button
-                  key={mod}
-                  type="button"
-                  onClick={() => handleSelectModule(mod)}
-                  className={cn(
-                    "w-full text-left flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150",
-                    isActive
-                      ? "bg-primary/15 text-primary font-bold border border-primary/30"
-                      : "hover:bg-pt-subtle text-pt hover:text-primary"
-                  )}
-                >
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span
-                      className={cn(
-                        "w-2 h-2 rounded-full shrink-0",
-                        isActive ? "bg-primary animate-ping" : "bg-pt-muted/40"
-                      )}
-                    />
-                    <span className="truncate">{mod}</span>
-                  </div>
-                  {isActive && (
-                    <CheckCircle
-                      size={16}
-                      weight="fill"
-                      className="text-primary shrink-0"
-                    />
-                  )}
-                </button>
-              );
-            })}
+            <div>
+              <p className="text-sm font-black text-slate-900 dark:text-white">Fetching Module Data...</p>
+              <p className="text-xs text-slate-500 mt-1 font-semibold">Loading latest records from database</p>
+            </div>
+            <div className="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden mt-1">
+              <div className="bg-primary h-full rounded-full animate-pulse w-3/4" />
+            </div>
           </div>
         </div>
       )}
-    </div>
+
+      <div className={cn("relative inline-block text-left", className)} ref={dropdownRef}>
+        <button
+          type="button"
+          onClick={() => setIsOpen((prev) => !prev)}
+          disabled={isLoading}
+          className={cn(
+            "group inline-flex items-center justify-between gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-200",
+            "bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 hover:from-primary/20 hover:to-primary/20",
+            "text-primary border border-primary/25 hover:border-primary/40 shadow-sm hover:shadow",
+            "focus:outline-none focus:ring-2 focus:ring-primary/30",
+            isLoading && "opacity-75 cursor-not-allowed"
+          )}
+          aria-expanded={isOpen}
+          aria-haspopup="true"
+        >
+          <div className="flex items-center gap-1.5 min-w-0">
+            {isLoading ? (
+              <SpinnerGap size={14} className="animate-spin text-primary shrink-0" />
+            ) : (
+              <Sparkle size={14} weight="fill" className="text-primary shrink-0 animate-pulse" />
+            )}
+            <span className="text-[10px] uppercase tracking-wider text-primary/70 font-bold hidden sm:inline">
+              Active:
+            </span>
+            <span className="truncate max-w-[130px] sm:max-w-[190px] font-bold text-pt">
+              {activeModuleName}
+            </span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="px-1.5 py-0.5 rounded-md bg-primary/15 text-[10px] font-bold text-primary">
+              {modules.length} Modules
+            </span>
+            <CaretDown
+              size={13}
+              weight="bold"
+              className={cn(
+                "text-primary transition-transform duration-200 shrink-0",
+                isOpen && "rotate-180"
+              )}
+            />
+          </div>
+        </button>
+
+        {isOpen && (
+          <div
+            className={cn(
+              "absolute left-0 sm:right-0 sm:left-auto mt-2 w-72 sm:w-80 rounded-2xl bg-pt-surface border border-pt/60 shadow-2xl z-50 overflow-hidden",
+              "animate-in fade-in slide-in-from-top-2 duration-150"
+            )}
+          >
+            <div className="p-3 bg-pt-subtle/50 border-b border-pt/40 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <GraduationCap size={18} weight="duotone" className="text-primary" />
+                <div>
+                  <p className="text-xs font-bold text-pt">Enrolled Modules</p>
+                  <p className="text-[10px] text-pt-muted">Switch active view</p>
+                </div>
+              </div>
+              <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                1 Account Portal
+              </span>
+            </div>
+
+            <div className="p-1.5 space-y-1 max-h-64 overflow-y-auto">
+              {modules.map((mod) => {
+                const isActive = mod === activeModuleName;
+                return (
+                  <button
+                    key={mod}
+                    type="button"
+                    onClick={() => handleSelectModule(mod)}
+                    className={cn(
+                      "w-full text-left flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150",
+                      isActive
+                        ? "bg-primary/15 text-primary font-bold border border-primary/30"
+                        : "hover:bg-pt-subtle text-pt hover:text-primary"
+                    )}
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span
+                        className={cn(
+                          "w-2 h-2 rounded-full shrink-0",
+                          isActive ? "bg-primary animate-ping" : "bg-pt-muted/40"
+                        )}
+                      />
+                      <span className="truncate">{mod}</span>
+                    </div>
+                    {isActive && (
+                      <CheckCircle
+                        size={16}
+                        weight="fill"
+                        className="text-primary shrink-0"
+                      />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
