@@ -12,7 +12,8 @@
     "test:watch": "vitest",
     "postinstall": "prisma generate",
     "db:push": "dotenv -e .env.local -- prisma db push",
-    "db:seed": "dotenv -e .env.local -- tsx -r ./scripts/suppress-server-only.cjs prisma/seed.ts"
+    "db:seed": "dotenv -e .env.local -- tsx -r ./scripts/suppress-server-only.cjs prisma/seed.ts",
+    "db:backfill-modules": "dotenv -e .env.local -- tsx -r ./scripts/suppress-server-only.cjs scripts/backfill-module-enrollments.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
