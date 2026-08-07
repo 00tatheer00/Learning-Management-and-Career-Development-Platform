@@ -65,38 +65,38 @@ interface StatCardProps {
 const accentStyles = {
   rose: {
     wrap: "portal-tone-rose border-2 border-rose-300/80 hover:border-rose-600 hover:shadow-md transition-all duration-200",
-    text: "text-rose-950 dark:text-rose-100 font-black",
-    label: "text-rose-900 dark:text-rose-200 font-bold",
+    text: "text-rose-700 dark:text-rose-300 font-black",
+    label: "text-rose-800 dark:text-rose-200 font-black tracking-wide uppercase",
     icon: "bg-rose-600 text-white shadow-xs",
   },
   orange: {
     wrap: "portal-tone-amber border-2 border-amber-300/80 hover:border-amber-600 hover:shadow-md transition-all duration-200",
-    text: "text-amber-950 dark:text-amber-100 font-black",
-    label: "text-amber-900 dark:text-amber-200 font-bold",
+    text: "text-amber-700 dark:text-amber-300 font-black",
+    label: "text-amber-800 dark:text-amber-200 font-black tracking-wide uppercase",
     icon: "bg-amber-600 text-white shadow-xs",
   },
   green: {
     wrap: "portal-tone-emerald border-2 border-emerald-300/80 hover:border-emerald-600 hover:shadow-md transition-all duration-200",
-    text: "text-emerald-950 dark:text-emerald-100 font-black",
-    label: "text-emerald-900 dark:text-emerald-200 font-bold",
+    text: "text-emerald-700 dark:text-emerald-300 font-black",
+    label: "text-emerald-800 dark:text-emerald-200 font-black tracking-wide uppercase",
     icon: "bg-emerald-600 text-white shadow-xs",
   },
   blue: {
     wrap: "portal-tone-indigo border-2 border-indigo-300/80 hover:border-indigo-600 hover:shadow-md transition-all duration-200",
-    text: "text-indigo-950 dark:text-indigo-100 font-black",
-    label: "text-indigo-900 dark:text-indigo-200 font-bold",
+    text: "text-indigo-700 dark:text-indigo-300 font-black",
+    label: "text-indigo-800 dark:text-indigo-200 font-black tracking-wide uppercase",
     icon: "bg-indigo-600 text-white shadow-xs",
   },
   sky: {
     wrap: "portal-tone-sky border-2 border-sky-300/80 hover:border-sky-600 hover:shadow-md transition-all duration-200",
-    text: "text-sky-950 dark:text-sky-100 font-black",
-    label: "text-sky-900 dark:text-sky-200 font-bold",
+    text: "text-sky-700 dark:text-sky-300 font-black",
+    label: "text-sky-800 dark:text-sky-200 font-black tracking-wide uppercase",
     icon: "bg-sky-600 text-white shadow-xs",
   },
   slate: {
     wrap: "portal-tone-slate border-2 border-slate-300/80 hover:border-slate-600 hover:shadow-md transition-all duration-200",
-    text: "text-slate-950 dark:text-slate-100 font-black",
-    label: "text-slate-800 dark:text-slate-200 font-bold",
+    text: "text-slate-800 dark:text-slate-100 font-black",
+    label: "text-slate-800 dark:text-slate-200 font-black tracking-wide uppercase",
     icon: "bg-slate-700 text-white shadow-xs",
   },
 };
@@ -128,13 +128,13 @@ export function StatCard({
         )}
         <div className="min-w-0">
           <p className={cn(compact ? "text-[10px]" : "text-xs", style.label)}>{label}</p>
-          <p className={cn("tabular-nums truncate", compact ? "text-xl mt-0.5" : "text-2.5xl mt-0.5", style.text)}>
+          <p className={cn("tabular-nums truncate", compact ? "text-2xl mt-0.5" : "text-3.5xl mt-0.5", style.text)}>
             {value}
           </p>
         </div>
       </div>
       {hint && (
-        <p className={cn("font-bold text-slate-700 dark:text-slate-300", compact ? "text-[10px] mt-1.5" : "text-xs mt-2")}>{hint}</p>
+        <p className={cn("font-extrabold text-slate-700 dark:text-slate-300", compact ? "text-[10px] mt-1.5" : "text-xs mt-2")}>{hint}</p>
       )}
     </>
   );
