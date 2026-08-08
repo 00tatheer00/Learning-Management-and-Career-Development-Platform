@@ -105,19 +105,10 @@ export function StudentCourseLectures({
 
             <div className="mt-8">
               {loadingUrl ? (
-                <div className="aspect-video bg-zinc-950/90 rounded-2xl border border-zinc-800 flex items-center justify-center p-6 sm:p-10 shadow-2xl">
-                  <div className="w-full max-w-md space-y-4">
-                    <DynamicProgressBar
-                      title="Preparing Secure Video Stream"
-                      steps={[
-                        "Authenticating playback token...",
-                        "Establishing stream handshake...",
-                        "Buffering high-definition video...",
-                        "Ready to play!",
-                      ]}
-                      size="md"
-                      variant="gradient"
-                    />
+                <div className="aspect-video bg-zinc-950 rounded-2xl border border-zinc-800/80 flex flex-col items-center justify-center p-6 space-y-3">
+                  <span className="text-xs font-medium text-zinc-400">Loading video stream...</span>
+                  <div className="w-48">
+                    <DynamicProgressBar isLoading={loadingUrl} size="xs" />
                   </div>
                 </div>
               ) : (

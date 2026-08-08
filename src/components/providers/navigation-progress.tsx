@@ -5,15 +5,14 @@ import NextTopLoader from "nextjs-toploader";
 export function NavigationProgress() {
   return (
     <NextTopLoader
-      color="#f97316"
-      initialPosition={0.08}
+      color="#ea580c"
+      initialPosition={0.1}
       crawlSpeed={200}
-      height={3.5}
+      height={2.5}
       showSpinner={false}
-      speed={350}
-      easing="ease-out"
-      showAtBottom={false}
-      shadow="0 0 16px #f97316, 0 0 8px #ea580c"
+      speed={300}
+      easing="ease"
+      shadow="0 0 8px rgba(234,88,12,0.4)"
       zIndex={99999}
     />
   );
