@@ -6,6 +6,7 @@ import { VideoPlayer } from "./video-player";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "@/lib/ui/toast";
+import { DynamicProgressBar } from "@/components/ui/dynamic-progress-bar";
 
 interface Lecture {
   id: string;
@@ -104,10 +105,19 @@ export function StudentCourseLectures({
 
             <div className="mt-8">
               {loadingUrl ? (
-                <div className="aspect-video bg-zinc-900 rounded-2xl flex items-center justify-center">
-                  <div className="text-center text-zinc-400 space-y-3">
-                    <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
-                    <p className="text-sm font-semibold animate-pulse tracking-wide">Configuring secure stream connection...</p>
+                <div className="aspect-video bg-zinc-950/90 rounded-2xl border border-zinc-800 flex items-center justify-center p-6 sm:p-10 shadow-2xl">
+                  <div className="w-full max-w-md space-y-4">
+                    <DynamicProgressBar
+                      title="Preparing Secure Video Stream"
+                      steps={[
+                        "Authenticating playback token...",
+                        "Establishing stream handshake...",
+                        "Buffering high-definition video...",
+                        "Ready to play!",
+                      ]}
+                      size="md"
+                      variant="gradient"
+                    />
                   </div>
                 </div>
               ) : (
