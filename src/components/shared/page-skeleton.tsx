@@ -28,23 +28,11 @@ export function MarketingPageSkeleton() {
 
 export function HomePageSkeleton() {
   return (
-    <div>
-      <div className="min-h-[70vh] flex flex-col items-center justify-center px-4 pt-24 pb-16">
-        <Skeleton className="h-8 w-48 mb-6 rounded-full" />
-        <Skeleton className="h-12 w-full max-w-2xl mb-4" />
-        <Skeleton className="h-12 w-full max-w-xl mb-6" />
-        <Skeleton className="h-5 w-full max-w-lg mb-10" />
-        <div className="flex gap-3">
-          <Skeleton className="h-14 w-44 rounded-lg" />
-          <Skeleton className="h-14 w-36 rounded-lg" />
-        </div>
-      </div>
-      <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-2 md:grid-cols-4 gap-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className="h-24 rounded-2xl" />
-        ))}
-      </div>
-    </div>
+    <ModuleDataLoadingModal
+      isLoading={true}
+      title="Loading Website..."
+      subtitle="Loading latest course content"
+    />
   );
 }
 
