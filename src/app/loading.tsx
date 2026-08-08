@@ -1,12 +1,6 @@
-import { ModuleDataLoadingModal } from "@/components/portal/module-data-loading-modal";
+import { HomePageSkeleton } from "@/components/shared/page-skeleton";
 
 export default function Loading() {
-  return (
-    <ModuleDataLoadingModal
-      isLoading={true}
-      title="Loading Website..."
-      subtitle="Fetching latest course records and portal data"
-    />
-  );
+  return <HomePageSkeleton />;
 }
 

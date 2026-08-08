@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils";
-import { ModuleDataLoadingModal } from "@/components/portal/module-data-loading-modal";
 
 function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
@@ -28,21 +27,35 @@ export function MarketingPageSkeleton() {
 
 export function HomePageSkeleton() {
   return (
-    <ModuleDataLoadingModal
-      isLoading={true}
-      title="Loading Website..."
-      subtitle="Loading latest course content"
-    />
+    <div className="min-h-[70vh] flex flex-col items-center justify-center px-4 pt-24 pb-16 max-w-7xl mx-auto space-y-6 animate-in fade-in duration-150">
+      <Skeleton className="h-8 w-48 rounded-full" />
+      <Skeleton className="h-12 w-full max-w-2xl rounded-xl" />
+      <Skeleton className="h-5 w-full max-w-lg rounded-lg" />
+      <div className="flex gap-3 pt-4">
+        <Skeleton className="h-12 w-40 rounded-xl" />
+        <Skeleton className="h-12 w-32 rounded-xl" />
+      </div>
+    </div>
   );
 }
 
 export function PortalPageSkeleton() {
   return (
-    <ModuleDataLoadingModal
-      isLoading={true}
-      title="Loading Page..."
-      subtitle="Fetching latest portal records"
-    />
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 animate-in fade-in duration-150">
+      <div className="space-y-2">
+        <Skeleton className="h-7 w-48 rounded-xl" />
+        <Skeleton className="h-4 w-72 rounded-lg" />
+      </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Skeleton key={i} className="h-28 rounded-2xl" />
+        ))}
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <Skeleton className="h-52 rounded-2xl lg:col-span-2" />
+        <Skeleton className="h-52 rounded-2xl" />
+      </div>
+    </div>
   );
 }
 
