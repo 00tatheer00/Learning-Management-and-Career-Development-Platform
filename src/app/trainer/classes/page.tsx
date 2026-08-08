@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { LinkSimple, PencilSimple, VideoCamera, CheckCircle } from "@phosphor-icons/react";
+import { LinkSimple, PencilSimple, VideoCamera, CheckCircle, Trash } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -51,6 +51,8 @@ export default function TrainerClassesPage() {
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editLink, setEditLink] = useState("");
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [now, setNow] = useState(() => new Date());
   const [selectedModule, setSelectedModule] = useState<string>("all");
 
@@ -151,6 +153,28 @@ export default function TrainerClassesPage() {
       setLoading(false);
     }
   };
+
+  const handleDeleteClass = async (sessionId: string) => {
+    setDeletingId(sessionId);
+    try {
+      const res = await fetch(`/api/trainer/sessions/${sessionId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success("Class deleted!", "This class has been removed for you and all students.");
+        setConfirmDeleteId(null);
+        load();
+      } else {
+        toast.error(data.message || data.error || "Could not delete class.");
+      }
+    } catch {
+      toast.error("Error. Try again.");
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
 
   return (
     <div>
@@ -340,14 +364,54 @@ export default function TrainerClassesPage() {
                     )}
                   </div>
 
-                  {session.roomType === "meet" && hasLink && !isEditing && lifecycle.canTrainerOpenMeet && (
-                    <Button asChild className="shrink-0">
-                      <a href={session.meetLink} target="_blank" rel="noopener noreferrer">
-                        <VideoCamera size={18} weight="duotone" /> Open Meet
-                      </a>
+                  <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                    {session.roomType === "meet" && hasLink && !isEditing && lifecycle.canTrainerOpenMeet && (
+                      <Button asChild className="shrink-0">
+                        <a href={session.meetLink} target="_blank" rel="noopener noreferrer">
+                          <VideoCamera size={18} weight="duotone" /> Open Meet
+                        </a>
+                      </Button>
+                    )}
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="text-red-500 hover:bg-red-500/10 hover:text-red-600 shrink-0 h-10 w-10 rounded-xl transition-colors"
+                      title="Delete class"
+                      onClick={() => setConfirmDeleteId(confirmDeleteId === session.id ? null : session.id)}
+                    >
+                      <Trash size={18} weight="duotone" />
                     </Button>
-                  )}
+                  </div>
                 </div>
+
+                {confirmDeleteId === session.id && (
+                  <div className="rounded-xl border border-red-500/30 bg-red-500/5 p-4 space-y-3">
+                    <p className="text-sm font-semibold text-red-600 dark:text-red-400">
+                      Are you sure you want to delete &quot;{session.title}&quot;?
+                    </p>
+                    <p className="text-xs text-muted">
+                      This class will be permanently removed for you and all students in their portal.
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        size="sm"
+                        className="bg-red-600 text-white hover:bg-red-700"
+                        disabled={deletingId === session.id}
+                        onClick={() => handleDeleteClass(session.id)}
+                      >
+                        {deletingId === session.id ? "Deleting..." : "Yes, Delete Class"}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={deletingId === session.id}
+                        onClick={() => setConfirmDeleteId(null)}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                )}
 
                 {session.roomType === "meet" && lifecycle.canTrainerEditLink && (
                   <div className="rounded-xl border border-border bg-surface p-4">
@@ -404,3 +468,4 @@ export default function TrainerClassesPage() {
     </div>
   );
 }
+

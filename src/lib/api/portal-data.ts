@@ -440,6 +440,16 @@ export async function updateLiveSession(
   }
 }
 
+export async function deleteLiveSession(id: string): Promise<boolean> {
+  try {
+    await prisma.liveSession.delete({ where: { id } });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+
 export async function getPortalStats() {
   const [programStats, assignments, sessions] = await Promise.all([
     getAdminProgramStats(),

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth/session";
 import { resolveTrainerId } from "@/lib/auth/trainer-scope";
-import { getLiveSessionById, updateLiveSession } from "@/lib/api/portal-data";
+import { deleteLiveSession, getLiveSessionById, updateLiveSession } from "@/lib/api/portal-data";
 import { createApiResponse } from "@/lib/api/enrollment";
 import { isValidMeetLink, normalizeMeetLink } from "@/lib/sessions/meet-link";
 
@@ -74,3 +74,41 @@ export async function PATCH(
     });
   }
 }
+
+export async function DELETE(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const user = await getCurrentUser();
+  if (!user || user.role !== "trainer") {
+    return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), {
+      status: 403,
+    });
+  }
+
+  const { id } = await params;
+  const existing = await getLiveSessionById(id);
+
+  if (!existing) {
+    return NextResponse.json(createApiResponse(false, { error: "Class not found" }), {
+      status: 404,
+    });
+  }
+
+  const trainerId = resolveTrainerId(user);
+  if (existing.trainerId !== trainerId) {
+    return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), {
+      status: 403,
+    });
+  }
+
+  const success = await deleteLiveSession(id);
+  if (!success) {
+    return NextResponse.json(createApiResponse(false, { error: "Failed to delete class" }), {
+      status: 500,
+    });
+  }
+
+  return NextResponse.json(createApiResponse(true, { message: "Class deleted successfully" }));
+}
+
