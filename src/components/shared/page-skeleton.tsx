@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { ModuleDataLoadingModal } from "@/components/portal/module-data-loading-modal";
 
 function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
@@ -49,19 +50,14 @@ export function HomePageSkeleton() {
 
 export function PortalPageSkeleton() {
   return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-6">
-      <Skeleton className="h-8 w-56" />
-      <Skeleton className="h-4 w-80 max-w-full" />
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className="h-28 rounded-2xl" />
-        ))}
-      </div>
-      <Skeleton className="h-40 rounded-2xl" />
-      <Skeleton className="h-40 rounded-2xl" />
-    </div>
+    <ModuleDataLoadingModal
+      isLoading={true}
+      title="Loading Page..."
+      subtitle="Fetching latest portal records"
+    />
   );
 }
+
 
 export function FormPageSkeleton() {
   return (
