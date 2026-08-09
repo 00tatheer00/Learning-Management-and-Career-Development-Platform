@@ -50,6 +50,7 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [editStudent, setEditStudent] = useState<AdminStudentRow | null>(null);
+  const [editCourse, setEditCourse] = useState("");
   const [editModule, setEditModule] = useState("");
   const [editBatch, setEditBatch] = useState(DEFAULT_BATCH_NAME);
   const [deleteTarget, setDeleteTarget] = useState<AdminStudentRow | null>(null);
@@ -141,6 +142,7 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
 
   const openEdit = (student: AdminStudentRow) => {
     setEditStudent(student);
+    setEditCourse(student.programSlug);
     setEditModule(student.module);
     setEditBatch(student.batch);
   };
@@ -150,15 +152,23 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
     const ok = await runAction(editStudent.studentId, {
       action: "update",
       enrollmentId: editStudent.id,
+      programSlug: editCourse,
       level: editModule,
       batch: editBatch,
     });
     setLoadingId(null);
     if (ok) {
+      const newCourseTitle = getProgramBySlug(editCourse)?.title ?? editCourse;
       setStudents((current) =>
         current.map((student) =>
           student.id === editStudent.id
-            ? { ...student, module: editModule, batch: editBatch }
+            ? {
+                ...student,
+                programSlug: editCourse,
+                course: newCourseTitle,
+                module: editModule,
+                batch: editBatch,
+              }
             : student
         )
       );
@@ -187,8 +197,8 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
     setLoadingId(null);
   };
 
-  const moduleOptions = editStudent
-    ? (getProgramBySlug(editStudent.programSlug)?.modules.map((mod) => mod.name) ?? [])
+  const moduleOptions = editCourse
+    ? (getProgramBySlug(editCourse)?.modules.map((mod) => mod.name) ?? [])
     : [];
 
   return (
@@ -702,14 +712,43 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
       >
         {editStudent && (
           <>
-            <p className="text-sm text-muted">{editStudent.name}</p>
+            <p className="text-sm text-muted font-medium">{editStudent.name}</p>
             <div className="mt-4 space-y-4">
+              <label className="block text-sm font-medium">
+                Course
+                <select
+                  value={editCourse}
+                  onChange={(event) => {
+                    const newCourse = event.target.value;
+                    setEditCourse(newCourse);
+                    const newMods = getProgramBySlug(newCourse)?.modules.map((m) => m.name) ?? [];
+                    if (newMods.length > 0 && !newMods.includes(editModule)) {
+                      setEditModule(newMods[0]);
+                    }
+                  }}
+                  className="mt-2 h-11 w-full rounded-lg border border-border bg-background px-3 text-sm font-medium"
+                >
+                  {ENROLLABLE_PROGRAM_SLUGS.map((slug) => {
+                    const prog = getProgramBySlug(slug);
+                    return (
+                      <option key={slug} value={slug}>
+                        {prog?.title ?? slug}
+                      </option>
+                    );
+                  })}
+                  {!ENROLLABLE_PROGRAM_SLUGS.includes(editCourse as any) && (
+                    <option value={editCourse}>
+                      {getProgramBySlug(editCourse)?.title ?? editCourse}
+                    </option>
+                  )}
+                </select>
+              </label>
               <label className="block text-sm font-medium">
                 Module
                 <select
                   value={editModule}
                   onChange={(event) => setEditModule(event.target.value)}
-                  className="mt-2 h-11 w-full rounded-lg border border-border bg-background px-3 text-sm"
+                  className="mt-2 h-11 w-full rounded-lg border border-border bg-background px-3 text-sm font-medium"
                 >
                   {moduleOptions.map((name) => (
                     <option key={name} value={name}>

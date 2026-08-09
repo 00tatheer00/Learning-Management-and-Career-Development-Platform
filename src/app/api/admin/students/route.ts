@@ -9,6 +9,7 @@ import { deleteAdminStudent } from "@/lib/api/admin-students";
 import { savePortalPasswordForStudentEmail } from "@/lib/auth/portal-password-vault";
 import { getPortalLoginUrl } from "@/lib/site-url";
 import { resetPortalWelcomeForEnrollment } from "@/lib/api/student-portal-welcome";
+import { normalizeProgramSlug, resolveTrainerIdForProgram } from "@/lib/auth/program-assignment";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
@@ -30,6 +31,7 @@ const patchSchema = z.discriminatedUnion("action", [
     id: z.string(),
     enrollmentId: z.string().optional(),
     action: z.literal("update"),
+    programSlug: z.string().min(1).optional(),
     level: z.string().min(1).optional(),
     batch: z.string().min(1).optional(),
   }),
@@ -213,19 +215,25 @@ export async function PATCH(request: Request) {
     }
   }
 
-  if (!parsed.data.level && !parsed.data.batch) {
+  if (!parsed.data.programSlug && !parsed.data.level && !parsed.data.batch) {
     return NextResponse.json(
-      createApiResponse(false, { message: "Provide module or batch to update" }),
+      createApiResponse(false, { message: "Provide course, module, or batch to update" }),
       { status: 400 }
     );
   }
 
   const enrollmentId = "enrollmentId" in parsed.data ? parsed.data.enrollmentId : undefined;
+  const newProgramSlug = parsed.data.programSlug
+    ? normalizeProgramSlug(parsed.data.programSlug)
+    : undefined;
+  const newTrainerId = newProgramSlug
+    ? await resolveTrainerIdForProgram(newProgramSlug)
+    : undefined;
 
   if (enrollmentId) {
     const enrollment = await prisma.enrollment.findUnique({
       where: { id: enrollmentId },
-      select: { email: true, status: true, level: true },
+      select: { email: true, status: true, level: true, program: true },
     });
 
     if (
@@ -241,37 +249,38 @@ export async function PATCH(request: Request) {
     const updatedEnrollment = await prisma.enrollment.update({
       where: { id: enrollmentId },
       data: {
+        program: newProgramSlug ?? undefined,
         level: parsed.data.level ?? undefined,
         batch: parsed.data.batch ?? undefined,
       },
     });
 
-    if (
-      student.programSlug &&
-      student.level === enrollment.level &&
-      parsed.data.level &&
-      parsed.data.level !== student.level
-    ) {
-      await updateUser(student.id, { level: parsed.data.level });
-    }
+    await updateUser(student.id, {
+      programSlug: newProgramSlug ?? student.programSlug,
+      level: parsed.data.level ?? student.level,
+      batch: parsed.data.batch ?? student.batch,
+      ...(newTrainerId ? { trainerId: newTrainerId } : {}),
+    });
 
     return NextResponse.json(
       createApiResponse(true, {
         data: updatedEnrollment,
-        message: "Enrollment module/batch updated.",
+        message: "Enrollment course/module/batch updated.",
       })
     );
   }
 
   const updated = await updateUser(student.id, {
+    programSlug: newProgramSlug ?? student.programSlug,
     level: parsed.data.level ?? student.level,
     batch: parsed.data.batch ?? student.batch,
+    ...(newTrainerId ? { trainerId: newTrainerId } : {}),
   });
 
   return NextResponse.json(
     createApiResponse(true, {
       data: updated,
-      message: "Student module/batch updated.",
+      message: "Student course/module/batch updated.",
     })
   );
 }
