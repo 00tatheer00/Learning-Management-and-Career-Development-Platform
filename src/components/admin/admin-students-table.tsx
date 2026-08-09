@@ -736,7 +736,7 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
                       </option>
                     );
                   })}
-                  {!ENROLLABLE_PROGRAM_SLUGS.includes(editCourse as any) && (
+                  {!(ENROLLABLE_PROGRAM_SLUGS as readonly string[]).includes(editCourse) && (
                     <option value={editCourse}>
                       {getProgramBySlug(editCourse)?.title ?? editCourse}
                     </option>
