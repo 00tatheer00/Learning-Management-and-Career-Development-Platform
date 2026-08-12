@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth/session";
 import { requireTrainerProgram, resolveTrainerId } from "@/lib/auth/trainer-scope";
-import { getFirstModuleName } from "@/lib/modules/student-module-access";
+import { getFirstModuleName, getProgramModuleNames } from "@/lib/modules/student-module-access";
 import {
   deleteClassRecording,
   getClassRecordings,
@@ -19,7 +19,22 @@ export async function GET() {
 
   try {
     const programSlug = requireTrainerProgram(user);
-    const recordings = await getClassRecordings(programSlug);
+    const allRecordings = await getClassRecordings(programSlug);
+
+    const programModules = getProgramModuleNames(programSlug);
+    const rawActiveLevel = user.level?.trim();
+    const activeLevel =
+      rawActiveLevel && rawActiveLevel !== "all"
+        ? rawActiveLevel
+        : programModules[0] || "HTML & CSS";
+
+    const normActive = activeLevel.toLowerCase().trim();
+
+    const recordings = allRecordings.filter((r) => {
+      const itemLevel = (r.level || programModules[0] || "HTML & CSS").toLowerCase().trim();
+      return itemLevel === normActive;
+    });
+
     return NextResponse.json(createApiResponse(true, { data: recordings }));
   } catch {
     return NextResponse.json(createApiResponse(false, { error: "Trainer course not configured" }), {
@@ -53,9 +68,16 @@ export async function POST(request: Request) {
       );
     }
 
+    const programModules = getProgramModuleNames(programSlug);
+    const rawActiveLevel = user.level?.trim();
+    const activeLevel =
+      rawActiveLevel && rawActiveLevel !== "all"
+        ? rawActiveLevel
+        : programModules[0] || "HTML & CSS";
+
     const recording = await upsertClassRecording({
       programSlug,
-      level: user.level ?? getFirstModuleName(programSlug) ?? undefined,
+      level: activeLevel,
       classNumber: parsed.data.classNumber,
       title: parsed.data.title,
       driveUrl: parsed.data.driveUrl,
