@@ -47,20 +47,29 @@ export async function GET() {
       (s) => s.trainerId === trainerId
     );
 
-    const activeLevel = user.level?.trim();
-    const isAll = !activeLevel || activeLevel === "all";
+    const programModules = getProgramModuleNames(programSlug);
+    const rawActiveLevel = user.level?.trim();
+    const activeLevel =
+      rawActiveLevel && rawActiveLevel !== "all"
+        ? rawActiveLevel
+        : programModules[0] || "HTML & CSS";
 
-    const scopedAssignments = isAll
-      ? assignments
-      : assignments.filter((a) => !a.level || a.level === activeLevel);
+    const normActive = activeLevel.toLowerCase().trim();
 
-    const scopedSessions = isAll
-      ? sessions
-      : sessions.filter((s) => !s.level || s.level === activeLevel);
+    const scopedAssignments = assignments.filter((a) => {
+      const itemLevel = (a.level || programModules[0] || "HTML & CSS").toLowerCase().trim();
+      return itemLevel === normActive;
+    });
 
-    const scopedStudents = isAll
-      ? students
-      : students.filter((st) => st.level === activeLevel);
+    const scopedSessions = sessions.filter((s) => {
+      const itemLevel = (s.level || programModules[0] || "HTML & CSS").toLowerCase().trim();
+      return itemLevel === normActive;
+    });
+
+    const scopedStudents = students.filter((st) => {
+      const itemLevel = (st.level || "").toLowerCase().trim();
+      return itemLevel === normActive;
+    });
 
     const scopedAssignmentIds = new Set(scopedAssignments.map((a) => a.id));
     const scopedSubmissions = allSubmissions.filter((s) => scopedAssignmentIds.has(s.assignmentId));

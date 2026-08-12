@@ -39,6 +39,7 @@ interface TrainerStudentsPanelProps {
   programSlug: string;
   courseTitle: string;
   designation: string;
+  activeModule?: string;
 }
 
 export function TrainerStudentsPanel({
@@ -46,11 +47,14 @@ export function TrainerStudentsPanel({
   programSlug,
   courseTitle,
   designation,
+  activeModule,
 }: TrainerStudentsPanelProps) {
   const searchParams = useSearchParams();
   const initialModule = searchParams.get("module");
   const initialPhase = searchParams.get("phase");
-  const [moduleFilter, setModuleFilter] = useState<string>("all");
+  const defaultModule =
+    initialModule || (activeModule && activeModule !== "all" ? activeModule : "all");
+  const [moduleFilter, setModuleFilter] = useState<string>(defaultModule);
   const [phaseFilter, setPhaseFilter] = useState<"all" | RegistrationPhase>("all");
   const [search, setSearch] = useState("");
 
@@ -70,11 +74,16 @@ export function TrainerStudentsPanel({
     if (initialModule) {
       const match = moduleOptions.find((mod) => mod.name === initialModule);
       if (match) setModuleFilter(match.name);
+    } else if (activeModule && activeModule !== "all") {
+      const match = moduleOptions.find(
+        (mod) => mod.name.trim().toLowerCase() === activeModule.trim().toLowerCase()
+      );
+      if (match) setModuleFilter(match.name);
     }
     if (initialPhase && (initialPhase === "phase-1" || initialPhase === "phase-2")) {
       setPhaseFilter(initialPhase);
     }
-  }, [initialModule, initialPhase, moduleOptions]);
+  }, [initialModule, activeModule, initialPhase, moduleOptions]);
 
   const filteredGroups = useMemo(() => {
     const query = search.trim().toLowerCase();

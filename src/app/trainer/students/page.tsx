@@ -32,6 +32,7 @@ export default async function TrainerStudentsPage() {
         programSlug={user.programSlug}
         courseTitle={getTrainerCourseTitle(user.programSlug)}
         designation={getTrainerDesignation(user.programSlug)}
+        activeModule={user.level ?? undefined}
       />
     </Suspense>
   );

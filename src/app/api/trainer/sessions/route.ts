@@ -59,8 +59,8 @@ export async function POST(request: Request) {
       roomType: isPortal ? "portal" : "meet",
       programSlug,
       level:
-        parsed.data.level ??
-        (user.level && user.level !== "all" ? user.level : getFirstModuleName(programSlug)) ??
+        parsed.data.level?.trim() ||
+        (user.level && user.level !== "all" ? user.level.trim() : getFirstModuleName(programSlug)) ||
         undefined,
       notes: parsed.data.notes,
       trainerId: resolveTrainerId(user),

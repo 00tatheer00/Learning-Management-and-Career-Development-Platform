@@ -5,6 +5,31 @@ import { getCentralPhaseMetrics, type CentralPhaseMetrics } from "@/lib/services
 export type PhaseMetrics = CentralPhaseMetrics;
 
 export interface AdminDashboardData {
+  /** Admissions business domain statistics */
+  admissions: {
+    totalEnrollments: number;
+    approvedEnrollments: number;
+    pendingEnrollments: number;
+    rejectedEnrollments: number;
+    estimatedRevenue: number;
+    returningRegistrations: number;
+    firstTimeRegistrations: number;
+  };
+  /** Academic operations domain statistics */
+  academic: {
+    activeStudents: number;
+    trainerAssignedStudents: number;
+    missingTrainerAssignments: number;
+    assignments: number;
+    upcomingSessions: number;
+    trainers: number;
+    loggedInStudents: number;
+    neverLoggedInStudents: number;
+    webStudents: number;
+    appStudents: number;
+  };
+
+  // Top-level fields preserved for 100% backward compatibility
   pendingEnrollments: number;
   approvedEnrollments: number;
   totalEnrollments: number;
@@ -106,7 +131,32 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   const today = now.toISOString().split("T")[0];
   const upcomingSessions = sessions.filter((s) => s.date >= today).length;
 
+  const admissions = {
+    totalEnrollments: allMetrics.totalEnrollments,
+    approvedEnrollments: allMetrics.approvedEnrollments,
+    pendingEnrollments: allMetrics.pendingEnrollments,
+    rejectedEnrollments: allMetrics.rejectedEnrollments,
+    estimatedRevenue: allMetrics.estimatedRevenue,
+    returningRegistrations: allMetrics.returningRegistrations,
+    firstTimeRegistrations: allMetrics.firstTimeRegistrations,
+  };
+
+  const academic = {
+    activeStudents: allMetrics.students,
+    trainerAssignedStudents: programStats.trainerAssignedStudents,
+    missingTrainerAssignments: programStats.missingTrainerAssignments,
+    assignments,
+    upcomingSessions,
+    trainers,
+    loggedInStudents: allMetrics.loggedInStudents,
+    neverLoggedInStudents: allMetrics.neverLoggedInStudents,
+    webStudents: allMetrics.webStudents,
+    appStudents: allMetrics.appStudents,
+  };
+
   return {
+    admissions,
+    academic,
     pendingEnrollments: allMetrics.pendingEnrollments,
     approvedEnrollments: allMetrics.approvedEnrollments,
     totalEnrollments: allMetrics.totalEnrollments,

@@ -10,7 +10,12 @@ export type RegistrationPhase = "phase-1" | "phase-2";
 export type PhaseFilter = "all" | "phase-1" | "phase-2";
 
 /**
- * Single source of truth for calculating phase based strictly on registration date.
+ * PhaseService — ADMISSIONS DOMAIN AUTHORITY
+ *
+ * Single source of truth for calculating admissions phase based strictly on registration date.
+ * Admission statistics (Total, Pending, Approved, Rejected, Phase 1 vs 2, Registration Revenue)
+ * derive EXCLUSIVELY from the Enrollment registration table.
+ *
  * Phase 1: registrations before 24 July 2026 00:00 PKT
  * Phase 2: registrations on or after 24 July 2026 00:00 PKT
  */

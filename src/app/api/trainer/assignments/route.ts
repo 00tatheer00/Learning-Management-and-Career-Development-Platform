@@ -45,8 +45,8 @@ export async function POST(request: Request) {
       dueDate: parsed.data.dueDate,
       programSlug,
       level:
-        parsed.data.level ??
-        (user.level && user.level !== "all" ? user.level : getFirstModuleName(programSlug)) ??
+        parsed.data.level?.trim() ||
+        (user.level && user.level !== "all" ? user.level.trim() : getFirstModuleName(programSlug)) ||
         undefined,
       trainerId: resolveTrainerId(user),
     });

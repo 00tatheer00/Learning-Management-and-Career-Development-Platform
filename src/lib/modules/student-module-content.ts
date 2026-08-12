@@ -1,7 +1,6 @@
 import { isDemoPortalStudent } from "@/lib/constants/demo-student";
 import {
   getFirstModuleName,
-  isFirstModuleStudent,
   resolveActiveStudentModule,
 } from "@/lib/modules/student-module-access";
 import {
@@ -19,6 +18,11 @@ export interface StudentModuleContentContext {
   /** Approved levels keyed by programSlug for per-program filtering. */
   approvedLevelsByProgram?: Record<string, string[]>;
   email?: string | null;
+}
+
+export function normalizeModuleName(name?: string | null): string {
+  if (!name) return "";
+  return name.trim().toLowerCase().replace(/\s+/g, " ");
 }
 
 export function resolveContentModuleLevel(
@@ -49,22 +53,31 @@ export function canStudentAccessModuleContent(
 ): boolean {
   if (isDemoPortalStudent(options?.email)) return true;
 
-  const resolvedContent = resolveContentModuleLevel(programSlug, contentLevel);
-  if (!resolvedContent) return false;
+  const rawContentLevel = contentLevel?.trim();
+  const contentNormalized = rawContentLevel
+    ? normalizeModuleName(rawContentLevel)
+    : normalizeModuleName(getFirstModuleName(programSlug));
 
-  const enrolled = new Set(
-    [...(options?.approvedLevels ?? []), studentLevel ?? ""]
-      .map((level) => level?.trim())
-      .filter(Boolean)
+  if (!contentNormalized) return false;
+
+  const normalizedApprovedList = (options?.approvedLevels ?? [])
+    .map(normalizeModuleName)
+    .filter(Boolean);
+
+  const activeLevelNormalized = studentLevel?.trim()
+    ? normalizeModuleName(studentLevel)
+    : normalizedApprovedList[0] || "";
+
+  const enrolledSet = new Set(
+    [...normalizedApprovedList, activeLevelNormalized].filter(Boolean)
   );
 
-  if (!enrolled.has(resolvedContent)) {
+  if (!enrolledSet.has(contentNormalized)) {
     return false;
   }
 
-  const activeLevel = studentLevel?.trim();
-  if (activeLevel && enrolled.has(activeLevel)) {
-    return resolvedContent === activeLevel;
+  if (activeLevelNormalized && enrolledSet.has(activeLevelNormalized)) {
+    return contentNormalized === activeLevelNormalized;
   }
 
   return true;
@@ -117,12 +130,6 @@ export function studentHasModuleLiveContent(
   const activeLevel = context.studentLevel?.trim();
   if (!activeLevel) return true;
 
-  // Module 1 (e.g. HTML & CSS) is always active/live for enrolled students
-  if (isFirstModuleStudent(context.programSlug, activeLevel)) {
-    return true;
-  }
-
-  // Any module the student is approved for has tracking & access enabled
   const normalizedApproved = (context.approvedLevels ?? []).map((l) => l.trim().toLowerCase());
   if (normalizedApproved.length > 0 && normalizedApproved.includes(activeLevel.toLowerCase())) {
     return true;

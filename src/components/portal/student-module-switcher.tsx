@@ -91,6 +91,9 @@ export function StudentModuleSwitcher({
       if (res.ok) {
         startTransition(() => {
           router.refresh();
+          if (typeof window !== "undefined") {
+            window.location.reload();
+          }
         });
       } else {
         console.error("Failed to switch active module");
