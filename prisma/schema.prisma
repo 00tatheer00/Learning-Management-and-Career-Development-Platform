@@ -68,6 +68,7 @@ model User {
   submissions AssignmentSubmission[] @relation("StudentSubmissions")
   attendance  ClassAttendance[]        @relation("StudentAttendance")
   moduleEnrollments ModuleEnrollment[] @relation("UserModuleEnrollments")
+  certificates Certificate[]           @relation("StudentCertificates")
 
   @@index([role])
   @@index([programSlug])
@@ -454,3 +455,26 @@ model ModuleEnrollment {
   @@index([studentId])
   @@index([programSlug])
 }
+
+model Certificate {
+  id                  String   @id @map("_id")
+  studentId           String
+  studentNameSnapshot String
+  programSlug         String
+  courseNameSnapshot  String
+  moduleName          String
+  moduleNameSnapshot  String
+  verificationCode    String   @unique
+  certificateNumber   String
+  completionDate      DateTime
+  issuedAt            DateTime @default(now())
+  status              String   @default("issued")
+  pdfUrl              String?
+
+  student User @relation("StudentCertificates", fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, programSlug, moduleName])
+  @@index([studentId])
+  @@index([programSlug])
+}
+

@@ -1,5 +1,3 @@
-import "server-only";
-
 /** Production always uses DATABASE_URL (mongodb+srv). Direct URL is local-dev only. */
 export function getDatabaseUrl(): string {
   const url = process.env.DATABASE_URL;

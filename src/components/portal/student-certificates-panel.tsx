@@ -42,7 +42,7 @@ export function StudentCertificatesPanel({ modules }: StudentCertificatesPanelPr
                         <Button size="sm" asChild>
                           <a href={row.downloadPath} download>
                             <DownloadSimple size={16} weight="bold" />
-                            Download PNG
+                            Download Certificate
                           </a>
                         </Button>
                       )}
@@ -54,6 +54,13 @@ export function StudentCertificatesPanel({ modules }: StudentCertificatesPanelPr
                             rel="noopener noreferrer"
                           >
                             View certificate
+                          </Link>
+                        </Button>
+                      )}
+                      {row.verifyPath && (
+                        <Button size="sm" variant="secondary" asChild>
+                          <Link href={row.verifyPath} target="_blank">
+                            Verify Certificate
                           </Link>
                         </Button>
                       )}

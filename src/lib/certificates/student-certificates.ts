@@ -1,5 +1,4 @@
-import "server-only";
-
+import { prisma } from "@/lib/prisma";
 import { isDemoPortalStudent } from "@/lib/constants/demo-student";
 import { getProgramBySlug } from "@/lib/data/programs";
 import { buildCertificateId, formatCertificateDate } from "@/lib/certificates/certificate-ids";
@@ -13,30 +12,33 @@ export interface StudentCertificateModuleView {
   programTitle: string;
   moduleName: string;
   status: CertificateModuleStatus;
-  certificateId?: string;
+  verificationCode?: string;
   issuedAtLabel?: string;
   downloadPath?: string;
-}
-
-/** Demo: HTML & CSS (Web Development) issued; all other modules locked. */
-function isDemoIssuedModule(programSlug: string, moduleName: string): boolean {
-  return programSlug === "web-development" && moduleName === "HTML & CSS";
+  verifyPath?: string;
 }
 
 export function certificatesEnabledForStudent(email?: string | null): boolean {
-  return isDemoPortalStudent(email);
+  return true;
 }
 
 export async function getStudentCertificateModules(
   user: Pick<PortalUser, "id" | "email" | "name" | "programSlug" | "programSlugs">
 ): Promise<StudentCertificateModuleView[]> {
-  if (!certificatesEnabledForStudent(user.email)) {
-    return [];
-  }
-
-  const issuedAt = new Date("2026-07-11T00:00:00.000Z");
-  const issuedLabel = formatCertificateDate(issuedAt);
   const programSlugs = await getStudentPortalProgramSlugs(user);
+
+  // Fetch real database certificates for this student
+  const dbCertificates = await prisma.certificate.findMany({
+    where: {
+      studentId: user.id,
+      status: "issued",
+    },
+  });
+
+  const certMap = new Map(
+    dbCertificates.map((c) => [`${c.programSlug}:${c.moduleName.trim().toLowerCase()}`, c])
+  );
+
   const views: StudentCertificateModuleView[] = [];
 
   for (const programSlug of programSlugs) {
@@ -44,21 +46,27 @@ export async function getStudentCertificateModules(
     if (!program) continue;
 
     for (const mod of program.modules) {
-      const issued = isDemoIssuedModule(programSlug, mod.name);
-      const certificateId = issued
-        ? buildCertificateId(user.id, programSlug, mod.name)
-        : undefined;
+      const key = `${programSlug}:${mod.name.trim().toLowerCase()}`;
+      const dbCert = certMap.get(key);
+
+      // Demo fallback if demo student
+      const isDemoIssued = isDemoPortalStudent(user.email) && programSlug === "web-development" && mod.name === "HTML & CSS";
+      const isIssued = Boolean(dbCert || isDemoIssued);
+
+      const verificationCode = dbCert?.verificationCode ?? (isDemoIssued ? buildCertificateId(user.id, programSlug, mod.name) : undefined);
+      const issuedAt = dbCert?.issuedAt ?? new Date("2026-07-11T00:00:00.000Z");
 
       views.push({
         programSlug,
         programTitle: program.title,
         moduleName: mod.name,
-        status: issued ? "issued" : "locked",
-        certificateId,
-        issuedAtLabel: issued ? issuedLabel : undefined,
-        downloadPath: issued
+        status: isIssued ? "issued" : "locked",
+        verificationCode,
+        issuedAtLabel: isIssued ? formatCertificateDate(issuedAt) : undefined,
+        downloadPath: isIssued
           ? `/api/student/certificates/download?program=${encodeURIComponent(programSlug)}&module=${encodeURIComponent(mod.name)}`
           : undefined,
+        verifyPath: verificationCode ? `/verify/${encodeURIComponent(verificationCode)}` : undefined,
       });
     }
   }
@@ -71,10 +79,20 @@ export async function canDownloadCertificate(
   programSlug: string,
   moduleName: string
 ): Promise<boolean> {
-  if (!certificatesEnabledForStudent(user.email)) return false;
-  if (!isDemoIssuedModule(programSlug, moduleName)) return false;
-  const slugs = await getStudentPortalProgramSlugs(user);
-  return slugs.includes(programSlug);
+  if (isDemoPortalStudent(user.email) && programSlug === "web-development" && moduleName === "HTML & CSS") {
+    return true;
+  }
+
+  const cert = await prisma.certificate.findFirst({
+    where: {
+      studentId: user.id,
+      programSlug,
+      moduleName: { equals: moduleName.trim(), mode: "insensitive" },
+      status: "issued",
+    },
+  });
+
+  return Boolean(cert);
 }
 
 export async function getCertificateRenderPayload(
@@ -82,20 +100,27 @@ export async function getCertificateRenderPayload(
   programSlug: string,
   moduleName: string
 ) {
-  if (!(await canDownloadCertificate(user, programSlug, moduleName))) {
-    return null;
-  }
+  const canDownload = await canDownloadCertificate(user, programSlug, moduleName);
+  if (!canDownload) return null;
+
+  const dbCert = await prisma.certificate.findFirst({
+    where: {
+      studentId: user.id,
+      programSlug,
+      moduleName: { equals: moduleName.trim(), mode: "insensitive" },
+    },
+  });
 
   const program = getProgramBySlug(programSlug);
-  if (!program) return null;
-
-  const issuedAt = new Date("2026-07-11T00:00:00.000Z");
+  const courseTitle = dbCert?.courseNameSnapshot ?? program?.title ?? programSlug;
+  const verificationCode = dbCert?.verificationCode ?? buildCertificateId(user.id, programSlug, moduleName);
+  const completionDate = dbCert?.completionDate ?? new Date();
 
   return {
-    studentName: user.name,
-    moduleName,
-    programTitle: program.title,
-    completionDate: formatCertificateDate(issuedAt),
-    certificateId: buildCertificateId(user.id, programSlug, moduleName),
+    studentName: dbCert?.studentNameSnapshot ?? user.name,
+    moduleName: dbCert?.moduleNameSnapshot ?? moduleName,
+    programTitle: courseTitle,
+    completionDate: formatCertificateDate(completionDate),
+    certificateId: verificationCode,
   };
 }
