@@ -12,6 +12,7 @@ export interface StudentCertificateModuleView {
   programTitle: string;
   moduleName: string;
   status: CertificateModuleStatus;
+  certificateId?: string;
   verificationCode?: string;
   issuedAtLabel?: string;
   downloadPath?: string;
@@ -61,6 +62,7 @@ export async function getStudentCertificateModules(
         programTitle: program.title,
         moduleName: mod.name,
         status: isIssued ? "issued" : "locked",
+        certificateId: verificationCode,
         verificationCode,
         issuedAtLabel: isIssued ? formatCertificateDate(issuedAt) : undefined,
         downloadPath: isIssued
