@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import sharp from "sharp";
 
 export interface CertificateRenderInput {
@@ -17,6 +19,57 @@ function escapeXml(value: string): string {
     .replace(/'/g, "&apos;");
 }
 
+// Load and base64 embed TTF fonts so Sharp/librsvg renders 100% accurate typography on any serverless platform
+let fontDefsStyle = "";
+try {
+  const alexBrushPath = path.join(process.cwd(), "public/fonts/AlexBrush-Regular.ttf");
+  const gVibesPath = path.join(process.cwd(), "public/fonts/GreatVibes-Regular.ttf");
+  const cinzelPath = path.join(process.cwd(), "public/fonts/Cinzel-Bold.ttf");
+  const interRegPath = path.join(process.cwd(), "public/fonts/Inter-Regular.ttf");
+  const interBoldPath = path.join(process.cwd(), "public/fonts/Inter-Bold.ttf");
+
+  const b64AlexBrush = fs.readFileSync(alexBrushPath).toString("base64");
+  const b64GreatVibes = fs.readFileSync(gVibesPath).toString("base64");
+  const b64Cinzel = fs.readFileSync(cinzelPath).toString("base64");
+  const b64InterReg = fs.readFileSync(interRegPath).toString("base64");
+  const b64InterBold = fs.readFileSync(interBoldPath).toString("base64");
+
+  fontDefsStyle = `
+    @font-face {
+      font-family: 'CertAlexBrush';
+      src: url('data:font/ttf;charset=utf-8;base64,${b64AlexBrush}') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'CertGreatVibes';
+      src: url('data:font/ttf;charset=utf-8;base64,${b64GreatVibes}') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'CertCinzel';
+      src: url('data:font/ttf;charset=utf-8;base64,${b64Cinzel}') format('truetype');
+      font-weight: bold;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'CertInter';
+      src: url('data:font/ttf;charset=utf-8;base64,${b64InterReg}') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'CertInterBold';
+      src: url('data:font/ttf;charset=utf-8;base64,${b64InterBold}') format('truetype');
+      font-weight: bold;
+      font-style: normal;
+    }
+  `;
+} catch (err) {
+  console.error("Warning: Failed to preload embedded TTF fonts for SVG rendering:", err);
+}
+
 export function buildMasterCertificateSvg(input: CertificateRenderInput): string {
   const width = 1200;
   const height = 800;
@@ -28,11 +81,16 @@ export function buildMasterCertificateSvg(input: CertificateRenderInput): string
   const certId = escapeXml(input.certificateId);
 
   const nameLen = input.studentName.length;
-  const nameFontSize = nameLen > 32 ? 34 : nameLen > 24 ? 42 : nameLen > 18 ? 50 : 58;
+  const nameFontSize = nameLen > 32 ? 46 : nameLen > 24 ? 54 : nameLen > 18 ? 64 : 76;
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
   <defs>
+    <!-- Embedded Base64 TTF Fonts -->
+    <style type="text/css">
+      ${fontDefsStyle}
+    </style>
+
     <!-- Background Gradient -->
     <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#FCFCFA"/>
@@ -102,9 +160,9 @@ export function buildMasterCertificateSvg(input: CertificateRenderInput): string
     
     <!-- Gold Star & Text -->
     <path d="M 38 116 L 41 123 L 48 124 L 43 129 L 44 136 L 38 132 L 32 136 L 33 129 L 28 124 L 35 123 Z" fill="url(#goldGrad)"/>
-    <text x="38" y="148" text-anchor="middle" font-family="Arial, sans-serif" font-size="7" font-weight="900" fill="#FCF6BA" letter-spacing="0.5">ACHIEVEMENT</text>
-    <text x="38" y="157" text-anchor="middle" font-family="Arial, sans-serif" font-size="7" font-weight="900" fill="#FCF6BA" letter-spacing="0.5">UNLOCKED</text>
-    <text x="38" y="167" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="url(#goldGrad)">★ ★ ★</text>
+    <text x="38" y="148" text-anchor="middle" font-family="'CertInterBold', sans-serif" font-size="7" font-weight="bold" fill="#FCF6BA" letter-spacing="0.5">ACHIEVEMENT</text>
+    <text x="38" y="157" text-anchor="middle" font-family="'CertInterBold', sans-serif" font-size="7" font-weight="bold" fill="#FCF6BA" letter-spacing="0.5">UNLOCKED</text>
+    <text x="38" y="167" text-anchor="middle" font-family="'CertInter', sans-serif" font-size="9" fill="url(#goldGrad)">★ ★ ★</text>
   </g>
 
   <!-- Header Logo & Branding -->
@@ -116,43 +174,43 @@ export function buildMasterCertificateSvg(input: CertificateRenderInput): string
     <path d="M 24 24 H 32 V 36 H 24 Z" fill="#FFFFFF"/>
     
     <!-- Organization Titles -->
-    <text x="72" y="24" font-family="'Helvetica Neue', Arial, sans-serif" font-size="22" font-weight="900" fill="#0B132B" letter-spacing="1">EMERGING EDGE</text>
-    <text x="72" y="40" font-family="'Helvetica Neue', Arial, sans-serif" font-size="11" font-weight="700" fill="#475569" letter-spacing="3">SCHOOL OF TECHNOLOGY</text>
+    <text x="72" y="24" font-family="'CertInterBold', sans-serif" font-size="22" font-weight="bold" fill="#0B132B" letter-spacing="1">EMERGING EDGE</text>
+    <text x="72" y="40" font-family="'CertInterBold', sans-serif" font-size="11" font-weight="bold" fill="#475569" letter-spacing="3">SCHOOL OF TECHNOLOGY</text>
     <line x1="72" y1="46" x2="330" y2="46" stroke="#CBD5E1" stroke-width="1"/>
-    <text x="72" y="58" font-family="'Helvetica Neue', Arial, sans-serif" font-size="9" font-weight="800" fill="#EA580C" letter-spacing="1.5">POWERED BY TECH4EDGES*</text>
+    <text x="72" y="58" font-family="'CertInterBold', sans-serif" font-size="9" font-weight="bold" fill="#EA580C" letter-spacing="1.5">POWERED BY TECH4EDGES*</text>
   </g>
 
   <!-- Title Section -->
   <g transform="translate(600, 175)">
-    <text x="0" y="0" text-anchor="middle" font-family="'Georgia', 'Times New Roman', serif" font-size="46" font-weight="900" fill="#0B132B" letter-spacing="8">CERTIFICATE</text>
+    <text x="0" y="0" text-anchor="middle" font-family="'CertCinzel', serif" font-size="46" font-weight="bold" fill="#0B132B" letter-spacing="8">CERTIFICATE</text>
     
     <!-- Divider Ribbon Line -->
-    <line x1="-220" y1="20" x2="-30" y2="20" stroke="url(#orangeGrad)" stroke-width="2"/>
-    <polygon points="-25,20 -20,15 -15,20 -20,25" fill="#EA580C"/>
-    <text x="0" y="25" text-anchor="middle" font-family="'Helvetica Neue', Arial, sans-serif" font-size="16" font-weight="900" fill="#EA580C" letter-spacing="4">OF COMPLETION</text>
-    <polygon points="15,20 20,15 25,20 20,25" fill="#EA580C"/>
-    <line x1="30" y1="20" x2="220" y2="20" stroke="url(#orangeGrad)" stroke-width="2"/>
+    <line x1="-240" y1="20" x2="-140" y2="20" stroke="url(#orangeGrad)" stroke-width="2"/>
+    <polygon points="-135,20 -130,15 -125,20 -130,25" fill="#EA580C"/>
+    <text x="0" y="25" text-anchor="middle" font-family="'CertInterBold', sans-serif" font-size="16" font-weight="bold" fill="#EA580C" letter-spacing="4">OF COMPLETION</text>
+    <polygon points="125,20 130,15 135,20 130,25" fill="#EA580C"/>
+    <line x1="140" y1="20" x2="240" y2="20" stroke="url(#orangeGrad)" stroke-width="2"/>
 
     <!-- Certify Line -->
-    <text x="0" y="56" text-anchor="middle" font-family="'Helvetica Neue', Arial, sans-serif" font-size="12" font-weight="800" fill="#64748B" letter-spacing="3">THIS IS TO CERTIFY THAT</text>
+    <text x="0" y="56" text-anchor="middle" font-family="'CertInterBold', sans-serif" font-size="12" font-weight="bold" fill="#64748B" letter-spacing="3">THIS IS TO CERTIFY THAT</text>
   </g>
 
   <!-- Dynamic Student Name -->
   <g transform="translate(600, 290)">
-    <text x="0" y="0" text-anchor="middle" font-family="'Georgia', 'Times New Roman', serif" font-style="italic" font-size="${nameFontSize}" font-weight="700" fill="#0F172A">${name}</text>
+    <text x="0" y="0" text-anchor="middle" font-family="'CertAlexBrush', 'CertGreatVibes', cursive" font-size="${nameFontSize}" fill="#0F172A">${name}</text>
     <line x1="-320" y1="20" x2="320" y2="20" stroke="#CBD5E1" stroke-width="1.5"/>
     <polygon points="0,20 -5,15 0,10 5,15" fill="#EA580C"/>
   </g>
 
   <!-- Body Achievement Description -->
   <g transform="translate(600, 355)">
-    <text x="0" y="0" text-anchor="middle" font-family="'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="500" fill="#334155">
-      has successfully completed the <tspan font-weight="800" fill="#EA580C">[ ${moduleName} ]</tspan>
+    <text x="0" y="0" text-anchor="middle" font-family="'CertInter', sans-serif" font-size="15" fill="#334155">
+      has successfully completed the <tspan font-family="'CertInterBold', sans-serif" font-weight="bold" fill="#EA580C">[ ${moduleName} ]</tspan>
     </text>
-    <text x="0" y="26" text-anchor="middle" font-family="'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="500" fill="#334155">
-      as part of the <tspan font-weight="800" fill="#EA580C">[ ${programTitle} ]</tspan>
+    <text x="0" y="26" text-anchor="middle" font-family="'CertInter', sans-serif" font-size="15" fill="#334155">
+      as part of the <tspan font-family="'CertInterBold', sans-serif" font-weight="bold" fill="#EA580C">[ ${programTitle} ]</tspan>
     </text>
-    <text x="0" y="52" text-anchor="middle" font-family="'Helvetica Neue', Arial, sans-serif" font-size="13" font-weight="400" fill="#64748B">
+    <text x="0" y="52" text-anchor="middle" font-family="'CertInter', sans-serif" font-size="13" fill="#64748B">
       We appreciate your dedication, hard work and commitment to learning.
     </text>
   </g>
@@ -168,8 +226,8 @@ export function buildMasterCertificateSvg(input: CertificateRenderInput): string
       <circle cx="16" cy="18" r="1.5" fill="#EA580C"/>
       <circle cx="20" cy="18" r="1.5" fill="#EA580C"/>
       
-      <text x="42" y="14" font-family="'Helvetica Neue', Arial, sans-serif" font-size="10" font-weight="800" fill="#64748B" letter-spacing="1">DATE OF COMPLETION</text>
-      <text x="42" y="30" font-family="'Georgia', serif" font-size="15" font-weight="700" fill="#0F172A">${date}</text>
+      <text x="42" y="14" font-family="'CertInterBold', sans-serif" font-size="10" font-weight="bold" fill="#64748B" letter-spacing="1">DATE OF COMPLETION</text>
+      <text x="42" y="30" font-family="'CertCinzel', serif" font-size="15" font-weight="bold" fill="#0F172A">${date}</text>
     </g>
 
     <!-- Vertical Divider -->
@@ -181,8 +239,8 @@ export function buildMasterCertificateSvg(input: CertificateRenderInput): string
       <circle cx="0" cy="0" r="41" fill="#090C10"/>
       <circle cx="0" cy="0" r="37" fill="none" stroke="url(#goldGrad)" stroke-width="1.5" stroke-dasharray="4,2"/>
       <path d="M 0 -22 L 14 -12 V 4 C 14 14 0 22 0 22 C 0 22 -14 14 -14 4 V -12 Z" fill="url(#orangeGrad)"/>
-      <text x="0" y="1" text-anchor="middle" font-family="'Helvetica Neue', Arial, sans-serif" font-size="11" font-weight="900" fill="#FFFFFF" letter-spacing="1">EEST</text>
-      <text x="0" y="14" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="url(#goldGrad)">★ ★ ★</text>
+      <text x="0" y="1" text-anchor="middle" font-family="'CertInterBold', sans-serif" font-size="11" font-weight="bold" fill="#FFFFFF" letter-spacing="1">EEST</text>
+      <text x="0" y="14" text-anchor="middle" font-family="'CertInter', sans-serif" font-size="8" fill="url(#goldGrad)">★ ★ ★</text>
     </g>
 
     <!-- Vertical Divider -->
@@ -193,7 +251,7 @@ export function buildMasterCertificateSvg(input: CertificateRenderInput): string
       <!-- Signature Path -->
       <path d="M 10 30 C 25 10 45 40 65 15 C 85 -10 95 35 115 20 C 130 5 145 25 160 15" fill="none" stroke="#0F172A" stroke-width="2.2" stroke-linecap="round"/>
       <line x1="0" y1="42" x2="170" y2="42" stroke="#0B132B" stroke-width="1.5"/>
-      <text x="85" y="58" text-anchor="middle" font-family="'Helvetica Neue', Arial, sans-serif" font-size="11" font-weight="800" fill="#0B132B" letter-spacing="1.5">EEST DIRECTOR</text>
+      <text x="85" y="58" text-anchor="middle" font-family="'CertInterBold', sans-serif" font-size="11" font-weight="bold" fill="#0B132B" letter-spacing="1.5">EEST DIRECTOR</text>
     </g>
   </g>
 
@@ -206,7 +264,7 @@ export function buildMasterCertificateSvg(input: CertificateRenderInput): string
     <g transform="translate(24, 16)">
       <path d="M 10 2 L 20 6 V 13 C 20 19 10 24 10 24 C 10 24 0 19 0 13 V 6 Z" fill="none" stroke="#EA580C" stroke-width="2"/>
       <path d="M 6 12 L 9 15 L 14 9" fill="none" stroke="#EA580C" stroke-width="2" stroke-linecap="round"/>
-      <text x="32" y="16" font-family="'Helvetica Neue', Arial, sans-serif" font-size="11" font-weight="800" fill="#0F172A" letter-spacing="1">VERIFICATION CODE</text>
+      <text x="32" y="16" font-family="'CertInterBold', sans-serif" font-size="11" font-weight="bold" fill="#0F172A" letter-spacing="1">VERIFICATION CODE</text>
     </g>
 
     <!-- Divider -->
@@ -215,7 +273,7 @@ export function buildMasterCertificateSvg(input: CertificateRenderInput): string
     <!-- Center: Code Pill Box -->
     <g transform="translate(250, 10)">
       <rect x="0" y="0" width="200" height="34" rx="8" fill="#FFF7ED" stroke="#FDBA74" stroke-width="1.2"/>
-      <text x="100" y="22" text-anchor="middle" font-family="'Courier New', Courier, monospace" font-size="15" font-weight="800" fill="#C2410C" letter-spacing="1.5">${certId}</text>
+      <text x="100" y="22" text-anchor="middle" font-family="'CertInterBold', sans-serif" font-size="15" font-weight="bold" fill="#C2410C" letter-spacing="1.5">${certId}</text>
     </g>
 
     <!-- Divider -->
@@ -223,8 +281,8 @@ export function buildMasterCertificateSvg(input: CertificateRenderInput): string
 
     <!-- Right: Verification URL -->
     <g transform="translate(490, 16)">
-      <text x="0" y="12" font-family="'Helvetica Neue', Arial, sans-serif" font-size="10" font-weight="600" fill="#64748B">Verify this certificate on our website</text>
-      <text x="0" y="26" font-family="'Helvetica Neue', Arial, sans-serif" font-size="12" font-weight="800" fill="#EA580C">schoolemergingedge.tech/verify</text>
+      <text x="0" y="12" font-family="'CertInter', sans-serif" font-size="10" fill="#64748B">Verify this certificate on our website</text>
+      <text x="0" y="26" font-family="'CertInterBold', sans-serif" font-size="12" font-weight="bold" fill="#EA580C">schoolemergingedge.tech/verify</text>
       
       <!-- Globe Icon -->
       <circle cx="310" cy="11" r="10" fill="none" stroke="#EA580C" stroke-width="1.5"/>
