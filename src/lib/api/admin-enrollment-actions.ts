@@ -240,7 +240,7 @@ export async function rejectEnrollment(
 
   return {
     enrollment,
-    message: "Registration rejected. Student will be notified on WhatsApp.",
+    message: "Registration rejected.",
   };
 }
 

@@ -4,8 +4,9 @@ export const DEFAULT_SESSION_TIMEZONE = PAKISTAN_TZ;
 
 function parseTimeToMinutes(time: string): number | null {
   const trimmed = time.trim();
-  const ampmMatch = trimmed.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)$/i);
-  const twentyFourMatch = trimmed.match(/^(\d{1,2}):(\d{2})$/);
+  const ampmMatch = trimmed.match(/^(\d{1,2}):(\d{1,2})(?::(\d{2}))?\s*(AM|PM)$/i);
+  const twentyFourMatch = trimmed.match(/^(\d{1,2}):(\d{1,2})$/);
+  const hourOnlyAmpm = trimmed.match(/^(\d{1,2})\s*(AM|PM)$/i);
 
   if (ampmMatch) {
     let hours = Number(ampmMatch[1]);
@@ -14,6 +15,14 @@ function parseTimeToMinutes(time: string): number | null {
     if (period === "PM" && hours < 12) hours += 12;
     if (period === "AM" && hours === 12) hours = 0;
     return hours * 60 + minutes;
+  }
+
+  if (hourOnlyAmpm) {
+    let hours = Number(hourOnlyAmpm[1]);
+    const period = hourOnlyAmpm[2].toUpperCase();
+    if (period === "PM" && hours < 12) hours += 12;
+    if (period === "AM" && hours === 12) hours = 0;
+    return hours * 60;
   }
 
   if (twentyFourMatch) {

@@ -32,9 +32,8 @@ export async function sendApprovalWelcomeNotifications(
     warnings.push(emailResult.error ?? "Approval email not sent");
   }
 
-  // Option 1: Direct 1-Click WhatsApp Chat enabled in Admin UI
   return {
-    whatsappSent: true,
+    whatsappSent: false,
     emailSent: emailResult.sent,
     warnings,
   };

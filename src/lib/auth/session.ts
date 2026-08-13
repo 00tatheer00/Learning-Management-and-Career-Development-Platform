@@ -73,19 +73,44 @@ async function readSessionIdentity(request?: Request): Promise<{
   };
 }
 
+const USER_CACHE_TTL_MS = 10_000;
+const userSessionCache = new Map<string, { user: PortalUser | null; timestamp: number }>();
+
+export function invalidateUserSessionCache(userId?: string) {
+  if (userId) {
+    userSessionCache.delete(userId);
+  } else {
+    userSessionCache.clear();
+  }
+}
+
 async function buildPortalUser(
   userId: string,
   sessionId?: string
 ): Promise<PortalUser | null> {
+  const cacheKey = `${userId}:${sessionId ?? ""}`;
+  const cached = userSessionCache.get(cacheKey);
+  const now = Date.now();
+
+  if (cached && now - cached.timestamp < USER_CACHE_TTL_MS) {
+    return cached.user;
+  }
+
   const user = await prisma.user.findUnique({
     where: { id: userId },
   });
 
-  if (!user || !user.isActive) return null;
+  if (!user || !user.isActive) {
+    userSessionCache.set(cacheKey, { user: null, timestamp: now });
+    return null;
+  }
 
   if (user.role === "student") {
     const sessionValid = await isActiveSession(user.id, sessionId);
-    if (!sessionValid) return null;
+    if (!sessionValid) {
+      userSessionCache.set(cacheKey, { user: null, timestamp: now });
+      return null;
+    }
   }
 
   const level =
@@ -106,7 +131,7 @@ async function buildPortalUser(
         : await getApprovedEnrollmentLevels(user.email, user.programSlug ?? "web-development")
       : undefined;
 
-  return {
+  const portalUser: PortalUser = {
     id: user.id,
     email: user.email,
     role: user.role,
@@ -120,6 +145,9 @@ async function buildPortalUser(
     avatarInitials: user.avatarInitials ?? undefined,
     avatarUrl: user.avatarUrl ?? undefined,
   };
+
+  userSessionCache.set(cacheKey, { user: portalUser, timestamp: now });
+  return portalUser;
 }
 
 export async function getCurrentUser(request?: Request): Promise<PortalUser | null> {

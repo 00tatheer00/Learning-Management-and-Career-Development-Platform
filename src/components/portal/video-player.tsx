@@ -180,6 +180,7 @@ export function VideoPlayer({
       <iframe
         ref={iframeRef}
         src={playbackUrl}
+        onLoad={() => setIsReady(true)}
         className="w-full h-full border-0"
         allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
         allowFullScreen

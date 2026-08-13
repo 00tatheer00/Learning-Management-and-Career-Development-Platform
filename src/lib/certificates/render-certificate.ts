@@ -29,6 +29,9 @@ function buildOverlaySvg(width: number, input: CertificateRenderInput): Buffer {
   const date = escapeXml(input.completionDate);
   const certId = escapeXml(input.certificateId);
 
+  const nameLen = input.studentName.length;
+  const nameFontSize = nameLen > 32 ? 26 : nameLen > 24 ? 32 : nameLen > 18 ? 36 : 42;
+
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg width="${width}" height="724" xmlns="http://www.w3.org/2000/svg">
   <rect x="32" y="248" width="${width - 64}" height="64" fill="#ffffff"/>
@@ -37,7 +40,7 @@ function buildOverlaySvg(width: number, input: CertificateRenderInput): Buffer {
   <rect x="72" y="636" width="220" height="26" fill="#ffffff"/>
   <rect x="372" y="636" width="268" height="26" fill="#ffffff"/>
 
-  <text x="${width / 2}" y="292" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="42" font-weight="700" fill="#141414">${name}</text>
+  <text x="${width / 2}" y="292" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="${nameFontSize}" font-weight="700" fill="#141414">${name}</text>
   <text x="${width / 2}" y="356" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700" fill="#141414">${moduleLine}</text>
   <text x="${width / 2}" y="522" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#141414">${date}</text>
   <text x="118" y="656" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" fill="#141414">${date}</text>

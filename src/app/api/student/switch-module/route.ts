@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth/session";
+import { getCurrentUser, invalidateUserSessionCache } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
 import { isDemoPortalStudent } from "@/lib/constants/demo-student";
 import { getApprovedEnrollmentLevels } from "@/lib/auth/student-module-sync";
@@ -60,6 +60,8 @@ export async function POST(req: Request) {
         programSlug: targetProgram,
       },
     });
+
+    invalidateUserSessionCache(user.id);
 
     return NextResponse.json({
       success: true,
