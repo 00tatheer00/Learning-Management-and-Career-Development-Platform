@@ -53,7 +53,6 @@ export function AdminCertificatesPanel() {
   const selectedProgram = programs.find((p) => p.slug === selectedCourse);
   const availableModules = selectedProgram?.modules.map((m) => m.name) ?? [];
 
-  // Whenever course changes, update available module to first module
   useEffect(() => {
     if (availableModules.length > 0 && !availableModules.includes(selectedModule)) {
       setSelectedModule(availableModules[0]);
@@ -111,38 +110,54 @@ export function AdminCertificatesPanel() {
   };
 
   const handleGenerateBulk = async () => {
-    if (stats.pendingCount === 0) {
+    const pendingList = students.filter((s) => s.status === "pending");
+    if (pendingList.length === 0) {
       toast.info("All eligible students already have certificates generated!");
       return;
     }
 
     setIsBulkGenerating(true);
-    setBulkProgress({ current: 0, total: stats.pendingCount });
+    setBulkProgress({ current: 0, total: pendingList.length });
 
-    try {
-      const res = await fetch("/api/admin/certificates/bulk-generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          programSlug: selectedCourse,
-          moduleName: selectedModule,
-        }),
-      });
-      const json = await res.json();
+    let successCount = 0;
+    let failCount = 0;
 
-      if (json.success && json.data) {
-        setBulkProgress({ current: json.data.generatedCount, total: stats.pendingCount });
-        toast.success(json.message ?? "Bulk certificates generated successfully!");
-        loadData();
-      } else {
-        toast.error(json.message ?? json.error ?? "Bulk generation failed");
-      }
-    } catch {
-      toast.error("Bulk generation encountered an error");
-    } finally {
-      setIsBulkGenerating(false);
-      setBulkProgress(null);
+    // Batched client-side processing (5 at a time) to prevent Vercel 10s request timeout
+    const batchSize = 5;
+    for (let i = 0; i < pendingList.length; i += batchSize) {
+      const batch = pendingList.slice(i, i + batchSize);
+      await Promise.all(
+        batch.map(async (student) => {
+          try {
+            const res = await fetch("/api/admin/certificates/generate", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                studentId: student.studentId,
+                programSlug: selectedCourse,
+                moduleName: selectedModule,
+              }),
+            });
+            const json = await res.json();
+            if (json.success) {
+              successCount++;
+            } else {
+              failCount++;
+            }
+          } catch {
+            failCount++;
+          }
+        })
+      );
+
+      setBulkProgress({ current: Math.min(i + batchSize, pendingList.length), total: pendingList.length });
     }
+
+    setIsBulkGenerating(false);
+    setBulkProgress(null);
+
+    toast.success(`Bulk generation complete! ${successCount} generated successfully${failCount > 0 ? `, ${failCount} failed` : ""}.`);
+    loadData();
   };
 
   const filteredStudents = students.filter(
@@ -175,7 +190,7 @@ export function AdminCertificatesPanel() {
               type="button"
               variant="outline"
               onClick={loadData}
-              disabled={loading}
+              disabled={loading || isBulkGenerating}
               className="gap-2 rounded-xl"
             >
               <ArrowClockwise size={16} className={cn(loading && "animate-spin")} />
@@ -312,6 +327,8 @@ export function AdminCertificatesPanel() {
               const isIssued = student.status === "issued";
               const isGenerating = generatingId === student.studentId;
 
+              const downloadUrl = `/api/student/certificates/download?code=${encodeURIComponent(student.verificationCode ?? "")}&studentId=${encodeURIComponent(student.studentId)}&program=${encodeURIComponent(selectedCourse)}&module=${encodeURIComponent(selectedModule)}`;
+
               return (
                 <div
                   key={student.studentId}
@@ -355,7 +372,7 @@ export function AdminCertificatesPanel() {
                           className="rounded-xl text-xs gap-1.5"
                         >
                           <a
-                            href={`/api/student/certificates/download?program=${encodeURIComponent(selectedCourse)}&module=${encodeURIComponent(selectedModule)}`}
+                            href={downloadUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                           >

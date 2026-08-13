@@ -1,8 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { getProgramBySlug } from "@/lib/data/programs";
 import { buildCertificateId, formatCertificateDate } from "@/lib/certificates/certificate-ids";
-import { getApprovedEnrollmentLevels } from "@/lib/auth/student-module-sync";
 import { renderCertificatePng } from "@/lib/certificates/render-certificate";
+import { isDemoPortalStudent } from "@/lib/constants/demo-student";
+import { normalizeProgramSlug } from "@/lib/auth/program-assignment";
 
 export interface EligibleStudentView {
   studentId: string;
@@ -24,39 +25,69 @@ export async function getEligibleStudentsForModule(
   eligibleStudents: EligibleStudentView[];
   stats: { totalEligible: number; generatedCount: number; pendingCount: number };
 }> {
-  const program = getProgramBySlug(programSlug);
-  const courseTitle = program?.title ?? programSlug;
+  const normSlug = normalizeProgramSlug(programSlug);
+  const normModule = moduleName.trim().toLowerCase();
 
-  // 1. Fetch all student accounts for this program or across platform
-  const students = await prisma.user.findMany({
-    where: {
-      role: "student",
-      isActive: true,
-    },
-    select: { id: true, name: true, email: true, programSlug: true, level: true },
-    orderBy: { name: "asc" },
-  });
+  // 1. Single batch query for students, enrollments, module enrollments, and certificates
+  const [students, approvedEnrollments, activeModuleEnrollments, existingCertificates] =
+    await Promise.all([
+      prisma.user.findMany({
+        where: {
+          role: "student",
+          isActive: true,
+        },
+        select: { id: true, name: true, email: true, programSlug: true, level: true },
+        orderBy: { name: "asc" },
+      }),
+      prisma.enrollment.findMany({
+        where: { status: "approved" },
+        select: { email: true, program: true, level: true },
+      }),
+      prisma.moduleEnrollment.findMany({
+        where: { status: "active" },
+        select: { email: true, programSlug: true, moduleName: true },
+      }),
+      prisma.certificate.findMany({
+        where: {
+          programSlug,
+          moduleName,
+        },
+      }),
+    ]);
 
-  // 2. Fetch all existing certificates for this program and module
-  const existingCertificates = await prisma.certificate.findMany({
-    where: {
-      programSlug,
-      moduleName,
-    },
-  });
+  // 2. Build fast in-memory lookup sets
+  const approvedEmailSet = new Set<string>();
+
+  for (const row of approvedEnrollments) {
+    if (!row.email) continue;
+    const emailNorm = row.email.trim().toLowerCase();
+    const rowProg = normalizeProgramSlug(row.program);
+    if (rowProg === normSlug) {
+      approvedEmailSet.add(emailNorm);
+    }
+  }
+
+  for (const row of activeModuleEnrollments) {
+    if (!row.email) continue;
+    const emailNorm = row.email.trim().toLowerCase();
+    const rowProg = normalizeProgramSlug(row.programSlug);
+    if (rowProg === normSlug && row.moduleName.trim().toLowerCase() === normModule) {
+      approvedEmailSet.add(emailNorm);
+    }
+  }
 
   const certByStudentId = new Map(existingCertificates.map((c) => [c.studentId, c]));
 
   const eligibleStudents: EligibleStudentView[] = [];
 
   for (const student of students) {
-    // Check if student has approved level access for this program & module
-    const approved = await getApprovedEnrollmentLevels(student.email, programSlug);
-    const isApprovedForModule = approved.some(
-      (m) => m.trim().toLowerCase() === moduleName.trim().toLowerCase()
-    );
+    const studentEmailNorm = student.email.trim().toLowerCase();
+    const isApproved =
+      isDemoPortalStudent(student.email) ||
+      approvedEmailSet.has(studentEmailNorm) ||
+      normalizeProgramSlug(student.programSlug ?? "") === normSlug;
 
-    if (!isApprovedForModule) continue;
+    if (!isApproved) continue;
 
     const existingCert = certByStudentId.get(student.id);
 
@@ -104,7 +135,7 @@ export async function generateSingleCertificate(input: {
   const program = getProgramBySlug(input.programSlug);
   const courseTitle = program?.title ?? input.programSlug;
 
-  // Count existing certificates to determine sequence number
+  // Count existing certificates for index
   const existingCount = await prisma.certificate.count({
     where: { programSlug: input.programSlug, moduleName: input.moduleName },
   });
@@ -118,7 +149,7 @@ export async function generateSingleCertificate(input: {
 
   const completionDate = input.completionDate ?? new Date();
 
-  // Test render to verify visual output before saving record
+  // Test render SVG/PNG to ensure high quality
   await renderCertificatePng({
     studentName: student.name,
     moduleName: input.moduleName,
@@ -180,7 +211,7 @@ export async function generateBulkCertificates(
   let generatedCount = 0;
   let failedCount = 0;
 
-  // Safe batched processing (5 at a time)
+  // Process in controlled batches of 5 to prevent timeouts
   const batchSize = 5;
   for (let i = 0; i < pendingStudents.length; i += batchSize) {
     const batch = pendingStudents.slice(i, i + batchSize);

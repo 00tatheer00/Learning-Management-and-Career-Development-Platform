@@ -1,33 +1,92 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/session";
-import {
-  getCertificateRenderPayload,
-} from "@/lib/certificates/student-certificates";
+import { getCertificateRenderPayload } from "@/lib/certificates/student-certificates";
 import { renderCertificatePng } from "@/lib/certificates/render-certificate";
+import { prisma } from "@/lib/prisma";
+import { formatCertificateDate } from "@/lib/certificates/certificate-ids";
 
 export async function GET(request: Request) {
-  const user = await getCurrentUser();
-  if (!user || user.role !== "student") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-  }
-
   const { searchParams } = new URL(request.url);
+  const code = searchParams.get("code")?.trim();
+  const studentId = searchParams.get("studentId")?.trim();
   const programSlug = searchParams.get("program")?.trim();
   const moduleName = searchParams.get("module")?.trim();
+  const preview = searchParams.get("preview") === "1";
 
-  if (!programSlug || !moduleName) {
-    return NextResponse.json({ error: "Missing program or module" }, { status: 400 });
+  const user = await getCurrentUser();
+
+  let payload: {
+    studentName: string;
+    moduleName: string;
+    programTitle: string;
+    completionDate: string;
+    certificateId: string;
+  } | null = null;
+
+  // 1. Direct lookup by verification code if provided
+  if (code) {
+    const cert = await prisma.certificate.findFirst({
+      where: {
+        verificationCode: { equals: code, mode: "insensitive" },
+      },
+    });
+
+    if (cert) {
+      payload = {
+        studentName: cert.studentNameSnapshot,
+        moduleName: cert.moduleNameSnapshot,
+        programTitle: cert.courseNameSnapshot,
+        completionDate: formatCertificateDate(cert.completionDate),
+        certificateId: cert.verificationCode,
+      };
+    }
   }
 
-  const payload = await getCertificateRenderPayload(user, programSlug, moduleName);
+  // 2. Admin lookup by studentId + program + module
+  if (!payload && user && (user.role === "admin" || user.role === "admin_readonly") && studentId && programSlug && moduleName) {
+    const cert = await prisma.certificate.findFirst({
+      where: {
+        studentId,
+        programSlug,
+        moduleName: { equals: moduleName, mode: "insensitive" },
+      },
+    });
+
+    if (cert) {
+      payload = {
+        studentName: cert.studentNameSnapshot,
+        moduleName: cert.moduleNameSnapshot,
+        programTitle: cert.courseNameSnapshot,
+        completionDate: formatCertificateDate(cert.completionDate),
+        certificateId: cert.verificationCode,
+      };
+    } else {
+      // Fallback: look up student user details if certificate record pending
+      const studentUser = await prisma.user.findUnique({ where: { id: studentId } });
+      if (studentUser) {
+        payload = {
+          studentName: studentUser.name,
+          moduleName,
+          programTitle: programSlug === "web-development" ? "Web Development" : programSlug,
+          completionDate: formatCertificateDate(new Date()),
+          certificateId: `PREVIEW-${studentId.slice(0, 6)}`,
+        };
+      }
+    }
+  }
+
+  // 3. Student lookup for logged in student user
+  if (!payload && user && user.role === "student" && programSlug && moduleName) {
+    payload = await getCertificateRenderPayload(user, programSlug, moduleName);
+  }
+
   if (!payload) {
-    return NextResponse.json({ error: "Certificate not available" }, { status: 403 });
+    return NextResponse.json({ error: "Certificate not found or unauthorized" }, { status: 403 });
   }
 
   const png = await renderCertificatePng(payload);
-  const safeModule = moduleName.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "");
+  const safeModule = (moduleName || "module").replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "");
   const filename = `EEST-${safeModule}-certificate.png`;
-  const preview = searchParams.get("preview") === "1";
 
   return new NextResponse(new Uint8Array(png), {
     headers: {
