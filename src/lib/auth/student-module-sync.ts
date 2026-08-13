@@ -19,24 +19,48 @@ export async function getApprovedEnrollmentLevels(
   }
 
   const normSlug = normalizeProgramSlug(programSlug);
-  const rows = await prisma.enrollment.findMany({
-    where: {
-      status: "approved",
-    },
-    select: { program: true, level: true, email: true },
-  });
-
   const normalizedEmail = email.trim().toLowerCase();
-  const studentRows = rows.filter(
+
+  const [enrollmentRows, moduleEnrollmentRows] = await Promise.all([
+    prisma.enrollment.findMany({
+      where: {
+        status: "approved",
+      },
+      select: { program: true, level: true, email: true },
+    }),
+    prisma.moduleEnrollment.findMany({
+      where: {
+        status: "active",
+      },
+      select: { programSlug: true, moduleName: true, email: true },
+    }),
+  ]);
+
+  const studentEnrollmentRows = enrollmentRows.filter(
     (row) =>
       row.email &&
       row.email.trim().toLowerCase() === normalizedEmail &&
       normalizeProgramSlug(row.program) === normSlug
   );
 
+  const studentModuleRows = moduleEnrollmentRows.filter(
+    (row) =>
+      row.email &&
+      row.email.trim().toLowerCase() === normalizedEmail &&
+      normalizeProgramSlug(row.programSlug) === normSlug
+  );
+
   const order = getProgramModuleNames(normSlug);
-  const levels = new Set(studentRows.map((row) => row.level.trim()).filter(Boolean));
-  return order.filter((moduleName) => levels.has(moduleName));
+  const lowerLevels = new Set<string>();
+
+  for (const row of studentEnrollmentRows) {
+    if (row.level?.trim()) lowerLevels.add(row.level.trim().toLowerCase());
+  }
+  for (const row of studentModuleRows) {
+    if (row.moduleName?.trim()) lowerLevels.add(row.moduleName.trim().toLowerCase());
+  }
+
+  return order.filter((moduleName) => lowerLevels.has(moduleName.trim().toLowerCase()));
 }
 
 /**

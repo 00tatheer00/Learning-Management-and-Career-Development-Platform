@@ -84,7 +84,7 @@ export async function approveEnrollmentAndCreateAccount(
     enrollment.program
   );
   const activeLevel =
-    resolveActiveStudentModule(enrollment.program, user?.level || enrollment.level, approvedLevels) ??
+    resolveActiveStudentModule(enrollment.program, enrollment.level, approvedLevels) ??
     assignment.level;
 
   if (!user) {

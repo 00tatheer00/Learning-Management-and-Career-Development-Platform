@@ -72,15 +72,7 @@ export function canStudentAccessModuleContent(
     [...normalizedApprovedList, activeLevelNormalized].filter(Boolean)
   );
 
-  if (!enrolledSet.has(contentNormalized)) {
-    return false;
-  }
-
-  if (activeLevelNormalized && enrolledSet.has(activeLevelNormalized)) {
-    return contentNormalized === activeLevelNormalized;
-  }
-
-  return true;
+  return enrolledSet.has(contentNormalized);
 }
 
 export function filterByStudentModule<T>(

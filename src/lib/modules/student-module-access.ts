@@ -15,21 +15,25 @@ export function resolveActiveStudentModule(
   approvedLevels: string[]
 ): string | null {
   const trimmedUserLevel = userLevel?.trim();
+  const lowerUserLevel = trimmedUserLevel?.toLowerCase();
   const normalizedApproved = approvedLevels.map((l) => l.trim()).filter(Boolean);
-
-  if (trimmedUserLevel && normalizedApproved.includes(trimmedUserLevel)) {
-    return trimmedUserLevel;
-  }
+  const enrolledLowerSet = new Set(normalizedApproved.map((l) => l.toLowerCase()));
 
   const order = getProgramModuleNames(programSlug);
+
+  // 1. If student's set level is valid & approved, honor it
+  if (trimmedUserLevel && lowerUserLevel && enrolledLowerSet.has(lowerUserLevel)) {
+    const matchedInOrder = order.find((m) => m.toLowerCase() === lowerUserLevel);
+    return matchedInOrder ?? trimmedUserLevel;
+  }
+
   if (order.length === 0) {
     return trimmedUserLevel || normalizedApproved[0] || null;
   }
 
-  const enrolled = new Set(normalizedApproved);
-
+  // 2. Fall back to the first approved module in program progression order
   for (const moduleName of order) {
-    if (enrolled.has(moduleName)) {
+    if (enrolledLowerSet.has(moduleName.toLowerCase())) {
       return moduleName;
     }
   }
