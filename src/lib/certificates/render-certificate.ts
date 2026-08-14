@@ -1,4 +1,4 @@
-import opentype from "opentype.js";
+import * as opentype from "opentype.js";
 import sharp from "sharp";
 import {
   ALEX_BRUSH_TTF_B64,

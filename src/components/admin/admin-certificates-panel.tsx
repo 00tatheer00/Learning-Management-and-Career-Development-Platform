@@ -233,10 +233,10 @@ export function AdminCertificatesPanel() {
             {stats.generatedCount > 0 && (
               <Button
                 type="button"
-                variant="destructive"
+                variant="outline"
                 onClick={handleResetAll}
                 disabled={loading || isBulkGenerating || isResetting}
-                className="gap-2 rounded-xl text-xs font-bold"
+                className="gap-2 rounded-xl text-xs font-bold border-red-500/30 text-red-600 dark:text-red-400 hover:bg-red-500/10"
               >
                 {isResetting ? (
                   <>

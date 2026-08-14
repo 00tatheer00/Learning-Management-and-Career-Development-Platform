@@ -26,7 +26,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(
       createApiResponse(true, {
-        deletedCount,
+        data: { deletedCount },
         message: `Successfully reset ${deletedCount} certificate(s).`,
       })
     );
