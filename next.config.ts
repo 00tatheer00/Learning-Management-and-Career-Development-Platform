@@ -23,6 +23,12 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  experimental: {
+    outputFileTracingIncludes: {
+      "/api/admin/certificates/*": ["./public/fonts/**/*", "./public/certificates/**/*"],
+      "/api/student/certificates/*": ["./public/fonts/**/*", "./public/certificates/**/*"],
+    },
+  },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },

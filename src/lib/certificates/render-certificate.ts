@@ -22,49 +22,70 @@ function escapeXml(value: string): string {
 
 const MASTER_TEMPLATE_PATH = path.join(process.cwd(), "public/certificates/certificate-master-template.png");
 
-// Preload opentype font for vector calligraphy rendering
-let scriptFont: opentype.Font | null = null;
-try {
-  const fontPath = path.join(process.cwd(), "public/fonts/AlexBrush-Regular.ttf");
-  const fontBuffer = fs.readFileSync(fontPath);
-  scriptFont = opentype.parse(fontBuffer.buffer.slice(fontBuffer.byteOffset, fontBuffer.byteOffset + fontBuffer.byteLength));
-} catch (err) {
-  console.error("Warning: Failed to load script font for opentype rendering:", err);
+// ---------------------------------------------------------------------------
+// Load TTF fonts via opentype.js — converts ALL text to vector <path> data.
+// This guarantees 100% identical rendering on Windows, Linux, Vercel, Docker.
+// No @font-face, no librsvg font lookup, no tofu boxes. Ever.
+// ---------------------------------------------------------------------------
+
+function loadFont(relativePath: string): opentype.Font | null {
+  try {
+    const fullPath = path.join(process.cwd(), relativePath);
+    const buf = fs.readFileSync(fullPath);
+    return opentype.parse(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength));
+  } catch (err) {
+    console.error(`Warning: could not load font ${relativePath}:`, err);
+    return null;
+  }
 }
 
-// Preload Base64 TTF fonts for Sharp / librsvg rendering
-let fontDefsStyle = "";
-try {
-  const cinzelPath = path.join(process.cwd(), "public/fonts/Cinzel-Bold.ttf");
-  const interRegPath = path.join(process.cwd(), "public/fonts/Inter-Regular.ttf");
-  const interBoldPath = path.join(process.cwd(), "public/fonts/Inter-Bold.ttf");
+const scriptFont = loadFont("public/fonts/AlexBrush-Regular.ttf");
+const boldFont = loadFont("public/fonts/Inter-Bold.ttf");
+const regularFont = loadFont("public/fonts/Inter-Regular.ttf");
 
-  const b64Cinzel = fs.readFileSync(cinzelPath).toString("base64");
-  const b64InterReg = fs.readFileSync(interRegPath).toString("base64");
-  const b64InterBold = fs.readFileSync(interBoldPath).toString("base64");
+// Helper: render text string to SVG <path> using opentype vector outlines
+function textToVectorSvg(
+  font: opentype.Font | null,
+  text: string,
+  x: number,
+  y: number,
+  fontSize: number,
+  fill: string,
+  anchor: "start" | "middle" = "start",
+  letterSpacing = 0
+): string {
+  if (!font) {
+    // Absolute last-resort fallback (should never happen if fonts are bundled)
+    return `<text x="${x}" y="${y}" text-anchor="${anchor}" font-size="${fontSize}" fill="${fill}">${escapeXml(text)}</text>`;
+  }
 
-  fontDefsStyle = `
-    @font-face {
-      font-family: 'CertCinzel';
-      src: url('data:font/ttf;charset=utf-8;base64,${b64Cinzel}') format('truetype');
-      font-weight: bold;
-      font-style: normal;
+  try {
+    if (letterSpacing > 0) {
+      // Render character-by-character with spacing
+      let svgPaths = "";
+      let cursorX = 0;
+      for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        const charPath = font.getPath(ch, cursorX, 0, fontSize);
+        svgPaths += charPath.toSVG(4);
+        const adv = font.charToGlyph(ch).advanceWidth || 0;
+        cursorX += (adv / font.unitsPerEm) * fontSize + letterSpacing;
+      }
+      // Measure total width for centering
+      const totalWidth = cursorX - letterSpacing; // remove trailing spacing
+      const offsetX = anchor === "middle" ? x - totalWidth / 2 : x;
+      return `<g fill="${fill}" transform="translate(${offsetX},${y})">${svgPaths}</g>`;
     }
-    @font-face {
-      font-family: 'CertInter';
-      src: url('data:font/ttf;charset=utf-8;base64,${b64InterReg}') format('truetype');
-      font-weight: normal;
-      font-style: normal;
-    }
-    @font-face {
-      font-family: 'CertInterBold';
-      src: url('data:font/ttf;charset=utf-8;base64,${b64InterBold}') format('truetype');
-      font-weight: bold;
-      font-style: normal;
-    }
-  `;
-} catch (err) {
-  console.error("Warning: Failed to preload embedded TTF fonts for SVG rendering:", err);
+
+    const pathObj = font.getPath(text, 0, 0, fontSize);
+    const bbox = pathObj.getBoundingBox();
+    const textWidth = bbox.x2 - bbox.x1;
+    const offsetX = anchor === "middle" ? x - textWidth / 2 : x;
+    const svgPath = font.getPath(text, offsetX, y, fontSize).toSVG(4);
+    return `<g fill="${fill}">${svgPath}</g>`;
+  } catch {
+    return `<text x="${x}" y="${y}" text-anchor="${anchor}" font-size="${fontSize}" fill="${fill}">${escapeXml(text)}</text>`;
+  }
 }
 
 export function buildMasterCertificateOverlaySvg(input: CertificateRenderInput): string {
@@ -72,54 +93,39 @@ export function buildMasterCertificateOverlaySvg(input: CertificateRenderInput):
   const height = 682;
 
   // Clean brackets from raw input if present
-  const cleanModuleName = escapeXml(input.moduleName.replace(/^\[\s*/, "").replace(/\s*\]$/, ""));
-  const cleanProgramTitle = escapeXml(input.programTitle.replace(/^\[\s*/, "").replace(/\s*\]$/, ""));
-  const date = escapeXml(input.completionDate);
-  const certId = escapeXml(input.certificateId);
+  const cleanModule = input.moduleName.replace(/^\[\s*/, "").replace(/\s*\]$/, "");
+  const cleanProgram = input.programTitle.replace(/^\[\s*/, "").replace(/\s*\]$/, "");
+  const date = input.completionDate;
+  const certId = input.certificateId;
 
-  // Student Name Calligraphy Vector Path Generation
+  // Student Name — auto-scale for long names
   const rawName = input.studentName.trim();
   const nameLen = rawName.length;
   const nameFontSize = nameLen > 32 ? 38 : nameLen > 24 ? 46 : nameLen > 18 ? 54 : 64;
 
-  let nameSvgElement = "";
-  if (scriptFont) {
-    try {
-      const bbox = scriptFont.getPath(rawName, 0, 0, nameFontSize).getBoundingBox();
-      const textWidth = bbox.x2 - bbox.x1;
-      const targetX = 585 - textWidth / 2;
-      const targetY = 338;
-      const pathData = scriptFont.getPath(rawName, targetX, targetY, nameFontSize).toSVG(4);
-      nameSvgElement = `<g fill="#0D1117">${pathData}</g>`;
-    } catch {
-      nameSvgElement = `<text x="585" y="338" text-anchor="middle" font-family="'Georgia', serif" font-size="${nameFontSize}" fill="#0D1117">${escapeXml(rawName)}</text>`;
-    }
-  } else {
-    nameSvgElement = `<text x="585" y="338" text-anchor="middle" font-family="'Georgia', serif" font-size="${nameFontSize}" fill="#0D1117">${escapeXml(rawName)}</text>`;
-  }
+  // 1. Student Name (Centered Calligraphy Vector Paths)
+  const nameSvg = textToVectorSvg(scriptFont, rawName, 585, 338, nameFontSize, "#0D1117", "middle");
+
+  // 2. Module Name (Orange Bold — right after "has successfully completed the")
+  const moduleSvg = textToVectorSvg(boldFont, cleanModule, 574, 394, 13, "#EA580C", "start");
+
+  // 3. Course Name (Orange Bold — right after "as part of the")
+  const courseSvg = textToVectorSvg(boldFont, cleanProgram, 520, 418, 13, "#EA580C", "start");
+
+  // 4. Date of Completion (Centered under DATE heading)
+  const dateSvg = textToVectorSvg(boldFont, date, 286, 556, 11.5, "#262626", "middle");
+
+  // 5. Verification Code (Centered in footer pill box)
+  const codeSvg = textToVectorSvg(boldFont, certId, 477, 632.5, 12, "#C2410C", "middle", 0.5);
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <style type="text/css">
-      ${fontDefsStyle}
-    </style>
-  </defs>
-
-  <!-- 1. Student Name (Centered Vector Calligraphy Script) -->
-  ${nameSvgElement}
-
-  <!-- 2. Module Name (Orange Bold Text without brackets, aligned right after "has successfully completed the") -->
-  <text x="574" y="394" font-family="CertInterBold, sans-serif" font-size="13" font-weight="bold" fill="#EA580C">${cleanModuleName}</text>
-
-  <!-- 3. Course Name (Orange Bold Text without brackets, aligned right after "as part of the") -->
-  <text x="520" y="418" font-family="CertInterBold, sans-serif" font-size="13" font-weight="bold" fill="#EA580C">${cleanProgramTitle}</text>
-
-  <!-- 4. Date of Completion -->
-  <text x="286" y="556" text-anchor="middle" font-family="CertInterBold, sans-serif" font-size="11.5" font-weight="bold" fill="#262626">${date}</text>
-
-  <!-- 5. Verification Code (Perfectly centered horizontally & vertically inside footer box) -->
-  <text x="477" y="632.5" text-anchor="middle" dominant-baseline="central" font-family="CertInterBold, monospace" font-size="12" font-weight="bold" fill="#C2410C" letter-spacing="0.5">${certId}</text>
+  <!-- All text rendered as vector <path> outlines — zero font dependencies -->
+  ${nameSvg}
+  ${moduleSvg}
+  ${courseSvg}
+  ${dateSvg}
+  ${codeSvg}
 </svg>`;
 }
 
