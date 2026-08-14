@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import opentype from "opentype.js";
 import sharp from "sharp";
 
 export interface CertificateRenderInput {
@@ -21,34 +22,28 @@ function escapeXml(value: string): string {
 
 const MASTER_TEMPLATE_PATH = path.join(process.cwd(), "public/certificates/certificate-master-template.png");
 
-// Preload Base64 TTF fonts for Sharp / librsvg rendering on Linux & Vercel
+// Preload opentype font for vector calligraphy rendering
+let scriptFont: opentype.Font | null = null;
+try {
+  const fontPath = path.join(process.cwd(), "public/fonts/AlexBrush-Regular.ttf");
+  const fontBuffer = fs.readFileSync(fontPath);
+  scriptFont = opentype.parse(fontBuffer.buffer.slice(fontBuffer.byteOffset, fontBuffer.byteOffset + fontBuffer.byteLength));
+} catch (err) {
+  console.error("Warning: Failed to load script font for opentype rendering:", err);
+}
+
+// Preload Base64 TTF fonts for Sharp / librsvg rendering
 let fontDefsStyle = "";
 try {
-  const alexBrushPath = path.join(process.cwd(), "public/fonts/AlexBrush-Regular.ttf");
-  const gVibesPath = path.join(process.cwd(), "public/fonts/GreatVibes-Regular.ttf");
   const cinzelPath = path.join(process.cwd(), "public/fonts/Cinzel-Bold.ttf");
   const interRegPath = path.join(process.cwd(), "public/fonts/Inter-Regular.ttf");
   const interBoldPath = path.join(process.cwd(), "public/fonts/Inter-Bold.ttf");
 
-  const b64AlexBrush = fs.readFileSync(alexBrushPath).toString("base64");
-  const b64GreatVibes = fs.readFileSync(gVibesPath).toString("base64");
   const b64Cinzel = fs.readFileSync(cinzelPath).toString("base64");
   const b64InterReg = fs.readFileSync(interRegPath).toString("base64");
   const b64InterBold = fs.readFileSync(interBoldPath).toString("base64");
 
   fontDefsStyle = `
-    @font-face {
-      font-family: 'CertAlexBrush';
-      src: url('data:font/ttf;charset=utf-8;base64,${b64AlexBrush}') format('truetype');
-      font-weight: normal;
-      font-style: normal;
-    }
-    @font-face {
-      font-family: 'CertGreatVibes';
-      src: url('data:font/ttf;charset=utf-8;base64,${b64GreatVibes}') format('truetype');
-      font-weight: normal;
-      font-style: normal;
-    }
     @font-face {
       font-family: 'CertCinzel';
       src: url('data:font/ttf;charset=utf-8;base64,${b64Cinzel}') format('truetype');
@@ -76,14 +71,32 @@ export function buildMasterCertificateOverlaySvg(input: CertificateRenderInput):
   const width = 1024;
   const height = 682;
 
-  const name = escapeXml(input.studentName);
-  const moduleName = escapeXml(input.moduleName);
-  const programTitle = escapeXml(input.programTitle);
+  // Clean brackets from raw input if present
+  const cleanModuleName = escapeXml(input.moduleName.replace(/^\[\s*/, "").replace(/\s*\]$/, ""));
+  const cleanProgramTitle = escapeXml(input.programTitle.replace(/^\[\s*/, "").replace(/\s*\]$/, ""));
   const date = escapeXml(input.completionDate);
   const certId = escapeXml(input.certificateId);
 
-  const nameLen = input.studentName.length;
+  // Student Name Calligraphy Vector Path Generation
+  const rawName = input.studentName.trim();
+  const nameLen = rawName.length;
   const nameFontSize = nameLen > 32 ? 38 : nameLen > 24 ? 46 : nameLen > 18 ? 54 : 64;
+
+  let nameSvgElement = "";
+  if (scriptFont) {
+    try {
+      const bbox = scriptFont.getPath(rawName, 0, 0, nameFontSize).getBoundingBox();
+      const textWidth = bbox.x2 - bbox.x1;
+      const targetX = 585 - textWidth / 2;
+      const targetY = 338;
+      const pathData = scriptFont.getPath(rawName, targetX, targetY, nameFontSize).toSVG(4);
+      nameSvgElement = `<g fill="#0D1117">${pathData}</g>`;
+    } catch {
+      nameSvgElement = `<text x="585" y="338" text-anchor="middle" font-family="'Georgia', serif" font-size="${nameFontSize}" fill="#0D1117">${escapeXml(rawName)}</text>`;
+    }
+  } else {
+    nameSvgElement = `<text x="585" y="338" text-anchor="middle" font-family="'Georgia', serif" font-size="${nameFontSize}" fill="#0D1117">${escapeXml(rawName)}</text>`;
+  }
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
@@ -93,21 +106,20 @@ export function buildMasterCertificateOverlaySvg(input: CertificateRenderInput):
     </style>
   </defs>
 
-  <!-- Dynamic Text Overlays on Pristine Clean User Master Artwork Background -->
-  <!-- 1. Student Name (Centered Calligraphy Cursive) -->
-  <text x="585" y="340" text-anchor="middle" font-family="CertAlexBrush, CertGreatVibes, cursive" font-size="${nameFontSize}" fill="#0D1117">${name}</text>
+  <!-- 1. Student Name (Centered Vector Calligraphy Script) -->
+  ${nameSvgElement}
 
-  <!-- 2. Module Name (Orange Bold Text right after "has successfully completed the") -->
-  <text x="566" y="394" font-family="CertInterBold, sans-serif" font-size="13" font-weight="bold" fill="#EA580C">[ ${moduleName} ]</text>
+  <!-- 2. Module Name (Orange Bold Text without brackets, aligned right after "has successfully completed the") -->
+  <text x="574" y="394" font-family="CertInterBold, sans-serif" font-size="13" font-weight="bold" fill="#EA580C">${cleanModuleName}</text>
 
-  <!-- 3. Course Name (Orange Bold Text right after "as part of the") -->
-  <text x="518" y="418" font-family="CertInterBold, sans-serif" font-size="13" font-weight="bold" fill="#EA580C">[ ${programTitle} ]</text>
+  <!-- 3. Course Name (Orange Bold Text without brackets, aligned right after "as part of the") -->
+  <text x="520" y="418" font-family="CertInterBold, sans-serif" font-size="13" font-weight="bold" fill="#EA580C">${cleanProgramTitle}</text>
 
   <!-- 4. Date of Completion -->
   <text x="286" y="556" text-anchor="middle" font-family="CertInterBold, sans-serif" font-size="11.5" font-weight="bold" fill="#262626">${date}</text>
 
-  <!-- 5. Verification Code -->
-  <text x="476" y="633" text-anchor="middle" font-family="CertInterBold, monospace" font-size="12.5" font-weight="bold" fill="#C2410C" letter-spacing="0.5">${certId}</text>
+  <!-- 5. Verification Code (Perfectly centered horizontally & vertically inside footer box) -->
+  <text x="477" y="632.5" text-anchor="middle" dominant-baseline="central" font-family="CertInterBold, monospace" font-size="12" font-weight="bold" fill="#C2410C" letter-spacing="0.5">${certId}</text>
 </svg>`;
 }
 
