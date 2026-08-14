@@ -1,7 +1,7 @@
 import * as opentype from "opentype.js";
 import sharp from "sharp";
 import {
-  ALEX_BRUSH_TTF_B64,
+  GREAT_VIBES_TTF_B64,
   INTER_BOLD_TTF_B64,
   CERTIFICATE_TEMPLATE_B64,
 } from "./embedded-fonts";
@@ -44,7 +44,7 @@ function loadEmbeddedFont(b64: string): opentype.Font | null {
   }
 }
 
-const scriptFont = loadEmbeddedFont(ALEX_BRUSH_TTF_B64);
+const scriptFont = loadEmbeddedFont(GREAT_VIBES_TTF_B64);
 const boldFont = loadEmbeddedFont(INTER_BOLD_TTF_B64);
 
 // Render glyph-by-glyph with fill-rule="evenodd" for crisp, beautiful vector curves
@@ -98,16 +98,16 @@ export function buildMasterCertificateOverlaySvg(input: CertificateRenderInput):
   const formattedName = toTitleCase(input.studentName);
   const nameLen = formattedName.length;
   // Scaled for elegance & balance
-  const nameFontSize = nameLen > 30 ? 32 : nameLen > 22 ? 38 : 44;
+  const nameFontSize = nameLen > 30 ? 34 : nameLen > 22 ? 40 : 46;
 
   // 1. Student Name (PERFECTLY CENTERED above the gold line diamond at x=530, y=350)
   const nameSvg = renderTextByGlyphs(scriptFont, formattedName, 530, 350, nameFontSize, "#0D1117", "middle");
 
-  // 2. Module Name (Orange Bold — pixel-perfect baseline aligned with "has successfully completed the ")
-  const moduleSvg = renderTextByGlyphs(boldFont, cleanModule, 586, 397, 12.5, "#EA580C", "start");
+  // 2. Module Name (Orange Bold — perfectly spaced after "has successfully completed the ")
+  const moduleSvg = renderTextByGlyphs(boldFont, cleanModule, 600, 397, 12.5, "#EA580C", "start");
 
-  // 3. Course Name (Orange Bold — pixel-perfect baseline aligned with "as part of the ")
-  const courseSvg = renderTextByGlyphs(boldFont, cleanProgram, 526, 421, 12.5, "#EA580C", "start");
+  // 3. Course Name (Orange Bold — perfectly spaced after "as part of the ")
+  const courseSvg = renderTextByGlyphs(boldFont, cleanProgram, 540, 421, 12.5, "#EA580C", "start");
 
   // 4. Date of Completion (Centered under DATE heading)
   const dateSvg = renderTextByGlyphs(boldFont, date, 286, 556, 11.5, "#262626", "middle");
