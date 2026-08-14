@@ -93,24 +93,21 @@ export function buildMasterCertificateOverlaySvg(input: CertificateRenderInput):
     </style>
   </defs>
 
-  <!-- Dynamic Text Overlays on Pristine Master Artwork Background -->
+  <!-- Dynamic Text Overlays on Pristine Clean User Master Artwork Background -->
   <!-- 1. Student Name (Centered Calligraphy Cursive) -->
   <text x="585" y="340" text-anchor="middle" font-family="CertAlexBrush, CertGreatVibes, cursive" font-size="${nameFontSize}" fill="#0D1117">${name}</text>
 
   <!-- 2. Module Name (Orange Bold Text right after "has successfully completed the") -->
-  <text x="546" y="394" font-family="CertInterBold, sans-serif" font-size="13" font-weight="bold" fill="#EA580C">[ ${moduleName} ]</text>
+  <text x="566" y="394" font-family="CertInterBold, sans-serif" font-size="13" font-weight="bold" fill="#EA580C">[ ${moduleName} ]</text>
 
   <!-- 3. Course Name (Orange Bold Text right after "as part of the") -->
-  <text x="514" y="418" font-family="CertInterBold, sans-serif" font-size="13" font-weight="bold" fill="#EA580C">[ ${programTitle} ]</text>
+  <text x="518" y="418" font-family="CertInterBold, sans-serif" font-size="13" font-weight="bold" fill="#EA580C">[ ${programTitle} ]</text>
 
   <!-- 4. Date of Completion -->
   <text x="286" y="556" text-anchor="middle" font-family="CertInterBold, sans-serif" font-size="11.5" font-weight="bold" fill="#262626">${date}</text>
 
   <!-- 5. Verification Code -->
-  <text x="478" y="633" text-anchor="middle" font-family="CertInterBold, monospace" font-size="12.5" font-weight="bold" fill="#C2410C" letter-spacing="0.5">${certId}</text>
-
-  <!-- 6. Verification URL -->
-  <text x="586" y="638" font-family="CertInterBold, sans-serif" font-size="10" font-weight="bold" fill="#EA580C">schoolemergingedge.tech/verify</text>
+  <text x="476" y="633" text-anchor="middle" font-family="CertInterBold, monospace" font-size="12.5" font-weight="bold" fill="#C2410C" letter-spacing="0.5">${certId}</text>
 </svg>`;
 }
 
