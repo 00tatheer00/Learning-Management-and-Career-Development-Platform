@@ -103,11 +103,11 @@ export function buildMasterCertificateOverlaySvg(input: CertificateRenderInput):
   // 1. Student Name (PERFECTLY CENTERED above the gold line diamond at x=530, y=350)
   const nameSvg = renderTextByGlyphs(scriptFont, formattedName, 530, 350, nameFontSize, "#0D1117", "middle");
 
-  // 2. Module Name (Orange Bold — perfectly aligned after "has successfully completed the ")
-  const moduleSvg = renderTextByGlyphs(boldFont, cleanModule, 582, 394, 13, "#EA580C", "start");
+  // 2. Module Name (Orange Bold — pixel-perfect baseline aligned with "has successfully completed the ")
+  const moduleSvg = renderTextByGlyphs(boldFont, cleanModule, 586, 397, 12.5, "#EA580C", "start");
 
-  // 3. Course Name (Orange Bold — perfectly aligned after "as part of the ")
-  const courseSvg = renderTextByGlyphs(boldFont, cleanProgram, 524, 418, 13, "#EA580C", "start");
+  // 3. Course Name (Orange Bold — pixel-perfect baseline aligned with "as part of the ")
+  const courseSvg = renderTextByGlyphs(boldFont, cleanProgram, 526, 421, 12.5, "#EA580C", "start");
 
   // 4. Date of Completion (Centered under DATE heading)
   const dateSvg = renderTextByGlyphs(boldFont, date, 286, 556, 11.5, "#262626", "middle");
