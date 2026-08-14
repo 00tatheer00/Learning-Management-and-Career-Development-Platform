@@ -1,7 +1,10 @@
-import fs from "fs";
-import path from "path";
 import opentype from "opentype.js";
 import sharp from "sharp";
+import {
+  ALEX_BRUSH_TTF_B64,
+  INTER_BOLD_TTF_B64,
+  CERTIFICATE_TEMPLATE_B64,
+} from "./embedded-fonts";
 
 export interface CertificateRenderInput {
   studentName: string;
@@ -21,58 +24,26 @@ function escapeXml(value: string): string {
 }
 
 // ---------------------------------------------------------------------------
-// Resolve asset paths — try __dirname-relative first (Vercel serverless),
-// then fall back to process.cwd()/public (local dev).
+// Fonts & template are embedded as base64 constants — NO filesystem access.
+// Works identically on Windows, Linux, Vercel serverless, Docker, everywhere.
 // ---------------------------------------------------------------------------
-function resolveAsset(...segments: string[]): string {
-  // 1. Try __dirname-relative (bundled alongside this file in Vercel)
-  const dirRelative = path.join(__dirname, ...segments);
-  if (fs.existsSync(dirRelative)) return dirRelative;
+const templateBuffer = Buffer.from(CERTIFICATE_TEMPLATE_B64, "base64");
 
-  // 2. Fallback to process.cwd()/public (local dev)
-  const cwdRelative = path.join(process.cwd(), "public", ...segments);
-  if (fs.existsSync(cwdRelative)) return cwdRelative;
-
-  // 3. Try process.cwd() directly
-  const cwdDirect = path.join(process.cwd(), ...segments);
-  if (fs.existsSync(cwdDirect)) return cwdDirect;
-
-  throw new Error(`Asset not found: ${segments.join("/")}`);
-}
-
-// Master certificate artwork template
-const MASTER_TEMPLATE_PATH = (() => {
+function loadEmbeddedFont(b64: string): opentype.Font | null {
   try {
-    return resolveAsset("assets", "certificate-master-template.png");
-  } catch {
-    return path.join(process.cwd(), "public/certificates/certificate-master-template.png");
-  }
-})();
-
-// ---------------------------------------------------------------------------
-// Load TTF fonts via opentype.js — converts ALL text to vector <path> data.
-// Guaranteed identical rendering on Windows, Linux, Vercel, Docker.
-// ---------------------------------------------------------------------------
-function loadFont(dirRelPath: string, publicRelPath: string): opentype.Font | null {
-  try {
-    let fontPath: string;
-    try {
-      fontPath = resolveAsset(...dirRelPath.split("/"));
-    } catch {
-      fontPath = path.join(process.cwd(), publicRelPath);
-    }
-    const buf = fs.readFileSync(fontPath);
+    const buf = Buffer.from(b64, "base64");
     return opentype.parse(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength));
   } catch (err) {
-    console.error(`Warning: could not load font:`, err);
+    console.error("Warning: could not parse embedded font:", err);
     return null;
   }
 }
 
-const scriptFont = loadFont("fonts/AlexBrush-Regular.ttf", "public/fonts/AlexBrush-Regular.ttf");
-const boldFont = loadFont("fonts/Inter-Bold.ttf", "public/fonts/Inter-Bold.ttf");
+const scriptFont = loadEmbeddedFont(ALEX_BRUSH_TTF_B64);
+const boldFont = loadEmbeddedFont(INTER_BOLD_TTF_B64);
 
-// Helper: render text string to SVG <path> using opentype vector outlines
+// Render text string to SVG <path> elements using opentype vector outlines.
+// Each character is rendered as a separate <path> to avoid librsvg d-attr truncation.
 function textToVectorSvg(
   font: opentype.Font | null,
   text: string,
@@ -88,7 +59,6 @@ function textToVectorSvg(
   }
 
   try {
-    // Render each character individually to avoid librsvg single-path-d truncation
     let svgPaths = "";
     let cursorX = 0;
     for (let i = 0; i < text.length; i++) {
@@ -140,7 +110,6 @@ export function buildMasterCertificateOverlaySvg(input: CertificateRenderInput):
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
-  <!-- All text rendered as vector <path> outlines — zero font dependencies -->
   ${nameSvg}
   ${moduleSvg}
   ${courseSvg}
@@ -152,7 +121,7 @@ export function buildMasterCertificateOverlaySvg(input: CertificateRenderInput):
 export async function renderCertificatePng(input: CertificateRenderInput): Promise<Buffer> {
   const overlaySvg = buildMasterCertificateOverlaySvg(input);
 
-  return sharp(MASTER_TEMPLATE_PATH)
+  return sharp(templateBuffer)
     .composite([{ input: Buffer.from(overlaySvg), top: 0, left: 0 }])
     .png({ quality: 100, compressionLevel: 6 })
     .toBuffer();
