@@ -98,15 +98,15 @@ export function buildMasterCertificateOverlaySvg(input: CertificateRenderInput):
   const formattedName = toTitleCase(input.studentName);
   const nameLen = formattedName.length;
   // Scaled for elegance & balance
-  const nameFontSize = nameLen > 30 ? 34 : nameLen > 22 ? 40 : 46;
+  const nameFontSize = nameLen > 30 ? 32 : nameLen > 22 ? 38 : 44;
 
-  // 1. Student Name (Centered Calligraphy Vector Paths with Title Case)
-  const nameSvg = renderTextByGlyphs(scriptFont, formattedName, 585, 335, nameFontSize, "#0D1117", "middle");
+  // 1. Student Name (PERFECTLY CENTERED above the gold line diamond at x=530, y=350)
+  const nameSvg = renderTextByGlyphs(scriptFont, formattedName, 530, 350, nameFontSize, "#0D1117", "middle");
 
-  // 2. Module Name (Orange Bold — perfectly spaced after "has successfully completed the ")
+  // 2. Module Name (Orange Bold — perfectly aligned after "has successfully completed the ")
   const moduleSvg = renderTextByGlyphs(boldFont, cleanModule, 582, 394, 13, "#EA580C", "start");
 
-  // 3. Course Name (Orange Bold — perfectly spaced after "as part of the ")
+  // 3. Course Name (Orange Bold — perfectly aligned after "as part of the ")
   const courseSvg = renderTextByGlyphs(boldFont, cleanProgram, 524, 418, 13, "#EA580C", "start");
 
   // 4. Date of Completion (Centered under DATE heading)
