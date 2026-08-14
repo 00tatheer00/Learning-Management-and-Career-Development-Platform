@@ -9,6 +9,7 @@ export const maxDuration = 60; // Max execution timeout for serverless environme
 const bulkSchema = z.object({
   programSlug: z.string(),
   moduleName: z.string(),
+  regenerateAll: z.boolean().optional(),
 });
 
 export async function POST(request: Request) {
@@ -27,7 +28,8 @@ export async function POST(request: Request) {
   try {
     const summary = await generateBulkCertificates(
       parsed.data.programSlug,
-      parsed.data.moduleName
+      parsed.data.moduleName,
+      { regenerateAll: parsed.data.regenerateAll }
     );
 
     return NextResponse.json(

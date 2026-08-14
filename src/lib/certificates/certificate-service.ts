@@ -28,7 +28,7 @@ export async function getEligibleStudentsForModule(
   const normSlug = normalizeProgramSlug(programSlug);
   const normModule = moduleName.trim().toLowerCase();
 
-  // 1. Single batch query for students, enrollments, module enrollments, and certificates
+  // 1. Batch query for students, enrollments, module enrollments, and certificates
   const [students, approvedEnrollments, activeModuleEnrollments, existingCertificates] =
     await Promise.all([
       prisma.user.findMany({
@@ -55,7 +55,7 @@ export async function getEligibleStudentsForModule(
       }),
     ]);
 
-  // 2. Build fast in-memory lookup sets
+  // 2. Build in-memory lookup sets
   const approvedEmailSet = new Set<string>();
 
   for (const row of approvedEnrollments) {
@@ -118,11 +118,27 @@ export async function getEligibleStudentsForModule(
   };
 }
 
+export async function resetCertificates(filter?: {
+  programSlug?: string;
+  moduleName?: string;
+}): Promise<number> {
+  const where: Record<string, string> = {};
+  if (filter?.programSlug) where.programSlug = filter.programSlug;
+  if (filter?.moduleName) where.moduleName = filter.moduleName;
+
+  const result = await prisma.certificate.deleteMany({
+    where,
+  });
+
+  return result.count;
+}
+
 export async function generateSingleCertificate(input: {
   studentId: string;
   programSlug: string;
   moduleName: string;
   completionDate?: Date;
+  indexOverride?: number;
 }) {
   const student = await prisma.user.findUnique({
     where: { id: input.studentId },
@@ -135,21 +151,53 @@ export async function generateSingleCertificate(input: {
   const program = getProgramBySlug(input.programSlug);
   const courseTitle = program?.title ?? input.programSlug;
 
-  // Count existing certificates for index
-  const existingCount = await prisma.certificate.count({
-    where: { programSlug: input.programSlug, moduleName: input.moduleName },
+  // Check if student already has a certificate
+  const existingCert = await prisma.certificate.findFirst({
+    where: {
+      studentId: input.studentId,
+      programSlug: input.programSlug,
+      moduleName: input.moduleName,
+    },
   });
+
+  let indexNumber = input.indexOverride;
+  if (!indexNumber) {
+    if (existingCert?.verificationCode) {
+      const match = existingCert.verificationCode.match(/-(\d+)$/);
+      if (match) {
+        indexNumber = parseInt(match[1], 10);
+      }
+    }
+  }
+
+  if (!indexNumber) {
+    // Find highest used index number for this module
+    const allCerts = await prisma.certificate.findMany({
+      where: { programSlug: input.programSlug, moduleName: input.moduleName },
+      select: { verificationCode: true },
+    });
+
+    let maxIndex = 0;
+    for (const c of allCerts) {
+      const m = c.verificationCode?.match(/-(\d+)$/);
+      if (m) {
+        const num = parseInt(m[1], 10);
+        if (num > maxIndex) maxIndex = num;
+      }
+    }
+    indexNumber = maxIndex + 1;
+  }
 
   const verificationCode = buildCertificateId(
     input.studentId,
     input.programSlug,
     input.moduleName,
-    existingCount + 1
+    indexNumber
   );
 
   const completionDate = input.completionDate ?? new Date();
 
-  // Test render SVG/PNG to ensure high quality
+  // Test render to ensure 100% valid vector output
   await renderCertificatePng({
     studentName: student.name,
     moduleName: input.moduleName,
@@ -158,7 +206,7 @@ export async function generateSingleCertificate(input: {
     certificateId: verificationCode,
   });
 
-  const id = `cert_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+  const id = existingCert?.id ?? `cert_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
 
   const certificate = await prisma.certificate.upsert({
     where: {
@@ -186,6 +234,8 @@ export async function generateSingleCertificate(input: {
       studentNameSnapshot: student.name,
       courseNameSnapshot: courseTitle,
       moduleNameSnapshot: input.moduleName,
+      verificationCode,
+      certificateNumber: verificationCode,
       completionDate,
       issuedAt: new Date(),
       status: "issued",
@@ -197,49 +247,55 @@ export async function generateSingleCertificate(input: {
 
 export async function generateBulkCertificates(
   programSlug: string,
-  moduleName: string
+  moduleName: string,
+  options?: { regenerateAll?: boolean }
 ): Promise<{
   total: number;
   generatedCount: number;
   failedCount: number;
-  results: Array<{ studentId: string; name: string; success: boolean; error?: string }>;
+  results: Array<{ studentId: string; name: string; success: boolean; verificationCode?: string; error?: string }>;
 }> {
   const { eligibleStudents } = await getEligibleStudentsForModule(programSlug, moduleName);
-  const pendingStudents = eligibleStudents.filter((s) => s.status === "pending");
+  const targetStudents = options?.regenerateAll
+    ? eligibleStudents
+    : eligibleStudents.filter((s) => s.status === "pending");
 
-  const results: Array<{ studentId: string; name: string; success: boolean; error?: string }> = [];
+  const results: Array<{ studentId: string; name: string; success: boolean; verificationCode?: string; error?: string }> = [];
   let generatedCount = 0;
   let failedCount = 0;
 
-  // Process in controlled batches of 5 to prevent timeouts
-  const batchSize = 5;
-  for (let i = 0; i < pendingStudents.length; i += batchSize) {
-    const batch = pendingStudents.slice(i, i + batchSize);
-    await Promise.all(
-      batch.map(async (student) => {
-        try {
-          await generateSingleCertificate({
-            studentId: student.studentId,
-            programSlug,
-            moduleName,
-          });
-          generatedCount++;
-          results.push({ studentId: student.studentId, name: student.name, success: true });
-        } catch (err) {
-          failedCount++;
-          results.push({
-            studentId: student.studentId,
-            name: student.name,
-            success: false,
-            error: err instanceof Error ? err.message : "Failed to generate certificate",
-          });
-        }
-      })
-    );
+  // Assign deterministic, sequential 1-based index numbers across students
+  for (let i = 0; i < targetStudents.length; i++) {
+    const student = targetStudents[i];
+    const studentIndex = i + 1; // 1 -> 0001, 2 -> 0002, ..., 145 -> 0145
+
+    try {
+      const cert = await generateSingleCertificate({
+        studentId: student.studentId,
+        programSlug,
+        moduleName,
+        indexOverride: studentIndex,
+      });
+      generatedCount++;
+      results.push({
+        studentId: student.studentId,
+        name: student.name,
+        success: true,
+        verificationCode: cert.verificationCode,
+      });
+    } catch (err) {
+      failedCount++;
+      results.push({
+        studentId: student.studentId,
+        name: student.name,
+        success: false,
+        error: err instanceof Error ? err.message : "Failed to generate certificate",
+      });
+    }
   }
 
   return {
-    total: pendingStudents.length,
+    total: targetStudents.length,
     generatedCount,
     failedCount,
     results,

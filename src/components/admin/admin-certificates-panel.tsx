@@ -12,6 +12,7 @@ import {
   DownloadSimple,
   SealCheck,
   WarningCircle,
+  Trash,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -48,6 +49,7 @@ export function AdminCertificatesPanel() {
   const [search, setSearch] = useState<string>("");
   const [generatingId, setGeneratingId] = useState<string | null>(null);
   const [isBulkGenerating, setIsBulkGenerating] = useState<boolean>(false);
+  const [isResetting, setIsResetting] = useState<boolean>(false);
   const [bulkProgress, setBulkProgress] = useState<{ current: number; total: number } | null>(null);
 
   const selectedProgram = programs.find((p) => p.slug === selectedCourse);
@@ -83,6 +85,39 @@ export function AdminCertificatesPanel() {
     loadData();
   }, [loadData]);
 
+  const handleResetAll = async () => {
+    if (
+      !window.confirm(
+        `Are you sure you want to RESET/DELETE all certificates for "${selectedModule}" (${selectedProgram?.title})? This will allow generating fresh unique certificates for all students.`
+      )
+    ) {
+      return;
+    }
+
+    setIsResetting(true);
+    try {
+      const res = await fetch("/api/admin/certificates/reset", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          programSlug: selectedCourse,
+          moduleName: selectedModule,
+        }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        toast.success(json.message ?? "Certificates reset successfully!");
+        loadData();
+      } else {
+        toast.error(json.message ?? json.error ?? "Failed to reset certificates");
+      }
+    } catch {
+      toast.error("Failed to reset certificates");
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
   const handleGenerateSingle = async (student: EligibleStudentView) => {
     setGeneratingId(student.studentId);
     try {
@@ -109,54 +144,52 @@ export function AdminCertificatesPanel() {
     }
   };
 
-  const handleGenerateBulk = async () => {
-    const pendingList = students.filter((s) => s.status === "pending");
-    if (pendingList.length === 0) {
-      toast.info("All eligible students already have certificates generated!");
+  const handleGenerateBulk = async (forceRegenerate = false) => {
+    const targetList = forceRegenerate
+      ? students
+      : students.filter((s) => s.status === "pending");
+
+    if (targetList.length === 0) {
+      toast.info("No students found to generate certificates for!");
       return;
     }
 
     setIsBulkGenerating(true);
-    setBulkProgress({ current: 0, total: pendingList.length });
+    setBulkProgress({ current: 0, total: targetList.length });
 
     let successCount = 0;
     let failCount = 0;
 
-    // Batched client-side processing (5 at a time) to prevent Vercel 10s request timeout
-    const batchSize = 5;
-    for (let i = 0; i < pendingList.length; i += batchSize) {
-      const batch = pendingList.slice(i, i + batchSize);
-      await Promise.all(
-        batch.map(async (student) => {
-          try {
-            const res = await fetch("/api/admin/certificates/generate", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                studentId: student.studentId,
-                programSlug: selectedCourse,
-                moduleName: selectedModule,
-              }),
-            });
-            const json = await res.json();
-            if (json.success) {
-              successCount++;
-            } else {
-              failCount++;
-            }
-          } catch {
-            failCount++;
-          }
-        })
-      );
+    // Process sequentially or in batches of 3 to assign unique sequential codes without race conditions
+    for (let i = 0; i < targetList.length; i++) {
+      const student = targetList[i];
+      try {
+        const res = await fetch("/api/admin/certificates/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            studentId: student.studentId,
+            programSlug: selectedCourse,
+            moduleName: selectedModule,
+          }),
+        });
+        const json = await res.json();
+        if (json.success) {
+          successCount++;
+        } else {
+          failCount++;
+        }
+      } catch {
+        failCount++;
+      }
 
-      setBulkProgress({ current: Math.min(i + batchSize, pendingList.length), total: pendingList.length });
+      setBulkProgress({ current: i + 1, total: targetList.length });
     }
 
     setIsBulkGenerating(false);
     setBulkProgress(null);
 
-    toast.success(`Bulk generation complete! ${successCount} generated successfully${failCount > 0 ? `, ${failCount} failed` : ""}.`);
+    toast.success(`Generation complete! ${successCount} generated successfully${failCount > 0 ? `, ${failCount} failed` : ""}.`);
     loadData();
   };
 
@@ -190,23 +223,50 @@ export function AdminCertificatesPanel() {
               type="button"
               variant="outline"
               onClick={loadData}
-              disabled={loading || isBulkGenerating}
+              disabled={loading || isBulkGenerating || isResetting}
               className="gap-2 rounded-xl"
             >
               <ArrowClockwise size={16} className={cn(loading && "animate-spin")} />
               Refresh Data
             </Button>
 
+            {stats.generatedCount > 0 && (
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={handleResetAll}
+                disabled={loading || isBulkGenerating || isResetting}
+                className="gap-2 rounded-xl text-xs font-bold"
+              >
+                {isResetting ? (
+                  <>
+                    <SpinnerGap size={16} className="animate-spin" />
+                    Resetting...
+                  </>
+                ) : (
+                  <>
+                    <Trash size={16} />
+                    Reset All Certificates
+                  </>
+                )}
+              </Button>
+            )}
+
             <Button
               type="button"
-              onClick={handleGenerateBulk}
-              disabled={isBulkGenerating || stats.pendingCount === 0 || loading}
+              onClick={() => handleGenerateBulk(stats.pendingCount === 0)}
+              disabled={isBulkGenerating || isResetting || loading || stats.totalEligible === 0}
               className="gap-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-6 shadow-md"
             >
               {isBulkGenerating ? (
                 <>
                   <SpinnerGap size={18} className="animate-spin" />
                   Generating ({bulkProgress?.current ?? 0} / {bulkProgress?.total ?? 0})
+                </>
+              ) : stats.pendingCount === 0 ? (
+                <>
+                  <Sparkle size={18} weight="fill" />
+                  Regenerate All Certificates ({stats.totalEligible})
                 </>
               ) : (
                 <>
