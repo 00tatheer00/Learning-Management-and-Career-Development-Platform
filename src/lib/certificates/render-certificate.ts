@@ -20,28 +20,57 @@ function escapeXml(value: string): string {
     .replace(/'/g, "&apos;");
 }
 
-const MASTER_TEMPLATE_PATH = path.join(process.cwd(), "public/certificates/certificate-master-template.png");
+// ---------------------------------------------------------------------------
+// Resolve asset paths — try __dirname-relative first (Vercel serverless),
+// then fall back to process.cwd()/public (local dev).
+// ---------------------------------------------------------------------------
+function resolveAsset(...segments: string[]): string {
+  // 1. Try __dirname-relative (bundled alongside this file in Vercel)
+  const dirRelative = path.join(__dirname, ...segments);
+  if (fs.existsSync(dirRelative)) return dirRelative;
+
+  // 2. Fallback to process.cwd()/public (local dev)
+  const cwdRelative = path.join(process.cwd(), "public", ...segments);
+  if (fs.existsSync(cwdRelative)) return cwdRelative;
+
+  // 3. Try process.cwd() directly
+  const cwdDirect = path.join(process.cwd(), ...segments);
+  if (fs.existsSync(cwdDirect)) return cwdDirect;
+
+  throw new Error(`Asset not found: ${segments.join("/")}`);
+}
+
+// Master certificate artwork template
+const MASTER_TEMPLATE_PATH = (() => {
+  try {
+    return resolveAsset("assets", "certificate-master-template.png");
+  } catch {
+    return path.join(process.cwd(), "public/certificates/certificate-master-template.png");
+  }
+})();
 
 // ---------------------------------------------------------------------------
 // Load TTF fonts via opentype.js — converts ALL text to vector <path> data.
-// This guarantees 100% identical rendering on Windows, Linux, Vercel, Docker.
-// No @font-face, no librsvg font lookup, no tofu boxes. Ever.
+// Guaranteed identical rendering on Windows, Linux, Vercel, Docker.
 // ---------------------------------------------------------------------------
-
-function loadFont(relativePath: string): opentype.Font | null {
+function loadFont(dirRelPath: string, publicRelPath: string): opentype.Font | null {
   try {
-    const fullPath = path.join(process.cwd(), relativePath);
-    const buf = fs.readFileSync(fullPath);
+    let fontPath: string;
+    try {
+      fontPath = resolveAsset(...dirRelPath.split("/"));
+    } catch {
+      fontPath = path.join(process.cwd(), publicRelPath);
+    }
+    const buf = fs.readFileSync(fontPath);
     return opentype.parse(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength));
   } catch (err) {
-    console.error(`Warning: could not load font ${relativePath}:`, err);
+    console.error(`Warning: could not load font:`, err);
     return null;
   }
 }
 
-const scriptFont = loadFont("public/fonts/AlexBrush-Regular.ttf");
-const boldFont = loadFont("public/fonts/Inter-Bold.ttf");
-const regularFont = loadFont("public/fonts/Inter-Regular.ttf");
+const scriptFont = loadFont("fonts/AlexBrush-Regular.ttf", "public/fonts/AlexBrush-Regular.ttf");
+const boldFont = loadFont("fonts/Inter-Bold.ttf", "public/fonts/Inter-Bold.ttf");
 
 // Helper: render text string to SVG <path> using opentype vector outlines
 function textToVectorSvg(
@@ -55,34 +84,25 @@ function textToVectorSvg(
   letterSpacing = 0
 ): string {
   if (!font) {
-    // Absolute last-resort fallback (should never happen if fonts are bundled)
     return `<text x="${x}" y="${y}" text-anchor="${anchor}" font-size="${fontSize}" fill="${fill}">${escapeXml(text)}</text>`;
   }
 
   try {
-    if (letterSpacing > 0) {
-      // Render character-by-character with spacing
-      let svgPaths = "";
-      let cursorX = 0;
-      for (let i = 0; i < text.length; i++) {
-        const ch = text[i];
+    // Render each character individually to avoid librsvg single-path-d truncation
+    let svgPaths = "";
+    let cursorX = 0;
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i];
+      if (ch !== " ") {
         const charPath = font.getPath(ch, cursorX, 0, fontSize);
         svgPaths += charPath.toSVG(4);
-        const adv = font.charToGlyph(ch).advanceWidth || 0;
-        cursorX += (adv / font.unitsPerEm) * fontSize + letterSpacing;
       }
-      // Measure total width for centering
-      const totalWidth = cursorX - letterSpacing; // remove trailing spacing
-      const offsetX = anchor === "middle" ? x - totalWidth / 2 : x;
-      return `<g fill="${fill}" transform="translate(${offsetX},${y})">${svgPaths}</g>`;
+      const adv = font.charToGlyph(ch).advanceWidth || 0;
+      cursorX += (adv / font.unitsPerEm) * fontSize + letterSpacing;
     }
-
-    const pathObj = font.getPath(text, 0, 0, fontSize);
-    const bbox = pathObj.getBoundingBox();
-    const textWidth = bbox.x2 - bbox.x1;
-    const offsetX = anchor === "middle" ? x - textWidth / 2 : x;
-    const svgPath = font.getPath(text, offsetX, y, fontSize).toSVG(4);
-    return `<g fill="${fill}">${svgPath}</g>`;
+    const totalWidth = cursorX - letterSpacing;
+    const offsetX = anchor === "middle" ? x - totalWidth / 2 : x;
+    return `<g fill="${fill}" transform="translate(${offsetX},${y})">${svgPaths}</g>`;
   } catch {
     return `<text x="${x}" y="${y}" text-anchor="${anchor}" font-size="${fontSize}" fill="${fill}">${escapeXml(text)}</text>`;
   }
