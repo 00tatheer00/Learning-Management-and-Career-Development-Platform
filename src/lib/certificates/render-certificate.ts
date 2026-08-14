@@ -97,11 +97,11 @@ export function buildMasterCertificateOverlaySvg(input: CertificateRenderInput):
   <!-- 1. Student Name (Centered Calligraphy Cursive) -->
   <text x="585" y="340" text-anchor="middle" font-family="CertAlexBrush, CertGreatVibes, cursive" font-size="${nameFontSize}" fill="#0D1117">${name}</text>
 
-  <!-- 2. Module Name (Orange Bold Text) -->
-  <text x="515" y="398" font-family="CertInterBold, sans-serif" font-size="13" font-weight="bold" fill="#EA580C">[ ${moduleName} ]</text>
+  <!-- 2. Module Name (Orange Bold Text right after "has successfully completed the") -->
+  <text x="546" y="394" font-family="CertInterBold, sans-serif" font-size="13" font-weight="bold" fill="#EA580C">[ ${moduleName} ]</text>
 
-  <!-- 3. Course Name (Orange Bold Text) -->
-  <text x="515" y="422" font-family="CertInterBold, sans-serif" font-size="13" font-weight="bold" fill="#EA580C">[ ${programTitle} ]</text>
+  <!-- 3. Course Name (Orange Bold Text right after "as part of the") -->
+  <text x="514" y="418" font-family="CertInterBold, sans-serif" font-size="13" font-weight="bold" fill="#EA580C">[ ${programTitle} ]</text>
 
   <!-- 4. Date of Completion -->
   <text x="286" y="556" text-anchor="middle" font-family="CertInterBold, sans-serif" font-size="11.5" font-weight="bold" fill="#262626">${date}</text>
