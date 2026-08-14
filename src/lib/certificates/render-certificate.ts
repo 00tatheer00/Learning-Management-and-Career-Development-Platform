@@ -112,8 +112,8 @@ export function buildMasterCertificateOverlaySvg(input: CertificateRenderInput):
   // 4. Date of Completion (Centered under DATE heading)
   const dateSvg = renderTextByGlyphs(boldFont, date, 286, 556, 11.5, "#262626", "middle");
 
-  // 5. Verification Code (Centered in footer pill box)
-  const codeSvg = renderTextByGlyphs(boldFont, certId, 477, 633, 12, "#C2410C", "middle", 0.5);
+  // 5. Verification Code (PERFECTLY CENTERED in footer box at x=488, y=635)
+  const codeSvg = renderTextByGlyphs(boldFont, certId, 488, 635, 11.5, "#C2410C", "middle", 0.5);
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg width="${width}" height="${height}" viewBox="0 0 1024 682" xmlns="http://www.w3.org/2000/svg">
