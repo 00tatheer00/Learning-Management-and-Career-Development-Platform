@@ -1,5 +1,6 @@
 import * as opentype from "opentype.js";
 import sharp from "sharp";
+import { PDFDocument } from "pdf-lib";
 import {
   GREAT_VIBES_TTF_B64,
   INTER_BOLD_TTF_B64,
@@ -132,4 +133,31 @@ export async function renderCertificatePng(input: CertificateRenderInput): Promi
     .composite([{ input: Buffer.from(overlaySvg), top: 0, left: 0 }])
     .png({ quality: 100, compressionLevel: 6 })
     .toBuffer();
+}
+
+/**
+ * Render an official High-Quality Print-Ready PDF Certificate (1024x682 pt).
+ */
+export async function renderCertificatePdf(input: CertificateRenderInput): Promise<Buffer> {
+  const pngBuffer = await renderCertificatePng(input);
+
+  const pdfDoc = await PDFDocument.create();
+  const page = pdfDoc.addPage([1024, 682]);
+  const pngImage = await pdfDoc.embedPng(pngBuffer);
+
+  page.drawImage(pngImage, {
+    x: 0,
+    y: 0,
+    width: 1024,
+    height: 682,
+  });
+
+  pdfDoc.setTitle(`Certificate of Completion - ${input.studentName}`);
+  pdfDoc.setAuthor("Emerging Edge School of Technology");
+  pdfDoc.setSubject(`Certificate of Completion for ${input.moduleName}`);
+  pdfDoc.setCreator("Emerging Edge School Portal");
+  pdfDoc.setProducer("Emerging Edge School Portal");
+
+  const pdfBytes = await pdfDoc.save();
+  return Buffer.from(pdfBytes);
 }

@@ -40,6 +40,7 @@
     "next-auth": "^4.24.14",
     "nextjs-toploader": "^3.9.17",
     "opentype.js": "^2.0.0",
+    "pdf-lib": "^1.17.1",
     "qrcode": "^1.5.4",
     "react": "19.1.0",
     "react-countup": "^6.5.3",
