@@ -2,6 +2,7 @@ import * as opentype from "opentype.js";
 import sharp from "sharp";
 import { PDFDocument } from "pdf-lib";
 import {
+  CINZEL_TTF_B64,
   GREAT_VIBES_TTF_B64,
   INTER_BOLD_TTF_B64,
   CERTIFICATE_TEMPLATE_B64,
@@ -45,10 +46,10 @@ function loadEmbeddedFont(b64: string): opentype.Font | null {
   }
 }
 
-const scriptFont = loadEmbeddedFont(GREAT_VIBES_TTF_B64);
+const nameFont = loadEmbeddedFont(CINZEL_TTF_B64) ?? loadEmbeddedFont(GREAT_VIBES_TTF_B64);
 const boldFont = loadEmbeddedFont(INTER_BOLD_TTF_B64);
 
-// Render glyph-by-glyph with fill-rule="nonzero" for solid, unbroken cursive vector curves
+// Render glyph-by-glyph with fill-rule="nonzero" for solid, unbroken vector curves
 function renderTextByGlyphs(
   font: opentype.Font | null,
   text: string,
@@ -90,7 +91,7 @@ export function buildMasterCertificateOverlaySvg(input: CertificateRenderInput):
   const width = 1024;
   const height = 682;
 
-  // Clean brackets and format name into Title Case for gorgeous calligraphy aesthetics
+  // Clean brackets and format name
   const cleanModule = input.moduleName.replace(/^\[\s*/, "").replace(/\s*\]$/, "");
   const cleanProgram = input.programTitle.replace(/^\[\s*/, "").replace(/\s*\]$/, "");
   const date = input.completionDate;
@@ -99,10 +100,10 @@ export function buildMasterCertificateOverlaySvg(input: CertificateRenderInput):
   const formattedName = toTitleCase(input.studentName);
   const nameLen = formattedName.length;
   // Scaled for elegance & balance
-  const nameFontSize = nameLen > 30 ? 34 : nameLen > 22 ? 40 : 46;
+  const nameFontSize = nameLen > 28 ? 26 : nameLen > 20 ? 30 : 34;
 
-  // 1. Student Name (PERFECTLY CENTERED above the gold line diamond at x=530, y=350)
-  const nameSvg = renderTextByGlyphs(scriptFont, formattedName, 530, 350, nameFontSize, "#0D1117", "middle");
+  // 1. Student Name (PERFECTLY CENTERED above the gold line diamond at x=530, y=345)
+  const nameSvg = renderTextByGlyphs(nameFont, formattedName.toUpperCase(), 530, 345, nameFontSize, "#0D1117", "middle", 0.5);
 
   // 2. Module Name (Orange Bold — perfectly spaced after "has successfully completed the ")
   const moduleSvg = renderTextByGlyphs(boldFont, cleanModule, 600, 397, 12.5, "#EA580C", "start");
