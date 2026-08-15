@@ -65,8 +65,8 @@ export async function getStudentCertificateModules(
         certificateId: verificationCode,
         verificationCode,
         issuedAtLabel: isIssued ? formatCertificateDate(issuedAt) : undefined,
-        downloadPath: isIssued
-          ? `/api/student/certificates/download?program=${encodeURIComponent(programSlug)}&module=${encodeURIComponent(mod.name)}`
+        downloadPath: isIssued && verificationCode
+          ? `/api/student/certificates/download?code=${encodeURIComponent(verificationCode)}&program=${encodeURIComponent(programSlug)}&module=${encodeURIComponent(mod.name)}`
           : undefined,
         verifyPath: verificationCode ? `/verify/${encodeURIComponent(verificationCode)}` : undefined,
       });
@@ -119,7 +119,7 @@ export async function getCertificateRenderPayload(
   const completionDate = dbCert?.completionDate ?? new Date();
 
   return {
-    studentName: dbCert?.studentNameSnapshot ?? user.name,
+    studentName: user.name || dbCert?.studentNameSnapshot || "Student",
     moduleName: dbCert?.moduleNameSnapshot ?? moduleName,
     programTitle: courseTitle,
     completionDate: formatCertificateDate(completionDate),

@@ -335,8 +335,10 @@ export async function generateBulkCertificates(
 }
 
 export async function verifyCertificateByCode(verificationCode: string) {
+  if (!verificationCode) return null;
   const codeNormalized = verificationCode.trim();
-  const cert = await prisma.certificate.findFirst({
+
+  let cert = await prisma.certificate.findFirst({
     where: {
       verificationCode: {
         equals: codeNormalized,
@@ -350,11 +352,29 @@ export async function verifyCertificateByCode(verificationCode: string) {
     },
   });
 
+  // If not found directly, try compact dash normalization
+  if (!cert) {
+    const compact = codeNormalized.replace(/[\s_]+/g, "-");
+    cert = await prisma.certificate.findFirst({
+      where: {
+        verificationCode: {
+          equals: compact,
+          mode: "insensitive",
+        },
+      },
+      include: {
+        student: {
+          select: { name: true, email: true },
+        },
+      },
+    });
+  }
+
   if (!cert) return null;
 
   return {
     verificationCode: cert.verificationCode,
-    studentName: cert.studentNameSnapshot,
+    studentName: cert.student?.name || cert.studentNameSnapshot,
     courseTitle: cert.courseNameSnapshot,
     moduleName: cert.moduleNameSnapshot,
     completionDateLabel: formatCertificateDate(cert.completionDate),

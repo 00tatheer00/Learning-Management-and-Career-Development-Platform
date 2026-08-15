@@ -30,11 +30,14 @@ export async function GET(request: Request) {
       where: {
         verificationCode: { equals: code, mode: "insensitive" },
       },
+      include: {
+        student: { select: { name: true, email: true } },
+      },
     });
 
     if (cert) {
       payload = {
-        studentName: cert.studentNameSnapshot,
+        studentName: cert.student?.name || cert.studentNameSnapshot,
         moduleName: cert.moduleNameSnapshot,
         programTitle: cert.courseNameSnapshot,
         completionDate: formatCertificateDate(cert.completionDate),
