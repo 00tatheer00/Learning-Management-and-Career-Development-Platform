@@ -77,12 +77,14 @@ export async function getEligibleStudentsForModule(
     const emailNorm = row.email.trim().toLowerCase();
     const rowProg = normalizeProgramSlug(row.program);
     if (rowProg === normSlug) {
-      const rowModuleNorm = normalizeModuleName(row.level);
-      if (
-        rowModuleNorm === normModule ||
-        (isFirstModule && (!rowModuleNorm || rowModuleNorm === "beginner" || rowModuleNorm === "all"))
-      ) {
+      if (isFirstModule) {
+        // For the first module, ALL approved students for the program are eligible
         approvedEmailSet.add(emailNorm);
+      } else {
+        const rowModuleNorm = normalizeModuleName(row.level);
+        if (rowModuleNorm === normModule) {
+          approvedEmailSet.add(emailNorm);
+        }
       }
     }
   }
@@ -93,7 +95,7 @@ export async function getEligibleStudentsForModule(
     const rowProg = normalizeProgramSlug(row.programSlug);
     if (rowProg === normSlug) {
       const rowModuleNorm = normalizeModuleName(row.moduleName);
-      if (rowModuleNorm === normModule) {
+      if (rowModuleNorm === normModule || isFirstModule) {
         approvedEmailSet.add(emailNorm);
       }
     }
@@ -111,11 +113,9 @@ export async function getEligibleStudentsForModule(
     const hasApprovedEnrollment = approvedEmailSet.has(studentEmailNorm);
 
     const studentProg = normalizeProgramSlug(student.programSlug ?? "");
-    const studentModuleNorm = normalizeModuleName(student.level);
-    const isStudentInModule =
-      studentProg === normSlug &&
-      (studentModuleNorm === normModule ||
-        (isFirstModule && (!studentModuleNorm || studentModuleNorm === "beginner" || studentModuleNorm === "all")));
+    const isStudentInModule = isFirstModule
+      ? studentProg === normSlug
+      : studentProg === normSlug && normalizeModuleName(student.level) === normModule;
 
     const isEligible = Boolean(isDemo || hasApprovedEnrollment || isStudentInModule || existingCert);
 

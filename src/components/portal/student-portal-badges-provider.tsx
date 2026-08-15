@@ -13,6 +13,7 @@ import {
 interface StudentPortalBadgesState {
   assignments: number;
   classes: number;
+  certificates: number;
   refresh: () => Promise<void>;
   markSeen: (section: "assignments" | "classes") => Promise<void>;
 }
@@ -22,6 +23,7 @@ const StudentPortalBadgesContext = createContext<StudentPortalBadgesState | null
 export function StudentPortalBadgesProvider({ children }: { children: ReactNode }) {
   const [assignments, setAssignments] = useState(0);
   const [classes, setClasses] = useState(0);
+  const [certificates, setCertificates] = useState(0);
 
   const refresh = useCallback(async () => {
     try {
@@ -30,6 +32,7 @@ export function StudentPortalBadgesProvider({ children }: { children: ReactNode 
       if (payload.success) {
         setAssignments(payload.data.assignments ?? 0);
         setClasses(payload.data.classes ?? 0);
+        setCertificates(payload.data.certificates ?? 0);
       }
     } catch {
       // Ignore transient network errors.
@@ -61,8 +64,8 @@ export function StudentPortalBadgesProvider({ children }: { children: ReactNode 
   }, [refresh]);
 
   const value = useMemo(
-    () => ({ assignments, classes, refresh, markSeen }),
-    [assignments, classes, refresh, markSeen]
+    () => ({ assignments, classes, certificates, refresh, markSeen }),
+    [assignments, classes, certificates, refresh, markSeen]
   );
 
   return (

@@ -16,6 +16,7 @@ import {
 export interface StudentPortalBadgeCounts {
   assignments: number;
   classes: number;
+  certificates: number;
 }
 
 function seenKey(userId: string, section: "assignments" | "classes"): string {
@@ -84,10 +85,15 @@ export async function getStudentPortalBadgeCounts(
       return sessionIsStillRelevant(session.startsAt, session.date, session.time);
     }).length;
 
-    return { assignments: assignmentsCount, classes: classesCount };
+    // Certificate count — student has at least 1 issued certificate
+    const certificateCount = await prisma.certificate.count({
+      where: { studentId: user.id, status: "issued" },
+    });
+
+    return { assignments: assignmentsCount, classes: classesCount, certificates: certificateCount };
   } catch (error) {
     console.error("[student-portal/badges] count failed:", error);
-    return { assignments: 0, classes: 0 };
+    return { assignments: 0, classes: 0, certificates: 0 };
   }
 }
 

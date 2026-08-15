@@ -441,6 +441,8 @@ function SidebarContent({
                   isStudent && item.href === "/student/assignments" && (studentBadges?.assignments ?? 0) > 0;
                 const showClassesBadge =
                   isStudent && item.href === "/student/classes" && (studentBadges?.classes ?? 0) > 0;
+                const showCertificatesDot =
+                  isStudent && item.href === "/student/certificates" && (studentBadges?.certificates ?? 0) > 0;
                 const navBadgeCount = showEnrollmentBadge
                   ? enrollmentBadgeCount
                   : showWhatsAppBadge
@@ -477,10 +479,22 @@ function SidebarContent({
                       <>
                         <span className="flex-1 min-w-0 truncate">{item.label}</span>
                         {showNavBadge && <AdminNavBadge count={navBadgeCount} />}
+                        {showCertificatesDot && (
+                          <span className="relative flex h-2.5 w-2.5 shrink-0">
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500" />
+                          </span>
+                        )}
                       </>
                     )}
                     {collapsed && showNavBadge && (
                       <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-red-500 ring-2 ring-[var(--pt-surface)]" />
+                    )}
+                    {collapsed && showCertificatesDot && !showNavBadge && (
+                      <span className="absolute right-1 top-1 flex h-2.5 w-2.5">
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-[var(--pt-surface)]" />
+                      </span>
                     )}
                   </Link>
                 );
