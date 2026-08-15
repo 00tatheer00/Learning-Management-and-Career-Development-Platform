@@ -18,6 +18,15 @@ export interface EligibleStudentView {
   certificateId?: string;
 }
 
+function normalizeModuleName(name?: string | null): string {
+  if (!name) return "";
+  return name
+    .trim()
+    .toLowerCase()
+    .replace(/&amp;/g, "&")
+    .replace(/\s+/g, " ");
+}
+
 export async function getEligibleStudentsForModule(
   programSlug: string,
   moduleName: string
@@ -26,7 +35,12 @@ export async function getEligibleStudentsForModule(
   stats: { totalEligible: number; generatedCount: number; pendingCount: number };
 }> {
   const normSlug = normalizeProgramSlug(programSlug);
-  const normModule = moduleName.trim().toLowerCase();
+  const normModule = normalizeModuleName(moduleName);
+
+  const program = getProgramBySlug(programSlug);
+  const firstModuleRaw = program?.modules[0]?.name ?? "";
+  const firstModuleNorm = normalizeModuleName(firstModuleRaw);
+  const isFirstModule = normModule === firstModuleNorm;
 
   // 1. Batch query for students, enrollments, module enrollments, and certificates
   const [students, approvedEnrollments, activeModuleEnrollments, existingCertificates] =
@@ -44,18 +58,18 @@ export async function getEligibleStudentsForModule(
         select: { email: true, program: true, level: true },
       }),
       prisma.moduleEnrollment.findMany({
-        where: { status: "active" },
+        where: { status: { in: ["active", "completed"] } },
         select: { email: true, programSlug: true, moduleName: true },
       }),
       prisma.certificate.findMany({
         where: {
           programSlug,
-          moduleName,
+          moduleName: { equals: moduleName.trim(), mode: "insensitive" },
         },
       }),
     ]);
 
-  // 2. Build in-memory lookup sets
+  // 2. Build in-memory lookup sets for students eligible for this specific module
   const approvedEmailSet = new Set<string>();
 
   for (const row of approvedEnrollments) {
@@ -63,7 +77,13 @@ export async function getEligibleStudentsForModule(
     const emailNorm = row.email.trim().toLowerCase();
     const rowProg = normalizeProgramSlug(row.program);
     if (rowProg === normSlug) {
-      approvedEmailSet.add(emailNorm);
+      const rowModuleNorm = normalizeModuleName(row.level);
+      if (
+        rowModuleNorm === normModule ||
+        (isFirstModule && (!rowModuleNorm || rowModuleNorm === "beginner" || rowModuleNorm === "all"))
+      ) {
+        approvedEmailSet.add(emailNorm);
+      }
     }
   }
 
@@ -71,8 +91,11 @@ export async function getEligibleStudentsForModule(
     if (!row.email) continue;
     const emailNorm = row.email.trim().toLowerCase();
     const rowProg = normalizeProgramSlug(row.programSlug);
-    if (rowProg === normSlug && row.moduleName.trim().toLowerCase() === normModule) {
-      approvedEmailSet.add(emailNorm);
+    if (rowProg === normSlug) {
+      const rowModuleNorm = normalizeModuleName(row.moduleName);
+      if (rowModuleNorm === normModule) {
+        approvedEmailSet.add(emailNorm);
+      }
     }
   }
 
@@ -82,14 +105,21 @@ export async function getEligibleStudentsForModule(
 
   for (const student of students) {
     const studentEmailNorm = student.email.trim().toLowerCase();
-    const isApproved =
-      isDemoPortalStudent(student.email) ||
-      approvedEmailSet.has(studentEmailNorm) ||
-      normalizeProgramSlug(student.programSlug ?? "") === normSlug;
-
-    if (!isApproved) continue;
-
     const existingCert = certByStudentId.get(student.id);
+
+    const isDemo = isDemoPortalStudent(student.email) && (isFirstModule || normSlug === "web-development");
+    const hasApprovedEnrollment = approvedEmailSet.has(studentEmailNorm);
+
+    const studentProg = normalizeProgramSlug(student.programSlug ?? "");
+    const studentModuleNorm = normalizeModuleName(student.level);
+    const isStudentInModule =
+      studentProg === normSlug &&
+      (studentModuleNorm === normModule ||
+        (isFirstModule && (!studentModuleNorm || studentModuleNorm === "beginner" || studentModuleNorm === "all")));
+
+    const isEligible = Boolean(isDemo || hasApprovedEnrollment || isStudentInModule || existingCert);
+
+    if (!isEligible) continue;
 
     eligibleStudents.push({
       studentId: student.id,
