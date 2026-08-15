@@ -17,7 +17,7 @@ export default function PublicVerifySearchPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-zinc-900 to-slate-950 text-white flex items-center justify-center p-4 sm:p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-zinc-900 to-slate-950 text-white flex items-center justify-center p-4 sm:p-6 pt-28 pb-20">
       <div className="w-full max-w-xl text-center space-y-8">
         {/* Header Branding */}
         <div className="space-y-3">

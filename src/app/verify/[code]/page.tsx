@@ -24,7 +24,7 @@ export default async function PublicVerifyCodePage({ params }: VerifyPageProps) 
   const cert = await verifyCertificateByCode(code);
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-zinc-900 to-slate-950 text-white flex items-center justify-center p-4 sm:p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-zinc-900 to-slate-950 text-white flex items-center justify-center p-4 sm:p-6 pt-28 pb-20">
       <div className="w-full max-w-2xl">
         {/* Top Back Link */}
         <div className="mb-6 flex items-center justify-between">

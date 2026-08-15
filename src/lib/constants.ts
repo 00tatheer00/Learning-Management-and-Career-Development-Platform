@@ -30,6 +30,7 @@ export const NAV_LINKS = [
   { href: "/programs#learning-paths", label: "Learning Paths" },
   { href: "/trainers", label: "Trainers" },
   { href: "/admissions", label: "Admissions" },
+  { href: "/verify", label: "Verify" },
   { href: "/student-portal", label: "Student Portal" },
   { href: "/contact", label: "Contact" },
 ] as const;
