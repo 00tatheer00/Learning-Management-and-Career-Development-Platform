@@ -87,10 +87,11 @@ function renderTextByGlyphs(
   }
 }
 
-export function buildMasterCertificateOverlaySvg(input: CertificateRenderInput): string {
-  const width = 1024;
-  const height = 682;
-
+export function buildMasterCertificateOverlaySvg(
+  input: CertificateRenderInput,
+  renderWidth = 2048,
+  renderHeight = 1364
+): string {
   // Clean brackets and format name
   const cleanModule = input.moduleName.replace(/^\[\s*/, "").replace(/\s*\]$/, "");
   const cleanProgram = input.programTitle.replace(/^\[\s*/, "").replace(/\s*\]$/, "");
@@ -118,7 +119,7 @@ export function buildMasterCertificateOverlaySvg(input: CertificateRenderInput):
   const codeSvg = renderTextByGlyphs(boldFont, certId, 488, 635, 11.5, "#C2410C", "middle", 0.5);
 
   return `<?xml version="1.0" encoding="UTF-8"?>
-<svg width="${width}" height="${height}" viewBox="0 0 1024 682" xmlns="http://www.w3.org/2000/svg">
+<svg width="${renderWidth}" height="${renderHeight}" viewBox="0 0 1024 682" xmlns="http://www.w3.org/2000/svg">
   ${nameSvg}
   ${moduleSvg}
   ${courseSvg}
@@ -128,16 +129,17 @@ export function buildMasterCertificateOverlaySvg(input: CertificateRenderInput):
 }
 
 export async function renderCertificatePng(input: CertificateRenderInput): Promise<Buffer> {
-  const overlaySvg = buildMasterCertificateOverlaySvg(input);
+  const overlaySvg = buildMasterCertificateOverlaySvg(input, 2048, 1364);
 
   return sharp(templateBuffer)
+    .resize(2048, 1364, { kernel: sharp.kernel.lanczos3, fit: "fill" })
     .composite([{ input: Buffer.from(overlaySvg), top: 0, left: 0 }])
     .png({ quality: 100, compressionLevel: 6 })
     .toBuffer();
 }
 
 /**
- * Render an official High-Quality Print-Ready PDF Certificate (1024x682 pt).
+ * Render an official Ultra High-Quality Print-Ready PDF Certificate (300 DPI density).
  */
 export async function renderCertificatePdf(input: CertificateRenderInput): Promise<Buffer> {
   const pngBuffer = await renderCertificatePng(input);

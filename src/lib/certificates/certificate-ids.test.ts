@@ -30,7 +30,7 @@ describe("certificate ids and rendering", () => {
       certificateId: "EEST26-WEB-M1-0001",
     });
     expect(png1).toBeInstanceOf(Buffer);
-    expect(png1.length).toBeGreaterThan(10000);
+    expect(png1.length).toBeGreaterThan(100000);
 
     const png2 = await renderCertificatePng({
       studentName: "Muskan Noor",
@@ -40,6 +40,6 @@ describe("certificate ids and rendering", () => {
       certificateId: "EEST26-WEB-M1-0002",
     });
     expect(png2).toBeInstanceOf(Buffer);
-    expect(png2.length).toBeGreaterThan(10000);
-  });
+    expect(png2.length).toBeGreaterThan(100000);
+  }, 15000);
 });
