@@ -5,6 +5,7 @@ import { resetCertificates } from "@/lib/certificates/certificate-service";
 import { z } from "zod";
 
 const resetSchema = z.object({
+  studentId: z.string().optional(),
   programSlug: z.string().optional(),
   moduleName: z.string().optional(),
   resetAll: z.boolean().optional(),
@@ -17,9 +18,10 @@ export async function POST(request: Request) {
   try {
     const body = await request.json().catch(() => ({}));
     const parsed = resetSchema.safeParse(body);
-    const { programSlug, moduleName, resetAll } = parsed.success ? parsed.data : {};
+    const { studentId, programSlug, moduleName, resetAll } = parsed.success ? parsed.data : {};
 
     const deletedCount = await resetCertificates({
+      studentId,
       programSlug: resetAll ? undefined : programSlug,
       moduleName: resetAll ? undefined : moduleName,
     });

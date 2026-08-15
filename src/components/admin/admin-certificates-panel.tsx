@@ -50,6 +50,7 @@ export function AdminCertificatesPanel() {
   const [generatingId, setGeneratingId] = useState<string | null>(null);
   const [isBulkGenerating, setIsBulkGenerating] = useState<boolean>(false);
   const [isResetting, setIsResetting] = useState<boolean>(false);
+  const [resettingStudentId, setResettingStudentId] = useState<string | null>(null);
   const [bulkProgress, setBulkProgress] = useState<{ current: number; total: number } | null>(null);
 
   const selectedProgram = programs.find((p) => p.slug === selectedCourse);
@@ -84,6 +85,40 @@ export function AdminCertificatesPanel() {
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  const handleResetSingle = async (student: EligibleStudentView) => {
+    if (
+      !window.confirm(
+        `Are you sure you want to RESET the certificate for "${student.name}" in "${selectedModule}" (${selectedProgram?.title})? This will remove this certificate and allow regenerating it.`
+      )
+    ) {
+      return;
+    }
+
+    setResettingStudentId(student.studentId);
+    try {
+      const res = await fetch("/api/admin/certificates/reset", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          studentId: student.studentId,
+          programSlug: selectedCourse,
+          moduleName: selectedModule,
+        }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        toast.success(json.message ?? `Certificate reset for ${student.name}`);
+        loadData();
+      } else {
+        toast.error(json.message ?? json.error ?? "Failed to reset certificate");
+      }
+    } catch {
+      toast.error("Failed to reset certificate");
+    } finally {
+      setResettingStudentId(null);
+    }
+  };
 
   const handleResetAll = async () => {
     if (
@@ -454,6 +489,28 @@ export function AdminCertificatesPanel() {
                             </Link>
                           </Button>
                         )}
+
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleResetSingle(student)}
+                          disabled={resettingStudentId === student.studentId || isBulkGenerating || isResetting}
+                          title="Reset this student's certificate"
+                          className="rounded-xl text-xs gap-1.5 border-red-500/20 text-red-600 dark:text-red-400 hover:bg-red-500/10 hover:border-red-500/30"
+                        >
+                          {resettingStudentId === student.studentId ? (
+                            <>
+                              <SpinnerGap size={13} className="animate-spin" />
+                              Resetting...
+                            </>
+                          ) : (
+                            <>
+                              <Trash size={13} />
+                              Reset
+                            </>
+                          )}
+                        </Button>
                       </>
                     ) : (
                       <Button

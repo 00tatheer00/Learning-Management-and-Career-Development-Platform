@@ -149,10 +149,12 @@ export async function getEligibleStudentsForModule(
 }
 
 export async function resetCertificates(filter?: {
+  studentId?: string;
   programSlug?: string;
   moduleName?: string;
 }): Promise<number> {
   const where: Record<string, string> = {};
+  if (filter?.studentId) where.studentId = filter.studentId;
   if (filter?.programSlug) where.programSlug = filter.programSlug;
   if (filter?.moduleName) where.moduleName = filter.moduleName;
 
