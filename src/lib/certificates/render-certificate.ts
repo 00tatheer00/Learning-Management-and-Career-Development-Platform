@@ -16,12 +16,12 @@ export interface CertificateRenderInput {
 }
 
 export function toTitleCase(str: string): string {
+  if (!str) return "";
   return str
-    .toLowerCase()
+    .trim()
     .split(/\s+/)
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ")
-    .trim();
+    .map((word) => (word.length > 0 ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() : ""))
+    .join(" ");
 }
 
 function escapeXml(value: string): string {
@@ -48,7 +48,7 @@ function loadEmbeddedFont(b64: string): opentype.Font | null {
 const scriptFont = loadEmbeddedFont(GREAT_VIBES_TTF_B64);
 const boldFont = loadEmbeddedFont(INTER_BOLD_TTF_B64);
 
-// Render glyph-by-glyph with fill-rule="evenodd" for crisp, beautiful vector curves
+// Render glyph-by-glyph with fill-rule="nonzero" for solid, unbroken cursive vector curves
 function renderTextByGlyphs(
   font: opentype.Font | null,
   text: string,
@@ -80,7 +80,7 @@ function renderTextByGlyphs(
 
     const totalWidth = cursorX - letterSpacing;
     const offsetX = anchor === "middle" ? targetX - totalWidth / 2 : targetX;
-    return `<g fill="${fill}" fill-rule="evenodd" transform="translate(${offsetX},${targetY})">${svgPaths}</g>`;
+    return `<g fill="${fill}" fill-rule="nonzero" transform="translate(${offsetX},${targetY})">${svgPaths}</g>`;
   } catch {
     return `<text x="${targetX}" y="${targetY}" text-anchor="${anchor}" font-size="${size}" fill="${fill}">${escapeXml(text)}</text>`;
   }
