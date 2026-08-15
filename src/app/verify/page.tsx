@@ -76,6 +76,6 @@ export default function PublicVerifySearchPage() {
           <span>Emerging Edge School of Technology</span>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

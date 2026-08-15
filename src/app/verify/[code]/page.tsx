@@ -154,6 +154,6 @@ export default async function PublicVerifyCodePage({ params }: VerifyPageProps) 
           </div>
         )}
       </div>
-    </main>
+    </div>
   );
 }
