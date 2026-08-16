@@ -69,6 +69,7 @@ model User {
   attendance  ClassAttendance[]        @relation("StudentAttendance")
   moduleEnrollments ModuleEnrollment[] @relation("UserModuleEnrollments")
   certificates Certificate[]           @relation("StudentCertificates")
+  topicAssignments StudentTopicAssignment[] @relation("UserTopicAssignments")
 
   @@index([role])
   @@index([programSlug])
@@ -141,15 +142,20 @@ model Assignment {
 }
 
 model AssignmentSubmission {
-  id           String           @id @map("_id")
-  assignmentId String
-  studentId    String
-  studentName  String
-  content      String
-  status       SubmissionStatus @default(submitted)
-  submittedAt  DateTime         @default(now())
-  feedback     String?
-  reviewedAt   DateTime?
+  id             String           @id @map("_id")
+  assignmentId   String
+  studentId      String
+  studentName    String
+  content        String
+  liveWebsiteUrl String?
+  githubUrl      String?
+  portfolioUrl   String?
+  assignedTopic  String?
+  notes          String?
+  status         SubmissionStatus @default(submitted)
+  submittedAt    DateTime         @default(now())
+  feedback       String?
+  reviewedAt     DateTime?
 
   assignment Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
   student    User       @relation("StudentSubmissions", fields: [studentId], references: [id], onDelete: Cascade)
@@ -476,5 +482,23 @@ model Certificate {
   @@unique([studentId, programSlug, moduleName])
   @@index([studentId])
   @@index([programSlug])
+}
+
+model StudentTopicAssignment {
+  id            String   @id @map("_id")
+  studentId     String
+  studentName   String?
+  email         String
+  programSlug   String   @default("web-development")
+  moduleName    String   @default("HTML & CSS")
+  topic         String
+  topicCategory String?
+  assignedAt    DateTime @default(now())
+
+  user User @relation("UserTopicAssignments", fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, programSlug, moduleName])
+  @@index([email])
+  @@index([programSlug, moduleName])
 }
 

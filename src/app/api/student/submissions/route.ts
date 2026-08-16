@@ -7,7 +7,12 @@ import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
 
 const schema = z.object({
   assignmentId: z.string(),
-  content: z.string().min(5, STUDENT_UR.api.assignmentMinWords),
+  content: z.string().optional(),
+  liveWebsiteUrl: z.string().url("Please provide a valid Live Website URL (e.g. https://...)").optional().or(z.literal("")),
+  githubUrl: z.string().url("Please provide a valid GitHub Repository URL (e.g. https://github.com/...)").optional().or(z.literal("")),
+  portfolioUrl: z.string().url("Please provide a valid Portfolio URL (e.g. https://...)").optional().or(z.literal("")),
+  assignedTopic: z.string().optional(),
+  notes: z.string().optional(),
 });
 
 export async function POST(request: Request) {
@@ -34,12 +39,39 @@ export async function POST(request: Request) {
     );
   }
 
+  const {
+    assignmentId,
+    content: rawContent,
+    liveWebsiteUrl,
+    githubUrl,
+    portfolioUrl,
+    assignedTopic,
+    notes,
+  } = parsed.data;
+
+  // Build a structured content summary if URLs are provided
+  let content = rawContent?.trim() || "";
+  if (!content) {
+    const parts: string[] = [];
+    if (assignedTopic) parts.push(`Assigned Topic: ${assignedTopic}`);
+    if (liveWebsiteUrl) parts.push(`Live Website: ${liveWebsiteUrl}`);
+    if (githubUrl) parts.push(`GitHub Repo: ${githubUrl}`);
+    if (portfolioUrl) parts.push(`Portfolio: ${portfolioUrl}`);
+    if (notes) parts.push(`Notes: ${notes}`);
+    content = parts.join("\n") || "Assignment submission";
+  }
+
   const result = await createSubmission(
     {
-      assignmentId: parsed.data.assignmentId,
+      assignmentId,
       studentId: user.id,
       studentName: user.name,
-      content: parsed.data.content,
+      content,
+      liveWebsiteUrl: liveWebsiteUrl || undefined,
+      githubUrl: githubUrl || undefined,
+      portfolioUrl: portfolioUrl || undefined,
+      assignedTopic: assignedTopic || undefined,
+      notes: notes || undefined,
     },
     user.programSlug ?? "web-development",
     user.level,

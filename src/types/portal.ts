@@ -68,10 +68,27 @@ export interface AssignmentSubmission {
   studentId: string;
   studentName: string;
   content: string;
+  liveWebsiteUrl?: string;
+  githubUrl?: string;
+  portfolioUrl?: string;
+  assignedTopic?: string;
+  notes?: string;
   status: "submitted" | "approved" | "needs_revision";
   submittedAt: string;
   feedback?: string;
   reviewedAt?: string;
+}
+
+export interface StudentTopicAssignment {
+  id: string;
+  studentId: string;
+  studentName?: string;
+  email: string;
+  programSlug: string;
+  moduleName: string;
+  topic: string;
+  topicCategory?: string;
+  assignedAt: string;
 }
 
 export interface LiveSession {

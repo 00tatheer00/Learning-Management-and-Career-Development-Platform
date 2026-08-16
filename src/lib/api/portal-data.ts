@@ -269,16 +269,47 @@ export async function createSubmission(
     return { error: "This assignment is not for your module" };
   }
 
-  const submission = await prisma.assignmentSubmission.create({
-    data: {
-      id: crypto.randomUUID(),
+  // Check if a submission by this student for this assignment already exists to allow resubmission/updating
+  const existingSubmission = await prisma.assignmentSubmission.findFirst({
+    where: {
       assignmentId: data.assignmentId,
       studentId: data.studentId,
-      studentName: data.studentName,
-      content: data.content,
-      status: "submitted",
     },
   });
+
+  let submission;
+  if (existingSubmission) {
+    submission = await prisma.assignmentSubmission.update({
+      where: { id: existingSubmission.id },
+      data: {
+        studentName: data.studentName,
+        content: data.content,
+        liveWebsiteUrl: data.liveWebsiteUrl ?? existingSubmission.liveWebsiteUrl,
+        githubUrl: data.githubUrl ?? existingSubmission.githubUrl,
+        portfolioUrl: data.portfolioUrl ?? existingSubmission.portfolioUrl,
+        assignedTopic: data.assignedTopic ?? existingSubmission.assignedTopic,
+        notes: data.notes ?? existingSubmission.notes,
+        status: "submitted",
+        submittedAt: new Date(),
+      },
+    });
+  } else {
+    submission = await prisma.assignmentSubmission.create({
+      data: {
+        id: crypto.randomUUID(),
+        assignmentId: data.assignmentId,
+        studentId: data.studentId,
+        studentName: data.studentName,
+        content: data.content,
+        liveWebsiteUrl: data.liveWebsiteUrl ?? null,
+        githubUrl: data.githubUrl ?? null,
+        portfolioUrl: data.portfolioUrl ?? null,
+        assignedTopic: data.assignedTopic ?? null,
+        notes: data.notes ?? null,
+        status: "submitted",
+      },
+    });
+  }
 
   return { submission: mapSubmission(submission) };
 }
@@ -293,6 +324,11 @@ export async function updateSubmission(
       data: {
         status: updates.status,
         feedback: updates.feedback,
+        liveWebsiteUrl: updates.liveWebsiteUrl,
+        githubUrl: updates.githubUrl,
+        portfolioUrl: updates.portfolioUrl,
+        assignedTopic: updates.assignedTopic,
+        notes: updates.notes,
         reviewedAt: new Date(),
       },
     });
@@ -486,6 +522,11 @@ function mapSubmission(submission: {
   studentId: string;
   studentName: string;
   content: string;
+  liveWebsiteUrl?: string | null;
+  githubUrl?: string | null;
+  portfolioUrl?: string | null;
+  assignedTopic?: string | null;
+  notes?: string | null;
   status: "submitted" | "approved" | "needs_revision";
   submittedAt: Date;
   feedback: string | null;
@@ -497,6 +538,11 @@ function mapSubmission(submission: {
     studentId: submission.studentId,
     studentName: submission.studentName,
     content: submission.content,
+    liveWebsiteUrl: submission.liveWebsiteUrl ?? undefined,
+    githubUrl: submission.githubUrl ?? undefined,
+    portfolioUrl: submission.portfolioUrl ?? undefined,
+    assignedTopic: submission.assignedTopic ?? undefined,
+    notes: submission.notes ?? undefined,
     status: submission.status,
     submittedAt: submission.submittedAt.toISOString(),
     feedback: submission.feedback ?? undefined,

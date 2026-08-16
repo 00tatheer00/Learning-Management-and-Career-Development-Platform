@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PortalPageHeader, EmptyState } from "@/components/portal/portal-ui";
 import { toast } from "@/lib/ui/toast";
+import { AutomatedAssignmentsManager } from "@/components/portal/automated-assignments-manager";
+import { Sparkle, ClipboardText } from "@phosphor-icons/react";
 
 interface TrainerInfo {
   programSlug: string;
@@ -120,21 +122,23 @@ export default function TrainerAssignmentsPage() {
   };
 
   const pendingSubmissions = submissions.filter((s) => s.status === "submitted");
+  const [activeTab, setActiveTab] = useState<"automated" | "manual">("automated");
   const hasModules = trainer && trainer.modules.length > 1;
+  const isWebDev = !trainer || trainer.programSlug === "web-development";
 
   return (
-    <div>
+    <div className="space-y-6">
       <PortalPageHeader
         eyebrow="Trainer Portal"
-        title="Assignments"
+        title="Assignments & Projects"
         description={
           trainer
-            ? `Create homework and review submissions for ${trainer.courseTitle}.`
-            : "Create homework for students and review their submissions."
+            ? `Manage homework, automated projects, and student reviews for ${trainer.courseTitle}.`
+            : "Manage homework, automated projects, and student reviews."
         }
       >
         <div className="flex items-center gap-2">
-          {hasModules && (
+          {hasModules && activeTab === "manual" && (
             <select
               value={selectedModule}
               onChange={(e) => setSelectedModule(e.target.value)}
@@ -146,11 +150,47 @@ export default function TrainerAssignmentsPage() {
               ))}
             </select>
           )}
-          <Button size="lg" onClick={() => setShowForm(!showForm)} disabled={pageLoading}>
-            {showForm ? "Cancel" : "+ New Assignment"}
-          </Button>
+          {activeTab === "manual" && (
+            <Button size="lg" onClick={() => setShowForm(!showForm)} disabled={pageLoading}>
+              {showForm ? "Cancel" : "+ New Assignment"}
+            </Button>
+          )}
         </div>
       </PortalPageHeader>
+
+      {/* Tabs Switcher */}
+      {isWebDev && (
+        <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-muted/60 border border-border/80 w-fit">
+          <button
+            onClick={() => setActiveTab("automated")}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${
+              activeTab === "automated"
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Sparkle size={16} weight="fill" className="text-primary" />
+            Module 1 Automated Projects
+          </button>
+
+          <button
+            onClick={() => setActiveTab("manual")}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${
+              activeTab === "manual"
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <ClipboardText size={16} weight="bold" />
+            Regular Tasks & Homework
+          </button>
+        </div>
+      )}
+
+      {isWebDev && activeTab === "automated" ? (
+        <AutomatedAssignmentsManager />
+      ) : (
+        <div className="space-y-6">
 
       {showForm && trainer && (
         <form
@@ -308,6 +348,8 @@ export default function TrainerAssignmentsPage() {
               </div>
             </div>
           ))}
+        </div>
+      )}
         </div>
       )}
     </div>

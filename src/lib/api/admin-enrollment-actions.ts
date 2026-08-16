@@ -20,6 +20,7 @@ import { prisma } from "@/lib/prisma";
 import { getPortalLoginUrl } from "@/lib/site-url";
 import { syncApprovedStudentsTrainerAssignments } from "@/lib/auth/trainer-assignment-sync";
 import { recordModuleEnrollment } from "@/lib/services/module-enrollment-service";
+import { getOrAssignStudentTopic } from "@/lib/assignments/topic-assignment-service";
 import type { EnrollmentRecord } from "@/types/portal";
 
 export async function approveEnrollmentAndCreateAccount(
@@ -127,6 +128,13 @@ export async function approveEnrollmentAndCreateAccount(
     enrollmentId,
     status: "active",
   });
+
+  if (
+    assignment.programSlug === "web-development" &&
+    (!enrollment.level || enrollment.level.trim() === "HTML & CSS" || enrollment.level.includes("Module 1"))
+  ) {
+    void getOrAssignStudentTopic(student.id, student.email, student.name, "web-development", "HTML & CSS").catch(() => null);
+  }
 
   const passwordIssue = isExistingUser
     ? { ok: true, error: undefined }
