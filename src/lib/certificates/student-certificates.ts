@@ -5,6 +5,8 @@ import { buildCertificateId, formatCertificateDate } from "@/lib/certificates/ce
 import { getStudentPortalProgramSlugs } from "@/lib/student-portal/program-scope";
 import type { PortalUser } from "@/types/portal";
 
+import { normalizeProgramSlug } from "@/lib/auth/program-assignment";
+
 export type CertificateModuleStatus = "locked" | "issued";
 
 export interface StudentCertificateModuleView {
@@ -28,13 +30,33 @@ export async function getStudentCertificateModules(
 ): Promise<StudentCertificateModuleView[]> {
   const programSlugs = await getStudentPortalProgramSlugs(user);
 
-  // Fetch real database certificates for this student
-  const dbCertificates = await prisma.certificate.findMany({
-    where: {
-      studentId: user.id,
-      status: "issued",
-    },
-  });
+  // Fetch real database certificates and student admission records
+  const [dbCertificates, approvedEnrollments, activeModuleEnrollments] = await Promise.all([
+    prisma.certificate.findMany({
+      where: {
+        studentId: user.id,
+        status: "issued",
+      },
+    }),
+    user.email
+      ? prisma.enrollment.findMany({
+          where: {
+            email: { equals: user.email.trim(), mode: "insensitive" },
+            status: "approved",
+          },
+          select: { program: true, level: true },
+        })
+      : Promise.resolve([]),
+    user.email
+      ? prisma.moduleEnrollment.findMany({
+          where: {
+            email: { equals: user.email.trim(), mode: "insensitive" },
+            status: { in: ["active", "completed"] },
+          },
+          select: { programSlug: true, moduleName: true },
+        })
+      : Promise.resolve([]),
+  ]);
 
   const certMap = new Map(
     dbCertificates.map((c) => [`${c.programSlug}:${c.moduleName.trim().toLowerCase()}`, c])
@@ -46,20 +68,49 @@ export async function getStudentCertificateModules(
     const program = getProgramBySlug(programSlug);
     if (!program) continue;
 
-    const firstModule = program.modules[0]?.name;
+    const normProg = normalizeProgramSlug(programSlug);
 
-    // Show Module 1 (e.g. HTML & CSS for Web Dev, Dart & OOP for App Dev), plus any explicitly issued cert in DB
-    const activeModules = program.modules.filter((mod, idx) => {
-      const isFirst = idx === 0;
-      const hasCert = certMap.has(`${programSlug}:${mod.name.trim().toLowerCase()}`);
-      return isFirst || hasCert;
+    // Collect all modules the student has actually taken admission in for this program
+    const enrolledModuleNames = new Set<string>();
+
+    for (const e of approvedEnrollments) {
+      if (normalizeProgramSlug(e.program) === normProg && e.level) {
+        enrolledModuleNames.add(e.level.trim().toLowerCase());
+      }
+    }
+
+    for (const m of activeModuleEnrollments) {
+      if (normalizeProgramSlug(m.programSlug) === normProg && m.moduleName) {
+        enrolledModuleNames.add(m.moduleName.trim().toLowerCase());
+      }
+    }
+
+    if (user.programSlug && normalizeProgramSlug(user.programSlug) === normProg && user.level) {
+      enrolledModuleNames.add(user.level.trim().toLowerCase());
+    }
+
+    // Demo student fallback for demo courses
+    if (isDemoPortalStudent(user.email)) {
+      if (normProg === "web-development") enrolledModuleNames.add("html & css");
+      if (normProg === "app-development") enrolledModuleNames.add("dart & oop");
+    }
+
+    // Include any module where a certificate is already issued in DB
+    for (const c of dbCertificates) {
+      if (normalizeProgramSlug(c.programSlug) === normProg) {
+        enrolledModuleNames.add(c.moduleName.trim().toLowerCase());
+      }
+    }
+
+    // Filter program modules to strictly those the student applied for or has cert for
+    const activeModules = program.modules.filter((mod) => {
+      return enrolledModuleNames.has(mod.name.trim().toLowerCase());
     });
 
     for (const mod of activeModules) {
       const key = `${programSlug}:${mod.name.trim().toLowerCase()}`;
       const dbCert = certMap.get(key);
 
-      // Demo fallback if demo student
       const isDemoIssued =
         isDemoPortalStudent(user.email) &&
         ((programSlug === "web-development" && mod.name === "HTML & CSS") ||

@@ -37,11 +37,6 @@ export async function getEligibleStudentsForModule(
   const normSlug = normalizeProgramSlug(programSlug);
   const normModule = normalizeModuleName(moduleName);
 
-  const program = getProgramBySlug(programSlug);
-  const firstModuleRaw = program?.modules[0]?.name ?? "";
-  const firstModuleNorm = normalizeModuleName(firstModuleRaw);
-  const isFirstModule = normModule === firstModuleNorm;
-
   // 1. Batch query for students, enrollments, module enrollments, and certificates
   const [students, approvedEnrollments, activeModuleEnrollments, existingCertificates] =
     await Promise.all([
@@ -69,23 +64,16 @@ export async function getEligibleStudentsForModule(
       }),
     ]);
 
-  // 2. Build in-memory lookup sets for students eligible for this specific module
+  // 2. Build in-memory lookup sets strictly for students who enrolled/applied in THIS specific module
   const approvedEmailSet = new Set<string>();
 
   for (const row of approvedEnrollments) {
     if (!row.email) continue;
     const emailNorm = row.email.trim().toLowerCase();
     const rowProg = normalizeProgramSlug(row.program);
-    if (rowProg === normSlug) {
-      if (isFirstModule) {
-        // For the first module, ALL approved students for the program are eligible
-        approvedEmailSet.add(emailNorm);
-      } else {
-        const rowModuleNorm = normalizeModuleName(row.level);
-        if (rowModuleNorm === normModule) {
-          approvedEmailSet.add(emailNorm);
-        }
-      }
+    const rowModuleNorm = normalizeModuleName(row.level);
+    if (rowProg === normSlug && rowModuleNorm === normModule) {
+      approvedEmailSet.add(emailNorm);
     }
   }
 
@@ -93,11 +81,9 @@ export async function getEligibleStudentsForModule(
     if (!row.email) continue;
     const emailNorm = row.email.trim().toLowerCase();
     const rowProg = normalizeProgramSlug(row.programSlug);
-    if (rowProg === normSlug) {
-      const rowModuleNorm = normalizeModuleName(row.moduleName);
-      if (rowModuleNorm === normModule || isFirstModule) {
-        approvedEmailSet.add(emailNorm);
-      }
+    const rowModuleNorm = normalizeModuleName(row.moduleName);
+    if (rowProg === normSlug && rowModuleNorm === normModule) {
+      approvedEmailSet.add(emailNorm);
     }
   }
 
@@ -110,14 +96,17 @@ export async function getEligibleStudentsForModule(
     const existingCert = certByStudentId.get(student.id);
 
     const studentProg = normalizeProgramSlug(student.programSlug ?? "");
+    const studentModuleNorm = normalizeModuleName(student.level);
+
     const isDemo =
       isDemoPortalStudent(student.email) &&
-      (studentProg === normSlug || (normSlug === "web-development" && (!studentProg || studentProg === "web-development")));
-    const hasApprovedEnrollment = approvedEmailSet.has(studentEmailNorm);
+      studentProg === normSlug &&
+      (studentModuleNorm === normModule ||
+        (normSlug === "web-development" && normModule === "html & css") ||
+        (normSlug === "app-development" && normModule === "dart & oop"));
 
-    const isStudentInModule = isFirstModule
-      ? studentProg === normSlug
-      : studentProg === normSlug && normalizeModuleName(student.level) === normModule;
+    const hasApprovedEnrollment = approvedEmailSet.has(studentEmailNorm);
+    const isStudentInModule = studentProg === normSlug && studentModuleNorm === normModule;
 
     const isEligible = Boolean(isDemo || hasApprovedEnrollment || isStudentInModule || existingCert);
 
