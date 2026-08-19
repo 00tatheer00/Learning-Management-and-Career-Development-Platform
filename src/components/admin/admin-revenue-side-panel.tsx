@@ -12,7 +12,6 @@ import {
   CurrencyCircleDollar,
   X,
   ArrowClockwise,
-  TrendUp,
   Buildings,
   GraduationCap,
   Sparkle,
@@ -22,9 +21,7 @@ import type {
   AdminRevenuePhaseStats,
   AdminRevenueCourseStats,
 } from "@/lib/api/admin-revenue";
-import { usePortalThemeOptional } from "@/components/portal/portal-theme-provider";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 
 type RevenuePeriod = "all" | "week" | "month" | string;
 
@@ -543,7 +540,11 @@ function AdminRevenueSidePanel() {
                   </div>
                   <div>
                     <p className="text-lg font-semibold tabular-nums text-pt">
-                      {selectedPhase === "phase-1" ? (stats.phases.phase1.students ?? periodStats.students) : (stats.phases.phase2.students ?? periodStats.students)}
+                      {selectedPhase === "phase-1"
+                        ? stats.phases.phase1.totalApproved
+                        : selectedPhase === "phase-2"
+                          ? stats.phases.phase2.totalApproved
+                          : periodStats.students}
                     </p>
                     <p className="text-[11px] font-medium text-pt-secondary">Active Students</p>
                   </div>
