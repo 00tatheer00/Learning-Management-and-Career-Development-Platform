@@ -26,7 +26,7 @@ export function certificatesEnabledForStudent(email?: string | null): boolean {
 }
 
 export async function getStudentCertificateModules(
-  user: Pick<PortalUser, "id" | "email" | "name" | "programSlug" | "programSlugs">
+  user: Pick<PortalUser, "id" | "email" | "name" | "programSlug" | "programSlugs" | "level">
 ): Promise<StudentCertificateModuleView[]> {
   const programSlugs = await getStudentPortalProgramSlugs(user);
 

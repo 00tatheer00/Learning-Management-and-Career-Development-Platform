@@ -216,12 +216,7 @@ export function AdminRevenueSidebarCard({
         onClick={() => ctx.setOpen(true)}
         title="Registration Revenue"
         aria-label="Open registration revenue panel"
-        className={cn(
-          "mx-auto flex h-9 w-9 items-center justify-center rounded-lg transition-colors duration-150 ease-out cursor-pointer select-none",
-          dark
-            ? "border border-emerald-500/30 bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25"
-            : "border border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-emerald-100/80 hover:border-emerald-400"
-        )}
+        className="mx-auto flex h-9 w-9 items-center justify-center rounded-lg transition-colors duration-150 ease-out cursor-pointer select-none border border-emerald-500/30 bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25"
       >
         <CurrencyCircleDollar size={20} weight="duotone" />
       </button>
@@ -232,37 +227,17 @@ export function AdminRevenueSidebarCard({
     <button
       type="button"
       onClick={() => ctx.setOpen(true)}
-      className={cn(
-        "w-full rounded-xl p-2.5 text-left transition-all duration-150 ease-out cursor-pointer select-none group border",
-        dark
-          ? "border-emerald-500/30 bg-emerald-950/30 hover:bg-emerald-900/40 text-emerald-300 shadow-xs"
-          : "border-emerald-200/90 bg-gradient-to-r from-emerald-50 to-teal-50/60 hover:bg-emerald-100/70 text-emerald-950 shadow-xs"
-      )}
+      className="w-full rounded-xl p-2.5 text-left transition-all duration-150 ease-out cursor-pointer select-none group border border-emerald-500/30 bg-gradient-to-r from-[#0d1f18] to-[#0f172a] hover:border-emerald-500/50 text-white shadow-xs"
     >
       <div className="flex items-center gap-2.5">
-        <div
-          className={cn(
-            "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg shadow-xs",
-            dark ? "bg-emerald-500/25 text-emerald-300 border border-emerald-500/30" : "bg-emerald-600 text-white"
-          )}
-        >
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg shadow-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
           <CurrencyCircleDollar size={18} weight="duotone" />
         </div>
         <div className="min-w-0 flex-1">
-          <p
-            className={cn(
-              "text-[10px] font-bold uppercase tracking-wider",
-              dark ? "text-emerald-400" : "text-emerald-800"
-            )}
-          >
+          <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-400">
             Financial Analytics
           </p>
-          <p
-            className={cn(
-              "text-xs font-bold truncate",
-              dark ? "text-emerald-100" : "text-emerald-950"
-            )}
-          >
+          <p className="text-xs font-bold text-slate-100 truncate">
             Registration Revenue
           </p>
         </div>
@@ -362,7 +337,7 @@ function AdminRevenueSidePanel() {
       <button
         type="button"
         aria-label="Close revenue panel"
-        className="absolute inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
+        className="absolute inset-0 bg-black/75 backdrop-blur-xs transition-opacity"
         onClick={() => setOpen(false)}
       />
 
@@ -370,84 +345,80 @@ function AdminRevenueSidePanel() {
         role="dialog"
         aria-modal="true"
         aria-label="Registration Revenue"
-        className="relative flex h-full w-full max-w-[520px] flex-col bg-background text-foreground shadow-2xl border-l border-border z-10"
+        className="relative flex h-full w-full max-w-[530px] flex-col bg-[#0c1017] text-slate-100 shadow-2xl border-l border-slate-800 z-10"
       >
         {/* Top Header Card */}
-        <div className="relative overflow-hidden shrink-0 border-b border-emerald-800/40">
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-800 via-teal-900 to-slate-950" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(52,211,153,0.2)_0%,_transparent_70%)]" />
-          <div className="relative px-5 pt-5 pb-5 text-white">
-            <div className="flex items-start justify-between gap-3 mb-3">
-              <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/15 backdrop-blur-sm ring-1 ring-white/25 shadow-inner">
-                  <CurrencyCircleDollar size={26} weight="duotone" className="text-emerald-300" />
-                </div>
-                <div>
-                  <p className="text-[11px] font-bold uppercase tracking-widest text-emerald-300">
-                    Financial Overview
-                  </p>
-                  <h2 className="text-xl font-bold tracking-tight text-white">Registration Revenue</h2>
-                </div>
+        <div className="relative shrink-0 border-b border-slate-800 bg-[#131923] px-5 pt-5 pb-5 text-white">
+          <div className="flex items-start justify-between gap-3 mb-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 shadow-xs">
+                <CurrencyCircleDollar size={26} weight="duotone" />
               </div>
-              <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => void refresh()}
-                  disabled={loading}
-                  className="rounded-lg p-2 text-white/80 hover:text-white hover:bg-white/15 transition-colors disabled:opacity-50 cursor-pointer"
-                  aria-label="Refresh data"
-                >
-                  <ArrowClockwise size={18} className={loading ? "animate-spin" : ""} />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setOpen(false)}
-                  className="rounded-lg p-2 text-white/80 hover:text-white hover:bg-white/15 transition-colors cursor-pointer"
-                  aria-label="Close"
-                >
-                  <X size={20} weight="bold" />
-                </button>
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-widest text-emerald-400">
+                  Financial Overview
+                </p>
+                <h2 className="text-xl font-bold tracking-tight text-white">Registration Revenue</h2>
               </div>
             </div>
-
-            {/* Dynamic phase split explanation */}
-            {selectedPhase === "phase-1" ? (
-              <div className="text-xs text-indigo-100 leading-relaxed bg-indigo-950/60 border border-indigo-400/30 rounded-xl p-2.5 shadow-xs">
-                <span className="font-bold text-white uppercase text-[10px] tracking-wider bg-indigo-500/40 px-1.5 py-0.5 rounded mr-1.5">
-                  Phase 1 Model
-                </span>
-                PKR 1,000 → <strong className="text-white">PKR 200</strong> Mgmt (Komal) · <strong className="text-white">PKR 800</strong> Trainer (Tatheer / Talha) · <strong className="text-white">PKR 0</strong> School
-              </div>
-            ) : selectedPhase === "phase-2" ? (
-              <div className="text-xs text-emerald-100 leading-relaxed bg-emerald-950/60 border border-emerald-400/30 rounded-xl p-2.5 shadow-xs">
-                <span className="font-bold text-white uppercase text-[10px] tracking-wider bg-emerald-500/40 px-1.5 py-0.5 rounded mr-1.5">
-                  Phase 2 Model
-                </span>
-                PKR 1,000 → <strong className="text-white">PKR 200</strong> Mgmt (Komal) · <strong className="text-white">PKR 700</strong> Trainer · <strong className="text-white">PKR 100</strong> School
-              </div>
-            ) : (
-              <div className="text-xs text-emerald-100/95 leading-relaxed bg-black/25 border border-emerald-500/20 rounded-xl p-2.5">
-                <span className="font-bold text-white">Phase 1:</span> Rs 200 Mgmt / Rs 800 Trainer · <span className="font-bold text-white">Phase 2:</span> Rs 200 Mgmt / Rs 700 Trainer / Rs 100 School
-              </div>
-            )}
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => void refresh()}
+                disabled={loading}
+                className="rounded-lg p-2 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors disabled:opacity-50 cursor-pointer"
+                aria-label="Refresh data"
+              >
+                <ArrowClockwise size={18} className={loading ? "animate-spin text-emerald-400" : ""} />
+              </button>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                className="rounded-lg p-2 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+                aria-label="Close"
+              >
+                <X size={20} weight="bold" />
+              </button>
+            </div>
           </div>
+
+          {/* Dynamic phase split explanation */}
+          {selectedPhase === "phase-1" ? (
+            <div className="text-xs text-slate-200 leading-relaxed bg-[#1a2332] border border-indigo-500/30 rounded-xl p-3 shadow-xs">
+              <span className="font-bold text-indigo-300 uppercase text-[10px] tracking-wider bg-indigo-950/80 border border-indigo-500/40 px-2 py-0.5 rounded-md mr-2">
+                Phase 1 Model
+              </span>
+              PKR 1,000 → <strong className="text-white">PKR 200</strong> Mgmt (Komal) · <strong className="text-white">PKR 800</strong> Trainer (Tatheer / Talha) · <strong className="text-white">PKR 0</strong> School
+            </div>
+          ) : selectedPhase === "phase-2" ? (
+            <div className="text-xs text-slate-200 leading-relaxed bg-[#1a2332] border border-emerald-500/30 rounded-xl p-3 shadow-xs">
+              <span className="font-bold text-emerald-300 uppercase text-[10px] tracking-wider bg-emerald-950/80 border border-emerald-500/40 px-2 py-0.5 rounded-md mr-2">
+                Phase 2 Model
+              </span>
+              PKR 1,000 → <strong className="text-white">PKR 200</strong> Mgmt (Komal) · <strong className="text-white">PKR 700</strong> Trainer · <strong className="text-white">PKR 100</strong> School
+            </div>
+          ) : (
+            <div className="text-xs text-slate-300 leading-relaxed bg-[#1a2332] border border-slate-700/60 rounded-xl p-3">
+              <span className="font-bold text-indigo-300">Phase 1:</span> Rs 200 Mgmt / Rs 800 Trainer · <span className="font-bold text-emerald-300">Phase 2:</span> Rs 200 Mgmt / Rs 700 Trainer / Rs 100 School
+            </div>
+          )}
         </div>
 
         {/* Phase Filter Toggle Bar */}
         {stats && stats.phases && (
-          <div className="shrink-0 border-b border-border bg-muted/40 px-4 py-2.5 flex items-center justify-between gap-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground shrink-0">
+          <div className="shrink-0 border-b border-slate-800 bg-[#0f141c] px-4 py-2.5 flex items-center justify-between gap-2">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 shrink-0">
               Module Phase
             </span>
-            <div className="flex gap-1 bg-background/80 border border-border p-1 rounded-xl shadow-xs">
+            <div className="flex gap-1.5 bg-[#161b22] border border-slate-700/80 p-1 rounded-xl shadow-xs">
               <button
                 type="button"
                 onClick={() => handlePhaseChange("all")}
                 className={cn(
                   "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer",
                   selectedPhase === "all"
-                    ? "bg-emerald-600 text-white shadow-sm font-bold"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    ? "bg-slate-700 text-white shadow-sm font-bold"
+                    : "text-slate-400 hover:text-white hover:bg-slate-800"
                 )}
               >
                 All ({stats.totalApproved})
@@ -459,7 +430,7 @@ function AdminRevenueSidePanel() {
                   "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer",
                   selectedPhase === "phase-1"
                     ? "bg-indigo-600 text-white shadow-sm font-bold"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    : "text-slate-400 hover:text-white hover:bg-slate-800"
                 )}
               >
                 Phase 1 ({stats.phases.phase1.totalApproved})
@@ -470,8 +441,8 @@ function AdminRevenueSidePanel() {
                 className={cn(
                   "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer",
                   selectedPhase === "phase-2"
-                    ? "bg-teal-600 text-white shadow-sm font-bold"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    ? "bg-emerald-600 text-white shadow-sm font-bold"
+                    : "text-slate-400 hover:text-white hover:bg-slate-800"
                 )}
               >
                 Phase 2 ({stats.phases.phase2.totalApproved})
@@ -481,7 +452,7 @@ function AdminRevenueSidePanel() {
         )}
 
         {/* Time Period Filter Bar */}
-        <div className="shrink-0 border-b border-border bg-background px-4 py-2.5 flex gap-2 overflow-x-auto">
+        <div className="shrink-0 border-b border-slate-800 bg-[#0c1017] px-4 py-2.5 flex gap-2 overflow-x-auto">
           {periodOptions.map((opt) => (
             <button
               key={opt.key}
@@ -491,9 +462,9 @@ function AdminRevenueSidePanel() {
                 "flex-1 min-w-[80px] rounded-xl py-2 px-2.5 text-xs font-semibold transition-all cursor-pointer whitespace-nowrap text-center border",
                 period === opt.key
                   ? selectedPhase === "phase-1"
-                    ? "bg-indigo-600 text-white border-indigo-600 shadow-sm font-bold"
-                    : "bg-emerald-600 text-white border-emerald-600 shadow-sm font-bold"
-                  : "bg-muted/30 border-border text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                    ? "bg-indigo-600 text-white border-indigo-500 shadow-sm font-bold"
+                    : "bg-emerald-600 text-white border-emerald-500 shadow-sm font-bold"
+                  : "bg-[#131923] border-slate-800 text-slate-300 hover:text-white hover:border-slate-700"
               )}
             >
               {opt.label}
@@ -503,8 +474,8 @@ function AdminRevenueSidePanel() {
 
         <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
           {loading && !stats && (
-            <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-              <ArrowClockwise size={32} className="animate-spin mb-3 text-emerald-500" />
+            <div className="flex flex-col items-center justify-center py-16 text-slate-400">
+              <ArrowClockwise size={32} className="animate-spin mb-3 text-emerald-400" />
               <p className="text-sm font-medium">Loading revenue data…</p>
             </div>
           )}
@@ -514,41 +485,22 @@ function AdminRevenueSidePanel() {
               {/* Gross Revenue Hero Card */}
               <div
                 className={cn(
-                  "rounded-2xl p-5 shadow-sm border transition-all",
+                  "rounded-2xl p-5 shadow-lg border relative overflow-hidden bg-[#131923]",
                   selectedPhase === "phase-1"
-                    ? "bg-gradient-to-br from-indigo-50/90 via-indigo-50/40 to-white dark:from-indigo-950/40 dark:via-indigo-950/20 dark:to-background border-indigo-200 dark:border-indigo-800/60"
-                    : "bg-gradient-to-br from-emerald-50/90 via-teal-50/40 to-white dark:from-emerald-950/40 dark:via-emerald-950/20 dark:to-background border-emerald-200 dark:border-emerald-800/60"
+                    ? "border-indigo-500/30"
+                    : "border-emerald-500/30"
                 )}
               >
-                <div
-                  className={cn(
-                    "flex items-center gap-2 mb-1.5 font-bold text-xs uppercase tracking-wider",
-                    selectedPhase === "phase-1"
-                      ? "text-indigo-700 dark:text-indigo-400"
-                      : "text-emerald-700 dark:text-emerald-400"
-                  )}
-                >
-                  <TrendUp size={18} weight="duotone" />
-                  <span>{periodStats.label} — Gross Collected</span>
+                <div className="flex items-center gap-2 mb-2 font-bold text-xs uppercase tracking-wider text-emerald-400">
+                  <TrendUp size={18} weight="duotone" className={selectedPhase === "phase-1" ? "text-indigo-400" : "text-emerald-400"} />
+                  <span className={selectedPhase === "phase-1" ? "text-indigo-400" : "text-emerald-400"}>
+                    {periodStats.label} — Gross Collected
+                  </span>
                 </div>
-                <p
-                  className={cn(
-                    "text-3xl sm:text-4xl font-extrabold tracking-tight tabular-nums",
-                    selectedPhase === "phase-1"
-                      ? "text-indigo-950 dark:text-indigo-100"
-                      : "text-emerald-950 dark:text-emerald-100"
-                  )}
-                >
+                <p className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white tabular-nums">
                   {formatMoney(periodStats.gross, stats.currency)}
                 </p>
-                <p
-                  className={cn(
-                    "text-sm mt-1.5 font-semibold",
-                    selectedPhase === "phase-1"
-                      ? "text-indigo-800 dark:text-indigo-300"
-                      : "text-emerald-800 dark:text-emerald-300"
-                  )}
-                >
+                <p className="text-sm mt-1.5 font-medium text-slate-300">
                   {periodStats.students} verified paid registration
                   {periodStats.students === 1 ? "" : "s"}
                 </p>
@@ -557,86 +509,58 @@ function AdminRevenueSidePanel() {
               {/* 3 Share Cards (Management, Trainers, School) */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                 {/* Management Card */}
-                <div className="rounded-2xl border border-violet-200 dark:border-violet-800/50 bg-gradient-to-br from-violet-50/80 to-white dark:from-violet-950/30 dark:to-background p-3.5 shadow-xs">
-                  <div className="flex items-center gap-1.5 text-violet-700 dark:text-violet-400 mb-1.5">
+                <div className="rounded-2xl border border-purple-500/30 bg-[#131923] p-3.5 shadow-sm">
+                  <div className="flex items-center gap-1.5 text-purple-400 mb-1.5">
                     <Buildings size={16} weight="duotone" />
                     <p className="text-[10px] font-bold uppercase tracking-wider">Komal (Mgmt)</p>
                   </div>
-                  <p className="text-lg sm:text-xl font-bold text-violet-950 dark:text-violet-100 tabular-nums">
+                  <p className="text-lg sm:text-xl font-extrabold text-white tabular-nums">
                     {formatMoney(periodStats.management, stats.currency)}
                   </p>
-                  <p className="text-[11px] font-semibold text-violet-700 dark:text-violet-400 mt-1">
+                  <p className="text-[11px] font-medium text-purple-300 mt-1">
                     Rs 200 / student
                   </p>
                 </div>
 
                 {/* Trainer Card */}
-                <div className="rounded-2xl border border-blue-200 dark:border-blue-800/50 bg-gradient-to-br from-blue-50/80 to-white dark:from-blue-950/30 dark:to-background p-3.5 shadow-xs">
-                  <div className="flex items-center gap-1.5 text-blue-700 dark:text-blue-400 mb-1.5">
+                <div className="rounded-2xl border border-sky-500/30 bg-[#131923] p-3.5 shadow-sm">
+                  <div className="flex items-center gap-1.5 text-sky-400 mb-1.5">
                     <GraduationCap size={16} weight="duotone" />
                     <p className="text-[10px] font-bold uppercase tracking-wider">Trainers</p>
                   </div>
-                  <p className="text-lg sm:text-xl font-bold text-blue-950 dark:text-blue-100 tabular-nums">
+                  <p className="text-lg sm:text-xl font-extrabold text-white tabular-nums">
                     {formatMoney(periodStats.trainer, stats.currency)}
                   </p>
-                  <p className="text-[11px] font-semibold text-blue-700 dark:text-blue-400 mt-1">
+                  <p className="text-[11px] font-medium text-sky-300 mt-1">
                     {selectedPhase === "phase-1" ? "Rs 800 / student" : "Rs 700 / student"}
                   </p>
                 </div>
 
                 {/* School Card */}
-                <div
-                  className={cn(
-                    "rounded-2xl border p-3.5 shadow-xs bg-gradient-to-br",
-                    selectedPhase === "phase-1"
-                      ? "border-slate-200 dark:border-slate-800 from-slate-50/80 to-white dark:from-slate-900/30 dark:to-background opacity-80"
-                      : "border-teal-200 dark:border-teal-800/50 from-teal-50/80 to-white dark:from-teal-950/30 dark:to-background"
-                  )}
-                >
-                  <div
-                    className={cn(
-                      "flex items-center gap-1.5 mb-1.5",
-                      selectedPhase === "phase-1"
-                        ? "text-slate-600 dark:text-slate-400"
-                        : "text-teal-700 dark:text-teal-400"
-                    )}
-                  >
+                <div className="rounded-2xl border border-emerald-500/30 bg-[#131923] p-3.5 shadow-sm">
+                  <div className="flex items-center gap-1.5 text-emerald-400 mb-1.5">
                     <Buildings size={16} weight="duotone" />
                     <p className="text-[10px] font-bold uppercase tracking-wider">School %</p>
                   </div>
-                  <p
-                    className={cn(
-                      "text-lg sm:text-xl font-bold tabular-nums",
-                      selectedPhase === "phase-1"
-                        ? "text-slate-700 dark:text-slate-300"
-                        : "text-teal-950 dark:text-teal-100"
-                    )}
-                  >
+                  <p className="text-lg sm:text-xl font-extrabold text-white tabular-nums">
                     {formatMoney(periodStats.school, stats.currency)}
                   </p>
-                  <p
-                    className={cn(
-                      "text-[11px] font-semibold mt-1",
-                      selectedPhase === "phase-1"
-                        ? "text-slate-500 dark:text-slate-400"
-                        : "text-teal-700 dark:text-teal-400"
-                    )}
-                  >
-                    {selectedPhase === "phase-1" ? "Rs 0 (Phase 1 model)" : "Rs 100 / student"}
+                  <p className="text-[11px] font-medium text-emerald-300 mt-1">
+                    {selectedPhase === "phase-1" ? "Rs 0 (Phase 1)" : "Rs 100 / student"}
                   </p>
                 </div>
               </div>
 
               {/* Distribution Bar */}
               {periodStats.gross > 0 && (
-                <div className="rounded-2xl border border-border bg-card p-4 shadow-xs">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2.5">
+                <div className="rounded-2xl border border-slate-800 bg-[#131923] p-4 shadow-sm">
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2.5">
                     Revenue Distribution Share
                   </p>
-                  <div className="flex h-3.5 rounded-full overflow-hidden bg-slate-200 dark:bg-slate-800 gap-0.5 p-0.5 border border-border">
+                  <div className="flex h-3.5 rounded-full overflow-hidden bg-slate-800 gap-0.5 p-0.5 border border-slate-700">
                     {periodStats.management > 0 && (
                       <div
-                        className="bg-violet-500 rounded-sm transition-all"
+                        className="bg-purple-500 rounded-sm transition-all"
                         style={{
                           width: `${(periodStats.management / periodStats.gross) * 100}%`,
                         }}
@@ -645,7 +569,7 @@ function AdminRevenueSidePanel() {
                     )}
                     {periodStats.trainer > 0 && (
                       <div
-                        className="bg-blue-500 rounded-sm transition-all"
+                        className="bg-sky-500 rounded-sm transition-all"
                         style={{
                           width: `${(periodStats.trainer / periodStats.gross) * 100}%`,
                         }}
@@ -654,7 +578,7 @@ function AdminRevenueSidePanel() {
                     )}
                     {periodStats.school > 0 && (
                       <div
-                        className="bg-teal-500 rounded-sm transition-all"
+                        className="bg-emerald-500 rounded-sm transition-all"
                         style={{
                           width: `${(periodStats.school / periodStats.gross) * 100}%`,
                         }}
@@ -662,17 +586,17 @@ function AdminRevenueSidePanel() {
                       />
                     )}
                   </div>
-                  <div className="flex flex-wrap justify-between gap-1.5 mt-2.5 text-xs">
-                    <span className="text-violet-700 dark:text-violet-300 font-bold flex items-center gap-1">
-                      <span className="inline-block w-2 h-2 rounded-full bg-violet-500" />
+                  <div className="flex flex-wrap justify-between gap-1.5 mt-3 text-xs">
+                    <span className="text-purple-300 font-bold flex items-center gap-1.5">
+                      <span className="inline-block w-2.5 h-2.5 rounded-full bg-purple-500" />
                       Management {Math.round((periodStats.management / periodStats.gross) * 100)}%
                     </span>
-                    <span className="text-blue-700 dark:text-blue-300 font-bold flex items-center gap-1">
-                      <span className="inline-block w-2 h-2 rounded-full bg-blue-500" />
+                    <span className="text-sky-300 font-bold flex items-center gap-1.5">
+                      <span className="inline-block w-2.5 h-2.5 rounded-full bg-sky-500" />
                       Trainers {Math.round((periodStats.trainer / periodStats.gross) * 100)}%
                     </span>
-                    <span className="text-teal-700 dark:text-teal-300 font-bold flex items-center gap-1">
-                      <span className="inline-block w-2 h-2 rounded-full bg-teal-500" />
+                    <span className="text-emerald-300 font-bold flex items-center gap-1.5">
+                      <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500" />
                       School {Math.round((periodStats.school / periodStats.gross) * 100)}%
                     </span>
                   </div>
@@ -681,7 +605,7 @@ function AdminRevenueSidePanel() {
 
               {/* Course-wise Breakdown */}
               <div className="space-y-3 pt-1">
-                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-0.5">
+                <p className="text-xs font-bold uppercase tracking-wider text-slate-400 px-0.5">
                   Course-wise Breakdown
                 </p>
                 <div className="space-y-3.5">
@@ -691,7 +615,7 @@ function AdminRevenueSidePanel() {
                     return (
                       <div
                         key={course.programSlug}
-                        className="rounded-2xl border border-border overflow-hidden bg-card shadow-xs transition-all hover:border-border/80"
+                        className="rounded-2xl border border-slate-800 overflow-hidden bg-[#131923] shadow-sm transition-all hover:border-slate-700"
                       >
                         <div
                           className={cn(
@@ -701,16 +625,16 @@ function AdminRevenueSidePanel() {
                         >
                           <div className="flex items-center justify-between gap-2">
                             <div>
-                              <p className="font-bold text-sm tracking-tight">{course.courseTitle}</p>
-                              <p className="text-xs text-white/85 mt-0.5 font-medium">
+                              <p className="font-bold text-sm tracking-tight text-white">{course.courseTitle}</p>
+                              <p className="text-xs text-white/90 mt-0.5 font-medium">
                                 Trainer: {course.trainerName}
                               </p>
                             </div>
-                            <div className="text-right shrink-0 bg-black/20 backdrop-blur-xs px-2.5 py-1 rounded-lg border border-white/10">
+                            <div className="text-right shrink-0 bg-black/40 backdrop-blur-xs px-2.5 py-1 rounded-lg border border-white/20">
                               <p className="text-base sm:text-lg font-extrabold text-white">
                                 {period === "all" ? course.uniqueStudents : cp.students}
                               </p>
-                              <p className="text-[9px] uppercase tracking-wider text-white/80 font-bold">
+                              <p className="text-[9px] uppercase tracking-wider text-white/90 font-bold">
                                 {period === "all" ? "unique students" : "registrations"}
                               </p>
                             </div>
@@ -719,48 +643,48 @@ function AdminRevenueSidePanel() {
 
                         <div className="p-4 space-y-3.5">
                           <div className="flex items-center justify-between">
-                            <span className="text-sm text-muted-foreground font-semibold">Gross Collected</span>
-                            <span className="font-extrabold text-foreground text-base sm:text-lg tabular-nums">
+                            <span className="text-sm text-slate-300 font-semibold">Gross Collected</span>
+                            <span className="font-extrabold text-white text-base sm:text-lg tabular-nums">
                               {formatMoney(cp.gross, stats.currency)}
                             </span>
                           </div>
-                          <div className="h-px bg-border/80" />
+                          <div className="h-px bg-slate-800" />
                           <div className="grid grid-cols-3 gap-2">
-                            <div className="rounded-xl bg-violet-50/80 dark:bg-violet-950/30 border border-violet-200/80 dark:border-violet-900/40 p-2.5 text-center">
-                              <p className="text-[9px] font-bold uppercase text-violet-700 dark:text-violet-300">
+                            <div className="rounded-xl bg-purple-950/40 border border-purple-500/30 p-2.5 text-center">
+                              <p className="text-[9px] font-bold uppercase text-purple-400">
                                 Management
                               </p>
-                              <p className="text-xs sm:text-sm font-bold text-violet-950 dark:text-violet-100 mt-0.5 tabular-nums">
+                              <p className="text-xs sm:text-sm font-extrabold text-white mt-0.5 tabular-nums">
                                 {formatMoney(cp.management, stats.currency)}
                               </p>
                             </div>
-                            <div className="rounded-xl bg-blue-50/80 dark:bg-blue-950/30 border border-blue-200/80 dark:border-blue-900/40 p-2.5 text-center">
-                              <p className="text-[9px] font-bold uppercase text-blue-700 dark:text-blue-300">
+                            <div className="rounded-xl bg-sky-950/40 border border-sky-500/30 p-2.5 text-center">
+                              <p className="text-[9px] font-bold uppercase text-sky-400">
                                 {trainerShort}
                               </p>
-                              <p className="text-xs sm:text-sm font-bold text-blue-950 dark:text-blue-100 mt-0.5 tabular-nums">
+                              <p className="text-xs sm:text-sm font-extrabold text-white mt-0.5 tabular-nums">
                                 {formatMoney(cp.trainer, stats.currency)}
                               </p>
                             </div>
-                            <div className="rounded-xl bg-teal-50/80 dark:bg-teal-950/30 border border-teal-200/80 dark:border-teal-900/40 p-2.5 text-center">
-                              <p className="text-[9px] font-bold uppercase text-teal-700 dark:text-teal-300">
+                            <div className="rounded-xl bg-emerald-950/40 border border-emerald-500/30 p-2.5 text-center">
+                              <p className="text-[9px] font-bold uppercase text-emerald-400">
                                 School
                               </p>
-                              <p className="text-xs sm:text-sm font-bold text-teal-950 dark:text-teal-100 mt-0.5 tabular-nums">
+                              <p className="text-xs sm:text-sm font-extrabold text-white mt-0.5 tabular-nums">
                                 {formatMoney(cp.school, stats.currency)}
                               </p>
                             </div>
                           </div>
 
                           {period === "all" && course.approvedCount !== course.uniqueStudents && (
-                            <div className="text-xs rounded-xl px-3 py-2 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/40 text-amber-900 dark:text-amber-200 font-medium">
+                            <div className="text-xs rounded-xl px-3 py-2.5 bg-amber-950/40 border border-amber-500/30 text-amber-200 font-medium">
                               {course.approvedCount} paid registration
                               {course.approvedCount === 1 ? "" : "s"} (
                               {course.approvedCount - course.uniqueStudents} returning / repeat enrollments)
                             </div>
                           )}
                           {period === "all" && course.thisWeekCount > 0 && (
-                            <div className="text-xs rounded-xl px-3 py-2 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/40 text-emerald-900 dark:text-emerald-200 font-medium">
+                            <div className="text-xs rounded-xl px-3 py-2.5 bg-emerald-950/40 border border-emerald-500/30 text-emerald-200 font-medium">
                               +{course.thisWeekCount} new this week (
                               {formatMoney(course.thisWeekGross, stats.currency)} gross)
                             </div>
@@ -772,9 +696,9 @@ function AdminRevenueSidePanel() {
 
                   {/* Phase 1 AI Notice */}
                   {selectedPhase === "phase-1" && (
-                    <div className="rounded-2xl border border-dashed border-border p-4 text-center bg-muted/20">
-                      <p className="text-xs text-muted-foreground font-medium flex items-center justify-center gap-1.5">
-                        <Sparkle size={15} weight="duotone" className="text-purple-500 shrink-0" />
+                    <div className="rounded-2xl border border-dashed border-slate-800 p-4 text-center bg-[#131923]">
+                      <p className="text-xs text-slate-400 font-medium flex items-center justify-center gap-1.5">
+                        <Sparkle size={15} weight="duotone" className="text-purple-400 shrink-0" />
                         Artificial Intelligence program was launched in Phase 2
                       </p>
                     </div>
