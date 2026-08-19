@@ -95,9 +95,9 @@ export function StudentLiveSessionCard({
             hasJoinLink={session.hasJoinLink}
           />
         ) : (
-          <div className="rounded-xl border border-dashed border-indigo-300 bg-indigo-50 px-4 py-3 text-sm text-indigo-900 shrink-0 max-w-xs">
-            <p className="font-semibold">Your module starts next month</p>
-            <p className="mt-1 text-xs">This class is for Module 1 students only.</p>
+          <div className="rounded-xl border border-dashed border-indigo-300 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-950/30 px-4 py-3 text-sm text-indigo-900 dark:text-indigo-200 shrink-0 max-w-xs">
+            <p className="font-semibold">Your session starts soon</p>
+            <p className="mt-1 text-xs">Join opens 10 minutes before class time.</p>
           </div>
         )}
       </div>

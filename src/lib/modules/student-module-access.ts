@@ -63,7 +63,7 @@ export function canAccessModuleOneClasses(
 }
 
 export const MODULE_ONE_ACTIVE_NOTE =
-  "Live classes and recordings are currently for Module 1 students only.";
+  "Live classes and recordings are active for enrolled students.";
 
 export const MODULE_STARTS_SOON_MESSAGE =
-  "Your module will start soon — next month. We will notify you on WhatsApp when your batch begins.";
+  "Your classes will start soon. We will notify you on WhatsApp when your next session begins.";

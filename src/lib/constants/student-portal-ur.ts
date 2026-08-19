@@ -63,7 +63,7 @@ export const STUDENT_UR = {
   joinClass: {
     cannotJoin: "Cannot join class",
     moduleNotStarted:
-      "Live classes are currently for Module 1 students only. Your module starts next month — we will notify you on WhatsApp.",
+      "This live class is scheduled for another batch or module. Please check your module schedule on the portal.",
     tryAgain: "Try again or ask your trainer for the link.",
     enteringPresent: "Joining class — marked present",
     enteringLate: "Joining class — marked late",

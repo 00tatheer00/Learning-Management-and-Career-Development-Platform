@@ -219,11 +219,11 @@ export function AdminRevenueSidebarCard({
         className={cn(
           "mx-auto flex h-9 w-9 items-center justify-center rounded-lg transition-colors duration-150 ease-out cursor-pointer select-none",
           dark
-            ? "border border-emerald-500/20 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
-            : "border border-emerald-200/80 bg-emerald-50 text-emerald-700 hover:border-emerald-300"
+            ? "border border-emerald-500/30 bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25"
+            : "border border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-emerald-100/80 hover:border-emerald-400"
         )}
       >
-        <CurrencyCircleDollar size={18} weight="duotone" />
+        <CurrencyCircleDollar size={20} weight="duotone" />
       </button>
     );
   }
@@ -233,37 +233,37 @@ export function AdminRevenueSidebarCard({
       type="button"
       onClick={() => ctx.setOpen(true)}
       className={cn(
-        "w-full rounded-lg p-2.5 text-left transition-colors duration-150 ease-out cursor-pointer select-none group",
+        "w-full rounded-xl p-2.5 text-left transition-all duration-150 ease-out cursor-pointer select-none group border",
         dark
-          ? "border border-emerald-500/20 bg-emerald-500/10 hover:bg-emerald-500/15"
-          : "portal-revenue-trigger hover:opacity-95"
+          ? "border-emerald-500/30 bg-emerald-950/30 hover:bg-emerald-900/40 text-emerald-300 shadow-xs"
+          : "border-emerald-200/90 bg-gradient-to-r from-emerald-50 to-teal-50/60 hover:bg-emerald-100/70 text-emerald-950 shadow-xs"
       )}
     >
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2.5">
         <div
           className={cn(
-            "flex h-7 w-7 shrink-0 items-center justify-center rounded-md",
-            dark ? "bg-emerald-500/20 text-emerald-400" : "bg-emerald-600 text-white"
+            "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg shadow-xs",
+            dark ? "bg-emerald-500/25 text-emerald-300 border border-emerald-500/30" : "bg-emerald-600 text-white"
           )}
         >
-          <CurrencyCircleDollar size={15} weight="duotone" />
+          <CurrencyCircleDollar size={18} weight="duotone" />
         </div>
         <div className="min-w-0 flex-1">
           <p
             className={cn(
-              "text-[9px] font-bold uppercase tracking-wider",
-              dark ? "text-emerald-500/80" : "text-emerald-800"
+              "text-[10px] font-bold uppercase tracking-wider",
+              dark ? "text-emerald-400" : "text-emerald-800"
             )}
           >
-            Revenue
+            Financial Analytics
           </p>
           <p
             className={cn(
-              "text-xs font-semibold truncate",
-              dark ? "text-emerald-300" : "text-emerald-950"
+              "text-xs font-bold truncate",
+              dark ? "text-emerald-100" : "text-emerald-950"
             )}
           >
-            Open panel
+            Registration Revenue
           </p>
         </div>
       </div>
@@ -362,7 +362,7 @@ function AdminRevenueSidePanel() {
       <button
         type="button"
         aria-label="Close revenue panel"
-        className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"
+        className="absolute inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
         onClick={() => setOpen(false)}
       />
 
@@ -370,38 +370,39 @@ function AdminRevenueSidePanel() {
         role="dialog"
         aria-modal="true"
         aria-label="Registration Revenue"
-        className="relative flex h-full w-full max-w-[500px] flex-col bg-background shadow-2xl"
+        className="relative flex h-full w-full max-w-[520px] flex-col bg-background text-foreground shadow-2xl border-l border-border z-10"
       >
-        <div className="relative overflow-hidden shrink-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-700 via-emerald-800 to-slate-900" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(255,255,255,0.15)_0%,_transparent_60%)]" />
+        {/* Top Header Card */}
+        <div className="relative overflow-hidden shrink-0 border-b border-emerald-800/40">
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-800 via-teal-900 to-slate-950" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(52,211,153,0.2)_0%,_transparent_70%)]" />
           <div className="relative px-5 pt-5 pb-5 text-white">
             <div className="flex items-start justify-between gap-3 mb-3">
               <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/15 backdrop-blur-sm ring-1 ring-white/20">
-                  <CurrencyCircleDollar size={24} weight="duotone" />
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/15 backdrop-blur-sm ring-1 ring-white/25 shadow-inner">
+                  <CurrencyCircleDollar size={26} weight="duotone" className="text-emerald-300" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-widest text-emerald-200/90">
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-emerald-300">
                     Financial Overview
                   </p>
-                  <h2 className="text-lg font-bold">Registration Revenue</h2>
+                  <h2 className="text-xl font-bold tracking-tight text-white">Registration Revenue</h2>
                 </div>
               </div>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1.5">
                 <button
                   type="button"
                   onClick={() => void refresh()}
                   disabled={loading}
-                  className="rounded-lg p-2 hover:bg-white/10 transition-colors disabled:opacity-50"
-                  aria-label="Refresh"
+                  className="rounded-lg p-2 text-white/80 hover:text-white hover:bg-white/15 transition-colors disabled:opacity-50 cursor-pointer"
+                  aria-label="Refresh data"
                 >
                   <ArrowClockwise size={18} className={loading ? "animate-spin" : ""} />
                 </button>
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="rounded-lg p-2 hover:bg-white/10 transition-colors"
+                  className="rounded-lg p-2 text-white/80 hover:text-white hover:bg-white/15 transition-colors cursor-pointer"
                   aria-label="Close"
                 >
                   <X size={20} weight="bold" />
@@ -411,36 +412,42 @@ function AdminRevenueSidePanel() {
 
             {/* Dynamic phase split explanation */}
             {selectedPhase === "phase-1" ? (
-              <p className="text-xs text-indigo-100 leading-relaxed bg-indigo-950/40 border border-indigo-400/20 rounded-lg p-2">
-                <span className="font-semibold text-white">Phase 1 Model:</span> PKR 1,000 → PKR 200 Mgmt (Komal) · PKR 800 Trainer (Tatheer / Talha) · PKR 0 School
-              </p>
+              <div className="text-xs text-indigo-100 leading-relaxed bg-indigo-950/60 border border-indigo-400/30 rounded-xl p-2.5 shadow-xs">
+                <span className="font-bold text-white uppercase text-[10px] tracking-wider bg-indigo-500/40 px-1.5 py-0.5 rounded mr-1.5">
+                  Phase 1 Model
+                </span>
+                PKR 1,000 → <strong className="text-white">PKR 200</strong> Mgmt (Komal) · <strong className="text-white">PKR 800</strong> Trainer (Tatheer / Talha) · <strong className="text-white">PKR 0</strong> School
+              </div>
             ) : selectedPhase === "phase-2" ? (
-              <p className="text-xs text-emerald-100 leading-relaxed bg-emerald-950/40 border border-emerald-400/20 rounded-lg p-2">
-                <span className="font-semibold text-white">Phase 2 Model:</span> PKR 1,000 → PKR 200 Mgmt (Komal) · PKR 700 Trainer · PKR 100 School
-              </p>
+              <div className="text-xs text-emerald-100 leading-relaxed bg-emerald-950/60 border border-emerald-400/30 rounded-xl p-2.5 shadow-xs">
+                <span className="font-bold text-white uppercase text-[10px] tracking-wider bg-emerald-500/40 px-1.5 py-0.5 rounded mr-1.5">
+                  Phase 2 Model
+                </span>
+                PKR 1,000 → <strong className="text-white">PKR 200</strong> Mgmt (Komal) · <strong className="text-white">PKR 700</strong> Trainer · <strong className="text-white">PKR 100</strong> School
+              </div>
             ) : (
-              <p className="text-xs text-emerald-100/90 leading-relaxed">
-                <span className="font-semibold text-white">Phase 1:</span> Rs 200 Mgmt / Rs 800 Trainer · <span className="font-semibold text-white">Phase 2:</span> Rs 200 Mgmt / Rs 700 Trainer / Rs 100 School
-              </p>
+              <div className="text-xs text-emerald-100/95 leading-relaxed bg-black/25 border border-emerald-500/20 rounded-xl p-2.5">
+                <span className="font-bold text-white">Phase 1:</span> Rs 200 Mgmt / Rs 800 Trainer · <span className="font-bold text-white">Phase 2:</span> Rs 200 Mgmt / Rs 700 Trainer / Rs 100 School
+              </div>
             )}
           </div>
         </div>
 
         {/* Phase Filter Toggle Bar */}
         {stats && stats.phases && (
-          <div className="shrink-0 border-b border-border bg-muted/20 px-4 py-2.5 flex items-center justify-between gap-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-muted shrink-0">
+          <div className="shrink-0 border-b border-border bg-muted/40 px-4 py-2.5 flex items-center justify-between gap-2">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground shrink-0">
               Module Phase
             </span>
-            <div className="flex gap-1 bg-secondary/80 p-1 rounded-xl">
+            <div className="flex gap-1 bg-background/80 border border-border p-1 rounded-xl shadow-xs">
               <button
                 type="button"
                 onClick={() => handlePhaseChange("all")}
                 className={cn(
                   "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer",
                   selectedPhase === "all"
-                    ? "bg-background text-foreground shadow-sm font-bold"
-                    : "text-muted hover:text-foreground"
+                    ? "bg-emerald-600 text-white shadow-sm font-bold"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 )}
               >
                 All ({stats.totalApproved})
@@ -452,7 +459,7 @@ function AdminRevenueSidePanel() {
                   "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer",
                   selectedPhase === "phase-1"
                     ? "bg-indigo-600 text-white shadow-sm font-bold"
-                    : "text-muted hover:text-foreground"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 )}
               >
                 Phase 1 ({stats.phases.phase1.totalApproved})
@@ -463,8 +470,8 @@ function AdminRevenueSidePanel() {
                 className={cn(
                   "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer",
                   selectedPhase === "phase-2"
-                    ? "bg-emerald-600 text-white shadow-sm font-bold"
-                    : "text-muted hover:text-foreground"
+                    ? "bg-teal-600 text-white shadow-sm font-bold"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 )}
               >
                 Phase 2 ({stats.phases.phase2.totalApproved})
@@ -474,19 +481,19 @@ function AdminRevenueSidePanel() {
         )}
 
         {/* Time Period Filter Bar */}
-        <div className="shrink-0 border-b border-border px-4 py-2.5 flex gap-1.5 overflow-x-auto">
+        <div className="shrink-0 border-b border-border bg-background px-4 py-2.5 flex gap-2 overflow-x-auto">
           {periodOptions.map((opt) => (
             <button
               key={opt.key}
               type="button"
               onClick={() => setPeriod(opt.key)}
               className={cn(
-                "flex-1 min-w-[70px] rounded-xl py-2 px-2 text-xs font-semibold transition-all cursor-pointer whitespace-nowrap text-center",
+                "flex-1 min-w-[80px] rounded-xl py-2 px-2.5 text-xs font-semibold transition-all cursor-pointer whitespace-nowrap text-center border",
                 period === opt.key
                   ? selectedPhase === "phase-1"
-                    ? "bg-indigo-600 text-white shadow-sm font-bold"
-                    : "bg-emerald-600 text-white shadow-sm font-bold"
-                  : "bg-secondary text-muted hover:text-foreground"
+                    ? "bg-indigo-600 text-white border-indigo-600 shadow-sm font-bold"
+                    : "bg-emerald-600 text-white border-emerald-600 shadow-sm font-bold"
+                  : "bg-muted/30 border-border text-muted-foreground hover:text-foreground hover:bg-muted/60"
               )}
             >
               {opt.label}
@@ -496,9 +503,9 @@ function AdminRevenueSidePanel() {
 
         <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
           {loading && !stats && (
-            <div className="flex flex-col items-center justify-center py-16 text-muted">
-              <ArrowClockwise size={28} className="animate-spin mb-3 opacity-50" />
-              <p className="text-sm">Loading revenue data…</p>
+            <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+              <ArrowClockwise size={32} className="animate-spin mb-3 text-emerald-500" />
+              <p className="text-sm font-medium">Loading revenue data…</p>
             </div>
           )}
 
@@ -507,39 +514,39 @@ function AdminRevenueSidePanel() {
               {/* Gross Revenue Hero Card */}
               <div
                 className={cn(
-                  "rounded-2xl p-5 shadow-sm border",
+                  "rounded-2xl p-5 shadow-sm border transition-all",
                   selectedPhase === "phase-1"
-                    ? "bg-indigo-50/80 border-indigo-200/80 dark:bg-indigo-950/20 dark:border-indigo-800/40"
-                    : "portal-callout-emerald"
+                    ? "bg-gradient-to-br from-indigo-50/90 via-indigo-50/40 to-white dark:from-indigo-950/40 dark:via-indigo-950/20 dark:to-background border-indigo-200 dark:border-indigo-800/60"
+                    : "bg-gradient-to-br from-emerald-50/90 via-teal-50/40 to-white dark:from-emerald-950/40 dark:via-emerald-950/20 dark:to-background border-emerald-200 dark:border-emerald-800/60"
                 )}
               >
                 <div
                   className={cn(
-                    "flex items-center gap-2 mb-1 font-bold text-xs uppercase tracking-wider",
+                    "flex items-center gap-2 mb-1.5 font-bold text-xs uppercase tracking-wider",
                     selectedPhase === "phase-1"
                       ? "text-indigo-700 dark:text-indigo-400"
-                      : "text-emerald-700"
+                      : "text-emerald-700 dark:text-emerald-400"
                   )}
                 >
-                  <TrendUp size={16} weight="duotone" />
-                  <p>{periodStats.label} — gross collected</p>
+                  <TrendUp size={18} weight="duotone" />
+                  <span>{periodStats.label} — Gross Collected</span>
                 </div>
                 <p
                   className={cn(
-                    "text-3xl font-bold tracking-tight",
+                    "text-3xl sm:text-4xl font-extrabold tracking-tight tabular-nums",
                     selectedPhase === "phase-1"
                       ? "text-indigo-950 dark:text-indigo-100"
-                      : "text-emerald-950"
+                      : "text-emerald-950 dark:text-emerald-100"
                   )}
                 >
                   {formatMoney(periodStats.gross, stats.currency)}
                 </p>
                 <p
                   className={cn(
-                    "text-sm mt-1 font-medium",
+                    "text-sm mt-1.5 font-semibold",
                     selectedPhase === "phase-1"
-                      ? "text-indigo-800/80 dark:text-indigo-300/80"
-                      : "text-emerald-800/70"
+                      ? "text-indigo-800 dark:text-indigo-300"
+                      : "text-emerald-800 dark:text-emerald-300"
                   )}
                 >
                   {periodStats.students} verified paid registration
@@ -549,38 +556,41 @@ function AdminRevenueSidePanel() {
 
               {/* 3 Share Cards (Management, Trainers, School) */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                <div className="rounded-2xl border border-violet-200/70 bg-gradient-to-br from-violet-50 to-white dark:from-violet-950/20 dark:to-background p-3.5 shadow-xs">
+                {/* Management Card */}
+                <div className="rounded-2xl border border-violet-200 dark:border-violet-800/50 bg-gradient-to-br from-violet-50/80 to-white dark:from-violet-950/30 dark:to-background p-3.5 shadow-xs">
                   <div className="flex items-center gap-1.5 text-violet-700 dark:text-violet-400 mb-1.5">
-                    <Buildings size={15} weight="duotone" />
+                    <Buildings size={16} weight="duotone" />
                     <p className="text-[10px] font-bold uppercase tracking-wider">Komal (Mgmt)</p>
                   </div>
-                  <p className="text-lg font-bold text-violet-950 dark:text-violet-100">
+                  <p className="text-lg sm:text-xl font-bold text-violet-950 dark:text-violet-100 tabular-nums">
                     {formatMoney(periodStats.management, stats.currency)}
                   </p>
-                  <p className="text-[10px] text-violet-600 dark:text-violet-400 mt-0.5">
+                  <p className="text-[11px] font-semibold text-violet-700 dark:text-violet-400 mt-1">
                     Rs 200 / student
                   </p>
                 </div>
 
-                <div className="rounded-2xl border border-blue-200/70 bg-gradient-to-br from-blue-50 to-white dark:from-blue-950/20 dark:to-background p-3.5 shadow-xs">
+                {/* Trainer Card */}
+                <div className="rounded-2xl border border-blue-200 dark:border-blue-800/50 bg-gradient-to-br from-blue-50/80 to-white dark:from-blue-950/30 dark:to-background p-3.5 shadow-xs">
                   <div className="flex items-center gap-1.5 text-blue-700 dark:text-blue-400 mb-1.5">
-                    <GraduationCap size={15} weight="duotone" />
+                    <GraduationCap size={16} weight="duotone" />
                     <p className="text-[10px] font-bold uppercase tracking-wider">Trainers</p>
                   </div>
-                  <p className="text-lg font-bold text-blue-950 dark:text-blue-100">
+                  <p className="text-lg sm:text-xl font-bold text-blue-950 dark:text-blue-100 tabular-nums">
                     {formatMoney(periodStats.trainer, stats.currency)}
                   </p>
-                  <p className="text-[10px] text-blue-600 dark:text-blue-400 mt-0.5">
+                  <p className="text-[11px] font-semibold text-blue-700 dark:text-blue-400 mt-1">
                     {selectedPhase === "phase-1" ? "Rs 800 / student" : "Rs 700 / student"}
                   </p>
                 </div>
 
+                {/* School Card */}
                 <div
                   className={cn(
                     "rounded-2xl border p-3.5 shadow-xs bg-gradient-to-br",
                     selectedPhase === "phase-1"
-                      ? "border-slate-200/70 from-slate-50 to-white dark:from-slate-900/40 dark:to-background opacity-75"
-                      : "border-emerald-200/70 from-emerald-50 to-white dark:from-emerald-950/20 dark:to-background"
+                      ? "border-slate-200 dark:border-slate-800 from-slate-50/80 to-white dark:from-slate-900/30 dark:to-background opacity-80"
+                      : "border-teal-200 dark:border-teal-800/50 from-teal-50/80 to-white dark:from-teal-950/30 dark:to-background"
                   )}
                 >
                   <div
@@ -588,23 +598,30 @@ function AdminRevenueSidePanel() {
                       "flex items-center gap-1.5 mb-1.5",
                       selectedPhase === "phase-1"
                         ? "text-slate-600 dark:text-slate-400"
-                        : "text-emerald-700 dark:text-emerald-400"
+                        : "text-teal-700 dark:text-teal-400"
                     )}
                   >
-                    <Buildings size={15} weight="duotone" />
+                    <Buildings size={16} weight="duotone" />
                     <p className="text-[10px] font-bold uppercase tracking-wider">School %</p>
                   </div>
                   <p
                     className={cn(
-                      "text-lg font-bold",
+                      "text-lg sm:text-xl font-bold tabular-nums",
                       selectedPhase === "phase-1"
                         ? "text-slate-700 dark:text-slate-300"
-                        : "text-emerald-950 dark:text-emerald-100"
+                        : "text-teal-950 dark:text-teal-100"
                     )}
                   >
                     {formatMoney(periodStats.school, stats.currency)}
                   </p>
-                  <p className="text-[10px] text-muted mt-0.5">
+                  <p
+                    className={cn(
+                      "text-[11px] font-semibold mt-1",
+                      selectedPhase === "phase-1"
+                        ? "text-slate-500 dark:text-slate-400"
+                        : "text-teal-700 dark:text-teal-400"
+                    )}
+                  >
                     {selectedPhase === "phase-1" ? "Rs 0 (Phase 1 model)" : "Rs 100 / student"}
                   </p>
                 </div>
@@ -612,44 +629,50 @@ function AdminRevenueSidePanel() {
 
               {/* Distribution Bar */}
               {periodStats.gross > 0 && (
-                <div className="rounded-xl border border-border bg-secondary/40 p-3">
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-muted mb-2">
-                    Revenue Distribution
+                <div className="rounded-2xl border border-border bg-card p-4 shadow-xs">
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2.5">
+                    Revenue Distribution Share
                   </p>
-                  <div className="flex h-3 rounded-full overflow-hidden bg-slate-200 dark:bg-slate-800 gap-0.5">
+                  <div className="flex h-3.5 rounded-full overflow-hidden bg-slate-200 dark:bg-slate-800 gap-0.5 p-0.5 border border-border">
                     {periodStats.management > 0 && (
                       <div
-                        className="bg-violet-500 transition-all"
+                        className="bg-violet-500 rounded-sm transition-all"
                         style={{
                           width: `${(periodStats.management / periodStats.gross) * 100}%`,
                         }}
+                        title={`Management: ${Math.round((periodStats.management / periodStats.gross) * 100)}%`}
                       />
                     )}
                     {periodStats.trainer > 0 && (
                       <div
-                        className="bg-blue-500 transition-all"
+                        className="bg-blue-500 rounded-sm transition-all"
                         style={{
                           width: `${(periodStats.trainer / periodStats.gross) * 100}%`,
                         }}
+                        title={`Trainers: ${Math.round((periodStats.trainer / periodStats.gross) * 100)}%`}
                       />
                     )}
                     {periodStats.school > 0 && (
                       <div
-                        className="bg-emerald-500 transition-all"
+                        className="bg-teal-500 rounded-sm transition-all"
                         style={{
                           width: `${(periodStats.school / periodStats.gross) * 100}%`,
                         }}
+                        title={`School: ${Math.round((periodStats.school / periodStats.gross) * 100)}%`}
                       />
                     )}
                   </div>
-                  <div className="flex flex-wrap justify-between gap-1 mt-2 text-[11px] text-muted">
-                    <span className="text-violet-700 dark:text-violet-400 font-medium">
+                  <div className="flex flex-wrap justify-between gap-1.5 mt-2.5 text-xs">
+                    <span className="text-violet-700 dark:text-violet-300 font-bold flex items-center gap-1">
+                      <span className="inline-block w-2 h-2 rounded-full bg-violet-500" />
                       Management {Math.round((periodStats.management / periodStats.gross) * 100)}%
                     </span>
-                    <span className="text-blue-700 dark:text-blue-400 font-medium">
+                    <span className="text-blue-700 dark:text-blue-300 font-bold flex items-center gap-1">
+                      <span className="inline-block w-2 h-2 rounded-full bg-blue-500" />
                       Trainers {Math.round((periodStats.trainer / periodStats.gross) * 100)}%
                     </span>
-                    <span className="text-emerald-700 dark:text-emerald-400 font-medium">
+                    <span className="text-teal-700 dark:text-teal-300 font-bold flex items-center gap-1">
+                      <span className="inline-block w-2 h-2 rounded-full bg-teal-500" />
                       School {Math.round((periodStats.school / periodStats.gross) * 100)}%
                     </span>
                   </div>
@@ -657,90 +680,90 @@ function AdminRevenueSidePanel() {
               )}
 
               {/* Course-wise Breakdown */}
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-muted mb-3 px-0.5">
-                  Course-wise breakdown
+              <div className="space-y-3 pt-1">
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-0.5">
+                  Course-wise Breakdown
                 </p>
-                <div className="space-y-3">
+                <div className="space-y-3.5">
                   {coursesToDisplay?.map((course) => {
                     const cp = getCoursePeriodStats(course, period);
                     const trainerShort = course.trainerName.split(" ").slice(-1)[0];
                     return (
                       <div
                         key={course.programSlug}
-                        className="rounded-2xl border border-border overflow-hidden bg-background shadow-xs"
+                        className="rounded-2xl border border-border overflow-hidden bg-card shadow-xs transition-all hover:border-border/80"
                       >
                         <div
                           className={cn(
-                            "px-4 py-3 bg-gradient-to-r text-white",
+                            "px-4 py-3 bg-gradient-to-r text-white shadow-xs",
                             course.headerGradient
                           )}
                         >
                           <div className="flex items-center justify-between gap-2">
                             <div>
-                              <p className="font-bold text-sm">{course.courseTitle}</p>
-                              <p className="text-xs text-white/80 mt-0.5">
+                              <p className="font-bold text-sm tracking-tight">{course.courseTitle}</p>
+                              <p className="text-xs text-white/85 mt-0.5 font-medium">
                                 Trainer: {course.trainerName}
                               </p>
                             </div>
-                            <div className="text-right shrink-0">
-                              <p className="text-lg font-bold">
+                            <div className="text-right shrink-0 bg-black/20 backdrop-blur-xs px-2.5 py-1 rounded-lg border border-white/10">
+                              <p className="text-base sm:text-lg font-extrabold text-white">
                                 {period === "all" ? course.uniqueStudents : cp.students}
                               </p>
-                              <p className="text-[10px] uppercase tracking-wider text-white/75">
+                              <p className="text-[9px] uppercase tracking-wider text-white/80 font-bold">
                                 {period === "all" ? "unique students" : "registrations"}
                               </p>
                             </div>
                           </div>
                         </div>
 
-                        <div className="p-4 space-y-3">
+                        <div className="p-4 space-y-3.5">
                           <div className="flex items-center justify-between">
-                            <span className="text-sm text-muted font-medium">Gross collected</span>
-                            <span className="font-bold text-foreground text-base">
+                            <span className="text-sm text-muted-foreground font-semibold">Gross Collected</span>
+                            <span className="font-extrabold text-foreground text-base sm:text-lg tabular-nums">
                               {formatMoney(cp.gross, stats.currency)}
                             </span>
                           </div>
-                          <div className="h-px bg-border" />
+                          <div className="h-px bg-border/80" />
                           <div className="grid grid-cols-3 gap-2">
-                            <div className="rounded-xl bg-violet-50 dark:bg-violet-950/20 border border-violet-100 dark:border-violet-900/30 p-2 text-center">
-                              <p className="text-[9px] font-bold uppercase text-violet-600 dark:text-violet-400">
+                            <div className="rounded-xl bg-violet-50/80 dark:bg-violet-950/30 border border-violet-200/80 dark:border-violet-900/40 p-2.5 text-center">
+                              <p className="text-[9px] font-bold uppercase text-violet-700 dark:text-violet-300">
                                 Management
                               </p>
-                              <p className="text-xs font-bold text-violet-950 dark:text-violet-200 mt-0.5">
+                              <p className="text-xs sm:text-sm font-bold text-violet-950 dark:text-violet-100 mt-0.5 tabular-nums">
                                 {formatMoney(cp.management, stats.currency)}
                               </p>
                             </div>
-                            <div className="rounded-xl bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30 p-2 text-center">
-                              <p className="text-[9px] font-bold uppercase text-blue-600 dark:text-blue-400">
+                            <div className="rounded-xl bg-blue-50/80 dark:bg-blue-950/30 border border-blue-200/80 dark:border-blue-900/40 p-2.5 text-center">
+                              <p className="text-[9px] font-bold uppercase text-blue-700 dark:text-blue-300">
                                 {trainerShort}
                               </p>
-                              <p className="text-xs font-bold text-blue-950 dark:text-blue-200 mt-0.5">
+                              <p className="text-xs sm:text-sm font-bold text-blue-950 dark:text-blue-100 mt-0.5 tabular-nums">
                                 {formatMoney(cp.trainer, stats.currency)}
                               </p>
                             </div>
-                            <div className="rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 p-2 text-center">
-                              <p className="text-[9px] font-bold uppercase text-emerald-600 dark:text-emerald-400">
+                            <div className="rounded-xl bg-teal-50/80 dark:bg-teal-950/30 border border-teal-200/80 dark:border-teal-900/40 p-2.5 text-center">
+                              <p className="text-[9px] font-bold uppercase text-teal-700 dark:text-teal-300">
                                 School
                               </p>
-                              <p className="text-xs font-bold text-emerald-950 dark:text-emerald-200 mt-0.5">
+                              <p className="text-xs sm:text-sm font-bold text-teal-950 dark:text-teal-100 mt-0.5 tabular-nums">
                                 {formatMoney(cp.school, stats.currency)}
                               </p>
                             </div>
                           </div>
 
                           {period === "all" && course.approvedCount !== course.uniqueStudents && (
-                            <p className="text-xs portal-callout-amber rounded-lg px-3 py-2">
+                            <div className="text-xs rounded-xl px-3 py-2 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/40 text-amber-900 dark:text-amber-200 font-medium">
                               {course.approvedCount} paid registration
                               {course.approvedCount === 1 ? "" : "s"} (
                               {course.approvedCount - course.uniqueStudents} returning / repeat enrollments)
-                            </p>
+                            </div>
                           )}
                           {period === "all" && course.thisWeekCount > 0 && (
-                            <p className="text-xs portal-callout-emerald rounded-lg px-3 py-2">
-                              +{course.thisWeekCount} this week (
+                            <div className="text-xs rounded-xl px-3 py-2 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/40 text-emerald-900 dark:text-emerald-200 font-medium">
+                              +{course.thisWeekCount} new this week (
                               {formatMoney(course.thisWeekGross, stats.currency)} gross)
-                            </p>
+                            </div>
                           )}
                         </div>
                       </div>
@@ -749,9 +772,9 @@ function AdminRevenueSidePanel() {
 
                   {/* Phase 1 AI Notice */}
                   {selectedPhase === "phase-1" && (
-                    <div className="rounded-xl border border-dashed border-slate-300 dark:border-slate-800 p-3 text-center bg-slate-50/50 dark:bg-slate-900/20">
-                      <p className="text-xs text-muted font-medium flex items-center justify-center gap-1.5">
-                        <Sparkle size={14} className="text-purple-500" />
+                    <div className="rounded-2xl border border-dashed border-border p-4 text-center bg-muted/20">
+                      <p className="text-xs text-muted-foreground font-medium flex items-center justify-center gap-1.5">
+                        <Sparkle size={15} weight="duotone" className="text-purple-500 shrink-0" />
                         Artificial Intelligence program was launched in Phase 2
                       </p>
                     </div>

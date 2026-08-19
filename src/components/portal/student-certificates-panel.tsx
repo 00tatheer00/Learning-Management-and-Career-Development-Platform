@@ -201,6 +201,16 @@ export function StudentCertificatesPanel({ modules }: StudentCertificatesPanelPr
           </div>
         </section>
       )}
+
+      {issued.length === 0 && locked.length === 0 && (
+        <div className="rounded-2xl border border-dashed border-pt p-8 text-center bg-surface/40">
+          <Certificate size={40} weight="duotone" className="mx-auto text-amber-500 mb-3" />
+          <h3 className="text-base font-bold text-pt">No Certificates Issued Yet</h3>
+          <p className="text-sm text-pt-muted mt-1 max-w-md mx-auto">
+            Module 1 certificates are issued upon completion and verification by your course instructor. Check back soon!
+          </p>
+        </div>
+      )}
     </div>
   );
 }

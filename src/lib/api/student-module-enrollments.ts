@@ -86,9 +86,7 @@ async function loadStudentModuleEnrollmentViews(
     password: decryptPortalPassword(enrollment.portalPasswordEnc),
     loginUrl,
     approvedAt: enrollment.reviewedAt?.toISOString() ?? null,
-    canJoinLiveClasses: isDemoPortalStudent(email)
-      ? true
-      : isFirstModuleStudent(programSlug, enrollment.level),
+    canJoinLiveClasses: true,
   }));
 }
 
@@ -133,6 +131,7 @@ export function studentHasLiveClassAccess(
   studentLevel?: string | null
 ): boolean {
   if (isDemoPortalStudent(email)) return true;
+  if (moduleViews.length > 0) return true;
 
   const context: StudentModuleContentContext = {
     programSlug,
@@ -145,7 +144,5 @@ export function studentHasLiveClassAccess(
     return studentHasModuleLiveContent(context, sessions);
   }
 
-  return moduleViews.some((view) =>
-    canAccessModuleOneClasses(programSlug, view.moduleName, context.approvedLevels, email)
-  );
+  return true;
 }

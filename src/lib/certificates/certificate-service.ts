@@ -109,10 +109,12 @@ export async function getEligibleStudentsForModule(
     const studentEmailNorm = student.email.trim().toLowerCase();
     const existingCert = certByStudentId.get(student.id);
 
-    const isDemo = isDemoPortalStudent(student.email) && (isFirstModule || normSlug === "web-development");
+    const studentProg = normalizeProgramSlug(student.programSlug ?? "");
+    const isDemo =
+      isDemoPortalStudent(student.email) &&
+      (studentProg === normSlug || (normSlug === "web-development" && (!studentProg || studentProg === "web-development")));
     const hasApprovedEnrollment = approvedEmailSet.has(studentEmailNorm);
 
-    const studentProg = normalizeProgramSlug(student.programSlug ?? "");
     const isStudentInModule = isFirstModule
       ? studentProg === normSlug
       : studentProg === normSlug && normalizeModuleName(student.level) === normModule;

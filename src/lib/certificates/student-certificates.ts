@@ -46,15 +46,29 @@ export async function getStudentCertificateModules(
     const program = getProgramBySlug(programSlug);
     if (!program) continue;
 
-    for (const mod of program.modules) {
+    const firstModule = program.modules[0]?.name;
+
+    // Show Module 1 (e.g. HTML & CSS for Web Dev, Dart & OOP for App Dev), plus any explicitly issued cert in DB
+    const activeModules = program.modules.filter((mod, idx) => {
+      const isFirst = idx === 0;
+      const hasCert = certMap.has(`${programSlug}:${mod.name.trim().toLowerCase()}`);
+      return isFirst || hasCert;
+    });
+
+    for (const mod of activeModules) {
       const key = `${programSlug}:${mod.name.trim().toLowerCase()}`;
       const dbCert = certMap.get(key);
 
       // Demo fallback if demo student
-      const isDemoIssued = isDemoPortalStudent(user.email) && programSlug === "web-development" && mod.name === "HTML & CSS";
+      const isDemoIssued =
+        isDemoPortalStudent(user.email) &&
+        ((programSlug === "web-development" && mod.name === "HTML & CSS") ||
+          (programSlug === "app-development" && mod.name === "Dart & OOP"));
       const isIssued = Boolean(dbCert || isDemoIssued);
 
-      const verificationCode = dbCert?.verificationCode ?? (isDemoIssued ? buildCertificateId(user.id, programSlug, mod.name) : undefined);
+      const verificationCode =
+        dbCert?.verificationCode ??
+        (isDemoIssued ? buildCertificateId(user.id, programSlug, mod.name) : undefined);
       const issuedAt = dbCert?.issuedAt ?? new Date("2026-07-11T00:00:00.000Z");
 
       views.push({
@@ -65,9 +79,10 @@ export async function getStudentCertificateModules(
         certificateId: verificationCode,
         verificationCode,
         issuedAtLabel: isIssued ? formatCertificateDate(issuedAt) : undefined,
-        downloadPath: isIssued && verificationCode
-          ? `/api/student/certificates/download?code=${encodeURIComponent(verificationCode)}&program=${encodeURIComponent(programSlug)}&module=${encodeURIComponent(mod.name)}`
-          : undefined,
+        downloadPath:
+          isIssued && verificationCode
+            ? `/api/student/certificates/download?code=${encodeURIComponent(verificationCode)}&program=${encodeURIComponent(programSlug)}&module=${encodeURIComponent(mod.name)}`
+            : undefined,
         verifyPath: verificationCode ? `/verify/${encodeURIComponent(verificationCode)}` : undefined,
       });
     }
@@ -81,8 +96,10 @@ export async function canDownloadCertificate(
   programSlug: string,
   moduleName: string
 ): Promise<boolean> {
-  if (isDemoPortalStudent(user.email) && programSlug === "web-development" && moduleName === "HTML & CSS") {
-    return true;
+  const isDemo = isDemoPortalStudent(user.email);
+  if (isDemo) {
+    if (programSlug === "web-development" && moduleName === "HTML & CSS") return true;
+    if (programSlug === "app-development" && moduleName === "Dart & OOP") return true;
   }
 
   const cert = await prisma.certificate.findFirst({

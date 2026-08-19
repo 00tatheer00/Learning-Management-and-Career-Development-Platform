@@ -30,23 +30,11 @@ export async function GET(
     });
   }
 
-  if (!(await canStudentAccessProgram(user, session.programSlug))) {
+  const hasProgramAccess = await canStudentAccessProgram(user, session.programSlug);
+  if (!hasProgramAccess) {
     return NextResponse.json(createApiResponse(false, { error: STUDENT_UR.api.unauthorized }), {
       status: 403,
     });
-  }
-
-  if (
-    !canStudentAccessModuleContent(session.programSlug, user.level, session.level, {
-      email: user.email,
-    })
-  ) {
-    return NextResponse.json(
-      createApiResponse(false, {
-        message: STUDENT_UR.joinClass.moduleNotStarted,
-      }),
-      { status: 403 }
-    );
   }
 
   if (!isPortalRoomSession(session) && !session.meetLink?.trim()) {

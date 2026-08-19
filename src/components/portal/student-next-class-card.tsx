@@ -149,9 +149,9 @@ export function StudentNextClassCard({
               />
             ) : (
               <div className="portal-tone-indigo rounded-xl px-4 py-3 text-sm text-center min-w-[200px]">
-                <p className="font-semibold text-pt">Your module starts next month</p>
+                <p className="font-semibold text-pt">Session starting soon</p>
                 <p className="mt-1 text-xs text-pt-muted">
-                  {studentModule ? `Registered: ${studentModule}` : "Module 1 is live now"}
+                  {studentModule ? `Module: ${studentModule}` : "Class will begin shortly"}
                 </p>
               </div>
             )}
