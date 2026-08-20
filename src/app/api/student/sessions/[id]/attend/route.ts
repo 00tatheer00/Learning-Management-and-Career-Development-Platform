@@ -3,7 +3,6 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { getLiveSessionById } from "@/lib/api/portal-data";
 import { createApiResponse } from "@/lib/api/enrollment";
 import { recordClassJoin } from "@/lib/api/class-attendance";
-import { canStudentAccessModuleContent } from "@/lib/modules/student-module-content";
 import { canStudentAccessProgram } from "@/lib/student-portal/program-scope";
 import { getJoinWindowState } from "@/lib/sessions/join-window";
 import { STUDENT_UR } from "@/lib/constants/student-portal-ur";

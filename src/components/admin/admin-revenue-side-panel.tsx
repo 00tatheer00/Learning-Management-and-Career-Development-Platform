@@ -21,6 +21,7 @@ import type {
   AdminRevenuePhaseStats,
   AdminRevenueCourseStats,
 } from "@/lib/api/admin-revenue";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 type RevenuePeriod = "all" | "week" | "month" | string;

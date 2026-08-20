@@ -4,9 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { decryptPortalPassword } from "@/lib/auth/portal-password-vault";
 import { getProgramBySlug } from "@/lib/data/programs";
 import {
-  canAccessModuleOneClasses,
   getProgramModuleNames,
-  isFirstModuleStudent,
 } from "@/lib/modules/student-module-access";
 import {
   studentHasModuleLiveContent,

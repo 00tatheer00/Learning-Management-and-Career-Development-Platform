@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth/session";
 import { requireTrainerProgram, resolveTrainerId } from "@/lib/auth/trainer-scope";
-import { getFirstModuleName, getProgramModuleNames } from "@/lib/modules/student-module-access";
+import { getProgramModuleNames } from "@/lib/modules/student-module-access";
 import {
   deleteClassRecording,
   getClassRecordings,

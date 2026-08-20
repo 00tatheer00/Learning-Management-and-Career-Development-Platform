@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   Certificate,
   Sparkle,
@@ -53,14 +53,14 @@ export function AdminCertificatesPanel() {
   const [resettingStudentId, setResettingStudentId] = useState<string | null>(null);
   const [bulkProgress, setBulkProgress] = useState<{ current: number; total: number } | null>(null);
 
-  const selectedProgram = programs.find((p) => p.slug === selectedCourse);
-  const availableModules = selectedProgram?.modules.map((m) => m.name) ?? [];
+  const selectedProgram = useMemo(() => programs.find((p) => p.slug === selectedCourse), [selectedCourse]);
+  const availableModules = useMemo(() => selectedProgram?.modules.map((m) => m.name) ?? [], [selectedProgram]);
 
   useEffect(() => {
     if (availableModules.length > 0 && !availableModules.includes(selectedModule)) {
       setSelectedModule(availableModules[0]);
     }
-  }, [selectedCourse, availableModules, selectedModule]);
+  }, [availableModules, selectedModule]);
 
   const loadData = useCallback(async () => {
     setLoading(true);

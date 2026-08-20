@@ -22,6 +22,7 @@ export interface StudentCertificateModuleView {
 }
 
 export function certificatesEnabledForStudent(email?: string | null): boolean {
+  void email;
   return true;
 }
 

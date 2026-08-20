@@ -7,12 +7,10 @@ import {
   SealCheck,
   ShieldCheck,
   ArrowRight,
-  Sparkle,
   CheckCircle,
   FileText,
   LockKey,
 } from "@phosphor-icons/react";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export default function PublicVerifySearchPage() {

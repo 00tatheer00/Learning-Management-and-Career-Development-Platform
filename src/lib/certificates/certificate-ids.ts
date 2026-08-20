@@ -1,4 +1,3 @@
-import { createHash } from "crypto";
 
 export function getProgramCode(programSlug: string): string {
   const norm = programSlug.toLowerCase();
@@ -23,16 +22,12 @@ export function buildCertificateId(
   moduleName: string,
   indexNumber: number = 1
 ): string {
+  void studentId;
   const yearShort = new Date().getFullYear().toString().slice(-2);
   const progCode = getProgramCode(programSlug);
   const modCode = getModuleCode(moduleName);
 
   const numPadded = indexNumber.toString().padStart(4, "0");
-  const digest = createHash("sha256")
-    .update(`${studentId}:${programSlug}:${moduleName}`)
-    .digest("hex")
-    .slice(0, 3)
-    .toUpperCase();
 
   return `EEST${yearShort}-${progCode}-${modCode}-${numPadded}`;
 }
