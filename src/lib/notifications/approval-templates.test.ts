@@ -1,54 +1,40 @@
 import { describe, expect, it } from "vitest";
 import {
-  buildApprovalTemplatePreview,
-  buildRejectionTemplatePreview,
-  buildStudentLoginWhatsAppMessage,
+  buildApprovalEmailHtml,
+  buildApprovalEmailText,
 } from "@/lib/notifications/approval-templates";
-import { META_TEMPLATE_SUBMISSIONS } from "@/lib/whatsapp/cloud-api/templates";
 
-describe("approval WhatsApp templates", () => {
-  it("builds approval preview with email instruction and portal link", () => {
-    const preview = buildApprovalTemplatePreview({
-      firstName: "Ahmed",
-      courseName: "Web Development",
-      module: "Beginner",
-      portalLoginUrl: "https://school.emergingedge.tech/login",
-    });
-
-    expect(preview).toContain("Ahmed");
-    expect(preview).toContain("registered email");
-    expect(preview).toContain("https://school.emergingedge.tech/login");
-    expect(preview).not.toContain("Password:");
-  });
-
-  it("builds rejection preview with reason", () => {
-    const preview = buildRejectionTemplatePreview({
-      fullName: "Sara Khan",
-      courseName: "Web Development",
-      reason: "Payment not verified",
-    });
-
-    expect(preview).toContain("Sara Khan");
-    expect(preview).toContain("Payment not verified");
-  });
-
-  it("keeps login message for manual inbox send only", () => {
-    const login = buildStudentLoginWhatsAppMessage({
+describe("approval email templates", () => {
+  it("builds approval email HTML with credentials and student name", () => {
+    const html = buildApprovalEmailHtml({
       studentName: "Ahmed Ali",
       email: "ahmed@example.com",
-      password: "secret123",
+      password: "secretpassword123",
       courseName: "Web Development",
-      module: "Beginner",
       level: "Level 1",
       loginUrl: "https://school.emergingedge.tech/login",
     });
 
-    expect(login).toContain("secret123");
-    expect(login).toContain("ahmed@example.com");
+    expect(html).toContain("Ahmed");
+    expect(html).toContain("ahmed@example.com");
+    expect(html).toContain("secretpassword123");
+    expect(html).toContain("Web Development");
+    expect(html).toContain("https://school.emergingedge.tech/login");
   });
 
-  it("documents Meta template bodies with four body variables each", () => {
-    expect(META_TEMPLATE_SUBMISSIONS.eest_registration_approved.body).toMatch(/\{\{4\}\}/);
-    expect(META_TEMPLATE_SUBMISSIONS.eest_registration_rejected.body).toMatch(/\{\{4\}\}/);
+  it("builds approval email plain text with credentials", () => {
+    const text = buildApprovalEmailText({
+      studentName: "Sara Khan",
+      email: "sara@example.com",
+      password: "mypassword456",
+      courseName: "Artificial Intelligence",
+      level: "Beginner",
+      loginUrl: "https://school.emergingedge.tech/login",
+    });
+
+    expect(text).toContain("Sara");
+    expect(text).toContain("sara@example.com");
+    expect(text).toContain("mypassword456");
+    expect(text).toContain("Artificial Intelligence");
   });
 });

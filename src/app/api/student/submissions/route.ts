@@ -4,13 +4,22 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { createSubmission } from "@/lib/api/portal-data";
 import { createApiResponse } from "@/lib/api/enrollment";
 import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
+import { isValidSubmissionUrl, sanitizeSubmissionUrl } from "@/lib/security/url-sanitizer";
+
+const urlField = z
+  .string()
+  .refine((val) => !val || isValidSubmissionUrl(val), {
+    message: "Please provide a valid web URL (e.g. https://...)",
+  })
+  .optional()
+  .or(z.literal(""));
 
 const schema = z.object({
   assignmentId: z.string(),
   content: z.string().optional(),
-  liveWebsiteUrl: z.string().url("Please provide a valid Live Website URL (e.g. https://...)").optional().or(z.literal("")),
-  githubUrl: z.string().url("Please provide a valid GitHub Repository URL (e.g. https://github.com/...)").optional().or(z.literal("")),
-  portfolioUrl: z.string().url("Please provide a valid Portfolio URL (e.g. https://...)").optional().or(z.literal("")),
+  liveWebsiteUrl: urlField,
+  githubUrl: urlField,
+  portfolioUrl: urlField,
   assignedTopic: z.string().optional(),
   notes: z.string().optional(),
 });
@@ -49,14 +58,18 @@ export async function POST(request: Request) {
     notes,
   } = parsed.data;
 
+  const cleanLiveUrl = sanitizeSubmissionUrl(liveWebsiteUrl) ?? undefined;
+  const cleanGithubUrl = sanitizeSubmissionUrl(githubUrl) ?? undefined;
+  const cleanPortfolioUrl = sanitizeSubmissionUrl(portfolioUrl) ?? undefined;
+
   // Build a structured content summary if URLs are provided
   let content = rawContent?.trim() || "";
   if (!content) {
     const parts: string[] = [];
     if (assignedTopic) parts.push(`Assigned Topic: ${assignedTopic}`);
-    if (liveWebsiteUrl) parts.push(`Live Website: ${liveWebsiteUrl}`);
-    if (githubUrl) parts.push(`GitHub Repo: ${githubUrl}`);
-    if (portfolioUrl) parts.push(`Portfolio: ${portfolioUrl}`);
+    if (cleanLiveUrl) parts.push(`Live Website: ${cleanLiveUrl}`);
+    if (cleanGithubUrl) parts.push(`GitHub Repo: ${cleanGithubUrl}`);
+    if (cleanPortfolioUrl) parts.push(`Portfolio: ${cleanPortfolioUrl}`);
     if (notes) parts.push(`Notes: ${notes}`);
     content = parts.join("\n") || "Assignment submission";
   }
@@ -67,9 +80,9 @@ export async function POST(request: Request) {
       studentId: user.id,
       studentName: user.name,
       content,
-      liveWebsiteUrl: liveWebsiteUrl || undefined,
-      githubUrl: githubUrl || undefined,
-      portfolioUrl: portfolioUrl || undefined,
+      liveWebsiteUrl: cleanLiveUrl,
+      githubUrl: cleanGithubUrl,
+      portfolioUrl: cleanPortfolioUrl,
       assignedTopic: assignedTopic || undefined,
       notes: notes || undefined,
     },

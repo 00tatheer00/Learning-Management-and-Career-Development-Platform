@@ -4,6 +4,7 @@ import { buildCertificateId, formatCertificateDate } from "@/lib/certificates/ce
 import { renderCertificatePng } from "@/lib/certificates/render-certificate";
 import { isDemoPortalStudent } from "@/lib/constants/demo-student";
 import { normalizeProgramSlug } from "@/lib/auth/program-assignment";
+import { swrCache, invalidateCacheByTag } from "@/lib/cache/swr-cache";
 
 export interface EligibleStudentView {
   studentId: string;
@@ -153,6 +154,7 @@ export async function resetCertificates(filter?: {
     where,
   });
 
+  await invalidateCacheByTag("certificates");
   return result.count;
 }
 
@@ -265,6 +267,7 @@ export async function generateSingleCertificate(input: {
     },
   });
 
+  await invalidateCacheByTag("certificates");
   return certificate;
 }
 
@@ -327,50 +330,60 @@ export async function generateBulkCertificates(
 
 export async function verifyCertificateByCode(verificationCode: string) {
   if (!verificationCode) return null;
-  const codeNormalized = verificationCode.trim();
+  const codeNormalized = verificationCode.trim().toUpperCase();
 
-  let cert = await prisma.certificate.findFirst({
-    where: {
-      verificationCode: {
-        equals: codeNormalized,
-        mode: "insensitive",
-      },
-    },
-    include: {
-      student: {
-        select: { name: true, email: true },
-      },
-    },
-  });
-
-  // If not found directly, try compact dash normalization
-  if (!cert) {
-    const compact = codeNormalized.replace(/[\s_]+/g, "-");
-    cert = await prisma.certificate.findFirst({
-      where: {
-        verificationCode: {
-          equals: compact,
-          mode: "insensitive",
+  return swrCache(
+    `cert-verify:${codeNormalized}`,
+    async () => {
+      let cert = await prisma.certificate.findFirst({
+        where: {
+          verificationCode: {
+            equals: codeNormalized,
+            mode: "insensitive",
+          },
         },
-      },
-      include: {
-        student: {
-          select: { name: true, email: true },
+        include: {
+          student: {
+            select: { name: true, email: true },
+          },
         },
-      },
-    });
-  }
+      });
 
-  if (!cert) return null;
+      // If not found directly, try compact dash normalization
+      if (!cert) {
+        const compact = codeNormalized.replace(/[\s_]+/g, "-");
+        cert = await prisma.certificate.findFirst({
+          where: {
+            verificationCode: {
+              equals: compact,
+              mode: "insensitive",
+            },
+          },
+          include: {
+            student: {
+              select: { name: true, email: true },
+            },
+          },
+        });
+      }
 
-  return {
-    verificationCode: cert.verificationCode,
-    studentName: cert.student?.name || cert.studentNameSnapshot,
-    courseTitle: cert.courseNameSnapshot,
-    moduleName: cert.moduleNameSnapshot,
-    completionDateLabel: formatCertificateDate(cert.completionDate),
-    issuedAtLabel: formatCertificateDate(cert.issuedAt),
-    certificateId: cert.id,
-    status: cert.status,
-  };
+      if (!cert) return null;
+
+      return {
+        verificationCode: cert.verificationCode,
+        studentName: cert.student?.name || cert.studentNameSnapshot,
+        courseTitle: cert.courseNameSnapshot,
+        moduleName: cert.moduleNameSnapshot,
+        completionDateLabel: formatCertificateDate(cert.completionDate),
+        issuedAtLabel: formatCertificateDate(cert.issuedAt),
+        certificateId: cert.id,
+        status: cert.status,
+      };
+    },
+    {
+      ttlMs: 5 * 60 * 1000, // 5 minutes fresh
+      swrMs: 30 * 60 * 1000, // 30 minutes stale serving
+      tags: ["certificates"],
+    }
+  );
 }
