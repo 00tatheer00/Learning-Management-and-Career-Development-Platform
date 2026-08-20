@@ -1,17 +1,26 @@
 import crypto from "crypto";
 
-const BUNNY_STREAM_LIBRARY_ID = process.env.BUNNY_STREAM_LIBRARY_ID;
-const BUNNY_STREAM_API_KEY = process.env.BUNNY_STREAM_API_KEY;
-const BUNNY_STREAM_TOKEN_KEY = process.env.BUNNY_STREAM_TOKEN_KEY;
+function cleanEnv(val?: string | null): string {
+  if (!val) return "";
+  return val
+    .trim()
+    .replace(/^["'\\]+|["'\\]+$/g, "")
+    .replace(/^["']+|["']+$/g, "")
+    .trim();
+}
 
-function getBunnyConfig() {
-  if (!BUNNY_STREAM_LIBRARY_ID || !BUNNY_STREAM_API_KEY) {
+export function getBunnyConfig() {
+  const libraryId = cleanEnv(process.env.BUNNY_STREAM_LIBRARY_ID);
+  const apiKey = cleanEnv(process.env.BUNNY_STREAM_API_KEY);
+  const tokenKey = cleanEnv(process.env.BUNNY_STREAM_TOKEN_KEY);
+
+  if (!libraryId || !apiKey) {
     throw new Error("Bunny Stream library ID or API Key is not configured. Check your env variables.");
   }
   return {
-    libraryId: BUNNY_STREAM_LIBRARY_ID.trim(),
-    apiKey: BUNNY_STREAM_API_KEY.trim(),
-    tokenKey: BUNNY_STREAM_TOKEN_KEY?.trim() || "",
+    libraryId,
+    apiKey,
+    tokenKey,
   };
 }
 
