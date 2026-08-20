@@ -39,7 +39,12 @@ export async function GET() {
   }
 
   const allRecordings = await fetchMergedByProgram(programSlugs, getClassRecordings);
-  const recordings = filterByStudentModule(allRecordings, context, (item) => item.level);
+  const recordings = filterByStudentModule(
+    allRecordings,
+    context,
+    (item) => item.level,
+    (item) => item.programSlug
+  );
 
   return NextResponse.json(
     createApiResponse(true, {

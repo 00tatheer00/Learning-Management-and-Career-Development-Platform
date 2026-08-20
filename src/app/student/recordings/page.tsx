@@ -58,7 +58,11 @@ export default async function StudentRecordingsPage() {
           <ModuleStartsSoonNotice programSlug={primaryProgramSlug} studentModule={user.level} />
         </div>
       ) : (
-        <StudentRecordingsContent programSlug={primaryProgramSlug} recordings={recordings} />
+        <StudentRecordingsContent
+          programSlug={primaryProgramSlug}
+          recordings={recordings}
+          studentModule={user.level || undefined}
+        />
       )}
     </div>
   );

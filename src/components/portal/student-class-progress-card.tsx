@@ -9,11 +9,15 @@ import { cn } from "@/lib/utils";
 
 interface StudentClassProgressCardProps {
   programSlug: string;
+  studentLevel?: string | null;
 }
 
-export async function StudentClassProgressCard({ programSlug }: StudentClassProgressCardProps) {
+export async function StudentClassProgressCard({
+  programSlug,
+  studentLevel,
+}: StudentClassProgressCardProps) {
   const progress = getClassProgress(programSlug);
-  const recordings = await getClassRecordings(programSlug);
+  const recordings = await getClassRecordings(programSlug, studentLevel ?? undefined);
   const category = getProgramCategory(programSlug);
 
   if (!progress.config) return null;

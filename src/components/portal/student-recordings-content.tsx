@@ -16,6 +16,7 @@ interface StudentRecordingsContentProps {
   programSlug: string;
   recordings: ClassRecordingRecord[];
   adminView?: boolean;
+  studentModule?: string;
 }
 
 function statusStyles(status: ClassSlot["status"]) {
@@ -59,6 +60,7 @@ export function StudentRecordingsContent({
   programSlug,
   recordings,
   adminView = false,
+  studentModule,
 }: StudentRecordingsContentProps) {
   const progress = getClassProgress(programSlug);
   const category = getProgramCategory(programSlug);
@@ -81,10 +83,12 @@ export function StudentRecordingsContent({
         <div className="relative">
           <div className="flex items-center gap-2 text-white/90 text-xs font-bold uppercase tracking-widest">
             <Sparkle size={14} weight="fill" />
-            Class Journey
+            Class Journey {studentModule ? `· ${studentModule}` : ""}
           </div>
           <h2 className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight">
-            {progress.config?.programTitle ?? "Your Classes"}
+            {studentModule
+              ? `${progress.config?.programTitle ?? "Your Classes"} — ${studentModule}`
+              : progress.config?.programTitle ?? "Your Classes"}
           </h2>
           <p className="mt-2 text-sm text-white/90 max-w-xl">
             {progress.config?.daysLabel} · {progress.config?.timeLabel} (Pakistan time)
@@ -185,9 +189,16 @@ export function StudentRecordingsContent({
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-primary">
-                      Class {recording.classNumber}
-                    </p>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-primary">
+                        Class {recording.classNumber}
+                      </p>
+                      {recording.level && (
+                        <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
+                          {recording.level}
+                        </span>
+                      )}
+                    </div>
                     <p className="mt-1 text-lg font-bold text-pt group-hover:text-primary transition-colors">
                       {recording.title}
                     </p>

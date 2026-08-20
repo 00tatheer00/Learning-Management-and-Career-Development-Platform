@@ -7,32 +7,37 @@ import {
   deleteClassRecording,
   getClassRecordings,
   isValidRecordingUrl,
+  resolveCanonicalModule,
   upsertClassRecording,
 } from "@/lib/api/class-recordings";
 import { createApiResponse } from "@/lib/api/enrollment";
 
-export async function GET() {
+export async function GET(request: Request) {
   const user = await getCurrentUser();
   if (!user || user.role !== "trainer") {
     return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), { status: 403 });
   }
 
   try {
+    const { searchParams } = new URL(request.url);
+    const requestedModule = searchParams.get("module");
+
     const programSlug = requireTrainerProgram(user);
     const allRecordings = await getClassRecordings(programSlug);
 
     const programModules = getProgramModuleNames(programSlug);
-    const rawActiveLevel = user.level?.trim();
-    const activeLevel =
-      rawActiveLevel && rawActiveLevel !== "all"
-        ? rawActiveLevel
-        : programModules[0] || "HTML & CSS";
+    const activeScope = (requestedModule ?? user.level ?? "all").trim();
 
-    const normActive = activeLevel.toLowerCase().trim();
+    // If activeScope is "all", return all recordings
+    if (activeScope.toLowerCase() === "all") {
+      return NextResponse.json(createApiResponse(true, { data: allRecordings }));
+    }
+
+    const canonicalScope = resolveCanonicalModule(programSlug, activeScope);
 
     const recordings = allRecordings.filter((r) => {
-      const itemLevel = (r.level || programModules[0] || "HTML & CSS").toLowerCase().trim();
-      return itemLevel === normActive;
+      const itemCanonical = resolveCanonicalModule(r.programSlug, r.level);
+      return itemCanonical === canonicalScope;
     });
 
     return NextResponse.json(createApiResponse(true, { data: recordings }));
@@ -48,6 +53,7 @@ const upsertSchema = z.object({
   title: z.string().min(2).max(120),
   driveUrl: z.string().url().refine(isValidRecordingUrl, "Use a Google Drive, YouTube, or Loom link"),
   notes: z.string().max(500).optional(),
+  level: z.string().optional(),
 });
 
 export async function POST(request: Request) {
@@ -68,12 +74,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const programModules = getProgramModuleNames(programSlug);
-    const rawActiveLevel = user.level?.trim();
-    const activeLevel =
-      rawActiveLevel && rawActiveLevel !== "all"
-        ? rawActiveLevel
-        : programModules[0] || "HTML & CSS";
+    const rawActiveLevel = parsed.data.level?.trim() || user.level?.trim();
+    const activeLevel = resolveCanonicalModule(programSlug, rawActiveLevel);
 
     const recording = await upsertClassRecording({
       programSlug,

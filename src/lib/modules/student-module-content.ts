@@ -68,11 +68,19 @@ export function canStudentAccessModuleContent(
     ? normalizeModuleName(studentLevel)
     : normalizedApprovedList[0] || "";
 
-  const enrolledSet = new Set(
-    [...normalizedApprovedList, activeLevelNormalized].filter(Boolean)
-  );
+  // If approved levels list is provided, verify student has approval for this content
+  if (normalizedApprovedList.length > 0) {
+    if (!normalizedApprovedList.includes(contentNormalized)) {
+      return false;
+    }
+  }
 
-  return enrolledSet.has(contentNormalized);
+  // If student has an active module selected, match that active module
+  if (activeLevelNormalized) {
+    return activeLevelNormalized === contentNormalized;
+  }
+
+  return true;
 }
 
 export function filterByStudentModule<T>(

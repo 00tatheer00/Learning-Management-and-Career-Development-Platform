@@ -190,7 +190,10 @@ export default async function StudentDashboardPage() {
                 />
               </StudentStaggerItem>
               <StudentStaggerItem>
-                <StudentClassProgressCard programSlug={primaryProgramSlug} />
+                <StudentClassProgressCard
+                  programSlug={primaryProgramSlug}
+                  studentLevel={user.level}
+                />
               </StudentStaggerItem>
             </StudentStagger>
           )}

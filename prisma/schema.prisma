@@ -228,7 +228,7 @@ model ClassRecording {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  @@unique([programSlug, classNumber])
+  @@unique([programSlug, level, classNumber])
   @@index([programSlug, level])
 }
 
@@ -340,4 +340,76 @@ model Notification {
   @@index([userId, isRead])
   @@index([userId, createdAt])
 }
+
+model Batch {
+  id          String    @id @map("_id")
+  name        String
+  code        String    @unique
+  programSlug String    @default("all")
+  startDate   DateTime?
+  endDate     DateTime?
+  status      String    @default("active")
+  maxStudents Int?
+  notes       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([programSlug, status])
+}
+
+model AuditLog {
+  id         String   @id @map("_id")
+  actorId    String
+  actorEmail String
+  action     String
+  targetType String
+  targetId   String
+  details    String?
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  @@index([actorId])
+  @@index([action])
+  @@index([targetType, targetId])
+  @@index([createdAt])
+}
+
+model DiscussionThread {
+  id          String   @id @map("_id")
+  programSlug String
+  moduleName  String?
+  lectureId   String?
+  authorId    String
+  authorName  String
+  authorRole  UserRole
+  title       String
+  content     String
+  isPinned    Boolean  @default(false)
+  isResolved  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  replies DiscussionReply[]
+
+  @@index([programSlug, moduleName])
+  @@index([authorId])
+  @@index([createdAt])
+}
+
+model DiscussionReply {
+  id                 String   @id @map("_id")
+  threadId           String
+  authorId           String
+  authorName         String
+  authorRole         UserRole
+  content            String
+  isInstructorAnswer Boolean  @default(false)
+  createdAt          DateTime @default(now())
+
+  thread DiscussionThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@index([threadId])
+  @@index([authorId])
+}
+
 
