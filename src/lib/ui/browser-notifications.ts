@@ -63,10 +63,3 @@ export function notifyAdminNewRegistration(fullName: string, courseTitle: string
     tag: "eest-new-registration",
   });
 }
-
-export function notifyAdminWhatsAppMessage(contactName: string, preview: string) {
-  showBrowserNotification("WhatsApp message", {
-    body: `${contactName}: ${preview}`,
-    tag: "eest-whatsapp-inbox",
-  });
-}

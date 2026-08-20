@@ -5,7 +5,6 @@ import {
   ClipboardText,
   VideoCamera,
   Users,
-  ChatsCircle,
   UserCircle,
   Gear,
   ChartBar,
@@ -39,7 +38,6 @@ export const PORTAL_NAV: Record<UserRole, PortalNavItem[]> = {
     { href: "/student/attendance", label: "Attendance", icon: ListChecks, description: "Your attendance %" },
     { href: "/student/certificates", label: "Certificates", icon: Certificate, description: "Module certificates" },
     { href: "/student/trainer", label: "My Trainer", icon: ChalkboardTeacher, description: "Your instructor" },
-    { href: "/student/whatsapp", label: "WhatsApp", icon: ChatsCircle, description: "Class group chat" },
     { href: "/student/profile", label: "Profile", icon: UserCircle, description: "Account & logins" },
   ],
   trainer: [
@@ -59,7 +57,6 @@ export const PORTAL_NAV: Record<UserRole, PortalNavItem[]> = {
     { href: "/admin/live-classes", label: "Portal Classes", icon: Broadcast, description: "In-portal video rooms" },
     { href: "/admin/enrollments", label: "Registrations", icon: ClipboardText, description: "Approve new students" },
     { href: "/admin/certificates", label: "Certificates", icon: Certificate, description: "Module certificates" },
-    { href: "/admin/communication", label: "WhatsApp", icon: ChatsCircle, description: "Inbox & replies" },
     { href: "/admin/students", label: "Students", icon: GraduationCap, description: "All students" },
     { href: "/admin/credentials", label: "Portal Logins", icon: Key, description: "Student login IDs & passwords" },
     { href: "/admin/attendance", label: "Attendance", icon: ListChecks, description: "Day & module-wise attendance" },
@@ -74,7 +71,6 @@ export const PORTAL_NAV: Record<UserRole, PortalNavItem[]> = {
     { href: "/admin/live-classes", label: "Portal Classes", icon: Broadcast, description: "In-portal video rooms" },
     { href: "/admin/enrollments", label: "Registrations", icon: ClipboardText, description: "Manage applications" },
     { href: "/admin/certificates", label: "Certificates", icon: Certificate, description: "Module certificates" },
-    { href: "/admin/communication", label: "WhatsApp", icon: ChatsCircle, description: "Inbox & replies" },
     { href: "/admin/students", label: "Students", icon: GraduationCap, description: "All students" },
     { href: "/admin/credentials", label: "Portal Logins", icon: Key, description: "Student login IDs" },
     { href: "/admin/attendance", label: "Attendance", icon: ListChecks, description: "Day & module-wise attendance" },
@@ -134,7 +130,6 @@ export const STUDENT_PAGE_TITLES: Record<string, string> = {
   "/student/attendance": "Attendance",
   "/student/certificates": "Certificates",
   "/student/trainer": "My Trainer",
-  "/student/whatsapp": "WhatsApp",
   "/student/profile": "Profile",
 };
 

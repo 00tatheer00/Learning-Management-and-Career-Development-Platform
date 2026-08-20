@@ -86,19 +86,17 @@ export function PaymentInfoCard({ className, compact = false, amount }: PaymentI
           <span>📸</span> Share receipt screenshot in the form below
         </p>
         <p className="mt-1 text-slate-700 dark:text-slate-300 leading-relaxed">
-          After approval of your payment, you will get a confirmation message or email with your portal access!
+          After approval of your payment, you will receive an email confirmation with your portal access!
         </p>
       </div>
 
       <div className="mt-3 pt-2 border-t border-emerald-200/60 flex items-center justify-between text-xs">
         <span className="text-muted font-medium">Need payment help?</span>
         <a
-          href="https://wa.me/923374005515?text=Hello%20EEST%20Team%2C%20I%20need%20help%20with%20my%20registration%20payment."
-          target="_blank"
-          rel="noopener noreferrer"
+          href="/contact"
           className="inline-flex items-center gap-1 font-bold text-emerald-700 dark:text-emerald-300 hover:underline"
         >
-          <span>WhatsApp Support &rarr;</span>
+          <span>Contact Support &rarr;</span>
         </a>
       </div>
     </div>

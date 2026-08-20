@@ -45,7 +45,7 @@ export function AdminReadOnlyBanner() {
   return (
     <div className="portal-readonly-banner mb-4 rounded-xl border px-4 py-3 text-sm">
       <strong>Approve / Reject:</strong> Only Tatheer can approve or reject registrations.
-      You can handle everything else — students, portal logins, trainers, deletes, WhatsApp resend,
+      You can handle everything else — students, portal logins, trainers, deletes,
       exports, and settings.
     </div>
   );

@@ -8,7 +8,6 @@ import {
   Key,
   MagnifyingGlass,
   ArrowClockwise,
-  ChatsCircle,
   EnvelopeSimple,
   PencilSimple,
   Warning,
@@ -19,8 +18,6 @@ import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
 import { ENROLLABLE_PROGRAM_SLUGS } from "@/lib/constants/payment";
 import { getProgramCategory } from "@/lib/constants/program-categories";
-import { getProgramBySlug } from "@/lib/data/programs";
-import { buildStudentLoginWhatsAppMessage } from "@/lib/notifications/approval-templates";
 import { cn, formatAppliedDateTime } from "@/lib/utils";
 import { copyToClipboard } from "@/lib/utils/clipboard";
 import { PORTAL_VIEWPORT_PANEL } from "@/lib/constants/portal-layout";
@@ -29,11 +26,6 @@ import { useAdminPermissions } from "@/components/admin/admin-permissions";
 import { OpenStudentProfileButton, AdminStudentProfileButton } from "@/components/admin/admin-student-profile-drawer";
 import type { AdminCredentialRow } from "@/lib/api/admin-credentials";
 import { revealEnrollmentPassword } from "@/lib/api/admin-client";
-import {
-  getWhatsAppDirectLink,
-  buildApprovalWhatsAppMessage,
-  isDummyPhoneNumber,
-} from "@/lib/utils/whatsapp-direct";
 
 interface CredentialsMeta {
   total: number;
@@ -172,23 +164,6 @@ export function AdminCredentialsPanel() {
     await copyText("Password", password);
   };
 
-  const copyWhatsAppMessageForRow = async (row: AdminCredentialRow) => {
-    const password = await fetchPasswordForRow(row);
-    if (!password) return;
-
-    const programLevel = getProgramBySlug(row.programSlug)?.level ?? "—";
-    const message = buildStudentLoginWhatsAppMessage({
-      studentName: row.name,
-      email: row.email,
-      password,
-      courseName: row.course,
-      module: row.module,
-      level: programLevel,
-      loginUrl: row.loginUrl,
-    });
-    await copyText("WhatsApp message", message);
-  };
-
   const copyLoginDetailsForRow = async (row: AdminCredentialRow) => {
     const password = await fetchPasswordForRow(row);
     if (!password) return;
@@ -196,45 +171,6 @@ export function AdminCredentialsPanel() {
       "Login details",
       `Login ID: ${row.email}\nPassword: ${password}\nPortal: ${row.loginUrl}`
     );
-  };
-
-  const handleCopyWhatsAppMessage = async (row: AdminCredentialRow) => {
-    const password = row.password ?? undefined;
-    const text = buildStudentLoginWhatsAppMessage({
-      studentName: row.name,
-      email: row.email,
-      password: password || "[Stored in Portal Vault]",
-      courseName: row.course,
-      module: row.module,
-      level: row.module,
-      loginUrl: row.loginUrl,
-    });
-    const copied = await copyToClipboard(text);
-    if (copied) {
-      toast.success("WhatsApp Message Copied", `Full WhatsApp login message for ${row.name} copied to clipboard. Paste in WhatsApp to send.`);
-    } else {
-      toast.error("Could not copy WhatsApp message");
-    }
-  };
-
-  const handleResendWhatsApp = (row: AdminCredentialRow) => {
-    if (isDummyPhoneNumber(row.whatsapp)) {
-      toast.warning(
-        "Placeholder Phone Number",
-        `Student ${row.name} has a placeholder phone number (${row.whatsapp || "N/A"}). Update to a real WhatsApp number to chat.`
-      );
-    } else {
-      toast.success("Opening WhatsApp", `Opening WhatsApp chat for ${row.name}...`);
-    }
-    const text = buildApprovalWhatsAppMessage({
-      studentName: row.name,
-      programTitle: row.course,
-      moduleLevel: row.module,
-      email: row.email,
-      portalLoginUrl: row.loginUrl,
-    });
-    const link = getWhatsAppDirectLink(row.whatsapp, text);
-    window.open(link, "_blank");
   };
 
   const handleSendLoginEmail = async (row: AdminCredentialRow) => {
@@ -543,7 +479,7 @@ export function AdminCredentialsPanel() {
           <div>
             <h1 className="text-xl font-bold text-foreground">Portal Logins</h1>
             <p className="text-xs text-muted mt-0.5">
-              Student credentials · share via WhatsApp
+              Student credentials and portal vault
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -737,18 +673,6 @@ export function AdminCredentialsPanel() {
                       <EnvelopeSimple size={14} weight="fill" />
                       Email
                     </Button>
-                    {!row.isDemo && (
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        className="h-8 text-xs"
-                        disabled={loadingId === row.id}
-                        title="After student messages +92 321 5919502 with Portal login"
-                        onClick={() => void handleResendWhatsApp(row)}
-                      >
-                        WhatsApp
-                      </Button>
-                    )}
                   </>
                 )}
               </div>
@@ -764,7 +688,7 @@ export function AdminCredentialsPanel() {
             <thead className="sticky top-0 z-10 border-b border-border bg-surface/95 backdrop-blur-sm">
               <tr>
                 <th className="px-3 py-2.5 text-left text-xs font-semibold">Student</th>
-                <th className="px-3 py-2.5 text-left text-xs font-semibold">WhatsApp</th>
+                <th className="px-3 py-2.5 text-left text-xs font-semibold">Phone</th>
                 <th className="px-3 py-2.5 text-left text-xs font-semibold">Course</th>
                 <th className="px-3 py-2.5 text-left text-xs font-semibold">Login</th>
                 <th className="px-3 py-2.5 text-left text-xs font-semibold">Login ID</th>
@@ -933,26 +857,6 @@ export function AdminCredentialsPanel() {
                               >
                                 <EnvelopeSimple size={14} weight="fill" />
                               </button>
-                              {!row.isDemo && (
-                                <>
-                                  <button
-                                    type="button"
-                                    title="Copy formatted WhatsApp login message to paste manually"
-                                    onClick={() => void handleCopyWhatsAppMessage(row)}
-                                    className="rounded border border-[#25D366]/40 bg-[#25D366]/10 p-1.5 text-[#128C7E] hover:bg-[#25D366]/20"
-                                  >
-                                    <Copy size={14} />
-                                  </button>
-                                  <button
-                                    type="button"
-                                    title="Open WhatsApp chat with pre-filled message"
-                                    onClick={() => void handleResendWhatsApp(row)}
-                                    className="rounded border border-[#25D366]/40 bg-[#25D366]/10 p-1.5 text-[#128C7E] hover:bg-[#25D366]/20 disabled:opacity-40"
-                                  >
-                                    <ChatsCircle size={14} weight="fill" />
-                                  </button>
-                                </>
-                              )}
                               <button
                                 type="button"
                                 title="Repair all module logins for this student"
@@ -975,12 +879,12 @@ export function AdminCredentialsPanel() {
                           )}
                           <button
                             type="button"
-                            title="Copy WhatsApp message"
+                            title="Copy login details"
                             disabled={loadingId === row.id}
-                            onClick={() => void copyWhatsAppMessageForRow(row)}
+                            onClick={() => void copyLoginDetailsForRow(row)}
                             className="rounded border border-border p-1.5 hover:bg-surface disabled:opacity-40"
                           >
-                            <ChatsCircle size={14} weight="duotone" />
+                            <Copy size={14} />
                           </button>
                         </div>
                       </td>
@@ -1074,27 +978,6 @@ export function AdminCredentialsPanel() {
               >
                 <Copy size={16} />
                 Copy Login
-              </Button>
-              <Button
-                variant="secondary"
-                className="gap-2"
-                onClick={() =>
-                  void copyText(
-                    "WhatsApp message",
-                    buildStudentLoginWhatsAppMessage({
-                      studentName: credentialModal.name,
-                      email: credentialModal.loginId,
-                      password: credentialModal.password,
-                      courseName: credentialModal.course,
-                      module: credentialModal.module,
-                      level: getProgramBySlug(credentialModal.programSlug)?.level ?? "—",
-                      loginUrl: credentialModal.loginUrl,
-                    })
-                  )
-                }
-              >
-                <ChatsCircle size={16} />
-                Copy WhatsApp Text
               </Button>
             </div>
           </div>

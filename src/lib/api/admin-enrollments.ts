@@ -20,8 +20,6 @@ export interface AdminEnrollmentRow extends Omit<EnrollmentRecord, "paymentScree
   duplicateMatch: DuplicateMatchInfo | null;
   approvalEmailSent?: boolean | null;
   approvalEmailError?: string | null;
-  approvalWhatsAppSent?: boolean | null;
-  approvalWhatsAppError?: string | null;
   hasPaymentScreenshot: boolean;
 }
 
@@ -84,8 +82,6 @@ export async function getAdminEnrollmentRows(options?: {
       adminNotes: record.adminNotes ?? undefined,
       approvalEmailSent: record.approvalEmailSent,
       approvalEmailError: record.approvalEmailError ?? undefined,
-      approvalWhatsAppSent: record.approvalWhatsAppSent,
-      approvalWhatsAppError: record.approvalWhatsAppError ?? undefined,
       createdAt: record.createdAt.toISOString(),
       courseTitle: getProgramBySlug(record.program)?.title ?? record.program,
       reviewerName: record.reviewedBy
@@ -172,8 +168,6 @@ export async function getAdminEnrollmentPaginated(options?: {
       adminNotes: record.adminNotes ?? undefined,
       approvalEmailSent: record.approvalEmailSent,
       approvalEmailError: record.approvalEmailError ?? undefined,
-      approvalWhatsAppSent: record.approvalWhatsAppSent,
-      approvalWhatsAppError: record.approvalWhatsAppError ?? undefined,
       createdAt: record.createdAt.toISOString(),
       courseTitle: getProgramBySlug(record.program)?.title ?? record.program,
       reviewerName: record.reviewedBy

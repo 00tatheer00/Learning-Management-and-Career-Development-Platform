@@ -1,5 +1,5 @@
 import {
-  WhatsappLogo,
+  GraduationCap,
   VideoCamera,
   PlayCircle,
   Exam,
@@ -11,7 +11,7 @@ import { PAYMENT_CONFIG } from "@/lib/constants/payment";
 import { cn } from "@/lib/utils";
 
 const ACCESS_ICONS = [
-  WhatsappLogo,
+  GraduationCap,
   VideoCamera,
   PlayCircle,
   Exam,

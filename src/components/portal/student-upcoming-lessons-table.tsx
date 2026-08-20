@@ -34,7 +34,7 @@ export function StudentUpcomingLessonsTable({
 
       {rows.length === 0 ? (
         <div className="px-5 py-10 text-center text-sm text-pt-muted">
-          No classes scheduled yet. Check back soon or join the WhatsApp group for updates.
+          No classes scheduled yet. Check back soon for updates from your trainer.
         </div>
       ) : (
         <div className="overflow-x-auto">

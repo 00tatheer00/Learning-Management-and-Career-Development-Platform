@@ -64,7 +64,6 @@ export async function PATCH(request: Request) {
       void sendSubmissionReviewNotifications({
         studentName: student.name,
         email: student.email,
-        whatsapp: student.phone ?? undefined,
         assignmentTitle: existing.assignment.title,
         status: parsed.data.status,
         feedback: parsed.data.feedback,

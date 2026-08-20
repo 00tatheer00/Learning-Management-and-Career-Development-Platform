@@ -90,10 +90,10 @@ export default async function StudentCoursePage() {
         {materials.length === 0 && lectures.length === 0 ? (
           <EmptyState
             title="No lessons for your module yet"
-            description="Your trainer will add videos for your module soon. Check WhatsApp for updates."
+            description="Your trainer will upload videos and materials for your module soon."
             action={
               <Button asChild>
-                <Link href="/student/whatsapp">Open WhatsApp Group</Link>
+                <Link href="/student/classes">View Live Classes</Link>
               </Button>
             }
           />

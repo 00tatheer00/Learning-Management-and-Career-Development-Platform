@@ -110,23 +110,16 @@ export async function PATCH(request: Request) {
           );
         }
 
-        const whatsapp = student.phone ?? enrollment.whatsapp ?? "";
         const notifications = await sendPasswordResetNotifications({
           fullName: student.name,
           email: student.email,
-          whatsapp,
           password: plainPassword,
         });
 
-        const parts: string[] = [];
-        if (notifications.whatsappSent) parts.push("WhatsApp");
-
         const notificationSummary =
-          parts.length > 0
-            ? ` New password sent via ${parts.join(" and ")}.`
-            : notifications.warnings.length > 0
-              ? ` Password saved but WhatsApp failed: ${notifications.warnings.join("; ")}`
-              : ` Password saved for ${enrollment.level}.`;
+          notifications.warnings.length > 0
+            ? ` Password saved with warnings: ${notifications.warnings.join("; ")}`
+            : ` New password saved for ${enrollment.level}.`;
 
         return NextResponse.json(
           createApiResponse(true, {
@@ -173,23 +166,16 @@ export async function PATCH(request: Request) {
 
       await savePortalPasswordForStudentEmail(student.email, plainPassword);
 
-      const whatsapp = student.phone ?? latestEnrollment.whatsapp ?? "";
       const notifications = await sendPasswordResetNotifications({
         fullName: student.name,
         email: student.email,
-        whatsapp,
         password: plainPassword,
       });
 
-      const parts: string[] = [];
-      if (notifications.whatsappSent) parts.push("WhatsApp");
-
       const notificationSummary =
-        parts.length > 0
-          ? ` New password sent via ${parts.join(" and ")}.`
-          : notifications.warnings.length > 0
-            ? ` Password saved but WhatsApp failed: ${notifications.warnings.join("; ")}`
-            : " Password saved in Portal Logins.";
+        notifications.warnings.length > 0
+          ? ` Password saved with warnings: ${notifications.warnings.join("; ")}`
+          : " Password saved in Portal Logins.";
 
       return NextResponse.json(
         createApiResponse(true, {

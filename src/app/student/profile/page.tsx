@@ -31,7 +31,7 @@ export default async function StudentProfilePage() {
   const fields = [
     { icon: UserCircle, label: "Full Name", value: user.name },
     { icon: Envelope, label: "Email", value: user.email },
-    { icon: Phone, label: "Phone / WhatsApp", value: user.phone ?? "—" },
+    { icon: Phone, label: "Phone / Contact Number", value: user.phone ?? "—" },
     { icon: BookOpen, label: "Program Category", value: category?.sidebarLabel ?? program?.title ?? "—" },
     { icon: GraduationCap, label: "Active Module", value: user.level ?? "—" },
     { icon: ChalkboardTeacher, label: "Assigned Trainer", value: trainer?.name ?? "—" },

@@ -12,7 +12,6 @@ import {
   CheckSquare,
   Trash,
   Copy,
-  ChatsCircle,
   ArrowCounterClockwise,
   EnvelopeSimple,
 } from "@phosphor-icons/react";
@@ -25,7 +24,6 @@ import { ENROLLABLE_PROGRAM_SLUGS, getProgramRegistrationFee } from "@/lib/const
 import { ADMIN_REJECT_PRESETS } from "@/lib/constants/admin-reject-reasons";
 import { getProgramCategory } from "@/lib/constants/program-categories";
 import { formatAppliedDate, formatAppliedDateTime, formatAppliedTime, cn } from "@/lib/utils";
-import { copyToClipboard } from "@/lib/utils/clipboard";
 import { toast } from "@/lib/ui/toast";
 import { playPortalSound, primePortalSounds } from "@/lib/ui/portal-sounds";
 import { Alert } from "@/components/ui/alert";
@@ -38,16 +36,10 @@ import {
 } from "@/lib/constants/batch";
 import type { AdminEnrollmentRow } from "@/lib/api/admin-enrollments";
 import { paymentScreenshotHref } from "@/lib/api/admin-client";
-import {
-  getWhatsAppDirectLink,
-  buildApprovalWhatsAppMessage,
-  buildRejectionWhatsAppMessage,
-  isDummyPhoneNumber,
-} from "@/lib/utils/whatsapp-direct";
 
 type StatusFilter = "all" | "pending" | "approved" | "rejected";
 type PhaseFilter = "all" | RegistrationPhase;
-type QuickFilter = "all" | "today" | "returning" | "duplicates" | "whatsapp-failed" | "no-payment";
+type QuickFilter = "all" | "today" | "returning" | "duplicates" | "no-payment";
 type PendingAction = { id: string; type: "approved" | "rejected"; name: string };
 
 function isCreatedToday(iso: string): boolean {
@@ -176,12 +168,6 @@ export function AdminEnrollmentsPanel() {
       if (quickFilter === "today" && !isCreatedToday(enrollment.createdAt)) return false;
       if (quickFilter === "returning" && !enrollment.isReturningApplicant) return false;
       if (quickFilter === "duplicates" && !enrollment.duplicateMatch) return false;
-      if (
-        quickFilter === "whatsapp-failed" &&
-        !(enrollment.status === "approved" && enrollment.approvalWhatsAppSent === false)
-      ) {
-        return false;
-      }
       if (quickFilter === "no-payment" && enrollment.hasPaymentScreenshot) {
         return false;
       }
@@ -464,7 +450,6 @@ export function AdminEnrollmentsPanel() {
               { value: "today", label: "Today" },
               { value: "returning", label: "Returning" },
               { value: "duplicates", label: "Duplicate CNIC/Email" },
-              { value: "whatsapp-failed", label: "WhatsApp failed" },
               { value: "no-payment", label: "No payment SS" },
             ] as const
           ).map((item) => (
@@ -706,70 +691,25 @@ export function AdminEnrollmentsPanel() {
                         <Field label="Email" value={enrollment.email} />
                         <div className="flex items-center justify-between gap-2 rounded-lg bg-surface px-3 py-1.5 border border-border/50">
                           <div>
-                            <p className="text-[10px] font-bold uppercase tracking-wider text-muted">WhatsApp</p>
+                            <p className="text-[10px] font-bold uppercase tracking-wider text-muted">Phone</p>
                             <p className="font-mono text-sm font-semibold">{enrollment.whatsapp}</p>
                           </div>
-                          <div className="flex items-center gap-1.5">
-                            <button
-                              type="button"
-                              onClick={async () => {
-                                const msg =
-                                  enrollment.status === "approved"
-                                    ? buildApprovalWhatsAppMessage({
-                                        studentName: enrollment.fullName,
-                                        programTitle: enrollment.courseTitle,
-                                        moduleLevel: enrollment.level,
-                                        email: enrollment.email,
-                                      })
-                                    : enrollment.status === "rejected"
-                                      ? buildRejectionWhatsAppMessage({
-                                          studentName: enrollment.fullName,
-                                          programTitle: enrollment.courseTitle,
-                                          moduleLevel: enrollment.level,
-                                          reason: enrollment.adminNotes || undefined,
-                                        })
-                                      : `Assalam-o-Alaikum ${enrollment.fullName}! This is Emerging Edge School regarding your ${enrollment.courseTitle} (${enrollment.level}) application.`;
-                                const copied = await copyToClipboard(msg);
-                                if (copied) {
-                                  toast.success("WhatsApp Message Copied", "Paste it directly in WhatsApp chat to send to student.");
-                                } else {
-                                  toast.error("Failed to copy message");
-                                }
-                              }}
-                              className="inline-flex items-center gap-1 rounded-lg bg-surface hover:bg-border/60 border border-border px-2 py-1 text-xs font-bold text-foreground transition-all shadow-2xs"
-                              title="Copy formatted WhatsApp message to clipboard"
-                            >
-                              <Copy size={13} />
-                              Copy Msg
-                            </button>
-                            <a
-                              href={getWhatsAppDirectLink(
-                                enrollment.whatsapp,
-                                enrollment.status === "approved"
-                                  ? buildApprovalWhatsAppMessage({
-                                      studentName: enrollment.fullName,
-                                      programTitle: enrollment.courseTitle,
-                                      moduleLevel: enrollment.level,
-                                      email: enrollment.email,
-                                    })
-                                  : enrollment.status === "rejected"
-                                    ? buildRejectionWhatsAppMessage({
-                                        studentName: enrollment.fullName,
-                                        programTitle: enrollment.courseTitle,
-                                        moduleLevel: enrollment.level,
-                                        reason: enrollment.adminNotes || undefined,
-                                      })
-                                    : `Assalam-o-Alaikum ${enrollment.fullName}! This is Emerging Edge School regarding your ${enrollment.courseTitle} (${enrollment.level}) application.`
-                              )}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600/10 px-2.5 py-1 text-xs font-extrabold text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 hover:bg-emerald-600 hover:text-white transition-all shadow-2xs"
-                              title="Open WhatsApp Direct Chat"
-                            >
-                              <ChatsCircle size={15} weight="fill" />
-                              Chat
-                            </a>
-                          </div>
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              try {
+                                await navigator.clipboard.writeText(enrollment.whatsapp);
+                                toast.success("Phone copied");
+                              } catch {
+                                toast.error("Could not copy phone");
+                              }
+                            }}
+                            className="inline-flex items-center gap-1 rounded-lg bg-surface hover:bg-border/60 border border-border px-2 py-1 text-xs font-bold text-foreground transition-all shadow-2xs"
+                            title="Copy phone number"
+                          >
+                            <Copy size={13} />
+                            Copy
+                          </button>
                         </div>
                         <Field label="CNIC" value={enrollment.cnic} mono />
                         <Field label="Institution" value={enrollment.institution} />
@@ -1136,74 +1076,6 @@ export function AdminEnrollmentsPanel() {
               {!approvedCredentials.emailSent && approvedCredentials.emailError && (
                 <p className="mt-1 text-xs opacity-90">{approvedCredentials.emailError}</p>
               )}
-            </div>
-
-            {/* Option 1: 1-Click WhatsApp Direct Chat Button */}
-            <div className="mt-3 rounded-xl p-4 text-sm border border-emerald-300/80 bg-emerald-500/10 dark:bg-emerald-950/30">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                <div>
-                  <p className="font-extrabold text-emerald-800 dark:text-emerald-300 flex items-center gap-2">
-                    <ChatsCircle size={18} weight="fill" className="text-emerald-600" />
-                    Send WhatsApp Congrats (1-Click)
-                  </p>
-                  <p className="mt-0.5 text-xs text-emerald-700/90 dark:text-emerald-400">
-                    Opens WhatsApp Web / Mobile App with pre-filled congrats message.
-                  </p>
-                </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      const msg = buildApprovalWhatsAppMessage({
-                        studentName: approvedCredentials.name,
-                        programTitle: approvedCredentials.courseTitle || "Course Module",
-                        moduleLevel: approvedCredentials.moduleLevel,
-                        email: approvedCredentials.loginId,
-                        password: approvedCredentials.password,
-                        portalLoginUrl: approvedCredentials.loginUrl,
-                      });
-                      const copied = await copyToClipboard(msg);
-                      if (copied) {
-                        toast.success("WhatsApp Message Copied", `Message for ${approvedCredentials.name} copied. Paste in WhatsApp to send.`);
-                      } else {
-                        toast.error("Failed to copy message");
-                      }
-                    }}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-surface border border-border px-3 py-2 text-xs font-bold text-foreground hover:bg-border/60 transition-all shadow-2xs"
-                    title="Copy formatted WhatsApp message to clipboard"
-                  >
-                    <Copy size={15} />
-                    <span>Copy Msg</span>
-                  </button>
-                  <a
-                    href={getWhatsAppDirectLink(
-                      approvedCredentials.phone || approvedCredentials.loginId,
-                      buildApprovalWhatsAppMessage({
-                        studentName: approvedCredentials.name,
-                        programTitle: approvedCredentials.courseTitle || "Course Module",
-                        moduleLevel: approvedCredentials.moduleLevel,
-                        email: approvedCredentials.loginId,
-                        password: approvedCredentials.password,
-                        portalLoginUrl: approvedCredentials.loginUrl,
-                      })
-                    )}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => {
-                      if (isDummyPhoneNumber(approvedCredentials?.phone)) {
-                        toast.warning(
-                          "Placeholder Phone Number",
-                          `This student has a placeholder phone number (${approvedCredentials?.phone || "N/A"}). Update to a real WhatsApp number to chat.`
-                        );
-                      }
-                    }}
-                    className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-black uppercase tracking-wider text-white shadow-md hover:bg-emerald-700 transition-all shrink-0"
-                  >
-                    <ChatsCircle size={18} weight="fill" />
-                    <span>Open WhatsApp</span>
-                  </a>
-                </div>
-              </div>
             </div>
 
             <div className="mt-4 rounded-xl border border-border bg-surface p-4 space-y-2 text-sm">

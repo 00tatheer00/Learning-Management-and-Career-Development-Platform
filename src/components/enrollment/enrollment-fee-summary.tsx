@@ -57,7 +57,7 @@ export function EnrollmentFeeSummary({
 
           <div className="flex items-center gap-2">
             <Users size={13} className="text-sky-500 shrink-0" />
-            <span>Student Portal &amp; Batch WhatsApp Group Access</span>
+            <span>Dedicated Student Portal &amp; Batch Community Access</span>
           </div>
 
           <div className="flex items-center gap-2">

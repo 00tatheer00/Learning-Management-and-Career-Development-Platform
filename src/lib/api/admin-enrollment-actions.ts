@@ -177,8 +177,6 @@ export async function approveEnrollmentAndCreateAccount(
     data: {
       approvalEmailSent: notifications.emailSent,
       approvalEmailError: emailError,
-      approvalWhatsAppSent: notifications.whatsappSent,
-      approvalWhatsAppError: whatsappError,
     },
   });
 

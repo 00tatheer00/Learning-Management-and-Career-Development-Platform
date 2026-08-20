@@ -31,7 +31,6 @@ import {
   AdminRevenueSidebarCard,
 } from "@/components/admin/admin-revenue-side-panel";
 import { useAdminAlertsOptional } from "@/components/admin/admin-alerts-provider";
-import { useAdminWhatsAppInboxOptional } from "@/components/admin/admin-whatsapp-inbox-provider";
 import { isAdminRole } from "@/lib/auth/admin-roles";
 import {
   PortalThemeProvider,
@@ -91,7 +90,6 @@ function PortalShellInner({ user, children }: PortalShellProps) {
   const { theme } = usePortalTheme();
   const isStudent = user.role === "student";
   const isAdmin = isAdminRole(user.role);
-  const isWhatsAppInbox = pathname === "/admin/communication";
   const logoutLabel = "Logout";
   const websiteLabel = "Website";
   const headerTitle = isAdmin
@@ -258,16 +256,13 @@ function PortalShellInner({ user, children }: PortalShellProps) {
         <main
           id="main-content"
           className={cn(
-            "flex-1 min-h-0 overflow-x-hidden",
-            isWhatsAppInbox
-              ? "overflow-hidden p-0 lg:p-8"
-              : cn("overflow-y-auto p-4 sm:p-6 lg:p-8", isStudent && "pb-24 lg:pb-8")
+            "flex-1 min-h-0 overflow-x-hidden overflow-y-auto p-4 sm:p-6 lg:p-8",
+            isStudent && "pb-24 lg:pb-8"
           )}
         >
           <div
             className={cn(
-              isStudent && "student-portal-content relative z-[1] mx-auto max-w-7xl w-full",
-              isWhatsAppInbox && "h-full flex flex-col min-h-0 w-full max-lg:max-w-none"
+              isStudent && "student-portal-content relative z-[1] mx-auto max-w-7xl w-full"
             )}
           >
             {children}
@@ -300,7 +295,6 @@ function SidebarContent({
   onToggleCollapse?: () => void;
 }) {
   const adminAlerts = useAdminAlertsOptional();
-  const whatsAppInbox = useAdminWhatsAppInboxOptional();
   const studentBadges = useStudentPortalBadgesOptional();
   const enrollmentBadgeCount =
     adminAlerts && isAdminRole(user.role)
@@ -308,8 +302,6 @@ function SidebarContent({
         ? adminAlerts.unreadCount
         : adminAlerts.pendingCount
       : 0;
-  const whatsAppBadgeCount =
-    whatsAppInbox && isAdminRole(user.role) ? whatsAppInbox.totalUnread : 0;
 
   const isAdmin = isAdminRole(user.role);
   const isStudent = user.role === "student";
@@ -437,8 +429,6 @@ function SidebarContent({
                 const Icon = item.icon;
                 const showEnrollmentBadge =
                   item.href === "/admin/enrollments" && enrollmentBadgeCount > 0;
-                const showWhatsAppBadge =
-                  item.href === "/admin/communication" && whatsAppBadgeCount > 0;
                 const showAssignmentsBadge =
                   isStudent && item.href === "/student/assignments" && (studentBadges?.assignments ?? 0) > 0;
                 const showClassesBadge =
@@ -447,13 +437,11 @@ function SidebarContent({
                   isStudent && item.href === "/student/certificates" && (studentBadges?.certificates ?? 0) > 0;
                 const navBadgeCount = showEnrollmentBadge
                   ? enrollmentBadgeCount
-                  : showWhatsAppBadge
-                    ? whatsAppBadgeCount
-                    : showAssignmentsBadge
-                      ? studentBadges?.assignments ?? 0
-                      : showClassesBadge
-                        ? studentBadges?.classes ?? 0
-                        : 0;
+                  : showAssignmentsBadge
+                    ? studentBadges?.assignments ?? 0
+                    : showClassesBadge
+                      ? studentBadges?.classes ?? 0
+                      : 0;
                 const showNavBadge = navBadgeCount > 0;
 
                 return (

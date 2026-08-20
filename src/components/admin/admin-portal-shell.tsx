@@ -1,7 +1,6 @@
 "use client";
 
 import { AdminAlertsProvider } from "@/components/admin/admin-alerts-provider";
-import { AdminWhatsAppInboxProvider } from "@/components/admin/admin-whatsapp-inbox-provider";
 import { AdminReadOnlyBanner, AdminPermissionsProvider } from "@/components/admin/admin-permissions";
 import { AdminRevenueProvider } from "@/components/admin/admin-revenue-side-panel";
 import { AdminStudentProfileProvider } from "@/components/admin/admin-student-profile-drawer";
@@ -18,16 +17,14 @@ export function AdminPortalShell({
   return (
     <AdminPermissionsProvider role={user.role}>
       <AdminAlertsProvider>
-        <AdminWhatsAppInboxProvider>
-          <AdminRevenueProvider>
-            <AdminStudentProfileProvider>
-              <PortalShell user={user}>
-                <AdminReadOnlyBanner />
-                {children}
-              </PortalShell>
-            </AdminStudentProfileProvider>
-          </AdminRevenueProvider>
-        </AdminWhatsAppInboxProvider>
+        <AdminRevenueProvider>
+          <AdminStudentProfileProvider>
+            <PortalShell user={user}>
+              <AdminReadOnlyBanner />
+              {children}
+            </PortalShell>
+          </AdminStudentProfileProvider>
+        </AdminRevenueProvider>
       </AdminAlertsProvider>
     </AdminPermissionsProvider>
   );

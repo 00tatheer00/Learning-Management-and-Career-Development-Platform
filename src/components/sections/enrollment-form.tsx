@@ -590,7 +590,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
               </div>
 
               <div>
-                <RequiredLabel htmlFor="whatsapp">WhatsApp Number</RequiredLabel>
+                <RequiredLabel htmlFor="whatsapp">Phone / Contact Number</RequiredLabel>
                 <Input
                   id="whatsapp"
                   type="tel"
@@ -879,7 +879,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                 <span className="text-base">📸</span> Share receipt screenshot here
               </p>
               <p className="text-xs sm:text-sm text-slate-800 dark:text-slate-200 font-semibold leading-relaxed">
-                After approval of your payment (PKR <strong className="font-black text-blue-700 dark:text-blue-400">{selectedFee.toLocaleString()}</strong> registration fee per month), you will get a confirmation message on WhatsApp or an email with your portal login details!
+                After approval of your payment (PKR <strong className="font-black text-blue-700 dark:text-blue-400">{selectedFee.toLocaleString()}</strong> registration fee per month), you will get an email with your portal login details!
               </p>
             </div>
 

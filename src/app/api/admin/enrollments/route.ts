@@ -102,8 +102,6 @@ export async function PATCH(request: Request) {
         ? {
             emailSent: "emailSent" in result ? Boolean(result.emailSent) : false,
             emailError: "emailError" in result ? result.emailError : undefined,
-            whatsappSent: "whatsappSent" in result ? Boolean(result.whatsappSent) : false,
-            whatsappError: "whatsappError" in result ? result.whatsappError : undefined,
             studentId: "studentId" in result ? result.studentId : undefined,
             passwordSaved: "passwordSaved" in result ? result.passwordSaved : undefined,
           }

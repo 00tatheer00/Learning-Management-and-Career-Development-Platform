@@ -15,7 +15,6 @@ import {
   Copy,
   Eye,
   EyeSlash,
-  ChatsCircle,
   Key,
   ClipboardText,
   ListChecks,
@@ -28,8 +27,6 @@ import { Button } from "@/components/ui/button";
 import { useAdminPermissions } from "@/components/admin/admin-permissions";
 import type { AdminStudentProfile } from "@/lib/api/admin-student-profile";
 import { paymentScreenshotHref, revealEnrollmentPassword, revealStudentPassword } from "@/lib/api/admin-client";
-import { getWhatsAppDirectLink, isDummyPhoneNumber } from "@/lib/utils/whatsapp-direct";
-import { copyToClipboard } from "@/lib/utils/clipboard";
 import { cn, formatAppliedDateTime } from "@/lib/utils";
 import { toast } from "@/lib/ui/toast";
 
@@ -304,44 +301,6 @@ function AdminStudentProfileDrawer() {
     setShowPassword(true);
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const copyWhatsAppMessage = async () => {
-    if (!profile) return;
-    const text = `Assalam-o-Alaikum ${profile.name}!
-
-This is Emerging Edge School of Technology regarding your *${profile.course || "course"}${profile.module ? ` (${profile.module})` : ""}* application.
-
-- Course: ${profile.course || "Course Module"}
-${profile.module ? `- Module: ${profile.module}\n` : ""}- Email: ${profile.email}
-
-If you need any help with your registration or portal access, feel free to reply to this message!
-
-Thank you,
-— Emerging Edge School of Technology Team`;
-
-    const copied = await copyToClipboard(text);
-    if (copied) {
-      toast.success("WhatsApp Message Copied", `Message for ${profile.name} copied to clipboard.`);
-    } else {
-      toast.error("Could not copy message");
-    }
-  };
-
-  const resendWhatsApp = () => {
-    if (!profile) return;
-    if (isDummyPhoneNumber(profile.whatsapp)) {
-      toast.warning(
-        "Placeholder Phone Number",
-        `Student ${profile.name} has a placeholder phone number (${profile.whatsapp || "N/A"}). Update to a real WhatsApp number to chat.`
-      );
-    } else {
-      toast.success("Opening WhatsApp", `Opening WhatsApp chat for ${profile.name}...`);
-    }
-    const text = `Assalam-o-Alaikum ${profile.name}! This is Emerging Edge School regarding your ${profile.course || "course"} application.`;
-    const link = getWhatsAppDirectLink(profile.whatsapp, text);
-    window.open(link, "_blank");
-  };
-
   const initials = (profile?.name ?? "?")
     .split(" ")
     .map((part) => part[0])
@@ -440,7 +399,7 @@ Thank you,
                 <SectionTitle icon={<UserCircle size={16} weight="duotone" />} title="Contact" />
                 <div className="mt-2 space-y-2">
                   <CopyRow label="Email" value={profile.email} />
-                  <CopyRow label="WhatsApp" value={profile.whatsapp} />
+                  <CopyRow label="Phone" value={profile.whatsapp} />
                   {profile.cnic && <CopyRow label="CNIC" value={profile.cnic} mono />}
                   {profile.fatherName && (
                     <InfoRow label="Father" value={profile.fatherName} />
@@ -511,18 +470,6 @@ Thank you,
                           label="Last login"
                           value={formatAppliedDateTime(profile.lastLoginAt)}
                         />
-                      )}
-                      {canWrite && profile.studentId && profile.hasStoredPassword && (
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          className="w-full gap-2 mt-1"
-                          disabled={actionLoading === "whatsapp"}
-                          onClick={() => void resendWhatsApp()}
-                        >
-                          <ChatsCircle size={16} weight="duotone" />
-                          {actionLoading === "whatsapp" ? "Sending…" : "Resend login on WhatsApp"}
-                        </Button>
                       )}
                     </>
                   )}

@@ -16,11 +16,11 @@ export const PAYMENT_CONFIG = {
     title: "What you get after payment verification",
     subtitle: "After we verify your payment, you will get:",
     items: [
-      "Added to WhatsApp group",
-      "Live online class link",
+      "Instant Student Portal Access",
+      "Live interactive class access",
       "Recorded lecture videos",
-      "Quizzes & assignments",
-      "Projects to practice",
+      "Quizzes & module assignments",
+      "Projects & certifications",
     ],
   },
 } as const;

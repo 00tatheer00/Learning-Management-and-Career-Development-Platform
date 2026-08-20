@@ -3,7 +3,6 @@ import { Key, Envelope, Globe } from "@phosphor-icons/react/ssr";
 import { SITE_CONFIG } from "@/lib/constants";
 import { getPortalLoginUrl } from "@/lib/site-url";
 import { AdminNotificationSettings } from "@/components/admin/admin-notification-settings";
-import { AdminWhatsAppSettings } from "@/components/admin/admin-whatsapp-settings";
 
 export default async function AdminSettingsPage() {
   return (
@@ -23,8 +22,7 @@ export default async function AdminSettingsPage() {
           </div>
           <p className="text-sm text-muted">
             When you approve a registration, a random 8-character portal password is created and
-            saved under <strong>Portal Logins</strong>. Login details are sent on{" "}
-            <strong>WhatsApp</strong>. Username is the student&apos;s email.
+            saved under <strong>Portal Logins</strong>. Username is the student&apos;s email.
           </p>
         </div>
 
@@ -34,19 +32,11 @@ export default async function AdminSettingsPage() {
             <h2 className="font-bold">Email (Resend)</h2>
           </div>
           <p className="text-sm leading-relaxed opacity-90">
-            Student notifications currently use <strong>WhatsApp only</strong>. Email (Resend) is
-            disabled until domain verification is complete. When ready, verify{" "}
-            <strong>emergingedge.tech</strong> at{" "}
-            <a href="https://resend.com/domains" className="underline" target="_blank" rel="noopener noreferrer">
-              resend.com/domains
-            </a>
-            . Then set Vercel env <code className="portal-code-inline px-1 rounded text-[11px]">EMAIL_FROM</code> to{" "}
-            <code className="portal-code-inline px-1 rounded text-[11px]">EEST &lt;noreply@emergingedge.tech&gt;</code>.
-            Gmail addresses cannot be used as the sender.
+            Student notifications and approval welcome letters are sent directly via Resend email.
+            Make sure <code className="portal-code-inline px-1 rounded text-[11px]">RESEND_API_KEY</code> and{" "}
+            <code className="portal-code-inline px-1 rounded text-[11px]">EMAIL_FROM</code> are configured in production.
           </p>
         </div>
-
-        <AdminWhatsAppSettings />
 
         <div className="rounded-2xl border border-border bg-background p-5">
           <div className="flex items-center gap-3 mb-3">

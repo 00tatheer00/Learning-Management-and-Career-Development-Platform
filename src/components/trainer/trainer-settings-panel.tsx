@@ -144,7 +144,7 @@ export function TrainerSettingsPanel({ initial }: { initial: TrainerSettingsInit
               </label>
             </div>
             <label className="block text-sm">
-              <span className="font-medium">Phone / WhatsApp</span>
+              <span className="font-medium">Phone / Contact Number</span>
               <Input
                 value={draft.phone ?? ""}
                 onChange={(e) => setDraft({ ...draft, phone: e.target.value })}

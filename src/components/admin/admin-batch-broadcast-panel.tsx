@@ -1,14 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Send, MessageSquare, Mail, AlertCircle } from "lucide-react";
+import { Send, Mail, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/lib/ui/toast";
 
 export function AdminBatchBroadcastPanel() {
-  const [channel, setChannel] = useState<"whatsapp" | "email" | "both">("both");
   const [program, setProgram] = useState("web-development");
   const [batch, setBatch] = useState("Batch 1");
   const [title, setTitle] = useState("");
@@ -27,7 +26,7 @@ export function AdminBatchBroadcastPanel() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          channel,
+          channel: "email",
           programSlug: program,
           batch,
           title,
@@ -39,7 +38,7 @@ export function AdminBatchBroadcastPanel() {
         throw new Error("Failed to send broadcast");
       }
 
-      toast.success(`Broadcast sent successfully via ${channel.toUpperCase()}!`);
+      toast.success("Broadcast email dispatched successfully!");
       setTitle("");
       setMessage("");
     } catch {
@@ -54,53 +53,14 @@ export function AdminBatchBroadcastPanel() {
       <div>
         <h3 className="text-base font-bold text-foreground flex items-center gap-2">
           <Send size={18} className="text-primary" />
-          Batch Announcement Broadcast
+          Batch Email Announcement
         </h3>
         <p className="text-xs text-muted mt-0.5">
-          Dispatch instant updates, class links, and reminders directly to student WhatsApp & Email.
+          Dispatch instant updates, class schedules, and reminders directly to student registered email inboxes.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <div>
-          <Label className="text-xs font-semibold">Target Channel</Label>
-          <div className="flex items-center gap-1.5 mt-1.5">
-            <button
-              type="button"
-              onClick={() => setChannel("whatsapp")}
-              className={`flex-1 py-1.5 px-2 rounded-lg border text-xs font-bold flex items-center justify-center gap-1 transition-all ${
-                channel === "whatsapp"
-                  ? "border-emerald-500 bg-emerald-500/10 text-emerald-700"
-                  : "border-border text-muted"
-              }`}
-            >
-              <MessageSquare size={12} /> WhatsApp
-            </button>
-            <button
-              type="button"
-              onClick={() => setChannel("email")}
-              className={`flex-1 py-1.5 px-2 rounded-lg border text-xs font-bold flex items-center justify-center gap-1 transition-all ${
-                channel === "email"
-                  ? "border-sky-500 bg-sky-500/10 text-sky-700"
-                  : "border-border text-muted"
-              }`}
-            >
-              <Mail size={12} /> Email
-            </button>
-            <button
-              type="button"
-              onClick={() => setChannel("both")}
-              className={`flex-1 py-1.5 px-2 rounded-lg border text-xs font-bold flex items-center justify-center gap-1 transition-all ${
-                channel === "both"
-                  ? "border-primary bg-primary/10 text-primary"
-                  : "border-border text-muted"
-              }`}
-            >
-              Both
-            </button>
-          </div>
-        </div>
-
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div>
           <Label className="text-xs font-semibold">Program</Label>
           <select
@@ -155,7 +115,7 @@ export function AdminBatchBroadcastPanel() {
       <div className="flex items-center justify-between pt-2">
         <p className="text-[11px] text-muted flex items-center gap-1">
           <AlertCircle size={12} className="text-amber-500" />
-          Messages are dispatched to all verified students in target batch.
+          Messages are dispatched to all verified students in the target batch.
         </p>
 
         <Button
@@ -164,8 +124,8 @@ export function AdminBatchBroadcastPanel() {
           size="sm"
           className="gap-2 text-xs font-bold"
         >
-          <Send size={12} />
-          {sending ? "Sending Broadcast..." : "Send Broadcast"}
+          <Mail size={14} />
+          {sending ? "Sending Email..." : "Send Announcement"}
         </Button>
       </div>
     </div>

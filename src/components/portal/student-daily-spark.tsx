@@ -6,7 +6,7 @@ import { StudentReveal } from "@/components/portal/student-motion";
 const TIPS = [
   "Small daily practice beats one long cram session.",
   "Rewatch recordings at 1.25× when you revise.",
-  "Ask in WhatsApp — your batch learns together.",
+  "Ask your trainer — your batch learns together.",
   "Join class on time — attendance builds habits.",
 ];
 

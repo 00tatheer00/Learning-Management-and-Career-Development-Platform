@@ -40,7 +40,7 @@ export function RegistrationPageContent({
                   <p className="font-semibold text-foreground mb-1">What can you do now?</p>
                   <ul className="list-disc pl-4 space-y-1">
                     <li>Explore our courses in detail on the Programs page.</li>
-                    <li>Follow us on WhatsApp/Social channels for next batch announcements.</li>
+                    <li>Follow us on social channels for next batch announcements.</li>
                     <li>If you have queries, contact our admissions support team.</li>
                   </ul>
                 </div>

@@ -4,7 +4,6 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { getAssignments, getLiveSessionsPreview, getMaterials } from "@/lib/api/portal-data";
 import { PortalSurfaceCard } from "@/components/portal/portal-ui";
 import { StudentTrainerCard } from "@/components/portal/student-trainer-card";
-import { StudentWhatsAppGroupCard } from "@/components/portal/student-whatsapp-group-card";
 import { StudentNextClassCard } from "@/components/portal/student-next-class-card";
 import { StudentModuleRoadmap } from "@/components/portal/student-module-roadmap";
 import { StudentClassProgressCard } from "@/components/portal/student-class-progress-card";
@@ -97,13 +96,6 @@ export default async function StudentDashboardPage() {
       icon: "bell",
     });
   }
-  reminders.push({
-    id: "whatsapp",
-    label: "Join class WhatsApp group",
-    sub: "Stay updated with your batch",
-    href: "/student/classes",
-    icon: "chat",
-  });
 
   const lessonRows = sessions.map((s) => ({
     id: s.id,
@@ -212,10 +204,7 @@ export default async function StudentDashboardPage() {
           </StudentReveal>
 
           <StudentReveal delay={0.16}>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <StudentTrainerCard programSlug={primaryProgramSlug} trainerId={user.trainerId} />
-              <StudentWhatsAppGroupCard variant="banner" />
-            </div>
+            <StudentTrainerCard programSlug={primaryProgramSlug} trainerId={user.trainerId} />
           </StudentReveal>
 
           {moduleEnrollments.length > 1 && (

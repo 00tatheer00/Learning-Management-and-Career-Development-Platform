@@ -7,7 +7,7 @@ import { SITE_CONFIG } from "@/lib/constants";
 export const metadata = createMetadata({
   title: "Register",
   description:
-    "Register for Emerging Edge School of Technology. Pay module registration fee to join live classes, WhatsApp group, and learning resources.",
+    "Register for Emerging Edge School of Technology. Pay module registration fee to join live classes, student portal, and learning resources.",
   path: "/register",
 });
 
@@ -29,7 +29,7 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
       <PageHero
         label="Student Registration"
         title="Apply & Register Now"
-        description="Apply for your course and pay module registration fee to join — verified students get WhatsApp group access, live class link, recorded lectures, quizzes, assignments, and projects."
+        description="Apply for your course and pay module registration fee to join — verified students get instant portal access, live interactive classes, recorded lectures, quizzes, assignments, and projects."
       />
       <RegistrationPageContent defaultProgram={program} />
     </>

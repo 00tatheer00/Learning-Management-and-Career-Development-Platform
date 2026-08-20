@@ -1,9 +1,4 @@
 import { SITE_CONFIG } from "@/lib/constants";
-import {
-  BUSINESS_WHATSAPP_DISPLAY,
-  STUDENT_WHATSAPP_GROUP_NAME,
-  STUDENT_WHATSAPP_GROUP_URL,
-} from "@/lib/constants/contact";
 
 interface ApprovalEmailParams {
   studentName: string;
@@ -12,8 +7,6 @@ interface ApprovalEmailParams {
   courseName: string;
   level: string;
   loginUrl: string;
-  whatsappGroupUrl?: string;
-  whatsappGroupName?: string;
 }
 
 export function buildApprovalEmailHtml({
@@ -23,8 +16,6 @@ export function buildApprovalEmailHtml({
   courseName,
   level,
   loginUrl,
-  whatsappGroupUrl = STUDENT_WHATSAPP_GROUP_URL,
-  whatsappGroupName = STUDENT_WHATSAPP_GROUP_NAME,
 }: ApprovalEmailParams): string {
   const firstName = studentName.split(" ")[0];
 
@@ -79,20 +70,8 @@ export function buildApprovalEmailHtml({
                 </tr>
               </table>
 
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:16px;margin-bottom:20px;">
-                <tr>
-                  <td style="padding:20px;">
-                    <p style="margin:0 0 12px;font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#047857;">Join WhatsApp Group Now</p>
-                    <p style="margin:0 0 12px;font-size:15px;line-height:1.6;color:#374151;">
-                      After logging in, join <strong>${whatsappGroupName}</strong> for live class links, videos, and announcements.
-                    </p>
-                    <a href="${whatsappGroupUrl}" style="display:inline-block;padding:12px 24px;background:#25D366;color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;border-radius:999px;">Join Group on WhatsApp</a>
-                  </td>
-                </tr>
-              </table>
-
               <p style="margin:0;font-size:13px;line-height:1.6;color:#6b7280;">
-                Keep your login details private. If you need help, reply to this email or message us on WhatsApp.
+                Keep your login details private. If you need help, reply to this email.
               </p>
             </td>
           </tr>
@@ -111,124 +90,6 @@ export function buildApprovalEmailHtml({
 </html>`;
 }
 
-export interface StudentLoginWhatsAppParams {
-  studentName: string;
-  email: string;
-  password: string;
-  courseName: string;
-  module: string;
-  level: string;
-  loginUrl: string;
-}
-
-export interface ApprovalTemplateParams {
-  firstName: string;
-  courseName: string;
-  module: string;
-  portalLoginUrl: string;
-}
-
-export interface RejectionTemplateParams {
-  fullName: string;
-  courseName: string;
-  reason: string;
-}
-
-export function buildApprovalTemplatePreview({
-  firstName,
-  courseName,
-  module,
-  portalLoginUrl,
-}: ApprovalTemplateParams): string {
-  return [
-    `[Approved] Hello ${firstName},`,
-    "",
-    "Congratulations! Your registration at Emerging Edge School of Technology has been approved.",
-    "",
-    `Course: ${courseName}`,
-    `Module: ${module}`,
-    "",
-    "Login details sent to your registered email — check inbox and spam, then log in:",
-    portalLoginUrl,
-    "",
-    "EEST Team",
-  ].join("\n");
-}
-
-export function buildRejectionTemplatePreview({
-  fullName,
-  courseName,
-  reason,
-}: RejectionTemplateParams): string {
-  return [
-    `[Rejected] Hello ${fullName},`,
-    "",
-    "Thank you for applying to Emerging Edge School of Technology.",
-    "",
-    `Course: ${courseName}`,
-    "",
-    "Unfortunately your registration could not be approved at this time.",
-    "",
-    `Reason: ${reason}`,
-    "",
-    `Questions? WhatsApp ${BUSINESS_WHATSAPP_DISPLAY}`,
-    "",
-    "EEST Team",
-  ].join("\n");
-}
-
-/** Manual paste for Komal — only after student opened the 24h chat window. */
-export function buildStudentLoginWhatsAppMessage({
-  studentName,
-  email,
-  password,
-  courseName,
-  module,
-  level,
-  loginUrl,
-}: StudentLoginWhatsAppParams): string {
-  const name = studentName.trim();
-  const course = courseName.trim();
-  const mod = (module || level || "").trim();
-  const moduleText = mod ? ` (${mod})` : "";
-
-  const lines = [
-    `Assalam-o-Alaikum ${name}!`,
-    "",
-    `Congratulations! Your registration for *${course}${moduleText}* at Emerging Edge School of Technology has been *APPROVED*.`,
-    "",
-    "*Registration Details:*",
-    `- Student Name: ${name}`,
-    `- Course: ${course}`,
-  ];
-
-  if (mod) {
-    lines.push(`- Module: ${mod}`);
-  }
-  if (email) {
-    lines.push(`- Registered Email: ${email}`);
-  }
-
-  lines.push(
-    "",
-    "*Student Portal Login Credentials:*",
-    `- Username: ${email}`,
-    `- Password: ${password}`,
-    `- Portal URL: ${loginUrl}`,
-    "",
-    "Please log in to your student portal to access your live interactive classes, lecture recordings, and module assignments.",
-    "Keep your login credentials secure.",
-    "",
-    "Welcome aboard!",
-    "— Emerging Edge School of Technology Team"
-  );
-
-  return lines.join("\n");
-}
-
-/** @deprecated Use buildStudentLoginWhatsAppMessage — kept for imports during transition */
-export const buildApprovalWhatsAppMessage = buildStudentLoginWhatsAppMessage;
-
 export function buildApprovalEmailText({
   studentName,
   email,
@@ -236,8 +97,6 @@ export function buildApprovalEmailText({
   courseName,
   level,
   loginUrl,
-  whatsappGroupUrl = STUDENT_WHATSAPP_GROUP_URL,
-  whatsappGroupName = STUDENT_WHATSAPP_GROUP_NAME,
 }: ApprovalEmailParams): string {
   const firstName = studentName.split(" ")[0];
 
@@ -252,9 +111,6 @@ Portal Login
 Username: ${email}
 Password: ${password}
 Login: ${loginUrl}
-
-Join WhatsApp Group Now
-${whatsappGroupName}: ${whatsappGroupUrl}
 
 Keep your login details private.`;
 }
