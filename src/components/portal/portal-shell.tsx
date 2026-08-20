@@ -41,6 +41,7 @@ import { PortalThemeToggle } from "@/components/portal/portal-theme-toggle";
 import { StudentModuleSwitcher } from "@/components/portal/student-module-switcher";
 import { TrainerModuleSwitcher } from "@/components/portal/trainer-module-switcher";
 import { OfflineDetector } from "@/components/portal/offline-detector";
+import { StudentMobileBottomNav } from "@/components/portal/student-mobile-bottom-nav";
 import type { PortalUser, UserRole } from "@/types/portal";
 import { cn } from "@/lib/utils";
 
@@ -260,7 +261,7 @@ function PortalShellInner({ user, children }: PortalShellProps) {
             "flex-1 min-h-0 overflow-x-hidden",
             isWhatsAppInbox
               ? "overflow-hidden p-0 lg:p-8"
-              : "overflow-y-auto p-4 sm:p-6 lg:p-8"
+              : cn("overflow-y-auto p-4 sm:p-6 lg:p-8", isStudent && "pb-24 lg:pb-8")
           )}
         >
           <div
@@ -272,6 +273,7 @@ function PortalShellInner({ user, children }: PortalShellProps) {
             {children}
           </div>
         </main>
+        {isStudent && <StudentMobileBottomNav />}
         {user.role === "student" && (
           <StudentPortalWelcome studentId={user.id} studentName={user.name} />
         )}

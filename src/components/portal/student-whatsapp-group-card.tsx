@@ -21,7 +21,7 @@ export function StudentWhatsAppGroupCard({
   return (
     <div
       className={cn(
-        "portal-card rounded-2xl border border-pt h-full flex flex-col",
+        "portal-card portal-card-interactive rounded-2xl border border-pt h-full flex flex-col",
         isBanner ? "p-5 sm:p-6" : "p-6 sm:p-10 text-center max-w-xl mx-auto",
         className
       )}

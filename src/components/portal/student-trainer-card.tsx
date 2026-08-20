@@ -28,7 +28,7 @@ export async function StudentTrainerCard({
   if (!assignedTrainer || !category) return null;
 
   return (
-    <div className={cn("portal-card rounded-2xl overflow-hidden h-full", className)}>
+    <div className={cn("portal-card portal-card-interactive rounded-2xl overflow-hidden h-full", className)}>
       <div className="student-trainer-card-header flex items-center justify-between gap-3 px-5 py-3.5">
         <div className="flex items-center gap-2 text-primary">
           <ChalkboardTeacher size={20} weight="duotone" />
