@@ -66,4 +66,4 @@ export const MODULE_ONE_ACTIVE_NOTE =
   "Live classes and recordings are active for enrolled students.";
 
 export const MODULE_STARTS_SOON_MESSAGE =
-  "Your classes will start soon. We will notify you on WhatsApp when your next session begins.";
+  "Your classes will start soon. Check your portal notifications for session updates.";

@@ -1,7 +1,8 @@
 interface RejectionNoticeInput {
   fullName: string;
   email: string;
-  whatsapp: string;
+  phone?: string;
+  whatsapp?: string;
   program: string;
   level: string;
   reason?: string;
@@ -9,7 +10,7 @@ interface RejectionNoticeInput {
 
 export async function sendRejectionNotifications(
   input: RejectionNoticeInput
-): Promise<{ whatsappSent: boolean; warnings: string[] }> {
+): Promise<{ emailSent: boolean; warnings: string[] }> {
   void input;
-  return { whatsappSent: false, warnings: [] };
+  return { emailSent: false, warnings: [] };
 }

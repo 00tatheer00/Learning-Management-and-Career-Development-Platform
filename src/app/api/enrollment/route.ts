@@ -47,7 +47,7 @@ function friendlyValidationMessage(issue: z.ZodIssue | undefined): string {
   const field = String(issue.path[0] ?? "");
   if (field === "cnic") return "CNIC must be exactly 13 digits (numbers only).";
   if (field === "whatsapp") {
-    return "WhatsApp number must start with 03 and be 11 digits (e.g. 03001234567).";
+    return "Mobile number must start with 03 and be 11 digits (e.g. 03001234567).";
   }
   if (field === "program") return "Please select a valid program (Web Development, App Development, or Artificial Intelligence).";
   if (field === "level") return "Please choose your starting module.";
@@ -202,7 +202,7 @@ export async function POST(request: Request) {
     void sendAdminNewRegistrationAlert({
       fullName: validated.data.fullName,
       email: validated.data.email,
-      whatsapp: validated.data.whatsapp,
+      phone: validated.data.whatsapp,
       program: validated.data.program,
       level: validated.data.level,
       batch,
@@ -229,7 +229,7 @@ export async function POST(request: Request) {
       createApiResponse(false, {
         error: "Internal server error",
         message:
-          "Something went wrong on our server. Please try again in a minute. If it keeps failing, WhatsApp us your details.",
+          "Something went wrong on our server. Please try again in a minute or contact helpline support.",
       }),
       { status: 500 }
     );

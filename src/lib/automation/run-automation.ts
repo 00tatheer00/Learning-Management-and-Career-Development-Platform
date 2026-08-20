@@ -12,7 +12,7 @@ export interface AutomationRunSummary {
   pendingRegistrationSla: boolean;
 }
 
-/** Student emails: class reminders (30 min). WhatsApp: approve/reject only. */
+/** Student emails: class reminders (30 min) and portal notifications. */
 export async function runAllAutomations(now = new Date()): Promise<AutomationRunSummary> {
   const scheduledSessions = await ensureScheduledLiveSessions(now);
   const classReminders = await runClassReminders(now);

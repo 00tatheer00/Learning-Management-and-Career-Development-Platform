@@ -337,12 +337,3 @@
   background: var(--pt-muted);
   border-bottom: 1px solid var(--pt-border-subtle);
 }
-
-.student-whatsapp-btn {
-  background: #1e90ff !important;
-  color: #ffffff !important;
-}
-
-.student-whatsapp-btn:hover {
-  background: #1873cc !important;
-}

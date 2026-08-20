@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CheckCircle2, MessageSquare, ShieldCheck, Printer, Sparkles, Award, FileText, QrCode } from "lucide-react";
+import Link from "next/link";
+import { CheckCircle2, ShieldCheck, Printer, Sparkles, Award, FileText, QrCode, LogIn } from "lucide-react";
 import QRCode from "qrcode";
 import { Button } from "@/components/ui/button";
 import { getProgramBySlug } from "@/lib/data/programs";
 import { getProgramRegistrationFee } from "@/lib/constants/payment";
-import { getOfficialWhatsAppUrl, BUSINESS_WHATSAPP_DISPLAY } from "@/lib/constants/contact";
+import { OFFICIAL_PHONE_DISPLAY } from "@/lib/constants/contact";
+import { SITE_CONFIG } from "@/lib/constants";
 
 interface EnrollmentSuccessViewProps {
   applicationNumber: number;
@@ -36,12 +38,11 @@ export function EnrollmentSuccessView({
     year: "numeric",
   });
 
-  const waMessage = `Assalam-o-Alaikum! My name is ${fullName}. App #${receiptNumber} for ${programTitle} (${levelName}). Please verify my payment receipt & activate my portal password.`;
-  const officialWaUrl = getOfficialWhatsAppUrl(waMessage);
+  const verifyPortalUrl = `${SITE_CONFIG.url}/verify`;
 
   useEffect(() => {
     let isMounted = true;
-    QRCode.toDataURL(officialWaUrl, {
+    QRCode.toDataURL(verifyPortalUrl, {
       margin: 1,
       width: 220,
       color: {
@@ -58,7 +59,7 @@ export function EnrollmentSuccessView({
     return () => {
       isMounted = false;
     };
-  }, [officialWaUrl]);
+  }, [verifyPortalUrl]);
 
   const handlePrintSlip = () => {
     window.print();
@@ -183,7 +184,7 @@ export function EnrollmentSuccessView({
 
           <div>
             <span className="text-[10px] uppercase font-bold text-muted tracking-wider">Academic Batch:</span>
-            <p className="font-bold text-foreground text-xs mt-0.5">Batch 1 (Phase 2 - 2nd Module)</p>
+            <p className="font-bold text-foreground text-xs mt-0.5">Batch 1</p>
           </div>
 
           <div>
@@ -192,7 +193,7 @@ export function EnrollmentSuccessView({
           </div>
 
           <div>
-            <span className="text-[10px] uppercase font-bold text-muted tracking-wider">WhatsApp Number:</span>
+            <span className="text-[10px] uppercase font-bold text-muted tracking-wider">Contact / Mobile Number:</span>
             <p className="font-semibold text-foreground text-xs mt-0.5 font-mono">{whatsapp}</p>
           </div>
         </div>
@@ -249,14 +250,14 @@ export function EnrollmentSuccessView({
             </p>
           </div>
 
-          {/* Direct WhatsApp Verification QR Code Card with Phone Number */}
+          {/* Direct Verification QR Code Card */}
           <div className="flex items-center gap-3 bg-surface p-3 rounded-xl border border-sky-500/30 shrink-0 shadow-sm">
             <div className="h-20 w-20 bg-white rounded-lg border border-border p-1 flex items-center justify-center shrink-0">
               {qrDataUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={qrDataUrl}
-                  alt="Scan QR to Chat on WhatsApp"
+                  alt="Scan QR to Verify on Portal"
                   width={72}
                   height={72}
                   className="rounded object-contain"
@@ -269,53 +270,30 @@ export function EnrollmentSuccessView({
             </div>
             <div className="text-left space-y-0.5">
               <p className="font-black text-foreground uppercase tracking-wider text-[11px]">
-                Scan QR to Verify
+                Official QR Verification
               </p>
-              <p className="text-emerald-600 dark:text-emerald-400 font-extrabold text-xs flex items-center gap-1">
-                💬 WhatsApp Support
+              <p className="text-sky-600 dark:text-sky-400 font-extrabold text-xs">
+                EEST Student Portal
               </p>
-              <p className="font-mono text-xs font-black text-sky-700 dark:text-sky-300 mt-1">
-                {BUSINESS_WHATSAPP_DISPLAY}
+              <p className="font-mono text-xs font-black text-foreground mt-1">
+                {OFFICIAL_PHONE_DISPLAY}
               </p>
-              <p className="text-[9.5px] text-muted font-medium">Scan code or message helpline</p>
+              <p className="text-[9.5px] text-muted font-medium">Scan to check portal status</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Primary Action: Student Initiated Chat (Prevents WhatsApp Account Restrictions) */}
-      <div className="rounded-2xl border border-emerald-500/40 bg-emerald-50/60 dark:bg-emerald-950/30 p-4 text-center space-y-2.5 print:hidden">
-        <p className="text-xs font-black text-emerald-800 dark:text-emerald-200 flex items-center justify-center gap-1.5">
-          <Sparkles size={16} className="text-emerald-600" />
-          Speed Up Your Payment Verification &amp; Password Activation:
-        </p>
-        <p className="text-[11.5px] text-emerald-900/80 dark:text-emerald-300 font-medium max-w-md mx-auto">
-          Send a quick message to our Admissions Support on WhatsApp ({BUSINESS_WHATSAPP_DISPLAY}) so your payment is verified immediately.
-        </p>
-        <a
-          href={officialWaUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-xs font-black text-white shadow-md hover:bg-emerald-700 transition-all"
-        >
-          <MessageSquare size={16} /> Send WhatsApp Message to Admissions (Instant Verification)
-        </a>
-      </div>
-
-      {/* Action Buttons: PDF Download & Group Join */}
+      {/* Action Buttons: PDF Download & Portal Login */}
       <div className="flex flex-wrap items-center justify-center gap-3 print:hidden">
         <Button onClick={handlePrintSlip} variant="outline" size="sm" className="gap-2 font-bold text-xs border-primary/30 hover:bg-primary/5">
           <Printer size={15} /> Download Official PDF Receipt
         </Button>
 
-        <Button asChild size="sm" className="gap-2 font-bold text-xs bg-emerald-700 hover:bg-emerald-800 text-white shadow-sm">
-          <a
-            href="https://chat.whatsapp.com/EN0h0aFkQ6YJ6FwE93M01W"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <MessageSquare size={15} /> Join Official Batch WhatsApp Group
-          </a>
+        <Button asChild size="sm" className="gap-2 font-bold text-xs bg-primary hover:bg-primary/90 text-white shadow-sm">
+          <Link href="/login">
+            <LogIn size={15} /> Go to Student Portal Login
+          </Link>
         </Button>
       </div>
 
@@ -338,8 +316,8 @@ export function EnrollmentSuccessView({
           <div className="flex items-start gap-3">
             <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 font-bold text-primary text-xs">2</span>
             <div>
-              <p className="font-bold text-foreground">Portal Login Credentials Received</p>
-              <p className="text-muted mt-0.5">You will receive an automated Email &amp; WhatsApp notification with your Student Portal password.</p>
+              <p className="font-bold text-foreground">Portal Login Credentials Received via Email</p>
+              <p className="text-muted mt-0.5">You will receive an automated Email with your Student Portal login password.</p>
             </div>
           </div>
 

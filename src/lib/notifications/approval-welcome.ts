@@ -1,11 +1,9 @@
-import { getProgramBySlug } from "@/lib/data/programs";
-import { sendApprovalEmail } from "@/lib/notifications/email";
-import { getPortalLoginUrl } from "@/lib/site-url";
+import { enqueueApprovalEmail } from "@/lib/notifications/email-handlers";
 
 interface EnrollmentNotificationRecord {
   fullName: string;
   email: string;
-  whatsapp: string;
+  whatsapp?: string;
   program: string;
   level: string;
   password: string;
@@ -13,28 +11,24 @@ interface EnrollmentNotificationRecord {
 
 export async function sendApprovalWelcomeNotifications(
   enrollment: EnrollmentNotificationRecord
-): Promise<{ whatsappSent: boolean; emailSent: boolean; warnings: string[] }> {
-  const warnings: string[] = [];
-  const loginUrl = getPortalLoginUrl();
-  const courseName = getProgramBySlug(enrollment.program)?.title ?? enrollment.program;
-  const programLevel = getProgramBySlug(enrollment.program)?.level ?? "—";
-  const emailResult = await sendApprovalEmail({
-    to: enrollment.email,
-    studentName: enrollment.fullName,
-    email: enrollment.email,
-    password: enrollment.password,
-    courseName,
-    level: programLevel,
-    loginUrl,
-  });
+): Promise<{ emailSent: boolean; warnings: string[] }> {
+  try {
+    enqueueApprovalEmail({
+      email: enrollment.email,
+      fullName: enrollment.fullName,
+      password: enrollment.password,
+      program: enrollment.program,
+    });
 
-  if (!emailResult.sent) {
-    warnings.push(emailResult.error ?? "Approval email not sent");
+    return {
+      emailSent: true,
+      warnings: [],
+    };
+  } catch (err) {
+    const errorMsg = err instanceof Error ? err.message : "Failed to queue approval email";
+    return {
+      emailSent: false,
+      warnings: [errorMsg],
+    };
   }
-
-  return {
-    whatsappSent: false,
-    emailSent: emailResult.sent,
-    warnings,
-  };
 }

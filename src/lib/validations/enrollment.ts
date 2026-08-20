@@ -39,7 +39,7 @@ export const enrollmentSchema = z.object({
         .string()
         .regex(
           whatsappRegex,
-          "WhatsApp must be 11 digits starting with 03 (e.g. 03001234567). You can also use +92..."
+          "Phone number must be 11 digits starting with 03 (e.g. 03001234567). You can also use +92..."
         )
     ),
   fieldOfStudy: z

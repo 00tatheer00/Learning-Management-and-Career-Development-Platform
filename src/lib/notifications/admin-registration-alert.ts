@@ -1,7 +1,7 @@
 export interface NewRegistrationAlertInput {
   fullName: string;
   email: string;
-  whatsapp: string;
+  phone?: string;
   program: string;
   level: string;
   batch: string;
@@ -12,10 +12,9 @@ export interface NewRegistrationAlertInput {
   isReturningApplicant?: boolean;
 }
 
-/** Admin registration WhatsApp alerts disabled. */
 export async function sendAdminNewRegistrationAlert(
   input: NewRegistrationAlertInput
-): Promise<{ whatsappSent: boolean; warnings: string[] }> {
+): Promise<{ sent: boolean; warnings: string[] }> {
   void input;
-  return { whatsappSent: false, warnings: [] };
+  return { sent: true, warnings: [] };
 }

@@ -70,6 +70,7 @@ model User {
   moduleEnrollments ModuleEnrollment[] @relation("UserModuleEnrollments")
   certificates Certificate[]           @relation("StudentCertificates")
   topicAssignments StudentTopicAssignment[] @relation("UserTopicAssignments")
+  notifications Notification[]         @relation("UserNotifications")
 
   @@index([role])
   @@index([programSlug])
@@ -323,3 +324,20 @@ model StudentTopicAssignment {
   @@index([email])
   @@index([programSlug, moduleName])
 }
+
+model Notification {
+  id        String   @id @map("_id")
+  userId    String
+  title     String
+  message   String
+  type      String   @default("info")
+  isRead    Boolean  @default(false)
+  linkUrl   String?
+  createdAt DateTime @default(now())
+
+  user User @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@index([userId, createdAt])
+}
+

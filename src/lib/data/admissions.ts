@@ -20,18 +20,18 @@ export const applicationProcess = [
   },
   {
     step: "3",
-    title: "Wait 2–3 days",
-    desc: "We check your payment on WhatsApp",
+    title: "Verification (24 Hours)",
+    desc: "Admin team verifies your payment receipt and credentials",
   },
   {
     step: "4",
     title: "Start learning",
-    desc: "Join WhatsApp group + get class link and videos",
+    desc: "Login to student portal for live interactive classes and recordings",
   },
 ];
 
 export const requirements = [
   "Laptop or computer (recommended)",
-  "Internet connection",
-  "WhatsApp on your phone",
+  "Stable Internet connection",
+  "Active Email for portal credentials",
 ];

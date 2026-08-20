@@ -70,7 +70,7 @@ export function getStudentModuleSchedule(
         programLabel: "Web Development",
         headline: "Coming Soon",
         subline:
-          "Classes for this advanced module will be announced soon. Join your WhatsApp group for updates.",
+          "Classes for this advanced module will be announced soon. Check your portal notifications for updates.",
         daysLabel: "Schedule to be announced",
         startDateLabel: "Coming Soon",
         isComingSoon: true,
@@ -173,7 +173,7 @@ export function getStudentModuleSchedule(
         programLabel: "Artificial Intelligence",
         headline: "Classes start from Friday, 14th August, 10:00 PM",
         subline:
-          "Live classes on Fri, Sat, and Sun from 10:00 PM to 11:30 PM (PKT). Check your WhatsApp group for class timing and live session links.",
+          "Live classes on Fri, Sat, and Sun from 10:00 PM to 11:30 PM (PKT). Check your student portal for class timing and live session links.",
         daysLabel: "Friday · Saturday · Sunday",
         startDateLabel: "Friday, 14th August, 10:00 PM",
       };
@@ -184,7 +184,7 @@ export function getStudentModuleSchedule(
       programLabel: "Artificial Intelligence",
       headline: "Coming Soon",
       subline:
-        "Classes for this advanced AI module will be announced soon. Stay tuned on WhatsApp!",
+        "Classes for this advanced AI module will be announced soon. Check your portal notifications for updates.",
       daysLabel: "Schedule to be announced",
       startDateLabel: "Coming Soon",
       isComingSoon: true,
@@ -194,7 +194,7 @@ export function getStudentModuleSchedule(
   return {
     programLabel: "Emerging Edge Course",
     headline: "Classes Starting Soon",
-    subline: "Check portal and WhatsApp group for live session schedules.",
+    subline: "Check portal notifications for live session schedules.",
     daysLabel: "Weekly Live Sessions",
     startDateLabel: "Starting Soon",
   };

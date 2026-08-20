@@ -37,6 +37,7 @@ import {
   usePortalTheme,
 } from "@/components/portal/portal-theme-provider";
 import { PortalThemeToggle } from "@/components/portal/portal-theme-toggle";
+import { PortalNotificationsBell } from "@/components/portal/portal-notifications-bell";
 import { StudentModuleSwitcher } from "@/components/portal/student-module-switcher";
 import { TrainerModuleSwitcher } from "@/components/portal/trainer-module-switcher";
 import { OfflineDetector } from "@/components/portal/offline-detector";
@@ -228,7 +229,7 @@ function PortalShellInner({ user, children }: PortalShellProps) {
                 <AdminRevenueHeaderButton />
               </span>
             )}
-            {isAdmin && <AdminNotificationsBell />}
+            {isAdmin ? <AdminNotificationsBell /> : <PortalNotificationsBell />}
             <PortalThemeToggle />
             <Button
               variant="ghost"

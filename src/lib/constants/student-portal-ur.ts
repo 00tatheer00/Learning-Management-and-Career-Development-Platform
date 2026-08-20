@@ -11,35 +11,6 @@ export const STUDENT_UR = {
     button: "Enter Portal",
   },
 
-  whatsappModal: {
-    title: "Join the class WhatsApp group",
-    body: (groupName: string) =>
-      `Join ${groupName} for announcements and community — class links, assignments, and attendance are on the portal.`,
-    bullets: [
-      "Class reminders and community updates",
-      "Trainer announcements",
-      "Quick help from classmates",
-    ],
-    joinButton: "Join Group on WhatsApp",
-    later: "Maybe later",
-  },
-
-  whatsappCard: {
-    joinTitle: (groupName: string) => `Join ${groupName}`,
-    bannerDesc:
-      "Your registration is approved. Join the class WhatsApp group for announcements and community.",
-    pageDesc:
-      "Join our official WhatsApp group for class announcements. Live links, assignments, and attendance are on the portal.",
-    joinButton: "Join Group on WhatsApp",
-    bullets: [
-      "Class reminders and trainer announcements",
-      "Community chat with classmates",
-      "Quick updates when you are away from the portal",
-      "Assignment reminders",
-    ],
-    footer: "Tap the button above to open WhatsApp and join the group.",
-  },
-
   schedule: {
     web: {
       programLabel: "Web Development",

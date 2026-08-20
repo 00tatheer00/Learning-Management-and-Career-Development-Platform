@@ -1,16 +1,16 @@
 import {
-  OFFICIAL_WHATSAPP_NUMBER,
-  BUSINESS_WHATSAPP_DISPLAY,
+  OFFICIAL_PHONE_NUMBER,
+  OFFICIAL_PHONE_DISPLAY,
   OFFICIAL_HELP_MESSAGE,
-  getOfficialWhatsAppUrl,
+  getOfficialTelHref,
 } from "@/lib/constants/contact";
 
 export const HELP_CONFIG = {
-  whatsappNumber: OFFICIAL_WHATSAPP_NUMBER,
-  whatsappDisplay: BUSINESS_WHATSAPP_DISPLAY,
-  whatsappMessage: OFFICIAL_HELP_MESSAGE,
-  get whatsappUrl() {
-    return getOfficialWhatsAppUrl(this.whatsappMessage);
+  phoneNumber: OFFICIAL_PHONE_NUMBER,
+  phoneDisplay: OFFICIAL_PHONE_DISPLAY,
+  helpMessage: OFFICIAL_HELP_MESSAGE,
+  get telUrl() {
+    return getOfficialTelHref();
   },
 } as const;
 
@@ -18,7 +18,7 @@ export const SIMPLE_STEPS = [
   {
     step: "1",
     title: "Fill the form",
-    desc: "Write your name, WhatsApp number, and choose your course.",
+    desc: "Write your details and choose your desired course.",
   },
   {
     step: "2",
@@ -27,7 +27,7 @@ export const SIMPLE_STEPS = [
   },
   {
     step: "3",
-    title: "Join on WhatsApp",
-    desc: "After verification, you get class link, videos, and assignments.",
+    title: "Access Portal",
+    desc: "After verification, log in to access live classes, lecture videos, and assignments.",
   },
 ] as const;

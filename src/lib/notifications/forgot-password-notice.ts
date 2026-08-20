@@ -1,5 +1,5 @@
 import { getPasswordResetUrl } from "@/lib/auth/password-reset";
-import { sendForgotPasswordEmail } from "@/lib/notifications/email";
+import { enqueueForgotPasswordEmail } from "@/lib/notifications/email-handlers";
 
 interface ForgotPasswordNoticeInput {
   name: string;
@@ -10,25 +10,20 @@ interface ForgotPasswordNoticeInput {
 
 export async function sendForgotPasswordNotifications(
   input: ForgotPasswordNoticeInput
-): Promise<{ whatsappSent: boolean; emailSent: boolean; warnings: string[] }> {
+): Promise<{ emailSent: boolean; warnings: string[] }> {
   const warnings: string[] = [];
   const resetUrl = getPasswordResetUrl(input.token);
 
-  // Send Email
-  let emailSent = false;
   try {
-    const emailResult = await sendForgotPasswordEmail({
-      to: input.email,
-      studentName: input.name,
+    enqueueForgotPasswordEmail({
+      email: input.email,
+      name: input.name,
       resetUrl,
     });
-    emailSent = emailResult.sent;
-    if (!emailResult.sent && emailResult.error) {
-      warnings.push(`Email failed: ${emailResult.error}`);
-    }
+    return { emailSent: true, warnings: [] };
   } catch (error) {
-    warnings.push(`Email exception: ${error instanceof Error ? error.message : "unknown error"}`);
+    const errorMsg = error instanceof Error ? error.message : "Failed to queue password reset email";
+    warnings.push(`Email exception: ${errorMsg}`);
+    return { emailSent: false, warnings };
   }
-
-  return { whatsappSent: false, emailSent, warnings };
 }

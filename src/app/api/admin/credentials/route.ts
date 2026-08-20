@@ -184,7 +184,7 @@ export async function POST(request: Request) {
   if (parsed.data.action === "bulkResendLogin") {
     return NextResponse.json(
       createApiResponse(false, {
-        error: "Bulk WhatsApp is disabled. Approve students one by one or share login manually.",
+        error: "Bulk automated resend is disabled. Resend login emails individually.",
       }),
       { status: 403 }
     );

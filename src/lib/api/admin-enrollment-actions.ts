@@ -35,8 +35,6 @@ export async function approveEnrollmentAndCreateAccount(
   studentId?: string;
   emailSent?: boolean;
   emailError?: string;
-  whatsappSent?: boolean;
-  whatsappError?: string;
   passwordSaved?: boolean;
 }> {
   const existing = await getEnrollmentById(enrollmentId);
@@ -167,11 +165,6 @@ export async function approveEnrollmentAndCreateAccount(
     : (notifications.warnings.find((w) => w.toLowerCase().includes("email")) ??
         "Approval email not sent");
 
-  const whatsappError = notifications.whatsappSent
-    ? null
-    : (notifications.warnings.find((w) => w.toLowerCase().includes("whatsapp")) ??
-        "WhatsApp info message not sent");
-
   await prisma.enrollment.update({
     where: { id: enrollmentId },
     data: {
@@ -198,8 +191,6 @@ export async function approveEnrollmentAndCreateAccount(
     studentId: student?.id,
     emailSent: notifications.emailSent,
     emailError: emailError ?? undefined,
-    whatsappSent: notifications.whatsappSent,
-    whatsappError: whatsappError ?? undefined,
     passwordSaved,
     credentials: {
       loginId: enrollment.email,
