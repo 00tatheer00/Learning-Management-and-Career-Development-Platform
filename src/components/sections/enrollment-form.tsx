@@ -35,6 +35,7 @@ import { EnrollmentDropzone } from "@/components/enrollment/enrollment-dropzone"
 import { EnrollmentFeeSummary } from "@/components/enrollment/enrollment-fee-summary";
 import { useEnrollmentDraft } from "@/components/enrollment/use-enrollment-draft";
 import { EnrollmentSuccessView } from "@/components/enrollment/enrollment-success-view";
+import { uploadDirectToCloudinary } from "@/lib/cloudinary-client";
 
 function FormSection({
   title,
@@ -179,6 +180,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
   const [historyLoading, setHistoryLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [mobileStep, setMobileStep] = useState(0);
   const [submittedDetails, setSubmittedDetails] = useState<{
     fullName: string;
@@ -269,31 +271,24 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
       } finally {
         setHistoryLoading(false);
       }
-    }, 500);
+    }, 450);
 
     return () => window.clearTimeout(timer);
   }, [watchedEmail, watchedCnic]);
 
   const handleFileSelected = (file: File | null) => {
-    setScreenshotError(null);
-    if (screenshotPreview) URL.revokeObjectURL(screenshotPreview);
-
-    if (!file) {
-      setScreenshotFile(null);
-      setScreenshotPreview(null);
-      return;
-    }
-
-    const validationError = validatePaymentScreenshot(file);
-    if (validationError) {
-      setScreenshotError(validationError);
-      setScreenshotFile(null);
-      setScreenshotPreview(null);
-      return;
-    }
-
     setScreenshotFile(file);
-    setScreenshotPreview(URL.createObjectURL(file));
+    setScreenshotError(null);
+    setUploadProgress(null);
+    if (!file) {
+      setScreenshotPreview(null);
+      return;
+    }
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setScreenshotPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
   };
 
   const scrollToFirstError = (formErrors: FieldErrors<EnrollmentFormData>) => {
@@ -344,8 +339,17 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
   };
 
   const handleMobileNext = async () => {
-    const fields = STEP_FIELDS[mobileStep];
-    const valid = await trigger(fields);
+    const fieldsToValidate = STEP_FIELDS[mobileStep];
+    const valid = await trigger(fieldsToValidate);
+    if (mobileStep === 3) {
+      const fileValidation = validatePaymentScreenshot(screenshotFile ?? undefined);
+      if (fileValidation) {
+        setScreenshotError(fileValidation);
+        toast.error("Payment screenshot required", fileValidation);
+        document.getElementById("paymentScreenshot")?.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+    }
     if (!valid) {
       scrollToFirstError(errors);
       return;
@@ -364,6 +368,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
 
     setIsSubmitting(true);
     setError(null);
+    setUploadProgress(0);
 
     try {
       const uploadFile = await preparePaymentScreenshot(screenshotFile!);
@@ -371,7 +376,19 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
       Object.entries(data).forEach(([key, value]) => {
         formData.append(key, String(value));
       });
-      formData.append("paymentScreenshot", uploadFile);
+
+      // Try fast direct-to-Cloudinary signed upload
+      try {
+        const directResult = await uploadDirectToCloudinary(uploadFile, {
+          folder: "eest/payment-screenshots",
+          onProgress: (pct) => setUploadProgress(pct),
+        });
+        formData.append("paymentScreenshotUrl", directResult.url);
+        formData.append("paymentScreenshotPublicId", directResult.publicId);
+      } catch (directUploadErr) {
+        console.warn("Direct upload fallback to serverless upload:", directUploadErr);
+        formData.append("paymentScreenshot", uploadFile);
+      }
 
       const response = await fetch("/api/enrollment", {
         method: "POST",
@@ -423,6 +440,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
       setApplicantHistory(null);
       setScreenshotFile(null);
       setScreenshotPreview(null);
+      setUploadProgress(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
     } catch (err) {
       const message = err instanceof Error ? err.message : "Something went wrong";
@@ -430,6 +448,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
       toast.error("Registration failed", message);
     } finally {
       setIsSubmitting(false);
+      setUploadProgress(null);
     }
   };
 
@@ -942,6 +961,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                 previewUrl={screenshotPreview}
                 onFileSelect={handleFileSelected}
                 error={screenshotError ?? undefined}
+                uploadProgress={uploadProgress}
               />
             </div>
           </FormSection>

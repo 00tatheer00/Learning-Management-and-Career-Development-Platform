@@ -87,6 +87,12 @@ export function StudentCourseLectures({
     }));
   };
 
+  const activeIndex = activeLecture ? lectures.findIndex((l) => l.id === activeLecture.id) : -1;
+  const hasNextLecture = activeIndex >= 0 && activeIndex < lectures.length - 1;
+  const hasPrevLecture = activeIndex > 0;
+  const nextLecture = hasNextLecture ? lectures[activeIndex + 1] : null;
+  const prevLecture = hasPrevLecture ? lectures[activeIndex - 1] : null;
+
   return (
     <div className="space-y-8">
       {/* Playback Modal */}
@@ -117,6 +123,12 @@ export function StudentCourseLectures({
                     lectureId={activeLecture.id}
                     playbackUrl={playbackUrl}
                     initialTime={progressMap[activeLecture.id]?.watchedSeconds ?? 0}
+                    hasNextLecture={hasNextLecture}
+                    hasPrevLecture={hasPrevLecture}
+                    nextLectureTitle={nextLecture?.title}
+                    prevLectureTitle={prevLecture?.title}
+                    onPlayNext={() => nextLecture && handlePlay(nextLecture)}
+                    onPlayPrev={() => prevLecture && handlePlay(prevLecture)}
                     onClose={() => {
                       setActiveLecture(null);
                       setPlaybackUrl(null);

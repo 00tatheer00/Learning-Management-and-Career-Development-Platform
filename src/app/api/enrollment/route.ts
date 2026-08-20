@@ -92,37 +92,63 @@ export async function POST(request: Request) {
       );
     }
 
+    const preUploadedUrl = String(formData.get("paymentScreenshotUrl") ?? "").trim();
+    const preUploadedPublicId = String(formData.get("paymentScreenshotPublicId") ?? "").trim();
     const screenshot = formData.get("paymentScreenshot");
 
-    if (!(screenshot instanceof File) || screenshot.size === 0) {
-      return NextResponse.json(
-        createApiResponse(false, {
-          error: "Validation failed",
-          message: "Payment screenshot is required. Please upload your Easypaisa payment proof.",
-        }),
-        { status: 400 }
-      );
-    }
+    let paymentUpload: { url: string; publicId: string };
+    const id = crypto.randomUUID();
 
-    if (!isPaymentScreenshotImage(screenshot)) {
-      return NextResponse.json(
-        createApiResponse(false, {
-          error: "Validation failed",
-          message:
-            "Screenshot must be an image (JPG or PNG). On iPhone, save as JPG or take a new screenshot.",
-        }),
-        { status: 400 }
-      );
-    }
+    if (preUploadedUrl && preUploadedUrl.startsWith("http")) {
+      paymentUpload = {
+        url: preUploadedUrl,
+        publicId: preUploadedPublicId || preUploadedUrl,
+      };
+    } else {
+      if (!(screenshot instanceof File) || screenshot.size === 0) {
+        return NextResponse.json(
+          createApiResponse(false, {
+            error: "Validation failed",
+            message: "Payment screenshot is required. Please upload your Easypaisa payment proof.",
+          }),
+          { status: 400 }
+        );
+      }
 
-    if (screenshot.size > MAX_PAYMENT_SCREENSHOT_BYTES) {
-      return NextResponse.json(
-        createApiResponse(false, {
-          error: "Validation failed",
-          message: "Screenshot is too large. Please upload an image under 4MB.",
-        }),
-        { status: 400 }
-      );
+      if (!isPaymentScreenshotImage(screenshot)) {
+        return NextResponse.json(
+          createApiResponse(false, {
+            error: "Validation failed",
+            message:
+              "Screenshot must be an image (JPG or PNG). On iPhone, save as JPG or take a new screenshot.",
+          }),
+          { status: 400 }
+        );
+      }
+
+      if (screenshot.size > MAX_PAYMENT_SCREENSHOT_BYTES) {
+        return NextResponse.json(
+          createApiResponse(false, {
+            error: "Validation failed",
+            message: "Screenshot is too large. Please upload an image under 4MB.",
+          }),
+          { status: 400 }
+        );
+      }
+
+      try {
+        paymentUpload = await uploadPaymentScreenshot(screenshot, id);
+      } catch (uploadError) {
+        console.error("Payment screenshot upload failed:", uploadError);
+        return NextResponse.json(
+          createApiResponse(false, {
+            error: "Upload failed",
+            message:
+              "Could not upload payment screenshot. Please try a smaller JPG/PNG image under 4MB, or try again in a minute.",
+          }),
+          { status: 503 }
+        );
+      }
     }
 
     const raw = {
@@ -160,22 +186,6 @@ export async function POST(request: Request) {
       validated.data.cnic
     );
     const applicationNumber = previousRecords.length + 1;
-
-    const id = crypto.randomUUID();
-    let paymentUpload: { url: string; publicId: string };
-    try {
-      paymentUpload = await uploadPaymentScreenshot(screenshot, id);
-    } catch (uploadError) {
-      console.error("Payment screenshot upload failed:", uploadError);
-      return NextResponse.json(
-        createApiResponse(false, {
-          error: "Upload failed",
-          message:
-            "Could not upload payment screenshot. Please try a smaller JPG/PNG image under 4MB, or try again in a minute.",
-        }),
-        { status: 503 }
-      );
-    }
 
     const createdAt = new Date().toISOString();
     const batch = getBatchForProgram(validated.data.program);

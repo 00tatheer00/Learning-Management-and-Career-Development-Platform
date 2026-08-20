@@ -10,6 +10,7 @@ interface EnrollmentDropzoneProps {
   previewUrl: string | null;
   onFileSelect: (file: File | null) => void;
   error?: string;
+  uploadProgress?: number | null;
 }
 
 export function EnrollmentDropzone({
@@ -17,6 +18,7 @@ export function EnrollmentDropzone({
   previewUrl,
   onFileSelect,
   error,
+  uploadProgress = null,
 }: EnrollmentDropzoneProps) {
   const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -72,12 +74,20 @@ export function EnrollmentDropzone({
           <div className="flex-1 text-center sm:text-left min-w-0">
             <div className="flex items-center justify-center sm:justify-start gap-1.5 text-emerald-700 dark:text-emerald-300 font-bold text-sm">
               <CheckCircle2 size={16} />
-              <span>Screenshot Uploaded</span>
+              <span>{uploadProgress !== null && uploadProgress < 100 ? `Uploading Receipt (${uploadProgress}%)...` : "Screenshot Selected"}</span>
             </div>
             <p className="mt-1 text-xs font-semibold text-foreground truncate">{file.name}</p>
             <p className="text-[11px] text-muted font-medium">
               {(file.size / (1024 * 1024)).toFixed(2)} MB · {file.type || "Image"}
             </p>
+            {uploadProgress !== null && uploadProgress < 100 && (
+              <div className="w-full h-1.5 bg-emerald-950/20 dark:bg-emerald-500/20 rounded-full mt-2 overflow-hidden">
+                <div
+                  className="h-full bg-emerald-500 transition-all duration-200"
+                  style={{ width: `${uploadProgress}%` }}
+                />
+              </div>
+            )}
           </div>
 
           <Button
