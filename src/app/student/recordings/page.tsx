@@ -1,5 +1,14 @@
 import Link from "next/link";
-import { PlayCircle, LinkSimple, FileText, ArrowSquareOut } from "@phosphor-icons/react/ssr";
+import {
+  PlayCircle,
+  LinkSimple,
+  FileText,
+  ArrowSquareOut,
+  Clock,
+  Sparkle,
+  ArrowsLeftRight,
+  NotePencil,
+} from "@phosphor-icons/react/ssr";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getMaterials } from "@/lib/api/portal-data";
 import {
@@ -55,6 +64,45 @@ export default async function StudentRecordingsPage() {
             : `${getProgramBySlug(programSlugs[0] ?? "web-development")?.title ?? "Your course"} — high definition class recordings, syllabus, and study materials`
         }
       />
+
+      {/* Student How-to-use / Quick Tips */}
+      <div className="rounded-3xl border border-pt-subtle bg-gradient-to-r from-primary/10 via-surface/80 to-background p-5 sm:p-6 shadow-sm">
+        <div className="flex items-center gap-2 mb-3">
+          <Sparkle size={20} weight="fill" className="text-primary" />
+          <h3 className="font-bold text-base text-pt">How to make the most of your Class Recordings</h3>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mt-3">
+          <div className="rounded-2xl border border-pt-subtle bg-surface/60 p-3.5 space-y-1">
+            <div className="flex items-center gap-1.5 text-primary font-bold text-xs">
+              <Clock size={16} weight="duotone" />
+              Auto-Resume Watching
+            </div>
+            <p className="text-xs text-pt-muted leading-relaxed">
+              Video player auto-saves your exact watch progress. You can stop anytime and resume right where you left off.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-pt-subtle bg-surface/60 p-3.5 space-y-1">
+            <div className="flex items-center gap-1.5 text-primary font-bold text-xs">
+              <NotePencil size={16} weight="duotone" />
+              Interactive Study Notes
+            </div>
+            <p className="text-xs text-pt-muted leading-relaxed">
+              Write study notes while watching. Timestamped notes are saved to your profile for easy exam and project revision.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-pt-subtle bg-surface/60 p-3.5 space-y-1">
+            <div className="flex items-center gap-1.5 text-primary font-bold text-xs">
+              <ArrowsLeftRight size={16} weight="duotone" />
+              Module Switching
+            </div>
+            <p className="text-xs text-pt-muted leading-relaxed">
+              Use the topbar module switcher to view your current or previous module class recordings anytime.
+            </p>
+          </div>
+        </div>
+      </div>
 
       {programSlugs.map((programSlug) => {
         const program = getProgramBySlug(programSlug);
