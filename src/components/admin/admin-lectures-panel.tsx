@@ -287,8 +287,8 @@ export function AdminLecturesPanel() {
     <div className="space-y-6">
       <PortalPageHeader
         eyebrow="Admin Portal"
-        title="Manage Lectures"
-        description="Add, replace, and delete securely hosted Bunny Stream video lectures."
+        title="Manage Recordings"
+        description="Add, replace, and delete securely hosted Bunny Stream HD video recordings and lectures."
       >
         <div className="flex gap-2">
           <Button variant="secondary" onClick={() => void loadLectures()} disabled={loading || uploading}>
@@ -297,7 +297,7 @@ export function AdminLecturesPanel() {
           </Button>
           <Button onClick={openCreateModal} disabled={uploading}>
             <Plus size={18} />
-            Add Lecture
+            Add Recording
           </Button>
         </div>
       </PortalPageHeader>
@@ -334,13 +334,13 @@ export function AdminLecturesPanel() {
       ) : filteredLectures.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border p-12 text-center max-w-xl mx-auto">
           <FilmStrip size={48} className="mx-auto text-muted-foreground" />
-          <h3 className="mt-4 font-bold text-lg">No lectures found</h3>
+          <h3 className="mt-4 font-bold text-lg">No recordings found</h3>
           <p className="text-sm text-muted-foreground mt-1 max-w-sm mx-auto">
-            You haven&apos;t uploaded any video lectures for this program yet. Click &quot;Add Lecture&quot; to upload your first secure video.
+            You haven&apos;t uploaded any video recordings for this program yet. Click &quot;Add Recording&quot; to upload your first secure video.
           </p>
           <Button onClick={openCreateModal} className="mt-6">
             <Plus size={16} className="mr-1" />
-            Upload First Video
+            Upload First Recording
           </Button>
         </div>
       ) : (
@@ -426,16 +426,16 @@ export function AdminLecturesPanel() {
             </button>
 
             <h3 className="text-lg font-bold">
-              {editingLecture ? "Edit Lecture" : "Upload New Lecture"}
+              {editingLecture ? "Edit Recording" : "Upload New Recording"}
             </h3>
             <p className="text-sm text-muted-foreground mt-1">
-              {editingLecture ? "Modify lecture details or replace its secure video file." : "Add a video lecture directly to Bunny Stream."}
+              {editingLecture ? "Modify recording details or replace its video file." : "Add a video recording directly to Bunny Stream."}
             </p>
 
             <form onSubmit={handleSubmit} className="mt-5 space-y-4">
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">
-                  Lecture Title
+                  Recording Title
                 </label>
                 <input
                   type="text"

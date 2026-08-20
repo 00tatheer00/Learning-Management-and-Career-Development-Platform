@@ -1,5 +1,5 @@
-import { AdminRecordingsPanel } from "@/components/admin/admin-recordings-panel";
+import { AdminLecturesPanel } from "@/components/admin/admin-lectures-panel";
 
 export default function AdminRecordingsPage() {
-  return <AdminRecordingsPanel />;
+  return <AdminLecturesPanel />;
 }

@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth/session";
 import { requireTrainerProgram, resolveTrainerId } from "@/lib/auth/trainer-scope";
-import { getProgramModuleNames } from "@/lib/modules/student-module-access";
 import {
   deleteClassRecording,
   getClassRecordings,
@@ -25,7 +24,6 @@ export async function GET(request: Request) {
     const programSlug = requireTrainerProgram(user);
     const allRecordings = await getClassRecordings(programSlug);
 
-    const programModules = getProgramModuleNames(programSlug);
     const activeScope = (requestedModule ?? user.level ?? "all").trim();
 
     // If activeScope is "all", return all recordings

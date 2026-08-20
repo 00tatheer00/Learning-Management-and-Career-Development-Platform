@@ -16,7 +16,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PortalPageHeader, EmptyState } from "@/components/portal/portal-ui";
-import { getClassProgress } from "@/lib/class-schedule";
 import { DRIVE_DOWNLOAD_NOTE } from "@/lib/constants/drive-sharing-guide";
 import { toast } from "@/lib/ui/toast";
 import { cn } from "@/lib/utils";
@@ -60,8 +59,6 @@ export function TrainerRecordingsPanel({
     driveUrl: "",
     notes: "",
   });
-
-  const progress = getClassProgress(programSlug);
 
   const load = () =>
     fetch("/api/trainer/recordings?module=all")

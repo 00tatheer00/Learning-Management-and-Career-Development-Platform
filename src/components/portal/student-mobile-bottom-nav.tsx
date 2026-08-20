@@ -6,7 +6,7 @@ import {
   House,
   VideoCamera,
   ClipboardText,
-  BookOpen,
+  FilmStrip,
   Certificate,
 } from "@phosphor-icons/react";
 import { useStudentPortalBadgesOptional } from "@/components/portal/student-portal-badges-provider";
@@ -25,15 +25,15 @@ const STUDENT_BOTTOM_ITEMS = [
     badgeKey: "classes" as const,
   },
   {
+    href: "/student/recordings",
+    label: "Recordings",
+    icon: FilmStrip,
+  },
+  {
     href: "/student/assignments",
     label: "Tasks",
     icon: ClipboardText,
     badgeKey: "assignments" as const,
-  },
-  {
-    href: "/student/course",
-    label: "Course",
-    icon: BookOpen,
   },
   {
     href: "/student/certificates",

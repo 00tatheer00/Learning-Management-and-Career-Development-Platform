@@ -7,6 +7,7 @@ import {
   VideoCamera,
   CalendarBlank,
   Sparkle,
+  FilmStrip,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { ProgramCategoryBadge } from "@/components/portal/program-category-badge";
@@ -106,9 +107,9 @@ export function StudentDashboardHero({
               asChild
               className="rounded-xl text-white border border-white/25 hover:bg-white/12 hover:text-white"
             >
-              <Link href="/student/course">
-                <BookOpen size={18} weight="duotone" />
-                My Course
+              <Link href="/student/recordings">
+                <FilmStrip size={18} weight="duotone" />
+                Recordings
               </Link>
             </Button>
           </div>

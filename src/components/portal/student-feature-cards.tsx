@@ -1,20 +1,21 @@
 import Link from "next/link";
 import {
-  BookOpen,
   VideoCamera,
   ClipboardText,
   FilmStrip,
+  Certificate,
   ArrowRight,
 } from "@phosphor-icons/react/ssr";
 import { cn } from "@/lib/utils";
 
 const cards = [
   {
-    href: "/student/course",
-    title: "My Course",
-    subtitle: "Lessons & syllabus",
-    icon: BookOpen,
+    href: "/student/recordings",
+    title: "Recordings",
+    subtitle: "Video lessons & syllabus",
+    icon: FilmStrip,
     tint: "student-glass-card-gold",
+    key: "recordings" as const,
   },
   {
     href: "/student/classes",
@@ -22,6 +23,7 @@ const cards = [
     subtitle: "Join online sessions",
     icon: VideoCamera,
     tint: "student-glass-card-charcoal",
+    key: "classes" as const,
   },
   {
     href: "/student/assignments",
@@ -29,28 +31,35 @@ const cards = [
     subtitle: "Homework & tasks",
     icon: ClipboardText,
     tint: "student-glass-card-muted",
+    key: "tasks" as const,
   },
   {
-    href: "/student/recordings",
-    title: "Recordings",
-    subtitle: "Rewatch classes",
-    icon: FilmStrip,
+    href: "/student/certificates",
+    title: "Certificates",
+    subtitle: "Verified credentials",
+    icon: Certificate,
     tint: "student-glass-card-warm",
+    key: "certificates" as const,
   },
 ] as const;
 
 export function StudentFeatureCards({
   counts,
 }: {
-  counts: { lessons: number; classes: number; tasks: number };
+  counts: { recordings?: number; lessons?: number; classes: number; tasks: number; certificates?: number };
 }) {
-  const countMap = [counts.lessons, counts.classes, counts.tasks, null] as const;
+  const countMap: Record<string, number | undefined> = {
+    recordings: counts.recordings ?? counts.lessons,
+    classes: counts.classes,
+    tasks: counts.tasks,
+    certificates: counts.certificates,
+  };
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
-      {cards.map((card, i) => {
+      {cards.map((card) => {
         const Icon = card.icon;
-        const count = countMap[i];
+        const count = countMap[card.key];
         return (
           <Link
             key={card.href}

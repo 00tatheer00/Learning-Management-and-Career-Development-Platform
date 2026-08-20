@@ -1,5 +1,5 @@
-import { AdminLecturesPanel } from "@/components/admin/admin-lectures-panel";
+import { redirect } from "next/navigation";
 
 export default function AdminLecturesPage() {
-  return <AdminLecturesPanel />;
+  redirect("/admin/recordings");
 }

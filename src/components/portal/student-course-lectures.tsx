@@ -141,7 +141,7 @@ export function StudentCourseLectures({
 
             <div className="mt-5 text-left border-t border-zinc-900 pt-4">
               <span className="inline-flex items-center rounded-full bg-primary/20 px-3 py-0.5 text-[10px] font-bold text-primary uppercase tracking-widest">
-                {activeLecture.level || "Video Lesson"}
+                {activeLecture.level || "Class Recording"}
               </span>
               <h3 className="text-xl font-bold text-white mt-2">{activeLecture.title}</h3>
               {activeLecture.description && (
@@ -191,7 +191,7 @@ export function StudentCourseLectures({
               )}
             </div>
             <Button onClick={() => handlePlay(resumeLecture)} size="lg" className="shrink-0 group rounded-xl px-6">
-              Resume Lesson
+              Resume Recording
               <ArrowRight size={18} className="ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>
@@ -200,7 +200,7 @@ export function StudentCourseLectures({
 
       {/* Lectures List */}
       <div className="space-y-4">
-        <h3 className="font-bold text-lg text-pt tracking-tight">Course Lectures</h3>
+        <h3 className="font-bold text-lg text-pt tracking-tight">Class Recordings</h3>
 
         <div className="grid gap-3">
           {lectures.map((lecture) => {
@@ -220,7 +220,7 @@ export function StudentCourseLectures({
                   <div className="flex-1 min-w-0 space-y-1">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-primary flex items-center gap-1.5">
                       <FilmStrip size={12} weight="bold" />
-                      Lecture {lecture.order} {lecture.level && `• ${lecture.level}`}
+                      Class {lecture.order} {lecture.level && `• ${lecture.level}`}
                     </p>
 
                     <p className="text-lg font-bold text-pt group-hover:text-primary transition-colors">
@@ -271,7 +271,7 @@ export function StudentCourseLectures({
                 </div>
 
                 <div className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
-                  {isCompleted ? "Watch again" : hasStarted ? `Resume lesson (${percent}%)` : "Start lesson"}
+                  {isCompleted ? "Watch again" : hasStarted ? `Resume recording (${percent}%)` : "Watch recording"}
                   <ArrowRight size={14} />
                 </div>
               </div>
