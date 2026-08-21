@@ -43,8 +43,13 @@ interface TrainerRecordingsPanelProps {
 
 function formatDuration(seconds: number | null): string {
   if (!seconds || seconds <= 0) return "Duration pending";
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
+  const totalSecs = Math.round(seconds);
+  const hrs = Math.floor(totalSecs / 3600);
+  const mins = Math.floor((totalSecs % 3600) / 60);
+  const secs = totalSecs % 60;
+  if (hrs > 0) {
+    return `${hrs}h ${mins}m`;
+  }
   if (mins === 0) return `${secs}s`;
   if (secs === 0) return `${mins} mins`;
   return `${mins}m ${secs}s`;
@@ -70,6 +75,7 @@ export function TrainerRecordingsPanel({
   const [formLevel, setFormLevel] = useState(modules[0] || "HTML & CSS");
   const [formOrder, setFormOrder] = useState("1");
   const [formDuration, setFormDuration] = useState("");
+  const [detectedSeconds, setDetectedSeconds] = useState<number | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   // Upload progress states
@@ -81,26 +87,33 @@ export function TrainerRecordingsPanel({
   const [previewPlaybackUrl, setPreviewPlaybackUrl] = useState<string | null>(null);
   const [loadingPreview, setLoadingPreview] = useState(false);
 
-  // Fetch all recordings for this trainer's program
-  const loadRecordings = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/admin/lectures", { cache: "no-store" });
-      const json = await res.json();
-      if (json.success) {
-        const programLectures = (json.data || []).filter(
-          (l: Lecture) => l.programSlug === programSlug
-        );
-        setRecordings(programLectures);
-      } else {
-        toast.error(json.error ?? "Failed to load class recordings");
+  // Fetch all recordings for this trainer's program (with optional force sync)
+  const loadRecordings = useCallback(
+    async (forceSync = false) => {
+      setLoading(true);
+      try {
+        const url = forceSync ? "/api/admin/lectures?sync=true" : "/api/admin/lectures";
+        const res = await fetch(url, { cache: "no-store" });
+        const json = await res.json();
+        if (json.success) {
+          const programLectures = (json.data || []).filter(
+            (l: Lecture) => l.programSlug === programSlug
+          );
+          setRecordings(programLectures);
+          if (forceSync) {
+            toast.success("Synchronized recording durations with Bunny Stream!");
+          }
+        } else {
+          toast.error(json.error ?? "Failed to load class recordings");
+        }
+      } catch {
+        toast.error("Failed to load class recordings");
+      } finally {
+        setLoading(false);
       }
-    } catch {
-      toast.error("Failed to load class recordings");
-    } finally {
-      setLoading(false);
-    }
-  }, [programSlug]);
+    },
+    [programSlug]
+  );
 
   useEffect(() => {
     void loadRecordings();
@@ -146,6 +159,7 @@ export function TrainerRecordingsPanel({
     setFormTitle(`Class ${getNextClassNumber(defaultMod)}: `);
     setFormDescription("");
     setFormDuration("");
+    setDetectedSeconds(null);
     setSelectedFile(null);
     setIsModalOpen(true);
   };
@@ -158,6 +172,7 @@ export function TrainerRecordingsPanel({
     setFormLevel(rec.level || modules[0] || "HTML & CSS");
     setFormOrder(rec.order.toString());
     setFormDuration(rec.duration ? (rec.duration / 60).toFixed(1) : "");
+    setDetectedSeconds(rec.duration || null);
     setSelectedFile(null);
     setIsModalOpen(true);
   };
@@ -173,8 +188,25 @@ export function TrainerRecordingsPanel({
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setSelectedFile(e.target.files[0]);
+    const file = e.target.files?.[0] || null;
+    setSelectedFile(file);
+    if (file) {
+      try {
+        const video = document.createElement("video");
+        video.preload = "metadata";
+        video.onloadedmetadata = () => {
+          if (video.duration && !isNaN(video.duration) && video.duration > 0) {
+            const rawSecs = Math.round(video.duration);
+            setDetectedSeconds(rawSecs);
+            const mins = (video.duration / 60).toFixed(1);
+            setFormDuration(mins);
+          }
+          URL.revokeObjectURL(video.src);
+        };
+        video.src = URL.createObjectURL(file);
+      } catch (err) {
+        console.error("Auto duration detection error:", err);
+      }
     }
   };
 
@@ -188,6 +220,14 @@ export function TrainerRecordingsPanel({
       const json = await res.json();
       if (json.success) {
         setPreviewPlaybackUrl(json.data.playbackUrl);
+        // If duration was updated on server, update local state
+        if (json.data.lecture?.duration && json.data.lecture.duration !== rec.duration) {
+          setRecordings((prev) =>
+            prev.map((item) =>
+              item.id === rec.id ? { ...item, duration: json.data.lecture.duration } : item
+            )
+          );
+        }
       } else {
         toast.error(json.error ?? "Failed to load video player preview");
         setPreviewRecording(null);
@@ -280,7 +320,11 @@ export function TrainerRecordingsPanel({
                   programSlug,
                   level: formLevel,
                   order: formOrder,
-                  duration: formDuration ? (parseFloat(formDuration) * 60).toString() : null,
+                  duration: formDuration
+                    ? (parseFloat(formDuration) * 60).toString()
+                    : detectedSeconds
+                    ? detectedSeconds.toString()
+                    : null,
                   bunnyVideoId: videoId,
                   lectureId: editingRecording?.id || null,
                 }),
@@ -316,7 +360,11 @@ export function TrainerRecordingsPanel({
             programSlug,
             level: formLevel,
             order: formOrder,
-            duration: formDuration ? (parseFloat(formDuration) * 60).toString() : null,
+            duration: formDuration
+              ? (parseFloat(formDuration) * 60).toString()
+              : detectedSeconds
+              ? detectedSeconds.toString()
+              : null,
             bunnyVideoId: editingRecording?.bunnyVideoId || "",
             lectureId: editingRecording?.id || null,
           }),
@@ -324,17 +372,17 @@ export function TrainerRecordingsPanel({
         const json = await res.json();
         setUploading(false);
         if (json.success) {
-          toast.success("Recording details updated successfully!");
+          toast.success("Class recording details updated successfully!");
           setIsModalOpen(false);
           void loadRecordings();
         } else {
           toast.error(json.error ?? "Failed to update recording");
         }
       }
-    } catch (err) {
+    } catch (error) {
       setUploading(false);
-      const msg = err instanceof Error ? err.message : "Upload failed";
-      toast.error(msg);
+      const errMessage = error instanceof Error ? error.message : "Failed to process video upload";
+      toast.error(errMessage);
     }
   };
 
@@ -347,9 +395,14 @@ export function TrainerRecordingsPanel({
         description="Upload and publish high-definition Bunny Stream class video recordings for your students. Students can watch them with DRM encryption, auto-resuming, and study notes."
       >
         <div className="flex gap-2">
-          <Button variant="secondary" onClick={() => void loadRecordings()} disabled={loading || uploading}>
+          <Button
+            variant="secondary"
+            onClick={() => void loadRecordings(true)}
+            disabled={loading || uploading}
+            title="Sync real video duration and status directly from Bunny Stream"
+          >
             <ArrowClockwise size={18} className={cn(loading && "animate-spin")} />
-            Refresh
+            Sync with Bunny
           </Button>
           <Button onClick={openCreateModal} disabled={uploading}>
             <Plus size={18} />
@@ -708,9 +761,19 @@ export function TrainerRecordingsPanel({
                     {selectedFile ? selectedFile.name : "Drag & drop or click to browse screen recording video"}
                   </p>
                   {selectedFile && (
-                    <p className="text-[11px] text-primary font-bold mt-1">
-                      File Size: {(selectedFile.size / (1024 * 1024)).toFixed(1)} MB
-                    </p>
+                    <div className="flex flex-wrap items-center justify-center gap-3 mt-1.5 text-[11px]">
+                      <span className="text-primary font-bold">
+                        Size: {(selectedFile.size / (1024 * 1024)).toFixed(1)} MB
+                      </span>
+                      {detectedSeconds && detectedSeconds > 0 && (
+                        <>
+                          <span className="text-muted-foreground">•</span>
+                          <span className="text-emerald-500 font-bold">
+                            Length: {formatDuration(detectedSeconds)}
+                          </span>
+                        </>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>

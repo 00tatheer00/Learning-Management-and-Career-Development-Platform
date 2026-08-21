@@ -36,7 +36,29 @@ export async function getLecturesByProgram(programSlug: string): Promise<Student
     },
   });
 
-  return lectures;
+  // Check if any lectures have missing duration and sync in background / resolve
+  const synced = await Promise.all(
+    lectures.map(async (lec) => {
+      if ((!lec.duration || lec.duration <= 0) && lec.bunnyVideoId) {
+        try {
+          const { getBunnyVideoDetails } = await import("@/lib/bunny");
+          const details = await getBunnyVideoDetails(lec.bunnyVideoId);
+          if (details && details.length > 0) {
+            await prisma.lecture.update({
+              where: { id: lec.id },
+              data: { duration: details.length },
+            });
+            return { ...lec, duration: details.length };
+          }
+        } catch (e) {
+          console.error(`Failed to sync duration for student lecture ${lec.id}:`, e);
+        }
+      }
+      return lec;
+    })
+  );
+
+  return synced;
 }
 
 export async function getWatchProgressMap(

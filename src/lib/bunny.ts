@@ -103,6 +103,57 @@ export async function deleteBunnyVideo(videoId: string): Promise<boolean> {
 }
 
 /**
+ * Fetches real-time video details and transcoding status from Bunny Stream.
+ */
+export interface BunnyVideoDetails {
+  videoLibraryId: number;
+  guid: string;
+  title: string;
+  dateUploaded: string;
+  views: number;
+  isPublic: boolean;
+  length: number; // Duration in seconds
+  status: number; // 0: Created, 1: Uploaded, 2: Processing, 3: Transcoding, 4: Finished, 5: Error
+  framerate: number;
+  rotation: number | null;
+  width: number;
+  height: number;
+  availableResolutions: string | null;
+  thumbnailCount: number;
+  encodeProgress: number; // 0 - 100%
+  storageSize: number;
+  thumbnailUrl: string | null;
+}
+
+export async function getBunnyVideoDetails(videoId: string): Promise<BunnyVideoDetails | null> {
+  try {
+    const { libraryId, apiKey } = getBunnyConfig();
+    const url = `https://video.bunnycdn.com/library/${libraryId}/videos/${videoId}`;
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        AccessKey: apiKey,
+        accept: "application/json",
+      },
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) return null;
+      const errorText = await response.text();
+      console.error(`Failed to get video details from Bunny Stream: ${response.status}`, errorText);
+      return null;
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error in getBunnyVideoDetails:", error);
+    return null;
+  }
+}
+
+/**
  * Generates a secure, signed token-authenticated playback iframe URL.
  */
 export function generateBunnyEmbedUrl(videoId: string, expirationInSeconds: number = 300): string {

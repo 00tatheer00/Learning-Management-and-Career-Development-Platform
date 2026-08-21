@@ -31,23 +31,34 @@ interface StudentCourseLecturesProps {
 
 function formatDuration(seconds: number | null): string {
   if (!seconds || seconds <= 0) return "Duration pending";
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
+  const totalSecs = Math.round(seconds);
+  const hrs = Math.floor(totalSecs / 3600);
+  const mins = Math.floor((totalSecs % 3600) / 60);
+  const secs = totalSecs % 60;
+  if (hrs > 0) {
+    return `${hrs}h ${mins}m`;
+  }
   if (mins === 0) return `${secs}s`;
   if (secs === 0) return `${mins} mins`;
   return `${mins}m ${secs}s`;
 }
 
 function formatProgressTime(seconds: number): string {
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
+  const totalSecs = Math.round(seconds);
+  const hrs = Math.floor(totalSecs / 3600);
+  const mins = Math.floor((totalSecs % 3600) / 60);
+  const secs = totalSecs % 60;
+  if (hrs > 0) {
+    return `${hrs}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  }
   return `${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
 export function StudentCourseLectures({
-  lectures,
+  lectures: initialLectures,
   initialProgress,
 }: StudentCourseLecturesProps) {
+  const [lectures, setLectures] = useState<Lecture[]>(initialLectures);
   const [progressMap, setProgressMap] = useState<Record<string, Progress>>(initialProgress);
   const [activeLecture, setActiveLecture] = useState<Lecture | null>(null);
   const [playbackUrl, setPlaybackUrl] = useState<string | null>(null);
@@ -67,6 +78,13 @@ export function StudentCourseLectures({
       const json = await res.json();
       if (json.success) {
         setPlaybackUrl(json.data.playbackUrl);
+        if (json.data.lecture?.duration && json.data.lecture.duration !== lecture.duration) {
+          setLectures((prev) =>
+            prev.map((item) =>
+              item.id === lecture.id ? { ...item, duration: json.data.lecture.duration } : item
+            )
+          );
+        }
       } else {
         toast.error(json.error ?? "Failed to load video player");
         setActiveLecture(null);

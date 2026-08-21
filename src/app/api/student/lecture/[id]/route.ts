@@ -60,6 +60,23 @@ export async function GET(
       return NextResponse.json(createApiResponse(false, { error: "Forbidden" }), { status: 403 });
     }
 
+    let currentDuration = lecture.duration;
+    if ((!currentDuration || currentDuration <= 0) && lecture.bunnyVideoId) {
+      try {
+        const { getBunnyVideoDetails } = await import("@/lib/bunny");
+        const details = await getBunnyVideoDetails(lecture.bunnyVideoId);
+        if (details && details.length > 0) {
+          currentDuration = details.length;
+          await prisma.lecture.update({
+            where: { id },
+            data: { duration: details.length },
+          });
+        }
+      } catch (err) {
+        console.error("Could not sync duration on playback load:", err);
+      }
+    }
+
     const playbackUrl = generateBunnyEmbedUrl(lecture.bunnyVideoId, 300);
 
     const progress = await prisma.watchProgress.findUnique({
@@ -81,7 +98,7 @@ export async function GET(
             id: lecture.id,
             title: lecture.title,
             description: lecture.description,
-            duration: lecture.duration,
+            duration: currentDuration,
           },
         },
       })

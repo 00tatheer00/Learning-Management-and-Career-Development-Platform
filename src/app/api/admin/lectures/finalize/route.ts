@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/session";
 import { createApiResponse } from "@/lib/api/enrollment";
 import { prisma } from "@/lib/prisma";
-import { deleteBunnyVideo } from "@/lib/bunny";
+import { deleteBunnyVideo, getBunnyVideoDetails } from "@/lib/bunny";
 import crypto from "crypto";
 
 export const dynamic = "force-dynamic";
@@ -34,7 +34,19 @@ export async function POST(request: Request) {
     }
 
     const orderNum = parseInt(order, 10);
-    const durationNum = duration ? parseFloat(duration) : null;
+    let durationNum = duration ? parseFloat(duration) : null;
+
+    // If duration not provided by client, try querying Bunny Stream
+    if (!durationNum || durationNum <= 0) {
+      try {
+        const details = await getBunnyVideoDetails(bunnyVideoId);
+        if (details && details.length > 0) {
+          durationNum = details.length;
+        }
+      } catch (err) {
+        console.error("Could not fetch duration from Bunny at finalize:", err);
+      }
+    }
 
     if (lectureId) {
       const existing = await prisma.lecture.findUnique({

@@ -17,9 +17,8 @@ import {
   getWatchProgressMap,
 } from "@/lib/api/student-lectures";
 import { getProgramBySlug } from "@/lib/data/programs";
-import { CourseModulesSyllabus } from "@/components/portal/course-modules-syllabus";
 import { StudentCourseLectures } from "@/components/portal/student-course-lectures";
-import { PortalPageHeader, EmptyState, PortalSurfaceCard } from "@/components/portal/portal-ui";
+import { PortalPageHeader, EmptyState } from "@/components/portal/portal-ui";
 import { Button } from "@/components/ui/button";
 import { filterByStudentModule } from "@/lib/modules/student-module-content";
 import { getStudentModuleContentContext } from "@/lib/modules/student-module-content-server";
@@ -103,28 +102,6 @@ export default async function StudentRecordingsPage() {
           </div>
         </div>
       </div>
-
-      {programSlugs.map((programSlug) => {
-        const program = getProgramBySlug(programSlug);
-        if (!program || program.modules.length === 0) return null;
-
-        return (
-          <PortalSurfaceCard key={programSlug} className="p-5 sm:p-6">
-            <h2 className="text-lg font-bold text-pt mb-1">{program.title} — Syllabus</h2>
-            <p className="text-sm text-pt-muted mb-5">
-              {isDemo ? "Demo access to all modules" : `You are on: ${user.level ?? "—"}`}
-              {" · "}
-              Tap a module to explore topics
-            </p>
-            <CourseModulesSyllabus
-              program={program}
-              activeModuleName={isDemo ? undefined : user.level ?? undefined}
-              copyVariant="student"
-              restrictToActiveModule={!isDemo}
-            />
-          </PortalSurfaceCard>
-        );
-      })}
 
       {lectures.length > 0 && (
         <StudentCourseLectures lectures={lectures} initialProgress={progressMap} />

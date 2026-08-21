@@ -21,6 +21,20 @@ interface Lecture {
   createdAt: string;
 }
 
+function formatDuration(seconds: number | null): string {
+  if (!seconds || seconds <= 0) return "Duration pending";
+  const totalSecs = Math.round(seconds);
+  const hrs = Math.floor(totalSecs / 3600);
+  const mins = Math.floor((totalSecs % 3600) / 60);
+  const secs = totalSecs % 60;
+  if (hrs > 0) {
+    return `${hrs}h ${mins}m`;
+  }
+  if (mins === 0) return `${secs}s`;
+  if (secs === 0) return `${mins} mins`;
+  return `${mins}m ${secs}s`;
+}
+
 export function AdminLecturesPanel() {
   const [lectures, setLectures] = useState<Lecture[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,22 +50,27 @@ export function AdminLecturesPanel() {
   const [formLevel, setFormLevel] = useState("");
   const [formOrder, setFormOrder] = useState("1");
   const [formDuration, setFormDuration] = useState("");
+  const [detectedSeconds, setDetectedSeconds] = useState<number | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   // Upload progress states
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
-  // Fetch all lectures
-  const loadLectures = useCallback(async () => {
+  // Fetch all lectures (with optional forceSync)
+  const loadLectures = useCallback(async (forceSync = false) => {
     setLoading(true);
     try {
-      const res = await fetch("/api/admin/lectures", {
+      const url = forceSync ? "/api/admin/lectures?sync=true" : "/api/admin/lectures";
+      const res = await fetch(url, {
         cache: "no-store",
       });
       const json = await res.json();
       if (json.success) {
         setLectures(json.data || []);
+        if (forceSync) {
+          toast.success("Synchronized recording durations with Bunny Stream!");
+        }
       } else {
         toast.error(json.error ?? "Failed to load lectures");
       }
@@ -91,6 +110,7 @@ export function AdminLecturesPanel() {
       : 1;
     setFormOrder(nextOrder.toString());
     setFormDuration("");
+    setDetectedSeconds(null);
     setSelectedFile(null);
     setIsModalOpen(true);
   };
@@ -104,6 +124,7 @@ export function AdminLecturesPanel() {
     setFormLevel(lecture.level || "");
     setFormOrder(lecture.order.toString());
     setFormDuration(lecture.duration ? (lecture.duration / 60).toFixed(1) : ""); // Convert to minutes for UI
+    setDetectedSeconds(lecture.duration || null);
     setSelectedFile(null);
     setIsModalOpen(true);
   };
@@ -136,8 +157,12 @@ export function AdminLecturesPanel() {
         const video = document.createElement("video");
         video.preload = "metadata";
         video.onloadedmetadata = () => {
-          const mins = (video.duration / 60).toFixed(1);
-          setFormDuration(mins);
+          if (video.duration && !isNaN(video.duration) && video.duration > 0) {
+            const rawSecs = Math.round(video.duration);
+            setDetectedSeconds(rawSecs);
+            const mins = (video.duration / 60).toFixed(1);
+            setFormDuration(mins);
+          }
           URL.revokeObjectURL(video.src);
         };
         video.src = URL.createObjectURL(file);
@@ -207,7 +232,6 @@ export function AdminLecturesPanel() {
             setUploadProgress(percent);
           },
           onSuccess: async () => {
-            // 4. Finalize lecture save in database
             try {
               const res = await fetch("/api/admin/lectures/finalize", {
                 method: "POST",
@@ -220,7 +244,11 @@ export function AdminLecturesPanel() {
                   programSlug: formProgramSlug,
                   level: formLevel,
                   order: formOrder,
-                  duration: formDuration ? (parseFloat(formDuration) * 60).toString() : null,
+                  duration: formDuration
+                    ? (parseFloat(formDuration) * 60).toString()
+                    : detectedSeconds
+                    ? detectedSeconds.toString()
+                    : null,
                   bunnyVideoId: videoId,
                   lectureId: editingLecture?.id || null,
                 }),
@@ -254,7 +282,11 @@ export function AdminLecturesPanel() {
             programSlug: formProgramSlug,
             level: formLevel,
             order: formOrder,
-            duration: formDuration ? (parseFloat(formDuration) * 60).toString() : null,
+            duration: formDuration
+              ? (parseFloat(formDuration) * 60).toString()
+              : detectedSeconds
+              ? detectedSeconds.toString()
+              : null,
             bunnyVideoId: editingLecture?.bunnyVideoId || "",
             lectureId: editingLecture?.id || null,
           }),
@@ -291,9 +323,14 @@ export function AdminLecturesPanel() {
         description="Add, replace, and delete securely hosted Bunny Stream HD video recordings and lectures."
       >
         <div className="flex gap-2">
-          <Button variant="secondary" onClick={() => void loadLectures()} disabled={loading || uploading}>
+          <Button
+            variant="secondary"
+            onClick={() => void loadLectures(true)}
+            disabled={loading || uploading}
+            title="Sync real duration and transcoding status from Bunny Stream"
+          >
             <ArrowClockwise size={18} className={cn(loading && "animate-spin")} />
-            Refresh
+            Sync with Bunny
           </Button>
           <Button onClick={openCreateModal} disabled={uploading}>
             <Plus size={18} />
@@ -372,11 +409,7 @@ export function AdminLecturesPanel() {
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 mt-2 text-xs text-pt-muted font-medium">
                     <span className="flex items-center gap-1">
                       <Clock size={14} />
-                      {lecture.duration ? (
-                        <span>{(lecture.duration / 60).toFixed(1)} mins</span>
-                      ) : (
-                        <span className="text-amber-500 font-semibold">No duration</span>
-                      )}
+                      <span>{formatDuration(lecture.duration)}</span>
                     </span>
                     <span>•</span>
                     <span className="inline-flex items-center gap-1 font-mono text-[9px] bg-surface/80 px-2 py-0.5 rounded text-pt-muted border border-pt">
