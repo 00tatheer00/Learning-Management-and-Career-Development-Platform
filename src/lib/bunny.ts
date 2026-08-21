@@ -156,13 +156,13 @@ export async function getBunnyVideoDetails(videoId: string): Promise<BunnyVideoD
 /**
  * Generates a secure, signed token-authenticated playback iframe URL.
  */
-export function generateBunnyEmbedUrl(videoId: string, expirationInSeconds: number = 300): string {
+export function generateBunnyEmbedUrl(videoId: string, expirationInSeconds: number = 86400): string {
   const { libraryId, tokenKey } = getBunnyConfig();
   if (!tokenKey) {
     throw new Error("BUNNY_STREAM_TOKEN_KEY is required to generate secure playback URLs.");
   }
 
-  // expiration: Unix timestamp (in seconds)
+  // expiration: Unix timestamp (in seconds) - 24 hour default validity
   const expires = Math.floor(Date.now() / 1000) + expirationInSeconds;
   const stringToHash = tokenKey + videoId + expires;
 
@@ -171,5 +171,5 @@ export function generateBunnyEmbedUrl(videoId: string, expirationInSeconds: numb
     .update(stringToHash)
     .digest("hex");
 
-  return `https://iframe.mediadelivery.net/embed/${libraryId}/${videoId}?token=${token}&expires=${expires}`;
+  return `https://iframe.mediadelivery.net/embed/${libraryId}/${videoId}?token=${token}&expires=${expires}&autoplay=true`;
 }

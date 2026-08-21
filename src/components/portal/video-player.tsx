@@ -408,6 +408,7 @@ export function VideoPlayer({
           src={playbackUrl}
           onLoad={() => setIsReady(true)}
           className="w-full h-full border-0"
+          referrerPolicy="no-referrer-when-downgrade"
           allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
           allowFullScreen
         />
