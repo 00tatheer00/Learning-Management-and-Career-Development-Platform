@@ -52,54 +52,82 @@ export default async function StudentRecordingsPage() {
     lectures.map((lecture) => lecture.id)
   );
 
+  const totalDurationSeconds = lectures.reduce((acc, l) => acc + (l.duration ?? 0), 0);
+  const completedCount = lectures.filter((l) => progressMap[l.id]?.completed).length;
+  const inProgressCount = lectures.filter(
+    (l) => progressMap[l.id] && progressMap[l.id].watchedSeconds > 0 && !progressMap[l.id].completed
+  ).length;
+
   return (
-    <div className="space-y-8">
-      <PortalPageHeader
-        eyebrow="On demand"
-        title="Class Recordings"
-        description={
-          isDemo
-            ? "Web Development + App Development — full demo access to class recordings, syllabus, and study notes"
-            : `${getProgramBySlug(programSlugs[0] ?? "web-development")?.title ?? "Your course"} — high definition class recordings, syllabus, and study materials`
-        }
-      />
-
-      {/* Student How-to-use / Quick Tips */}
-      <div className="rounded-3xl border border-pt-subtle bg-gradient-to-r from-primary/10 via-surface/80 to-background p-5 sm:p-6 shadow-sm">
-        <div className="flex items-center gap-2 mb-3">
-          <Sparkle size={20} weight="fill" className="text-primary" />
-          <h3 className="font-bold text-base text-pt">How to make the most of your Class Recordings</h3>
+    <div className="space-y-10 pb-16">
+      {/* Apple-style Minimalist Page Header with Micro Stats */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-border/40 pb-6">
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-[11px] font-bold uppercase tracking-widest text-primary">
+              On-Demand Cinema &amp; Lectures
+            </span>
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight">
+            Class Recordings
+          </h1>
+          <p className="text-sm text-muted-foreground max-w-2xl leading-relaxed">
+            {isDemo
+              ? "Web Development + App Development — Studio master recordings with DRM encryption, interactive notes, and smart bookmarks."
+              : `${getProgramBySlug(programSlugs[0] ?? "web-development")?.title ?? "Course"} — High-definition class recordings, interactive study notes, and master session archives.`}
+          </p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mt-3">
-          <div className="rounded-2xl border border-pt-subtle bg-surface/60 p-3.5 space-y-1">
-            <div className="flex items-center gap-1.5 text-primary font-bold text-xs">
-              <Clock size={16} weight="duotone" />
-              Auto-Resume Watching
-            </div>
-            <p className="text-xs text-pt-muted leading-relaxed">
-              Video player auto-saves your exact watch progress. You can stop anytime and resume right where you left off.
-            </p>
-          </div>
 
-          <div className="rounded-2xl border border-pt-subtle bg-surface/60 p-3.5 space-y-1">
-            <div className="flex items-center gap-1.5 text-primary font-bold text-xs">
-              <NotePencil size={16} weight="duotone" />
-              Interactive Study Notes
-            </div>
-            <p className="text-xs text-pt-muted leading-relaxed">
-              Write study notes while watching. Timestamped notes are saved to your profile for easy exam and project revision.
-            </p>
+        {/* Apple Style Micro Badge Bar */}
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <div className="flex items-center gap-2 rounded-full border border-border/80 bg-surface/50 backdrop-blur-md px-3.5 py-1.5 text-xs font-semibold text-muted-foreground shadow-sm">
+            <span className="font-bold text-foreground">{lectures.length}</span> Classes
           </div>
+          <div className="flex items-center gap-2 rounded-full border border-border/80 bg-surface/50 backdrop-blur-md px-3.5 py-1.5 text-xs font-semibold text-muted-foreground shadow-sm">
+            <Clock size={14} className="text-primary" />
+            <span className="font-bold text-foreground">
+              {totalDurationSeconds > 0 ? `${Math.round(totalDurationSeconds / 60)} mins` : "Ready"}
+            </span>
+          </div>
+          {completedCount > 0 && (
+            <div className="flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-1.5 text-xs font-bold text-emerald-500 shadow-sm">
+              <span>{completedCount} Completed</span>
+            </div>
+          )}
+        </div>
+      </div>
 
-          <div className="rounded-2xl border border-pt-subtle bg-surface/60 p-3.5 space-y-1">
-            <div className="flex items-center gap-1.5 text-primary font-bold text-xs">
-              <ArrowsLeftRight size={16} weight="duotone" />
-              Module Switching
-            </div>
-            <p className="text-xs text-pt-muted leading-relaxed">
-              Use the topbar module switcher to view your current or previous module class recordings anytime.
-            </p>
+      {/* Apple Bento Feature Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="group relative overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-b from-surface/80 to-surface/30 p-5 backdrop-blur-xl transition-all duration-300 hover:border-primary/40 hover:shadow-lg">
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary border border-primary/20 mb-3.5 group-hover:scale-110 transition-transform">
+            <Clock size={20} weight="duotone" />
           </div>
+          <h3 className="font-bold text-sm text-foreground">Smart Auto-Resume</h3>
+          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+            Your exact playback position is synced in real time across devices. Pick up exactly where you left off.
+          </p>
+        </div>
+
+        <div className="group relative overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-b from-surface/80 to-surface/30 p-5 backdrop-blur-xl transition-all duration-300 hover:border-primary/40 hover:shadow-lg">
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary border border-primary/20 mb-3.5 group-hover:scale-110 transition-transform">
+            <NotePencil size={20} weight="duotone" />
+          </div>
+          <h3 className="font-bold text-sm text-foreground">Timestamped Study Notes</h3>
+          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+            Press &apos;N&apos; to write timestamped notes while watching. Click any note to jump directly to key concepts.
+          </p>
+        </div>
+
+        <div className="group relative overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-b from-surface/80 to-surface/30 p-5 backdrop-blur-xl transition-all duration-300 hover:border-primary/40 hover:shadow-lg">
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary border border-primary/20 mb-3.5 group-hover:scale-110 transition-transform">
+            <Sparkle size={20} weight="duotone" />
+          </div>
+          <h3 className="font-bold text-sm text-foreground">Adaptive HD Stream</h3>
+          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+            High bitrate Bunny CDN with DRM stream encryption, variable speed (0.75x–2x), and keyboard shortcuts.
+          </p>
         </div>
       </div>
 
