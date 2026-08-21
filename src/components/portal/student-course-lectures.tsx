@@ -8,17 +8,11 @@ import {
   ArrowRight,
   X,
   FilmStrip,
-  Sparkle,
-  BookmarkSimple,
-  ShieldCheck,
-  SlidersHorizontal,
   CheckCircle,
 } from "@phosphor-icons/react";
 import { VideoPlayer } from "./video-player";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "@/lib/ui/toast";
-import { DynamicProgressBar } from "@/components/ui/dynamic-progress-bar";
 
 interface Lecture {
   id: string;
@@ -39,6 +33,11 @@ interface Progress {
 interface StudentCourseLecturesProps {
   lectures: Lecture[];
   initialProgress: Record<string, Progress>;
+  studentInfo?: {
+    email?: string;
+    name?: string;
+    id?: string;
+  };
 }
 
 function formatDuration(seconds: number | null): string {
@@ -70,6 +69,7 @@ function formatBadgeDuration(seconds: number | null): string {
 export function StudentCourseLectures({
   lectures: initialLectures,
   initialProgress,
+  studentInfo,
 }: StudentCourseLecturesProps) {
   const [lectures, setLectures] = useState<Lecture[]>(initialLectures);
   const [progressMap, setProgressMap] = useState<Record<string, Progress>>(initialProgress);
@@ -448,6 +448,7 @@ export function StudentCourseLectures({
                   <VideoPlayer
                     lectureId={activeLecture.id}
                     playbackUrl={playbackUrl}
+                    studentInfo={studentInfo}
                     initialTime={progressMap[activeLecture.id]?.watchedSeconds ?? 0}
                     hasNextLecture={hasNextLecture}
                     hasPrevLecture={hasPrevLecture}

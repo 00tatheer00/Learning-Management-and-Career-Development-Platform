@@ -17,6 +17,7 @@ import {
   CaretRight,
   BookmarkSimple,
   Play,
+  ShieldCheck,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -31,6 +32,11 @@ interface StudyNote {
 interface VideoPlayerProps {
   lectureId: string;
   playbackUrl: string;
+  studentInfo?: {
+    email?: string;
+    name?: string;
+    id?: string;
+  };
   initialTime?: number;
   onClose?: () => void;
   onProgressSaved?: (watchedSeconds: number, completed: boolean) => void;
@@ -53,6 +59,7 @@ function formatTime(seconds: number): string {
 export function VideoPlayer({
   lectureId,
   playbackUrl,
+  studentInfo,
   initialTime = 0,
   onClose,
   onProgressSaved,
@@ -81,6 +88,103 @@ export function VideoPlayer({
   const currentTimeRef = useRef<number>(initialTime);
   const durationRef = useRef<number>(0);
   const isCompletedRef = useRef<boolean>(false);
+
+  // Send message to Bunny iframe player
+  const postToPlayer = useCallback((method: string, value?: unknown) => {
+    const iframe = iframeRef.current;
+    if (iframe?.contentWindow) {
+      iframe.contentWindow.postMessage(
+        JSON.stringify(value !== undefined ? { method, value } : { method }),
+        "*"
+      );
+    }
+  }, []);
+
+  // Security & Forensic Anti-Screen Recording State
+  const [screenShieldActive, setScreenShieldActive] = useState<boolean>(false);
+  const [shieldReason, setShieldReason] = useState<string>("Screen capture or recording activity detected.");
+  const [watermarkPos, setWatermarkPos] = useState<{
+    top?: string;
+    bottom?: string;
+    left?: string;
+    right?: string;
+  }>({
+    top: "16%",
+    left: "14%",
+  });
+  const [watermarkOpacity, setWatermarkOpacity] = useState<number>(0.35);
+
+  // Dynamic Floating Forensic Watermark Timer
+  useEffect(() => {
+    const positions = [
+      { top: "14%", left: "12%", right: "auto", bottom: "auto" },
+      { top: "20%", right: "14%", left: "auto", bottom: "auto" },
+      { top: "68%", left: "18%", right: "auto", bottom: "auto" },
+      { top: "58%", right: "16%", left: "auto", bottom: "auto" },
+      { top: "38%", left: "42%", right: "auto", bottom: "auto" },
+      { top: "78%", left: "25%", right: "auto", bottom: "auto" },
+      { top: "15%", right: "32%", left: "auto", bottom: "auto" },
+      { top: "48%", left: "12%", right: "auto", bottom: "auto" },
+    ];
+
+    const interval = setInterval(() => {
+      const nextPos = positions[Math.floor(Math.random() * positions.length)];
+      setWatermarkPos(nextPos);
+      setWatermarkOpacity(0.25 + Math.random() * 0.25);
+    }, 6500);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Anti-Screen Capture & Focus Shield
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // 1. Intercept PrintScreen
+      if (e.key === "PrintScreen" || e.code === "PrintScreen") {
+        e.preventDefault();
+        setShieldReason("Screenshot protection active. Direct screen capture is disabled.");
+        setScreenShieldActive(true);
+        postToPlayer("pause");
+        setTimeout(() => setScreenShieldActive(false), 4500);
+      }
+      // 2. Intercept Win+Shift+S (Snipping tool) / Cmd+Shift+3,4,5 / Ctrl+Shift+S
+      if (
+        (e.ctrlKey || e.metaKey) &&
+        e.shiftKey &&
+        (e.key === "S" || e.key === "s" || e.key === "3" || e.key === "4" || e.key === "5")
+      ) {
+        setShieldReason("Screen snip & recording utility intercepted.");
+        setScreenShieldActive(true);
+        postToPlayer("pause");
+        setTimeout(() => setScreenShieldActive(false), 4500);
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        postToPlayer("pause");
+        setShieldReason("Protected session: playback paused while the tab is hidden.");
+        setScreenShieldActive(true);
+      }
+    };
+
+    const handleWindowBlur = () => {
+      // When user switches to screen recorder or external window, pause and shield
+      postToPlayer("pause");
+      setShieldReason("Playback paused because video lost window focus.");
+      setScreenShieldActive(true);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("blur", handleWindowBlur);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("blur", handleWindowBlur);
+    };
+  }, [postToPlayer]);
 
   // Load saved notes for this lecture
   useEffect(() => {
@@ -126,17 +230,6 @@ export function VideoPlayer({
     const updated = notes.filter((n) => n.id !== id);
     saveNotesToStorage(updated);
   };
-
-  // Send message to Bunny iframe player
-  const postToPlayer = useCallback((method: string, value?: unknown) => {
-    const iframe = iframeRef.current;
-    if (iframe?.contentWindow) {
-      iframe.contentWindow.postMessage(
-        JSON.stringify(value !== undefined ? { method, value } : { method }),
-        "*"
-      );
-    }
-  }, []);
 
   const handleSeekTo = (targetSecs: number) => {
     postToPlayer("setCurrentTime", targetSecs);
@@ -308,14 +401,75 @@ export function VideoPlayer({
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Video Viewport */}
-      <div className="relative w-full aspect-video bg-black rounded-2xl border border-zinc-800 overflow-hidden shadow-2xl flex items-center justify-center group">
+      {/* Video Viewport with Anti-Piracy Shield & Forensic Watermark */}
+      <div
+        className="relative w-full aspect-video bg-black rounded-2xl border border-zinc-800 overflow-hidden shadow-2xl flex items-center justify-center group select-none"
+        onContextMenu={(e) => e.preventDefault()}
+      >
         {!isReady && !error && (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/90 text-white gap-3">
             <Spinner size={36} className="animate-spin text-primary" />
             <p className="text-sm font-semibold tracking-wide animate-pulse">
-              Configuring secure connection...
+              Configuring secure DRM connection...
             </p>
+          </div>
+        )}
+
+        {/* Dynamic Floating Forensic Anti-Piracy Watermark */}
+        {isReady && !error && (
+          <div
+            style={{
+              top: watermarkPos.top,
+              bottom: watermarkPos.bottom,
+              left: watermarkPos.left,
+              right: watermarkPos.right,
+              opacity: watermarkOpacity,
+              transition: "all 2.5s cubic-bezier(0.4, 0, 0.2, 1)",
+            }}
+            className="pointer-events-none absolute z-30 select-none font-mono text-[10px] sm:text-xs font-bold text-white/90 drop-shadow-[0_2px_8px_rgba(0,0,0,1)] flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-black/40 backdrop-blur-xs border border-white/10"
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span>EEST SECURE • {studentInfo?.email || "AUTHENTICATED STUDENT"}</span>
+          </div>
+        )}
+
+        {/* Diagonal Micro-Tiled Security Pattern */}
+        {isReady && !error && (
+          <div className="pointer-events-none absolute inset-0 z-20 select-none opacity-[0.035] overflow-hidden flex flex-wrap gap-12 p-4 text-[9px] font-mono text-white/80">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <span key={i} className="rotate-[-25deg] uppercase">
+                {studentInfo?.email ?? "EEST PORTAL"} • DRM PROTECTED
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Anti-Screen Recording & Blackout Shield Overlay */}
+        {screenShieldActive && (
+          <div className="absolute inset-0 z-40 flex flex-col items-center justify-center bg-black/98 text-white p-6 text-center backdrop-blur-2xl animate-in fade-in duration-200">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 mb-3 shadow-xl">
+              <ShieldCheck size={32} weight="duotone" />
+            </div>
+            <h4 className="text-lg font-bold text-white tracking-tight">
+              Content Protection Shield Active
+            </h4>
+            <p className="text-xs text-zinc-400 mt-1.5 max-w-sm leading-relaxed">
+              {shieldReason}
+            </p>
+            <p className="text-[10px] font-mono text-zinc-500 mt-2.5">
+              Licensed Session: {studentInfo?.email || "Authenticated Student"}
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setScreenShieldActive(false);
+                postToPlayer("play");
+              }}
+              className="mt-5 flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-xs font-bold text-primary-foreground shadow-lg hover:brightness-110 active:scale-95 transition-all cursor-pointer"
+            >
+              <Play size={13} weight="fill" />
+              Resume Video
+            </button>
           </div>
         )}
 

@@ -6,7 +6,6 @@ import {
   ArrowSquareOut,
   Clock,
   Sparkle,
-  ArrowsLeftRight,
   NotePencil,
 } from "@phosphor-icons/react/ssr";
 import { getCurrentUser } from "@/lib/auth/session";
@@ -18,7 +17,7 @@ import {
 } from "@/lib/api/student-lectures";
 import { getProgramBySlug } from "@/lib/data/programs";
 import { StudentCourseLectures } from "@/components/portal/student-course-lectures";
-import { PortalPageHeader, EmptyState } from "@/components/portal/portal-ui";
+import { EmptyState } from "@/components/portal/portal-ui";
 import { Button } from "@/components/ui/button";
 import { filterByStudentModule } from "@/lib/modules/student-module-content";
 import { getStudentModuleContentContext } from "@/lib/modules/student-module-content-server";
@@ -90,6 +89,11 @@ export default async function StudentRecordingsPage() {
               {totalDurationSeconds > 0 ? `${Math.round(totalDurationSeconds / 60)} mins` : "Ready"}
             </span>
           </div>
+          {inProgressCount > 0 && (
+            <div className="flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1.5 text-xs font-bold text-primary shadow-sm">
+              <span>{inProgressCount} Watching</span>
+            </div>
+          )}
           {completedCount > 0 && (
             <div className="flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-1.5 text-xs font-bold text-emerald-500 shadow-sm">
               <span>{completedCount} Completed</span>
@@ -132,7 +136,11 @@ export default async function StudentRecordingsPage() {
       </div>
 
       {lectures.length > 0 && (
-        <StudentCourseLectures lectures={lectures} initialProgress={progressMap} />
+        <StudentCourseLectures
+          lectures={lectures}
+          initialProgress={progressMap}
+          studentInfo={{ email: user.email, name: user.name, id: user.id }}
+        />
       )}
 
       <div>
