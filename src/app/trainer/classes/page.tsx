@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { LinkSimple, PencilSimple, VideoCamera, CheckCircle, Trash } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -61,15 +61,15 @@ export default function TrainerClassesPage() {
     return () => window.clearInterval(id);
   }, []);
 
-  const load = () =>
+  const load = useCallback(() => {
     fetch("/api/trainer/data")
       .then((r) => r.json())
       .then((d) => {
         if (d.success) {
           setSessions(d.data.sessions ?? []);
           setTrainer(d.data.trainer ?? null);
-          if (d.data.trainer?.modules?.length > 0 && form.level === "") {
-            setForm((prev) => ({ ...prev, level: d.data.trainer.currentLevel ?? d.data.trainer.modules[0] }));
+          if (d.data.trainer?.modules?.length > 0) {
+            setForm((prev) => (prev.level === "" ? { ...prev, level: d.data.trainer.currentLevel ?? d.data.trainer.modules[0] } : prev));
           }
         } else {
           toast.error("Could not load classes");
@@ -77,11 +77,11 @@ export default function TrainerClassesPage() {
       })
       .catch(() => toast.error("Could not load classes"))
       .finally(() => setPageLoading(false));
+  }, []);
 
   useEffect(() => {
     void load();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [load]);
 
   // Filter sessions by selected module
   const filteredSessions = selectedModule === "all"

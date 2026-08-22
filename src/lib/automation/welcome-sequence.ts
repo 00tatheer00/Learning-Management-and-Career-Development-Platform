@@ -1,4 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function runWelcomeSequence(_now = new Date()): Promise<{
   day1: number;
   day3: number;

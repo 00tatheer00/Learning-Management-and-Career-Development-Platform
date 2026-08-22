@@ -30,8 +30,11 @@ import {
   getStudentPortalProgramSlugs,
 } from "@/lib/student-portal/program-scope";
 
+import { PAKISTAN_TZ } from "@/lib/utils/pakistan-time";
+
 function formatDashboardDate() {
   return new Date().toLocaleDateString("en-GB", {
+    timeZone: PAKISTAN_TZ,
     weekday: "long",
     day: "numeric",
     month: "long",
