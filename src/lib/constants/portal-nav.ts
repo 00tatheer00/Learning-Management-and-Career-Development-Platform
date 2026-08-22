@@ -15,6 +15,7 @@ import {
   ListChecks,
   FilmStrip,
   Certificate,
+  PlayCircle,
 } from "@phosphor-icons/react";
 
 import type { UserRole } from "@/types/portal";

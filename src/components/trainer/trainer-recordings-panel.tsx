@@ -19,8 +19,6 @@ import {
   Check,
   ArrowSquareOut,
   MagnifyingGlass,
-  FileText,
-  Sparkle,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { PortalPageHeader } from "@/components/portal/portal-ui";
@@ -1365,9 +1363,9 @@ export function TrainerRecordingsPanel({
                 </div>
               ) : previewPlaybackUrl ? (
                 <VideoPlayer
+                  lectureId={previewRecording.id}
                   playbackUrl={previewPlaybackUrl}
-                  title={previewRecording.title}
-                  autoPlay
+                  onClose={() => setPreviewRecording(null)}
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center text-sm text-red-500 font-semibold">

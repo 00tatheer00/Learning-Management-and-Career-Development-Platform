@@ -2,11 +2,9 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getClassRecordings } from "@/lib/api/class-recordings";
 import { StudentRecordingsContent } from "@/components/portal/student-recordings-content";
-import { getProgramBySlug } from "@/lib/data/programs";
 import { filterByStudentModule } from "@/lib/modules/student-module-content";
 import { getStudentModuleContentContext } from "@/lib/modules/student-module-content-server";
 import { getProgramModuleNames } from "@/lib/modules/student-module-access";
-import { isDemoPortalStudent } from "@/lib/constants/demo-student";
 import {
   fetchMergedByProgram,
   getStudentPortalProgramSlugs,
@@ -18,7 +16,6 @@ export default async function StudentDriveRecordingsPage() {
 
   const programSlugs = await getStudentPortalProgramSlugs(user);
   const primarySlug = programSlugs[0] ?? user.programSlug ?? "web-development";
-  const isDemo = isDemoPortalStudent(user.email);
   const moduleContext = await getStudentModuleContentContext(user);
 
   const allRecordings = await fetchMergedByProgram(programSlugs, getClassRecordings);
@@ -36,7 +33,7 @@ export default async function StudentDriveRecordingsPage() {
       <StudentRecordingsContent
         programSlug={primarySlug}
         recordings={recordings}
-        studentModule={moduleContext.effectiveLevel || undefined}
+        studentModule={moduleContext.studentLevel || undefined}
         modules={programModules}
       />
     </div>
