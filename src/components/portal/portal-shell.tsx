@@ -426,7 +426,13 @@ function SidebarContent({
             <div className="space-y-0.5">
               {group.items.map((item) => {
                 const active =
-                  pathname === item.href || pathname.startsWith(`${item.href}/`);
+                  pathname === item.href ||
+                  (item.href !== "/student/dashboard" &&
+                   item.href !== "/student/recordings" &&
+                   item.href !== "/student/drive-recordings" &&
+                   item.href !== "/trainer/dashboard" &&
+                   item.href !== "/admin/dashboard" &&
+                   pathname.startsWith(`${item.href}/`));
                 const Icon = item.icon;
                 const showEnrollmentBadge =
                   item.href === "/admin/enrollments" && enrollmentBadgeCount > 0;

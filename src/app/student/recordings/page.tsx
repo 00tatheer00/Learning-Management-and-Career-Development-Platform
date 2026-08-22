@@ -121,7 +121,7 @@ export default async function StudentRecordingsPage() {
           </div>
         </div>
         <Button asChild size="sm" variant="secondary" className="rounded-xl shrink-0 font-bold shadow-sm border border-amber-500/30 hover:bg-amber-500/15">
-          <Link href="/student/recordings/drive" className="flex items-center gap-1.5">
+          <Link href="/student/drive-recordings" className="flex items-center gap-1.5">
             <PlayCircle size={15} weight="fill" className="text-amber-600 dark:text-amber-400" />
             Switch to Drive Recordings
           </Link>

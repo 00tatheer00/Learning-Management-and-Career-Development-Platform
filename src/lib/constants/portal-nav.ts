@@ -32,7 +32,7 @@ export const PORTAL_NAV: Record<UserRole, PortalNavItem[]> = {
     { href: "/student/dashboard", label: "Home", icon: House, description: "Your dashboard" },
     { href: "/student/modules", label: "My Modules", icon: GraduationCap, description: "Your enrolled & locked modules" },
     { href: "/student/recordings", label: "HD Recordings", icon: FilmStrip, description: "HD stream player & notes" },
-    { href: "/student/recordings/drive", label: "Drive Recordings", icon: PlayCircle, description: "Google Drive backup recordings" },
+    { href: "/student/drive-recordings", label: "Drive Recordings", icon: PlayCircle, description: "Google Drive backup recordings" },
     { href: "/student/classes", label: "Live Classes", icon: VideoCamera, description: "Join online class" },
     { href: "/student/assignments", label: "Assignments", icon: ClipboardText, description: "Homework & tasks" },
     { href: "/student/attendance", label: "Attendance", icon: ListChecks, description: "Your attendance %" },
