@@ -17,7 +17,6 @@ import {
   CaretRight,
   BookmarkSimple,
   Play,
-  ShieldCheck,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -100,9 +99,7 @@ export function VideoPlayer({
     }
   }, []);
 
-  // Security & Forensic Anti-Screen Recording State
-  const [screenShieldActive, setScreenShieldActive] = useState<boolean>(false);
-  const [shieldReason, setShieldReason] = useState<string>("Screen capture or recording activity detected.");
+  // Watermark Positioning State
   const [watermarkPos, setWatermarkPos] = useState<{
     top?: string;
     bottom?: string;
@@ -135,56 +132,6 @@ export function VideoPlayer({
 
     return () => clearInterval(interval);
   }, []);
-
-  // Anti-Screen Capture & Focus Shield
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // 1. Intercept PrintScreen
-      if (e.key === "PrintScreen" || e.code === "PrintScreen") {
-        e.preventDefault();
-        setShieldReason("Screenshot protection active. Direct screen capture is disabled.");
-        setScreenShieldActive(true);
-        postToPlayer("pause");
-        setTimeout(() => setScreenShieldActive(false), 4500);
-      }
-      // 2. Intercept Win+Shift+S (Snipping tool) / Cmd+Shift+3,4,5 / Ctrl+Shift+S
-      if (
-        (e.ctrlKey || e.metaKey) &&
-        e.shiftKey &&
-        (e.key === "S" || e.key === "s" || e.key === "3" || e.key === "4" || e.key === "5")
-      ) {
-        setShieldReason("Screen snip & recording utility intercepted.");
-        setScreenShieldActive(true);
-        postToPlayer("pause");
-        setTimeout(() => setScreenShieldActive(false), 4500);
-      }
-    };
-
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        postToPlayer("pause");
-        setShieldReason("Protected session: playback paused while the tab is hidden.");
-        setScreenShieldActive(true);
-      }
-    };
-
-    const handleWindowBlur = () => {
-      // When user switches to screen recorder or external window, pause and shield
-      postToPlayer("pause");
-      setShieldReason("Playback paused because video lost window focus.");
-      setScreenShieldActive(true);
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    window.addEventListener("blur", handleWindowBlur);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-      window.removeEventListener("blur", handleWindowBlur);
-    };
-  }, [postToPlayer]);
 
   // Load saved notes for this lecture
   useEffect(() => {
@@ -444,34 +391,7 @@ export function VideoPlayer({
           </div>
         )}
 
-        {/* Anti-Screen Recording & Blackout Shield Overlay */}
-        {screenShieldActive && (
-          <div className="absolute inset-0 z-40 flex flex-col items-center justify-center bg-black/98 text-white p-6 text-center backdrop-blur-2xl animate-in fade-in duration-200">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 mb-3 shadow-xl">
-              <ShieldCheck size={32} weight="duotone" />
-            </div>
-            <h4 className="text-lg font-bold text-white tracking-tight">
-              Content Protection Shield Active
-            </h4>
-            <p className="text-xs text-zinc-400 mt-1.5 max-w-sm leading-relaxed">
-              {shieldReason}
-            </p>
-            <p className="text-[10px] font-mono text-zinc-500 mt-2.5">
-              Licensed Session: {studentInfo?.email || "Authenticated Student"}
-            </p>
-            <button
-              type="button"
-              onClick={() => {
-                setScreenShieldActive(false);
-                postToPlayer("play");
-              }}
-              className="mt-5 flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-xs font-bold text-primary-foreground shadow-lg hover:brightness-110 active:scale-95 transition-all cursor-pointer"
-            >
-              <Play size={13} weight="fill" />
-              Resume Video
-            </button>
-          </div>
-        )}
+
 
         {/* Resume position toast notification */}
         {showResumeBanner && initialTime > 10 && (
