@@ -102,6 +102,32 @@ export default async function StudentRecordingsPage() {
         </div>
       </div>
 
+      {/* 🚀 Quick Switch Banner to Google Drive Backup Recordings */}
+      <div className="relative overflow-hidden rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-surface p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm backdrop-blur-md">
+        <div className="flex items-start sm:items-center gap-3.5">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+            <PlayCircle size={22} weight="duotone" />
+          </div>
+          <div>
+            <p className="font-bold text-sm text-foreground flex items-center gap-2">
+              Playback buffering or slow internet?
+              <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-amber-500/20 text-amber-700 dark:text-amber-300">
+                Backup Mirror
+              </span>
+            </p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              If Bunny HD Stream has issues, watch all class recordings directly on Google Drive without DRM buffering.
+            </p>
+          </div>
+        </div>
+        <Button asChild size="sm" variant="secondary" className="rounded-xl shrink-0 font-bold shadow-sm border border-amber-500/30 hover:bg-amber-500/15">
+          <Link href="/student/recordings/drive" className="flex items-center gap-1.5">
+            <PlayCircle size={15} weight="fill" className="text-amber-600 dark:text-amber-400" />
+            Switch to Drive Recordings
+          </Link>
+        </Button>
+      </div>
+
       {/* Apple Bento Feature Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="group relative overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-b from-surface/80 to-surface/30 p-5 backdrop-blur-xl transition-all duration-300 hover:border-primary/40 hover:shadow-lg">
