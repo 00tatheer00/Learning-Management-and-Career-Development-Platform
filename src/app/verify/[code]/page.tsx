@@ -15,7 +15,11 @@ interface VerifyPageProps {
 
 export default async function PublicVerifyCodePage({ params }: VerifyPageProps) {
   const { code } = await params;
-  const cert = await verifyCertificateByCode(code);
+  const sanitizedCode = decodeURIComponent(code || "").trim();
+  const cert =
+    sanitizedCode.length >= 3 && sanitizedCode.length <= 64
+      ? await verifyCertificateByCode(sanitizedCode)
+      : null;
 
   return (
     <div className="py-10 sm:py-16 lg:py-20">

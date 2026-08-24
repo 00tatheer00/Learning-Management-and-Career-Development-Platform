@@ -57,10 +57,32 @@ export function StudentPortalBadgesProvider({ children }: { children: ReactNode 
 
   useEffect(() => {
     void refresh();
+
+    let lastFetch = Date.now();
+    const pollInterval = 90_000;
+
     const intervalId = window.setInterval(() => {
-      void refresh();
-    }, 60_000);
-    return () => window.clearInterval(intervalId);
+      if (document.visibilityState === "visible") {
+        lastFetch = Date.now();
+        void refresh();
+      }
+    }, pollInterval);
+
+    const onFocusOrVisible = () => {
+      if (document.visibilityState === "visible" && Date.now() - lastFetch >= 20_000) {
+        lastFetch = Date.now();
+        void refresh();
+      }
+    };
+
+    document.addEventListener("visibilitychange", onFocusOrVisible);
+    window.addEventListener("focus", onFocusOrVisible);
+
+    return () => {
+      window.clearInterval(intervalId);
+      document.removeEventListener("visibilitychange", onFocusOrVisible);
+      window.removeEventListener("focus", onFocusOrVisible);
+    };
   }, [refresh]);
 
   const value = useMemo(

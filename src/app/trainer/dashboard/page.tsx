@@ -33,11 +33,10 @@ export default async function TrainerDashboardPage() {
     console.error("Background sync error:", err);
   });
 
-  const [allProgramStudents, allAssignments, allSessions, allSubmissions] = await Promise.all([
+  const [allProgramStudents, allAssignments, allSessions] = await Promise.all([
     getTrainerApprovedStudents(programSlug),
     getAssignments(programSlug),
     getLiveSessions(programSlug),
-    getSubmissions(),
   ]);
 
   const activeLevel = user.level?.trim();
@@ -56,8 +55,8 @@ export default async function TrainerDashboardPage() {
     : allSessions.filter((s) => s.trainerId === trainerId && (!s.level || s.level === activeLevel));
 
   const moduleGroups = groupStudentsByModule(allProgramStudents, programSlug);
-  const assignmentIds = new Set(assignments.map((a) => a.id));
-  const submissions = allSubmissions.filter((s) => assignmentIds.has(s.assignmentId));
+  const assignmentIds = assignments.map((a) => a.id);
+  const submissions = await getSubmissions(undefined, { assignmentIds });
 
   const pendingReviews = submissions.filter((s) => s.status === "submitted").length;
   const upcomingSessions = countUpcomingLiveSessions(sessions);

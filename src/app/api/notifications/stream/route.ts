@@ -1,63 +1,34 @@
-import { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/auth-options";
-import { notificationEvents } from "@/lib/services/notification-service";
+import {
+  getUserNotifications,
+  getUnreadNotificationCount,
+} from "@/lib/services/notification-service";
+import { createApiResponse } from "@/lib/api/enrollment";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
-    return new Response("Unauthorized", { status: 401 });
+    return NextResponse.json(
+      createApiResponse(false, { error: "Unauthorized" }),
+      { status: 401 }
+    );
   }
 
-  const userId = session.user.id;
-  const eventChannel = `user:${userId}`;
+  const [notifications, unreadCount] = await Promise.all([
+    getUserNotifications(session.user.id, 20),
+    getUnreadNotificationCount(session.user.id),
+  ]);
 
-  const stream = new ReadableStream({
-    start(controller) {
-      const encoder = new TextEncoder();
-
-      // Send initial keep-alive ping
-      controller.enqueue(encoder.encode(`event: ping\ndata: ${Date.now()}\n\n`));
-
-      const onNotification = (data: unknown) => {
-        try {
-          const payload = JSON.stringify(data);
-          controller.enqueue(encoder.encode(`event: notification\ndata: ${payload}\n\n`));
-        } catch {
-          // ignore serialize errors
-        }
-      };
-
-      notificationEvents.on(eventChannel, onNotification);
-
-      // Periodic 25-second keep-alive to keep connection active across proxies
-      const interval = setInterval(() => {
-        try {
-          controller.enqueue(encoder.encode(`event: ping\ndata: ${Date.now()}\n\n`));
-        } catch {
-          clearInterval(interval);
-        }
-      }, 25000);
-
-      req.signal.addEventListener("abort", () => {
-        clearInterval(interval);
-        notificationEvents.off(eventChannel, onNotification);
-        try {
-          controller.close();
-        } catch {
-          // already closed
-        }
-      });
-    },
-  });
-
-  return new Response(stream, {
-    headers: {
-      "Content-Type": "text/event-stream",
-      "Cache-Control": "no-cache, no-transform",
-      Connection: "keep-alive",
-    },
-  });
+  return NextResponse.json(
+    createApiResponse(true, {
+      data: {
+        notifications,
+        unreadCount,
+      },
+    })
+  );
 }

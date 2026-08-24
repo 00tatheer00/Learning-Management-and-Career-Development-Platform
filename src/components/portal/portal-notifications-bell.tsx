@@ -50,31 +50,30 @@ export function PortalNotificationsBell() {
   useEffect(() => {
     void fetchNotifications();
 
-    // Setup live SSE stream
-    let eventSource: EventSource | null = null;
-    try {
-      eventSource = new EventSource("/api/notifications/stream");
-      eventSource.addEventListener("notification", (event) => {
-        try {
-          const newNotif = JSON.parse(event.data) as NotificationItem;
-          setNotifications((prev) => [newNotif, ...prev]);
-          setUnreadCount((count) => count + 1);
-        } catch {
-          // ignore parse error
-        }
-      });
-    } catch {
-      // Fallback: regular polling if SSE not supported
-      const interval = setInterval(() => {
+    let lastFetch = Date.now();
+    const pollInterval = 75_000;
+
+    const interval = setInterval(() => {
+      if (document.visibilityState === "visible") {
+        lastFetch = Date.now();
         void fetchNotifications();
-      }, 30000);
-      return () => clearInterval(interval);
-    }
+      }
+    }, pollInterval);
+
+    const onFocusOrVisible = () => {
+      if (document.visibilityState === "visible" && Date.now() - lastFetch >= 20_000) {
+        lastFetch = Date.now();
+        void fetchNotifications();
+      }
+    };
+
+    document.addEventListener("visibilitychange", onFocusOrVisible);
+    window.addEventListener("focus", onFocusOrVisible);
 
     return () => {
-      if (eventSource) {
-        eventSource.close();
-      }
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", onFocusOrVisible);
+      window.removeEventListener("focus", onFocusOrVisible);
     };
   }, [fetchNotifications]);
 

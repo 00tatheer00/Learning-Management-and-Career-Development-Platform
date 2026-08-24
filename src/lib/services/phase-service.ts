@@ -78,24 +78,22 @@ export interface CentralPhaseMetrics {
   appStudents: number;
 }
 
-/**
- * Computes consistent metrics from a set of enrollments and student user accounts.
- * Student phase is strictly bound to approved registrations.
- */
-export async function getCentralPhaseMetrics(phase: PhaseFilter): Promise<CentralPhaseMetrics> {
-  const createdAtFilter = getPhaseCreatedAtFilter(phase);
-
-  const enrollments = await prisma.enrollment.findMany({
-    where: createdAtFilter ? { createdAt: createdAtFilter } : undefined,
-    select: {
-      id: true,
-      email: true,
-      status: true,
-      program: true,
-      createdAt: true,
-    },
-  });
-
+export function computeMetricsFromData(
+  enrollments: Array<{
+    id: string;
+    email: string;
+    status: string;
+    program: string;
+    createdAt: Date;
+  }>,
+  allStudentUsers: Array<{
+    id: string;
+    email: string;
+    firstLoginAt: Date | null;
+    programSlug: string | null;
+  }>,
+  isPhaseFiltered = false
+): CentralPhaseMetrics {
   const totalEnrollments = enrollments.length;
   const pendingEnrollments = enrollments.filter((e) => e.status === "pending").length;
   const approved = enrollments.filter((e) => e.status === "approved");
@@ -117,50 +115,29 @@ export async function getCentralPhaseMetrics(phase: PhaseFilter): Promise<Centra
   );
   const estimatedRevenue = revenueObj.gross;
 
-  // Student accounts strictly tied to approved registrations for this phase
-  let studentsCount = 0;
-  let loggedInStudents = 0;
-  let webStudents = 0;
-  let appStudents = 0;
+  // Student accounts strictly tied to approved registrations
+  let studentUsers: Array<{
+    id: string;
+    email: string;
+    firstLoginAt: Date | null;
+    programSlug: string | null;
+  }> = [];
 
   if (approvedEmails.size > 0) {
-    const studentUsers = await prisma.user.findMany({
-      where: {
-        role: "student",
-        isActive: true,
-        email: { in: Array.from(approvedEmails) },
-      },
-      select: {
-        id: true,
-        email: true,
-        firstLoginAt: true,
-        programSlug: true,
-      },
-    });
-
-    studentsCount = studentUsers.length;
-    loggedInStudents = studentUsers.filter((s) => Boolean(s.firstLoginAt)).length;
-
-    const webSlug = ENROLLABLE_PROGRAM_SLUGS[0];
-    const appSlug = ENROLLABLE_PROGRAM_SLUGS[1];
-    webStudents = studentUsers.filter((s) => s.programSlug === webSlug).length;
-    appStudents = studentUsers.filter((s) => s.programSlug === appSlug).length;
-  } else {
-    // If no approved registrations in this phase (or querying all with no students)
-    if (phase === "all") {
-      const allStudentUsers = await prisma.user.findMany({
-        where: { role: "student", isActive: true },
-        select: { id: true, firstLoginAt: true, programSlug: true },
-      });
-      studentsCount = allStudentUsers.length;
-      loggedInStudents = allStudentUsers.filter((s) => Boolean(s.firstLoginAt)).length;
-      const webSlug = ENROLLABLE_PROGRAM_SLUGS[0];
-      const appSlug = ENROLLABLE_PROGRAM_SLUGS[1];
-      webStudents = allStudentUsers.filter((s) => s.programSlug === webSlug).length;
-      appStudents = allStudentUsers.filter((s) => s.programSlug === appSlug).length;
-    }
+    studentUsers = allStudentUsers.filter((s) =>
+      approvedEmails.has(s.email.trim().toLowerCase())
+    );
+  } else if (!isPhaseFiltered) {
+    studentUsers = allStudentUsers;
   }
 
+  const studentsCount = studentUsers.length;
+  const loggedInStudents = studentUsers.filter((s) => Boolean(s.firstLoginAt)).length;
+
+  const webSlug = ENROLLABLE_PROGRAM_SLUGS[0];
+  const appSlug = ENROLLABLE_PROGRAM_SLUGS[1];
+  const webStudents = studentUsers.filter((s) => s.programSlug === webSlug).length;
+  const appStudents = studentUsers.filter((s) => s.programSlug === appSlug).length;
   const neverLoggedInStudents = Math.max(0, studentsCount - loggedInStudents);
 
   return {
@@ -177,4 +154,58 @@ export async function getCentralPhaseMetrics(phase: PhaseFilter): Promise<Centra
     webStudents,
     appStudents,
   };
+}
+
+/**
+ * Computes all phase metrics (all, phase-1, phase-2) in a single database pass.
+ */
+export async function getAllPhaseMetrics(): Promise<{
+  all: CentralPhaseMetrics;
+  phase1: CentralPhaseMetrics;
+  phase2: CentralPhaseMetrics;
+}> {
+  const [enrollments, allStudentUsers] = await Promise.all([
+    prisma.enrollment.findMany({
+      select: {
+        id: true,
+        email: true,
+        status: true,
+        program: true,
+        createdAt: true,
+      },
+    }),
+    prisma.user.findMany({
+      where: { role: "student", isActive: true },
+      select: {
+        id: true,
+        email: true,
+        firstLoginAt: true,
+        programSlug: true,
+      },
+    }),
+  ]);
+
+  const p2Time = PHASE_2_START_DATE.getTime();
+  const phase1Enrollments = enrollments.filter(
+    (e) => new Date(e.createdAt).getTime() < p2Time
+  );
+  const phase2Enrollments = enrollments.filter(
+    (e) => new Date(e.createdAt).getTime() >= p2Time
+  );
+
+  return {
+    all: computeMetricsFromData(enrollments, allStudentUsers, false),
+    phase1: computeMetricsFromData(phase1Enrollments, allStudentUsers, true),
+    phase2: computeMetricsFromData(phase2Enrollments, allStudentUsers, true),
+  };
+}
+
+/**
+ * Computes consistent metrics for a specific phase filter.
+ */
+export async function getCentralPhaseMetrics(phase: PhaseFilter): Promise<CentralPhaseMetrics> {
+  const allMetrics = await getAllPhaseMetrics();
+  if (phase === "phase-1") return allMetrics.phase1;
+  if (phase === "phase-2") return allMetrics.phase2;
+  return allMetrics.all;
 }

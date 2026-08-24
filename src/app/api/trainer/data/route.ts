@@ -35,11 +35,10 @@ export async function GET() {
       console.error("Background sync error:", err);
     });
 
-    const [students, allAssignments, allSessions, allSubmissions] = await Promise.all([
+    const [students, allAssignments, allSessions] = await Promise.all([
       getTrainerApprovedStudents(programSlug),
       getAssignments(programSlug),
       getLiveSessions(programSlug),
-      getSubmissions(),
     ]);
 
     const assignments = allAssignments.filter((a) => a.trainerId === trainerId);
@@ -71,8 +70,8 @@ export async function GET() {
       return itemLevel === normActive;
     });
 
-    const scopedAssignmentIds = new Set(scopedAssignments.map((a) => a.id));
-    const scopedSubmissions = allSubmissions.filter((s) => scopedAssignmentIds.has(s.assignmentId));
+    const scopedAssignmentIds = scopedAssignments.map((a) => a.id);
+    const scopedSubmissions = await getSubmissions(undefined, { assignmentIds: scopedAssignmentIds });
 
     return NextResponse.json(
       createApiResponse(true, {

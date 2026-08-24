@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getAdminProgramStats } from "@/lib/api/admin-program-stats";
-import { getCentralPhaseMetrics, type CentralPhaseMetrics } from "@/lib/services/phase-service";
+import { getAllPhaseMetrics, type CentralPhaseMetrics } from "@/lib/services/phase-service";
 
 export type PhaseMetrics = CentralPhaseMetrics;
 
@@ -81,9 +81,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     assignments,
     sessions,
     trainers,
-    allMetrics,
-    phase1Metrics,
-    phase2Metrics,
+    phaseMetrics,
     approvedThisMonth,
     approvedPrevMonth,
     pendingThisMonth,
@@ -95,9 +93,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     prisma.assignment.count(),
     prisma.liveSession.findMany({ select: { date: true } }),
     prisma.user.count({ where: { role: "trainer", isActive: true } }),
-    getCentralPhaseMetrics("all"),
-    getCentralPhaseMetrics("phase-1"),
-    getCentralPhaseMetrics("phase-2"),
+    getAllPhaseMetrics(),
     prisma.enrollment.count({
       where: { status: "approved", reviewedAt: { gte: monthStart } },
     }),
@@ -127,6 +123,10 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
       },
     }),
   ]);
+
+  const allMetrics = phaseMetrics.all;
+  const phase1Metrics = phaseMetrics.phase1;
+  const phase2Metrics = phaseMetrics.phase2;
 
   const today = now.toISOString().split("T")[0];
   const upcomingSessions = sessions.filter((s) => s.date >= today).length;

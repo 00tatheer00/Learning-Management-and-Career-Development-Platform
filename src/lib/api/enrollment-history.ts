@@ -167,10 +167,48 @@ export function enrichRowsWithApplicationMeta<
     hasPaymentScreenshot?: boolean;
   },
 >(rows: T[]) {
+  // Pre-index rows by normalized email and cnic in a single O(N) pass
+  const emailMap = new Map<string, T[]>();
+  const cnicMap = new Map<string, T[]>();
+
+  for (const row of rows) {
+    const e = normalizeEmail(row.email);
+    const c = normalizeCnic(row.cnic);
+
+    if (e) {
+      const list = emailMap.get(e);
+      if (list) list.push(row);
+      else emailMap.set(e, [row]);
+    }
+    if (c) {
+      const list = cnicMap.get(c);
+      if (list) list.push(row);
+      else cnicMap.set(c, [row]);
+    }
+  }
+
   return rows.map((row) => {
-    const related = rows
-      .filter((item) => applicantMatches(row, item))
-      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+    const e = normalizeEmail(row.email);
+    const c = normalizeCnic(row.cnic);
+
+    // Merge matching rows by reference in O(1)
+    const relatedSet = new Set<T>();
+    if (e) {
+      const byEmail = emailMap.get(e);
+      if (byEmail) {
+        for (const item of byEmail) relatedSet.add(item);
+      }
+    }
+    if (c) {
+      const byCnic = cnicMap.get(c);
+      if (byCnic) {
+        for (const item of byCnic) relatedSet.add(item);
+      }
+    }
+
+    const related = Array.from(relatedSet).sort(
+      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
 
     const applicationNumber = getApplicationNumber(row, related);
     const previousApplications: ApplicantApplicationSummary[] = related

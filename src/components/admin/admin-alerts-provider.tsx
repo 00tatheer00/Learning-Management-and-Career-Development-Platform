@@ -18,7 +18,6 @@ import {
 } from "@/lib/ui/browser-notifications";
 
 const SEEN_IDS_KEY = "eest-admin-seen-pending-ids";
-const SSE_RECONNECT_MS = 1_500;
 
 interface PendingAlert {
   id: string;
@@ -65,8 +64,6 @@ export function AdminAlertsProvider({ children }: { children: ReactNode }) {
   const knownIdsRef = useRef<Set<string>>(new Set());
   const initializedRef = useRef(false);
   const pendingRef = useRef<PendingAlert[]>([]);
-  const eventSourceRef = useRef<EventSource | null>(null);
-  const reconnectTimerRef = useRef<number | null>(null);
 
   const applyAlerts = useCallback((items: PendingAlert[], total: number) => {
     pendingRef.current = items;
@@ -96,47 +93,18 @@ export function AdminAlertsProvider({ children }: { children: ReactNode }) {
     knownIdsRef.current = new Set(items.map((item) => item.id));
   }, []);
 
-  const handleStreamPayload = useCallback(
-    (payload: {
-      type: string;
-      pendingCount?: number;
-      pending?: PendingAlert[];
-    }) => {
-      if (payload.type !== "update") return;
-      applyAlerts(payload.pending ?? [], payload.pendingCount ?? 0);
-    },
-    [applyAlerts]
-  );
-
-  const connectStream = useCallback(() => {
-    if (eventSourceRef.current) {
-      eventSourceRef.current.close();
-      eventSourceRef.current = null;
-    }
-
-    const source = new EventSource("/api/admin/notifications/stream");
-    eventSourceRef.current = source;
-
-    source.onmessage = (event) => {
-      try {
-        const payload = JSON.parse(event.data as string) as {
-          type: string;
-          pendingCount?: number;
-          pending?: PendingAlert[];
-        };
-        handleStreamPayload(payload);
-      } catch {
-        // ignore malformed events
+  const fetchAlerts = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/notifications");
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.success && data.data) {
+        applyAlerts(data.data.pending ?? [], data.data.pendingCount ?? 0);
       }
-    };
-
-    source.onerror = () => {
-      source.close();
-      eventSourceRef.current = null;
-      if (reconnectTimerRef.current) window.clearTimeout(reconnectTimerRef.current);
-      reconnectTimerRef.current = window.setTimeout(connectStream, SSE_RECONNECT_MS);
-    };
-  }, [handleStreamPayload]);
+    } catch {
+      // ignore network errors
+    }
+  }, [applyAlerts]);
 
   const markAllSeen = useCallback(() => {
     const seenIds = readSeenIds();
@@ -149,20 +117,34 @@ export function AdminAlertsProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     void requestBrowserNotificationPermission();
-    connectStream();
+    void fetchAlerts();
 
-    const onVisible = () => {
-      if (document.visibilityState === "visible") connectStream();
+    let lastFetch = Date.now();
+    const pollInterval = 60_000;
+
+    const interval = setInterval(() => {
+      if (document.visibilityState === "visible") {
+        lastFetch = Date.now();
+        void fetchAlerts();
+      }
+    }, pollInterval);
+
+    const onFocusOrVisible = () => {
+      if (document.visibilityState === "visible" && Date.now() - lastFetch >= 20_000) {
+        lastFetch = Date.now();
+        void fetchAlerts();
+      }
     };
-    document.addEventListener("visibilitychange", onVisible);
+
+    document.addEventListener("visibilitychange", onFocusOrVisible);
+    window.addEventListener("focus", onFocusOrVisible);
 
     return () => {
-      document.removeEventListener("visibilitychange", onVisible);
-      if (reconnectTimerRef.current) window.clearTimeout(reconnectTimerRef.current);
-      eventSourceRef.current?.close();
-      eventSourceRef.current = null;
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", onFocusOrVisible);
+      window.removeEventListener("focus", onFocusOrVisible);
     };
-  }, [connectStream]);
+  }, [fetchAlerts]);
 
   useEffect(() => {
     if (pathname.startsWith("/admin/enrollments")) {

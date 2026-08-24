@@ -230,10 +230,21 @@ export async function createAssignment(
   };
 }
 
-export async function getSubmissions(studentId?: string): Promise<AssignmentSubmission[]> {
+export async function getSubmissions(
+  studentId?: string,
+  options?: { assignmentIds?: string[]; take?: number }
+): Promise<AssignmentSubmission[]> {
+  const where: Record<string, unknown> = {};
+  if (studentId) where.studentId = studentId;
+  if (options?.assignmentIds) {
+    if (options.assignmentIds.length === 0) return [];
+    where.assignmentId = { in: options.assignmentIds };
+  }
+
   const submissions = await prisma.assignmentSubmission.findMany({
-    where: studentId ? { studentId } : undefined,
+    where: Object.keys(where).length > 0 ? where : undefined,
     orderBy: { submittedAt: "desc" },
+    take: options?.take,
   });
   return submissions.map(mapSubmission);
 }

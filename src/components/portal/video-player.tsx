@@ -87,6 +87,7 @@ export function VideoPlayer({
   const currentTimeRef = useRef<number>(initialTime);
   const durationRef = useRef<number>(0);
   const isCompletedRef = useRef<boolean>(false);
+  const isSavingProgressRef = useRef<boolean>(false);
 
   // Send message to Bunny iframe player
   const postToPlayer = useCallback((method: string, value?: unknown) => {
@@ -183,9 +184,11 @@ export function VideoPlayer({
     currentTimeRef.current = targetSecs;
   };
 
-  // Save watch progress to database
+  // Save watch progress to database with in-flight deduplication
   const saveProgress = useCallback(
     async (seconds: number, completed: boolean) => {
+      if (isSavingProgressRef.current) return;
+      isSavingProgressRef.current = true;
       try {
         const response = await fetch("/api/student/progress", {
           method: "POST",
@@ -204,6 +207,8 @@ export function VideoPlayer({
         }
       } catch (e) {
         console.error("Failed to save progress:", e);
+      } finally {
+        isSavingProgressRef.current = false;
       }
     },
     [lectureId, onProgressSaved]
@@ -289,7 +294,7 @@ export function VideoPlayer({
               setIsCompleted(true);
               void saveProgress(seconds, true);
               lastSavedTimeRef.current = seconds;
-            } else if (Math.abs(seconds - lastSavedTimeRef.current) >= 5) {
+            } else if (Math.abs(seconds - lastSavedTimeRef.current) >= 30) {
               void saveProgress(seconds, isCompletedRef.current);
               lastSavedTimeRef.current = seconds;
             }
@@ -298,8 +303,10 @@ export function VideoPlayer({
               setShowNextPrompt(true);
             }
           } else if (data.event === "pause") {
-            void saveProgress(currentTimeRef.current, isCompletedRef.current);
-            lastSavedTimeRef.current = currentTimeRef.current;
+            if (Math.abs(currentTimeRef.current - lastSavedTimeRef.current) >= 1) {
+              void saveProgress(currentTimeRef.current, isCompletedRef.current);
+              lastSavedTimeRef.current = currentTimeRef.current;
+            }
           } else if (data.event === "ended") {
             isCompletedRef.current = true;
             setIsCompleted(true);
@@ -318,7 +325,7 @@ export function VideoPlayer({
     window.addEventListener("message", handleMessage);
     return () => {
       window.removeEventListener("message", handleMessage);
-      if (currentTimeRef.current > 0) {
+      if (currentTimeRef.current > 0 && Math.abs(currentTimeRef.current - lastSavedTimeRef.current) >= 2) {
         void saveProgress(currentTimeRef.current, isCompletedRef.current);
       }
     };

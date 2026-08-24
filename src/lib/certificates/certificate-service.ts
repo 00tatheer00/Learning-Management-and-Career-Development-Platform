@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getProgramBySlug } from "@/lib/data/programs";
 import { buildCertificateId, formatCertificateDate } from "@/lib/certificates/certificate-ids";
-import { renderCertificatePng } from "@/lib/certificates/render-certificate";
 import { isDemoPortalStudent } from "@/lib/constants/demo-student";
 import { normalizeProgramSlug } from "@/lib/auth/program-assignment";
 import { swrCache, invalidateCacheByTag } from "@/lib/cache/swr-cache";
@@ -221,15 +220,6 @@ export async function generateSingleCertificate(input: {
   );
 
   const completionDate = input.completionDate ?? new Date();
-
-  // Test render to ensure 100% valid vector output
-  await renderCertificatePng({
-    studentName: student.name,
-    moduleName: input.moduleName,
-    programTitle: courseTitle,
-    completionDate: formatCertificateDate(completionDate),
-    certificateId: verificationCode,
-  });
 
   const id = existingCert?.id ?? `cert_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
 
