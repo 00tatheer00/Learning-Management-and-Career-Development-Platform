@@ -47,10 +47,11 @@ export async function GET(request: Request) {
     });
 
     return NextResponse.json(createApiResponse(true, { data: recordings }));
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errMessage = error instanceof Error ? error.message : "Trainer course not configured";
     console.error("[TRAINER_RECORDINGS_GET_ERROR]", error);
     return NextResponse.json(
-      createApiResponse(false, { error: error?.message || "Trainer course not configured" }),
+      createApiResponse(false, { error: errMessage }),
       { status: 400 }
     );
   }
@@ -112,12 +113,13 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json(createApiResponse(true, { data: recording }));
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errMessage = error instanceof Error ? error.message : "Could not save recording";
     console.error("[TRAINER_RECORDINGS_POST_ERROR]", error);
     return NextResponse.json(
       createApiResponse(false, {
-        error: error?.message || "Could not save recording",
-        message: error?.message || "Could not save recording",
+        error: errMessage,
+        message: errMessage,
       }),
       { status: 400 }
     );
@@ -150,10 +152,11 @@ export async function DELETE(request: Request) {
     }
 
     return NextResponse.json(createApiResponse(true, { data: { deleted: true } }));
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errMessage = error instanceof Error ? error.message : "Could not delete recording";
     console.error("[TRAINER_RECORDINGS_DELETE_ERROR]", error);
     return NextResponse.json(
-      createApiResponse(false, { error: error?.message || "Could not delete recording" }),
+      createApiResponse(false, { error: errMessage }),
       { status: 400 }
     );
   }

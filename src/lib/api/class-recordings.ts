@@ -177,9 +177,13 @@ export async function upsertClassRecording(data: {
       ...mapRecording(created),
       level: normalizedLevel,
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     // If unique constraint conflict, fetch existing and update
-    if (error?.code === "P2002" || String(error?.message).includes("Unique constraint")) {
+    const isConflict =
+      Boolean(error && typeof error === "object" && "code" in error && (error as { code: string }).code === "P2002") ||
+      (error instanceof Error && error.message.includes("Unique constraint"));
+
+    if (isConflict) {
       const conflict = await prisma.classRecording.findFirst({
         where: {
           programSlug: data.programSlug,
