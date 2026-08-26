@@ -44,12 +44,12 @@ describe("swr-cache", () => {
     let count = 0;
     const fetcher = vi.fn().mockImplementation(async () => ({ count: ++count }));
 
-    const first = await swrCache("key-to-del", fetcher, { ttlMs: 5000 });
+    const first = await swrCache<{ count: number }>("key-to-del", fetcher, { ttlMs: 5000 });
     expect(first.count).toBe(1);
 
     await invalidateCache("key-to-del");
 
-    const second = await swrCache("key-to-del", fetcher, { ttlMs: 5000 });
+    const second = await swrCache<{ count: number }>("key-to-del", fetcher, { ttlMs: 5000 });
     expect(second.count).toBe(2);
     expect(fetcher).toHaveBeenCalledTimes(2);
   });

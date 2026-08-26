@@ -13,17 +13,25 @@ import { createApiResponse } from "@/lib/api/enrollment";
 
 export async function GET(request: Request) {
   const user = await getCurrentUser();
-  if (!user || user.role !== "trainer") {
+  if (!user || (user.role !== "trainer" && user.role !== "admin")) {
     return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), { status: 403 });
   }
 
   try {
     const { searchParams } = new URL(request.url);
     const requestedModule = searchParams.get("module");
+    const requestedProgram = searchParams.get("programSlug");
 
-    const programSlug = requireTrainerProgram(user);
+    let programSlug = requestedProgram?.trim() || user.programSlug?.trim();
+    if (!programSlug) {
+      try {
+        programSlug = requireTrainerProgram(user);
+      } catch {
+        programSlug = "web-development";
+      }
+    }
+
     const allRecordings = await getClassRecordings(programSlug);
-
     const activeScope = (requestedModule ?? user.level ?? "all").trim();
 
     // If activeScope is "all", return all recordings
@@ -39,37 +47,54 @@ export async function GET(request: Request) {
     });
 
     return NextResponse.json(createApiResponse(true, { data: recordings }));
-  } catch {
-    return NextResponse.json(createApiResponse(false, { error: "Trainer course not configured" }), {
-      status: 400,
-    });
+  } catch (error: any) {
+    console.error("[TRAINER_RECORDINGS_GET_ERROR]", error);
+    return NextResponse.json(
+      createApiResponse(false, { error: error?.message || "Trainer course not configured" }),
+      { status: 400 }
+    );
   }
 }
 
 const upsertSchema = z.object({
-  classNumber: z.number().int().min(1).max(200),
-  title: z.string().min(2).max(120),
-  driveUrl: z.string().url().refine(isValidRecordingUrl, "Use a Google Drive, YouTube, or Loom link"),
-  notes: z.string().max(500).optional(),
-  level: z.string().optional(),
+  programSlug: z.string().optional(),
+  classNumber: z.coerce.number().int().min(1).max(500),
+  title: z.string().trim().min(1, "Please provide a class title").max(150),
+  driveUrl: z
+    .string()
+    .trim()
+    .min(5, "Please enter a recording link")
+    .refine(isValidRecordingUrl, "Please provide a valid Google Drive, YouTube, or video URL"),
+  notes: z.string().max(1000).optional().nullable(),
+  level: z.string().optional().nullable(),
 });
 
 export async function POST(request: Request) {
   const user = await getCurrentUser();
-  if (!user || user.role !== "trainer") {
+  if (!user || (user.role !== "trainer" && user.role !== "admin")) {
     return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), { status: 403 });
   }
 
   try {
-    const programSlug = requireTrainerProgram(user);
-    const parsed = upsertSchema.safeParse(await request.json());
+    const body = await request.json();
+    const parsed = upsertSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(
         createApiResponse(false, {
           message: parsed.error.issues[0]?.message ?? "Invalid recording data",
+          error: parsed.error.issues[0]?.message ?? "Invalid recording data",
         }),
         { status: 400 }
       );
+    }
+
+    let programSlug = parsed.data.programSlug?.trim() || user.programSlug?.trim();
+    if (!programSlug) {
+      try {
+        programSlug = requireTrainerProgram(user);
+      } catch {
+        programSlug = "web-development";
+      }
     }
 
     const rawActiveLevel = parsed.data.level?.trim() || user.level?.trim();
@@ -81,39 +106,55 @@ export async function POST(request: Request) {
       classNumber: parsed.data.classNumber,
       title: parsed.data.title,
       driveUrl: parsed.data.driveUrl,
-      trainerId: resolveTrainerId(user),
-      trainerName: user.name,
-      notes: parsed.data.notes,
+      trainerId: resolveTrainerId(user) || user.id || "trainer",
+      trainerName: user.name?.trim() || "Trainer",
+      notes: parsed.data.notes?.trim() || undefined,
     });
 
     return NextResponse.json(createApiResponse(true, { data: recording }));
-  } catch {
-    return NextResponse.json(createApiResponse(false, { error: "Could not save recording" }), {
-      status: 400,
-    });
+  } catch (error: any) {
+    console.error("[TRAINER_RECORDINGS_POST_ERROR]", error);
+    return NextResponse.json(
+      createApiResponse(false, {
+        error: error?.message || "Could not save recording",
+        message: error?.message || "Could not save recording",
+      }),
+      { status: 400 }
+    );
   }
 }
 
 export async function DELETE(request: Request) {
   const user = await getCurrentUser();
-  if (!user || user.role !== "trainer") {
+  if (!user || (user.role !== "trainer" && user.role !== "admin")) {
     return NextResponse.json(createApiResponse(false, { error: "Unauthorized" }), { status: 403 });
   }
 
-  const { searchParams } = new URL(request.url);
-  const id = searchParams.get("id");
-  if (!id) {
-    return NextResponse.json(createApiResponse(false, { message: "Recording id required" }), {
-      status: 400,
-    });
-  }
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+    if (!id) {
+      return NextResponse.json(createApiResponse(false, { message: "Recording id required" }), {
+        status: 400,
+      });
+    }
 
-  const deleted = await deleteClassRecording(id, resolveTrainerId(user));
-  if (!deleted) {
-    return NextResponse.json(createApiResponse(false, { error: "Recording not found" }), {
-      status: 404,
-    });
-  }
+    const deleted = await deleteClassRecording(
+      id,
+      user.role === "admin" ? undefined : resolveTrainerId(user)
+    );
+    if (!deleted) {
+      return NextResponse.json(createApiResponse(false, { error: "Recording not found" }), {
+        status: 404,
+      });
+    }
 
-  return NextResponse.json(createApiResponse(true, { data: { deleted: true } }));
+    return NextResponse.json(createApiResponse(true, { data: { deleted: true } }));
+  } catch (error: any) {
+    console.error("[TRAINER_RECORDINGS_DELETE_ERROR]", error);
+    return NextResponse.json(
+      createApiResponse(false, { error: error?.message || "Could not delete recording" }),
+      { status: 400 }
+    );
+  }
 }

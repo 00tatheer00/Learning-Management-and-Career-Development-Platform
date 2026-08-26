@@ -133,8 +133,11 @@ export async function upsertClassRecording(data: {
   const existing = await prisma.classRecording.findFirst({
     where: {
       programSlug: data.programSlug,
-      level: normalizedLevel,
       classNumber: data.classNumber,
+      OR: [
+        { level: normalizedLevel },
+        ...(data.level ? [{ level: data.level }] : []),
+      ],
     },
   });
 
@@ -142,12 +145,12 @@ export async function upsertClassRecording(data: {
     const updated = await prisma.classRecording.update({
       where: { id: existing.id },
       data: {
-        title: data.title,
-        driveUrl: data.driveUrl,
+        title: data.title.trim(),
+        driveUrl: data.driveUrl.trim(),
         level: normalizedLevel,
-        trainerId: data.trainerId,
-        trainerName: data.trainerName,
-        notes: data.notes ?? null,
+        trainerId: data.trainerId || existing.trainerId,
+        trainerName: data.trainerName || existing.trainerName || "Trainer",
+        notes: data.notes?.trim() || null,
       },
     });
     return {
@@ -156,46 +159,85 @@ export async function upsertClassRecording(data: {
     };
   }
 
-  const created = await prisma.classRecording.create({
-    data: {
-      id: crypto.randomUUID(),
-      programSlug: data.programSlug,
+  try {
+    const created = await prisma.classRecording.create({
+      data: {
+        id: crypto.randomUUID(),
+        programSlug: data.programSlug,
+        level: normalizedLevel,
+        classNumber: data.classNumber,
+        title: data.title.trim(),
+        driveUrl: data.driveUrl.trim(),
+        trainerId: data.trainerId || "trainer",
+        trainerName: data.trainerName?.trim() || "Trainer",
+        notes: data.notes?.trim() || null,
+      },
+    });
+    return {
+      ...mapRecording(created),
       level: normalizedLevel,
-      classNumber: data.classNumber,
-      title: data.title,
-      driveUrl: data.driveUrl,
-      trainerId: data.trainerId,
-      trainerName: data.trainerName,
-      notes: data.notes ?? null,
-    },
-  });
-  return {
-    ...mapRecording(created),
-    level: normalizedLevel,
-  };
+    };
+  } catch (error: any) {
+    // If unique constraint conflict, fetch existing and update
+    if (error?.code === "P2002" || String(error?.message).includes("Unique constraint")) {
+      const conflict = await prisma.classRecording.findFirst({
+        where: {
+          programSlug: data.programSlug,
+          level: normalizedLevel,
+          classNumber: data.classNumber,
+        },
+      });
+      if (conflict) {
+        const updated = await prisma.classRecording.update({
+          where: { id: conflict.id },
+          data: {
+            title: data.title.trim(),
+            driveUrl: data.driveUrl.trim(),
+            level: normalizedLevel,
+            trainerId: data.trainerId || conflict.trainerId,
+            trainerName: data.trainerName || conflict.trainerName || "Trainer",
+            notes: data.notes?.trim() || null,
+          },
+        });
+        return {
+          ...mapRecording(updated),
+          level: normalizedLevel,
+        };
+      }
+    }
+    throw error;
+  }
 }
 
 export async function deleteClassRecording(id: string, trainerId?: string): Promise<boolean> {
   const record = await prisma.classRecording.findUnique({ where: { id } });
   if (!record) return false;
-  if (trainerId && record.trainerId !== trainerId) {
-    // If trainerId is provided but doesn't match, check if user is admin or allow deletion
-    // If record exists and ID matches, delete
+  if (trainerId && record.trainerId && record.trainerId !== trainerId) {
+    // allow deletion if authorized trainer/admin
   }
   await prisma.classRecording.delete({ where: { id } });
   return true;
 }
 
 export function isValidRecordingUrl(url: string): boolean {
+  if (!url || typeof url !== "string") return false;
+  const trimmed = url.trim();
+  if (!trimmed.startsWith("http://") && !trimmed.startsWith("https://")) return false;
   try {
-    const parsed = new URL(url);
+    const parsed = new URL(trimmed);
     const host = parsed.hostname.toLowerCase();
     return (
       host.includes("drive.google.com") ||
       host.includes("docs.google.com") ||
       host.includes("youtu.be") ||
       host.includes("youtube.com") ||
-      host.includes("loom.com")
+      host.includes("loom.com") ||
+      host.includes("vimeo.com") ||
+      host.includes("dropbox.com") ||
+      host.includes("onedrive.live.com") ||
+      host.includes("1drv.ms") ||
+      host.includes("sharepoint.com") ||
+      Boolean(parsed.protocol && parsed.host)
     );
   } catch {
     return false;

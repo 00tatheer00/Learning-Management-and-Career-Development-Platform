@@ -120,7 +120,7 @@ export function TrainerRecordingsPanel({
   const loadDriveRecordings = useCallback(async () => {
     setLoadingDrive(true);
     try {
-      const res = await fetch("/api/trainer/recordings?module=all", { cache: "no-store" });
+      const res = await fetch(`/api/trainer/recordings?module=all&programSlug=${encodeURIComponent(programSlug)}`, { cache: "no-store" });
       const json = await res.json();
       if (json.success) {
         setDriveRecordings(json.data || []);
@@ -132,7 +132,7 @@ export function TrainerRecordingsPanel({
     } finally {
       setLoadingDrive(false);
     }
-  }, []);
+  }, [programSlug]);
 
   // -------------------------------------------------------------
   // Load Bunny Stream Lectures
@@ -271,6 +271,7 @@ export function TrainerRecordingsPanel({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          programSlug,
           classNumber: parseInt(driveFormClassNumber, 10) || 1,
           title: driveFormTitle.trim(),
           driveUrl: driveFormUrl.trim(),
