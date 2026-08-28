@@ -2,9 +2,14 @@ import { PageHero } from "@/components/shared/page-hero";
 import { createMetadata } from "@/lib/seo/metadata";
 
 export const metadata = createMetadata({
-  title: "Privacy Policy",
-  description: "Privacy Policy for Emerging Edge School of Technology.",
+  title: "Privacy Policy & Student Data Protection | EEST",
+  description: "Learn how Emerging Edge School of Technology protects your personal information, enrollment data, and privacy.",
   path: "/privacy",
+  keywords: [
+    "EEST Privacy Policy",
+    "Student Data Protection",
+    "Platform Privacy Terms",
+  ],
 });
 
 export default function PrivacyPage() {

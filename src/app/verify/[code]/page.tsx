@@ -1,16 +1,44 @@
+import type { Metadata } from "next";
 import { verifyCertificateByCode } from "@/lib/certificates/certificate-service";
 import Link from "next/link";
 import { WarningCircle, ArrowLeft, MagnifyingGlass, ShieldCheck } from "@phosphor-icons/react/dist/ssr";
 import { CertificateVerificationView } from "@/components/certificates/certificate-verification-view";
 import { Button } from "@/components/ui/button";
-
-export const metadata = {
-  title: "Verify Certificate | EEST Portal",
-  description: "Official certificate verification portal for Emerging Edge School of Technology.",
-};
+import { createMetadata } from "@/lib/seo/metadata";
 
 interface VerifyPageProps {
   params: Promise<{ code: string }>;
+}
+
+export async function generateMetadata({ params }: VerifyPageProps): Promise<Metadata> {
+  const { code } = await params;
+  const sanitizedCode = decodeURIComponent(code || "").trim();
+  const cert =
+    sanitizedCode.length >= 3 && sanitizedCode.length <= 64
+      ? await verifyCertificateByCode(sanitizedCode)
+      : null;
+
+  if (cert) {
+    return createMetadata({
+      title: `Verified Certificate: ${cert.studentName} — ${cert.programTitle} | EEST Registry`,
+      description: `Official verification for ${cert.studentName}'s completion of ${cert.programTitle} (${cert.level}) with Credential ID ${cert.code}.`,
+      path: `/verify/${encodeURIComponent(sanitizedCode)}`,
+      keywords: [
+        `Certificate ${cert.code}`,
+        `${cert.studentName} Certificate`,
+        `${cert.programTitle} Credential`,
+        "Verified Student Certificate",
+        "EEST Credential Registry",
+      ],
+    });
+  }
+
+  return createMetadata({
+    title: `Verify Credential: ${sanitizedCode || "Certificate"} | EEST Registry`,
+    description: "Official certificate verification portal for Emerging Edge School of Technology.",
+    path: `/verify/${encodeURIComponent(sanitizedCode)}`,
+    noIndex: true,
+  });
 }
 
 export default async function PublicVerifyCodePage({ params }: VerifyPageProps) {

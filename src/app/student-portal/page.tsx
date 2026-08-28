@@ -8,10 +8,17 @@ import { createMetadata } from "@/lib/seo/metadata";
 import { SITE_CONFIG } from "@/lib/constants";
 
 export const metadata = createMetadata({
-  title: "Student Portal",
+  title: "Student Learning Hub & Portal Overview | EEST",
   description:
-    "Access your courses, assignments, progress tracking, and community resources in the EEST Student Portal.",
+    "Explore the Emerging Edge Student Portal — access live interactive lectures, recordings, assignments, progress analytics, and verified certificates.",
   path: "/student-portal",
+  keywords: [
+    "EEST Student Portal",
+    "Learning Management System",
+    "Student Dashboard",
+    "Online Classroom Access",
+    "Assignment Submission Portal",
+  ],
 });
 
 export default function StudentPortalPage() {

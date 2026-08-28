@@ -8,10 +8,18 @@ import { createMetadata } from "@/lib/seo/metadata";
 import { SITE_CONFIG } from "@/lib/constants";
 
 export const metadata = createMetadata({
-  title: "Blog",
+  title: "Tech Blog, Career Insights & Tutorials | EEST",
   description:
-    "Insights, tutorials, and industry news from Emerging Edge School of Technology.",
+    "Discover the latest insights on web development, artificial intelligence, mobile apps, design trends, and student success stories from Emerging Edge School of Technology.",
   path: "/blog",
+  keywords: [
+    "Tech Blog Pakistan",
+    "Web Development Tutorials",
+    "AI Trends 2026",
+    "Flutter vs React Native",
+    "Career in Tech Guidance",
+    "EEST Tech Articles",
+  ],
 });
 
 const blogPosts = [

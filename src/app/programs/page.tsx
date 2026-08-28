@@ -7,10 +7,21 @@ import { SITE_CONFIG } from "@/lib/constants";
 import { programs } from "@/lib/data/programs";
 
 export const metadata = createMetadata({
-  title: "Programs",
+  title: "Tech Programs, Bootcamps & Modular Certifications | EEST",
   description:
-    "Explore modular training programs in Web Development, Flutter, AI, Video Editing, Digital Marketing, Graphics Designing, and UI/UX.",
+    "Explore our career-aligned programs in Full-Stack Web Development, AI & Machine Learning, Flutter Mobile Apps, Video Editing, Digital Marketing, Graphics Designing, and UI/UX.",
   path: "/programs",
+  keywords: [
+    "Web Development Program",
+    "AI Machine Learning Bootcamp",
+    "Flutter App Development Course",
+    "Video Editing and Motion Graphics",
+    "UI UX Design Bootcamp",
+    "Digital Marketing Certification",
+    "Graphic Design Course",
+    "Modular IT Certifications",
+    "Tech Courses in Pakistan",
+  ],
 });
 
 export default function ProgramsPage() {

@@ -2,9 +2,14 @@ import { PageHero } from "@/components/shared/page-hero";
 import { createMetadata } from "@/lib/seo/metadata";
 
 export const metadata = createMetadata({
-  title: "Terms of Service",
-  description: "Terms of Service for Emerging Edge School of Technology.",
+  title: "Terms of Service & Enrollment Guidelines | EEST",
+  description: "Terms of service, academic guidelines, and enrollment policies for Emerging Edge School of Technology.",
   path: "/terms",
+  keywords: [
+    "EEST Terms of Service",
+    "Enrollment Policies",
+    "Academic Guidelines",
+  ],
 });
 
 export default function TermsPage() {

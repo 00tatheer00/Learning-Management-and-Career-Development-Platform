@@ -5,10 +5,18 @@ import { createMetadata } from "@/lib/seo/metadata";
 import { SITE_CONFIG } from "@/lib/constants";
 
 export const metadata = createMetadata({
-  title: "Register",
+  title: "Online Admission & Student Registration | EEST Portal",
   description:
-    "Register for Emerging Edge School of Technology. Pay module registration fee to join live classes, student portal, and learning resources.",
+    "Apply now for Emerging Edge School of Technology bootcamps. Quick online registration, flexible module-based fee structure, and immediate portal access upon verification.",
   path: "/register",
+  keywords: [
+    "EEST Course Registration",
+    "Apply for IT Bootcamp",
+    "Student Course Enrollment",
+    "Online Tech Admission Pakistan",
+    "Register for Web Development",
+    "Register for AI Bootcamp",
+  ],
 });
 
 interface RegisterPageProps {

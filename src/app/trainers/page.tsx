@@ -6,10 +6,18 @@ import { SITE_CONFIG } from "@/lib/constants";
 import { trainers } from "@/lib/data/trainers";
 
 export const metadata = createMetadata({
-  title: "Mentors & Trainers",
+  title: "Industry Mentors & Expert Trainers | EEST Faculty",
   description:
-    "Meet our expert mentors and instructors — industry specialists from top companies guiding your hands-on practical learning journey.",
+    "Meet our expert mentors and instructors — industry specialists from top tech organizations guiding your hands-on practical learning journey.",
   path: "/trainers",
+  keywords: [
+    "Tech Mentors Pakistan",
+    "EEST Trainers and Instructors",
+    "Learn from Industry Experts",
+    "Software Engineering Mentors",
+    "AI and Web Instructors",
+    "UI UX Design Mentors",
+  ],
 });
 
 export default function TrainersPage() {

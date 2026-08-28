@@ -8,10 +8,18 @@ import { createMetadata } from "@/lib/seo/metadata";
 import { SITE_CONFIG } from "@/lib/constants";
 
 export const metadata = createMetadata({
-  title: "Events",
+  title: "Workshops, Tech Webinars & Live Events | EEST",
   description:
-    "Upcoming workshops, webinars, hackathons, and networking events at Emerging Edge School of Technology.",
+    "Join free live webinars, hands-on coding workshops, guest speaker sessions, and tech hackathons hosted by Emerging Edge School of Technology.",
   path: "/events",
+  keywords: [
+    "EEST Free Webinars",
+    "Online Tech Workshops",
+    "Live Coding Sessions",
+    "Web Development Bootcamp Preview",
+    "Flutter App Workshop",
+    "AI Masterclasses",
+  ],
 });
 
 const events = [
