@@ -8,5 +8,7 @@ export async function GET() {
   if (!user) return unauthorizedAdminResponse();
 
   const data = await getAdminDashboardData();
-  return NextResponse.json(createApiResponse(true, { data }));
+  const response = NextResponse.json(createApiResponse(true, { data }));
+  response.headers.set("Cache-Control", "private, s-maxage=60, stale-while-revalidate=300");
+  return response;
 }

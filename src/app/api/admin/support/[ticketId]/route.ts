@@ -1,10 +1,17 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import { getAdminUser, unauthorizedAdminResponse } from "@/lib/auth/admin-access";
 import { createApiResponse } from "@/lib/api/enrollment";
 import { prisma } from "@/lib/prisma";
 import { createNotification } from "@/lib/services/notification-service";
 
 export const dynamic = "force-dynamic";
+
+const ticketUpdateSchema = z.object({
+  adminReply: z.string().max(5000).optional(),
+  status: z.enum(["open", "in_progress", "resolved", "closed"]).optional(),
+  priority: z.enum(["low", "medium", "high"]).optional(),
+});
 
 /**
  * PATCH — Admin updates a support ticket (reply, status, priority)
@@ -19,11 +26,14 @@ export async function PATCH(
   try {
     const { ticketId } = await params;
     const body = await request.json();
-    const { adminReply, status, priority } = body as {
-      adminReply?: string;
-      status?: string;
-      priority?: string;
-    };
+    const parsed = ticketUpdateSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        createApiResponse(false, { error: parsed.error.issues[0]?.message ?? "Invalid input" }),
+        { status: 400 }
+      );
+    }
+    const { adminReply, status, priority } = parsed.data;
 
     // Check ticket exists
     const existing = await prisma.supportTicket.findUnique({

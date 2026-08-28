@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { getProgramBySlug } from "@/lib/data/programs";
 import { buildCertificateId, formatCertificateDate } from "@/lib/certificates/certificate-ids";
@@ -221,7 +222,7 @@ export async function generateSingleCertificate(input: {
 
   const completionDate = input.completionDate ?? new Date();
 
-  const id = existingCert?.id ?? `cert_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+  const id = existingCert?.id ?? `cert_${crypto.randomUUID()}`;
 
   const certificate = await prisma.certificate.upsert({
     where: {

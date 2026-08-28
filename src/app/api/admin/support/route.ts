@@ -5,8 +5,11 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
+const DEFAULT_PAGE_SIZE = 20;
+const MAX_PAGE_SIZE = 100;
+
 /**
- * GET — Admin fetches all support tickets with optional filters
+ * GET — Admin fetches support tickets with optional filters and pagination
  */
 export async function GET(request: Request) {
   const user = await getAdminUser(request);
@@ -17,6 +20,11 @@ export async function GET(request: Request) {
     const status = url.searchParams.get("status");
     const category = url.searchParams.get("category");
     const search = url.searchParams.get("search");
+    const page = Math.max(1, parseInt(url.searchParams.get("page") ?? "1", 10) || 1);
+    const limit = Math.min(
+      MAX_PAGE_SIZE,
+      Math.max(1, parseInt(url.searchParams.get("limit") ?? String(DEFAULT_PAGE_SIZE), 10) || DEFAULT_PAGE_SIZE)
+    );
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const where: any = {};
@@ -36,11 +44,16 @@ export async function GET(request: Request) {
       ];
     }
 
-    const [tickets, stats] = await Promise.all([
+    const skip = (page - 1) * limit;
+
+    const [tickets, totalCount, stats] = await Promise.all([
       prisma.supportTicket.findMany({
         where,
         orderBy: { createdAt: "desc" },
+        skip,
+        take: limit,
       }),
+      prisma.supportTicket.count({ where }),
       prisma.supportTicket.groupBy({
         by: ["status"],
         _count: { status: true },
@@ -63,8 +76,23 @@ export async function GET(request: Request) {
       else if (s.status === "closed") statsSummary.closed = count;
     }
 
+    const totalPages = Math.ceil(totalCount / limit);
+
     return NextResponse.json(
-      createApiResponse(true, { data: { tickets, stats: statsSummary } })
+      createApiResponse(true, {
+        data: {
+          tickets,
+          stats: statsSummary,
+          pagination: {
+            page,
+            limit,
+            totalCount,
+            totalPages,
+            hasNextPage: page < totalPages,
+            hasPrevPage: page > 1,
+          },
+        },
+      })
     );
   } catch (error) {
     console.error("[ADMIN_SUPPORT_FETCH]", error);
@@ -74,3 +102,4 @@ export async function GET(request: Request) {
     );
   }
 }
+

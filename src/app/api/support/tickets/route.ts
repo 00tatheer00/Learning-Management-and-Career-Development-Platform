@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import crypto from "crypto";
+import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth/session";
 import { createApiResponse } from "@/lib/api/enrollment";
 import { prisma } from "@/lib/prisma";
@@ -34,7 +36,15 @@ const VALID_CATEGORIES = [
   "assignment",
   "live-class",
   "other",
-];
+] as const;
+
+const ticketSchema = z.object({
+  category: z.enum(VALID_CATEGORIES, { message: "Invalid category" }),
+  subject: z.string().min(3, "Subject must be at least 3 characters").max(200),
+  description: z.string().min(10, "Description must be at least 10 characters").max(5000),
+  name: z.string().min(2).max(100).optional(),
+  email: z.string().email("Valid email is required").optional(),
+});
 
 /**
  * POST — Submit a new support ticket (authenticated student OR guest)
@@ -61,13 +71,15 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const { category, subject, description, name, email } = body as {
-      category?: string;
-      subject?: string;
-      description?: string;
-      name?: string;
-      email?: string;
-    };
+    const parsed = ticketSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        createApiResponse(false, { error: parsed.error.issues[0]?.message ?? "Invalid input" }),
+        { status: 400 }
+      );
+    }
+
+    const { category, subject, description, name, email } = parsed.data;
 
     // For guests, name and email are required
     const studentName = user?.name || name?.trim();
@@ -80,31 +92,9 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-    if (!studentEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(studentEmail)) {
+    if (!studentEmail) {
       return NextResponse.json(
         createApiResponse(false, { error: "Valid email is required" }),
-        { status: 400 }
-      );
-    }
-
-    // Validation
-    if (!category || !VALID_CATEGORIES.includes(category)) {
-      return NextResponse.json(
-        createApiResponse(false, { error: "Invalid category" }),
-        { status: 400 }
-      );
-    }
-    if (!subject || subject.trim().length < 3) {
-      return NextResponse.json(
-        createApiResponse(false, { error: "Subject must be at least 3 characters" }),
-        { status: 400 }
-      );
-    }
-    if (!description || description.trim().length < 10) {
-      return NextResponse.json(
-        createApiResponse(false, {
-          error: "Description must be at least 10 characters",
-        }),
         { status: 400 }
       );
     }
@@ -127,7 +117,7 @@ export async function POST(request: Request) {
     }
 
     const ticketNumber = await generateTicketNumber();
-    const id = `tkt_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    const id = `tkt_${crypto.randomUUID()}`;
 
     const ticket = await prisma.supportTicket.create({
       data: {
@@ -136,28 +126,30 @@ export async function POST(request: Request) {
         studentId,
         studentName,
         studentEmail,
-        category: category.trim(),
+        category,
         subject: subject.trim(),
         description: description.trim(),
       },
     });
 
-    // Notify all admins about new ticket
+    // Notify all admins about new ticket (parallel, non-blocking)
     const admins = await prisma.user.findMany({
       where: { role: { in: ["admin", "admin_readonly"] }, isActive: true },
       select: { id: true },
     });
 
     const guestLabel = studentId === "guest" ? " (Guest)" : "";
-    for (const admin of admins) {
-      await createNotification({
-        userId: admin.id,
-        title: "New Support Ticket",
-        message: `${studentName}${guestLabel} submitted ticket ${ticketNumber}: ${subject.trim()}`,
-        type: "warning",
-        linkUrl: "/admin/support",
-      });
-    }
+    void Promise.all(
+      admins.map((admin) =>
+        createNotification({
+          userId: admin.id,
+          title: "New Support Ticket",
+          message: `${studentName}${guestLabel} submitted ticket ${ticketNumber}: ${subject.trim()}`,
+          type: "warning",
+          linkUrl: "/admin/support",
+        })
+      )
+    ).catch((err) => console.error("[SUPPORT_TICKET] Admin notification failed:", err));
 
     return NextResponse.json(
       createApiResponse(true, { data: { ticketNumber: ticket.ticketNumber }, message: "Ticket submitted successfully" }),

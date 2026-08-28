@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { EventEmitter } from "events";
 
@@ -19,7 +20,7 @@ export const notificationEvents = new NotificationEventEmitter();
  * Creates a notification in DB and dispatches a live real-time event to active SSE streams.
  */
 export async function createNotification(input: CreateNotificationInput) {
-  const id = `notif_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  const id = `notif_${crypto.randomUUID()}`;
   const notification = await prisma.notification.create({
     data: {
       id,

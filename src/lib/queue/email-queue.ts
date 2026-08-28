@@ -4,6 +4,8 @@
  * and error telemetry so API routes never hang or fail due to Resend rate limits or timeouts.
  */
 
+import crypto from "crypto";
+
 export interface EmailJob<T = Record<string, unknown>> {
   id: string;
   type: string;
@@ -44,7 +46,7 @@ class EmailQueueManager {
     payload: T,
     options: { maxAttempts?: number } = {}
   ): string {
-    const jobId = `job_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    const jobId = `job_${crypto.randomUUID()}`;
     const job: EmailJob<T> = {
       id: jobId,
       type,

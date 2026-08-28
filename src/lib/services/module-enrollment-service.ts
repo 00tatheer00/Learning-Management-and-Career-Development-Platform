@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { getApprovedEnrollmentLevels } from "@/lib/auth/student-module-sync";
 
@@ -36,7 +37,7 @@ export async function recordModuleEnrollment(
     return null;
   }
 
-  const id = `mod_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+  const id = `mod_${crypto.randomUUID()}`;
 
   try {
     const record = await prisma.moduleEnrollment.upsert({
