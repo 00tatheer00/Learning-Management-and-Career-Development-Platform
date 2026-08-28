@@ -80,7 +80,9 @@ export function canStudentAccessModuleContent(
     return activeLevelNormalized === contentNormalized;
   }
 
-  return true;
+  // No approved levels and no active level — deny access to tagged content.
+  // This prevents data leaks when enrollment data is missing/corrupt.
+  return false;
 }
 
 export function filterByStudentModule<T>(

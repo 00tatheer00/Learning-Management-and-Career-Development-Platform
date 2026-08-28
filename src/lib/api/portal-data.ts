@@ -3,6 +3,7 @@ import "server-only";
 import { prisma } from "@/lib/prisma";
 import { canStudentAccessModuleContent } from "@/lib/modules/student-module-content";
 import { isDemoPortalStudent } from "@/lib/constants/demo-student";
+import { getApprovedEnrollmentLevels } from "@/lib/auth/student-module-sync";
 import { getSessionRoomName, generateRoomPassword } from "@/lib/portal-video/config";
 import { sessionHasJoinLink } from "@/lib/sessions/meet-link";
 import {
@@ -271,9 +272,15 @@ export async function createSubmission(
     return { error: "This assignment is not for your program" };
   }
 
+  // Fetch approved levels for proper module-scoped access check
+  const approvedLevels = studentEmail
+    ? await getApprovedEnrollmentLevels(studentEmail, assignment.programSlug)
+    : [];
+
   if (
     !canStudentAccessModuleContent(assignment.programSlug, studentLevel, assignment.level, {
       email: studentEmail,
+      approvedLevels,
     })
   ) {
     return { error: "This assignment is not for your module" };

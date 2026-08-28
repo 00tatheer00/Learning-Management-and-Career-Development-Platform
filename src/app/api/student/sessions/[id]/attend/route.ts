@@ -6,6 +6,8 @@ import { recordClassJoin } from "@/lib/api/class-attendance";
 import { canStudentAccessProgram } from "@/lib/student-portal/program-scope";
 import { getJoinWindowState } from "@/lib/sessions/join-window";
 import { STUDENT_UR } from "@/lib/constants/student-portal-ur";
+import { canStudentAccessModuleContent } from "@/lib/modules/student-module-content";
+import { getApprovedEnrollmentLevels } from "@/lib/auth/student-module-sync";
 
 /** Idempotent attendance mark when student enters the live room (Meet / portal). */
 export async function POST(
@@ -33,6 +35,23 @@ export async function POST(
     return NextResponse.json(createApiResponse(false, { error: STUDENT_UR.api.unauthorized }), {
       status: 403,
     });
+  }
+
+  // Module-level access: student must be enrolled in the session's module
+  if (session.level) {
+    const approvedLevels = await getApprovedEnrollmentLevels(user.email, session.programSlug);
+    const hasModuleAccess = canStudentAccessModuleContent(
+      session.programSlug,
+      user.level,
+      session.level,
+      { email: user.email, approvedLevels }
+    );
+    if (!hasModuleAccess) {
+      return NextResponse.json(
+        createApiResponse(false, { error: "This class is not for your module" }),
+        { status: 403 }
+      );
+    }
   }
 
   const joinWindow = getJoinWindowState({

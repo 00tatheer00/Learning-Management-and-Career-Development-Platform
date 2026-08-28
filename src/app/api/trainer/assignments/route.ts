@@ -39,15 +39,24 @@ export async function POST(request: Request) {
       );
     }
 
+    const resolvedLevel =
+      parsed.data.level?.trim() ||
+      (user.level && user.level !== "all" ? user.level.trim() : null) ||
+      getFirstModuleName(programSlug);
+
+    if (!resolvedLevel) {
+      return NextResponse.json(
+        createApiResponse(false, { message: "Module level is required for assignments" }),
+        { status: 400 }
+      );
+    }
+
     const assignment = await createAssignment({
       title: parsed.data.title,
       description: parsed.data.description,
       dueDate: parsed.data.dueDate,
       programSlug,
-      level:
-        parsed.data.level?.trim() ||
-        (user.level && user.level !== "all" ? user.level.trim() : getFirstModuleName(programSlug)) ||
-        undefined,
+      level: resolvedLevel,
       trainerId: resolveTrainerId(user),
     });
 

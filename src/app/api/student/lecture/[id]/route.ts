@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { createApiResponse } from "@/lib/api/enrollment";
 import { canStudentAccessProgram } from "@/lib/student-portal/program-scope";
 import { canStudentAccessModuleContent } from "@/lib/modules/student-module-content";
+import { getApprovedEnrollmentLevels } from "@/lib/auth/student-module-sync";
 import { generateBunnyEmbedUrl } from "@/lib/bunny";
 import { prisma } from "@/lib/prisma";
 
@@ -44,11 +45,12 @@ export async function GET(
         );
       }
 
+      const approvedLevels = await getApprovedEnrollmentLevels(user.email, lecture.programSlug);
       const canAccessModule = canStudentAccessModuleContent(
         lecture.programSlug,
         user.level,
         lecture.level,
-        { email: user.email }
+        { email: user.email, approvedLevels }
       );
       if (!canAccessModule) {
         return NextResponse.json(

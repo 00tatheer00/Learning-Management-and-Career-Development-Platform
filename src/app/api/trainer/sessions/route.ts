@@ -49,6 +49,18 @@ export async function POST(request: Request) {
       );
     }
 
+    const resolvedLevel =
+      parsed.data.level?.trim() ||
+      (user.level && user.level !== "all" ? user.level.trim() : null) ||
+      getFirstModuleName(programSlug);
+
+    if (!resolvedLevel) {
+      return NextResponse.json(
+        createApiResponse(false, { message: "Module level is required for sessions" }),
+        { status: 400 }
+      );
+    }
+
     const isPortal = parsed.data.roomType === "portal";
 
     const session = await createLiveSession({
@@ -58,10 +70,7 @@ export async function POST(request: Request) {
       meetLink: isPortal ? "" : parsed.data.meetLink,
       roomType: isPortal ? "portal" : "meet",
       programSlug,
-      level:
-        parsed.data.level?.trim() ||
-        (user.level && user.level !== "all" ? user.level.trim() : getFirstModuleName(programSlug)) ||
-        undefined,
+      level: resolvedLevel,
       notes: parsed.data.notes,
       trainerId: resolveTrainerId(user),
       trainerName: user.name,

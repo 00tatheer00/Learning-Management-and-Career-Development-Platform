@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/session";
 import { createApiResponse } from "@/lib/api/enrollment";
 import { prisma } from "@/lib/prisma";
+import { canStudentAccessModuleContent } from "@/lib/modules/student-module-content";
+import { getApprovedEnrollmentLevels } from "@/lib/auth/student-module-sync";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -20,6 +22,29 @@ export async function POST(request: Request) {
         createApiResponse(false, { error: "Missing required fields (lectureId, watchedSeconds, completed)" }),
         { status: 400 }
       );
+    }
+
+    // Verify student has module-level access to this lecture
+    if (user.role === "student") {
+      const lecture = await prisma.lecture.findUnique({
+        where: { id: lectureId },
+        select: { programSlug: true, level: true },
+      });
+      if (lecture?.level) {
+        const approvedLevels = await getApprovedEnrollmentLevels(user.email, lecture.programSlug);
+        const hasAccess = canStudentAccessModuleContent(
+          lecture.programSlug,
+          user.level,
+          lecture.level,
+          { email: user.email, approvedLevels }
+        );
+        if (!hasAccess) {
+          return NextResponse.json(
+            createApiResponse(false, { error: "Access denied" }),
+            { status: 403 }
+          );
+        }
+      }
     }
 
     const seconds = parseFloat(watchedSeconds);
