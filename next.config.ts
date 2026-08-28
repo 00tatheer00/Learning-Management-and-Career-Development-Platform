@@ -15,7 +15,7 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https://res.cloudinary.com https://images.unsplash.com https://*.b-cdn.net https://iframe.mediadelivery.net https://www.google-analytics.com https://stats.g.doubleclick.net",
       "font-src 'self' data:",
-      "connect-src 'self' https://graph.facebook.com https://res.cloudinary.com https://8x8.vc wss://8x8.vc https://meet.jit.si wss://meet.jit.si https://video.bunnycdn.com https://*.b-cdn.net https://iframe.mediadelivery.net https://www.google-analytics.com https://analytics.google.com https://stats.g.doubleclick.net",
+      "connect-src 'self' https://graph.facebook.com https://res.cloudinary.com https://api.cloudinary.com https://8x8.vc wss://8x8.vc https://meet.jit.si wss://meet.jit.si https://video.bunnycdn.com https://*.b-cdn.net https://iframe.mediadelivery.net https://www.google-analytics.com https://analytics.google.com https://stats.g.doubleclick.net",
       "frame-src 'self' https://meet.google.com https://meet.jit.si https://8x8.vc https://iframe.mediadelivery.net",
       "media-src 'self' blob: https://8x8.vc https://meet.jit.si https://*.b-cdn.net https://iframe.mediadelivery.net",
     ].join("; "),
