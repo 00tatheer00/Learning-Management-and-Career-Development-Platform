@@ -14,9 +14,15 @@ import {
   ChatDots,
   ShieldCheck,
   XCircle,
+  FileArrowUp,
+  Image as ImageIcon,
+  Trash,
+  Eye,
+  X,
 } from "@phosphor-icons/react";
 import { PortalPageHeader } from "@/components/portal/portal-ui";
 import { cn } from "@/lib/utils";
+import { uploadDirectToCloudinary } from "@/lib/cloudinary-client";
 
 interface SupportTicket {
   id: string;
@@ -27,6 +33,8 @@ interface SupportTicket {
   priority: string;
   status: string;
   adminReply: string | null;
+  attachmentUrl?: string | null;
+  attachmentPublicId?: string | null;
   resolvedAt: string | null;
   resolvedBy: string | null;
   createdAt: string;
@@ -82,6 +90,14 @@ export function StudentSupportPanel() {
   const [category, setCategory] = useState("");
   const [subject, setSubject] = useState("");
   const [description, setDescription] = useState("");
+  const [attachmentUrl, setAttachmentUrl] = useState("");
+  const [attachmentPublicId, setAttachmentPublicId] = useState("");
+  const [attachmentFileName, setAttachmentFileName] = useState("");
+  const [uploadingAttachment, setUploadingAttachment] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+  // Preview modal
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const fetchTickets = useCallback(async () => {
     try {
@@ -101,6 +117,46 @@ export function StudentSupportPanel() {
     void fetchTickets();
   }, [fetchTickets]);
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setError("Please upload an image file (PNG, JPG, WEBP).");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError("File size must be less than 5MB.");
+      return;
+    }
+
+    setError("");
+    setUploadingAttachment(true);
+    setUploadProgress(0);
+
+    try {
+      const res = await uploadDirectToCloudinary(file, {
+        folder: "eest/support-attachments",
+        onProgress: (p) => setUploadProgress(p),
+      });
+      setAttachmentUrl(res.url);
+      setAttachmentPublicId(res.publicId);
+      setAttachmentFileName(file.name);
+    } catch (err) {
+      console.error("Student attachment upload error:", err);
+      setError(err instanceof Error ? err.message : "Failed to upload screenshot");
+    } finally {
+      setUploadingAttachment(false);
+    }
+  };
+
+  const removeAttachment = () => {
+    setAttachmentUrl("");
+    setAttachmentPublicId("");
+    setAttachmentFileName("");
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -111,7 +167,13 @@ export function StudentSupportPanel() {
       const res = await fetch("/api/support/tickets", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ category, subject, description }),
+        body: JSON.stringify({
+          category,
+          subject,
+          description,
+          attachmentUrl: attachmentUrl || undefined,
+          attachmentPublicId: attachmentPublicId || undefined,
+        }),
       });
       const data = await res.json();
 
@@ -124,6 +186,7 @@ export function StudentSupportPanel() {
       setCategory("");
       setSubject("");
       setDescription("");
+      removeAttachment();
       setShowForm(false);
       await fetchTickets();
     } catch {
@@ -272,10 +335,85 @@ export function StudentSupportPanel() {
               <p className="text-[10px] text-pt-faint mt-1">{description.length}/2000</p>
             </div>
 
+            {/* Screenshot / File Attachment */}
+            <div>
+              <label className="block text-xs font-semibold text-pt-muted mb-1.5">
+                Attachment / Screenshot <span className="text-[11px] font-normal text-pt-faint">(Optional, PNG/JPG/WEBP up to 5MB)</span>
+              </label>
+
+              {!attachmentUrl ? (
+                <div className="relative">
+                  <label className={cn(
+                    "flex flex-col items-center justify-center border border-dashed border-border rounded-xl p-4 cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-all",
+                    uploadingAttachment && "opacity-60 pointer-events-none"
+                  )}>
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp,image/jpg"
+                      onChange={handleFileUpload}
+                      disabled={uploadingAttachment}
+                      className="hidden"
+                    />
+                    {uploadingAttachment ? (
+                      <div className="flex flex-col items-center gap-2 py-2">
+                        <Spinner size={24} className="animate-spin text-primary" />
+                        <p className="text-xs font-semibold text-primary">
+                          Uploading screenshot... {uploadProgress > 0 ? `${uploadProgress}%` : ""}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-3">
+                        <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                          <FileArrowUp size={20} weight="duotone" />
+                        </div>
+                        <div className="text-left">
+                          <p className="text-xs font-semibold text-pt">Click to upload screenshot or drag image here</p>
+                          <p className="text-[10px] text-pt-faint">Helps us resolve your issue faster</p>
+                        </div>
+                      </div>
+                    )}
+                  </label>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between p-3 rounded-xl border border-emerald-200 bg-emerald-50/50">
+                  <div className="flex items-center gap-3 overflow-hidden">
+                    <div className="relative h-12 w-12 rounded-lg overflow-hidden border border-emerald-300 shrink-0 bg-background">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={attachmentUrl} alt="Attached screenshot" className="h-full w-full object-cover" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold text-emerald-900 truncate">{attachmentFileName || "Screenshot attached"}</p>
+                      <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-700">
+                        <CheckCircle size={12} weight="fill" /> Ready to submit
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setPreviewImage(attachmentUrl)}
+                      className="p-1.5 rounded-lg text-emerald-700 hover:bg-emerald-100 transition-colors"
+                      title="Preview"
+                    >
+                      <Eye size={16} weight="bold" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={removeAttachment}
+                      className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
+                      title="Remove screenshot"
+                    >
+                      <Trash size={16} weight="bold" />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
             <div className="flex items-center gap-3 pt-1">
               <button
                 type="submit"
-                disabled={submitting}
+                disabled={submitting || uploadingAttachment}
                 className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-50 transition-all active:scale-[0.97]"
               >
                 {submitting ? (
@@ -419,6 +557,30 @@ export function StudentSupportPanel() {
                       <p className="text-sm text-pt whitespace-pre-wrap leading-relaxed">{ticket.description}</p>
                     </div>
 
+                    {/* Attached screenshot preview */}
+                    {ticket.attachmentUrl && (
+                      <div className="mb-3 p-3 rounded-xl border border-border bg-secondary/30">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-pt-faint mb-2">Attached Screenshot</p>
+                        <div className="flex items-center gap-3">
+                          <div
+                            onClick={() => setPreviewImage(ticket.attachmentUrl || null)}
+                            className="relative h-16 w-24 rounded-lg overflow-hidden border border-border cursor-pointer hover:opacity-90 transition-opacity bg-background shrink-0"
+                          >
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={ticket.attachmentUrl} alt="Attached screenshot" className="h-full w-full object-cover" />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setPreviewImage(ticket.attachmentUrl || null)}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-background text-xs font-medium text-pt hover:bg-secondary transition-colors"
+                          >
+                            <ImageIcon size={14} className="text-primary" weight="duotone" />
+                            View Full Image
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
                     {ticket.adminReply && (
                       <div className="rounded-xl bg-emerald-50/80 border border-emerald-200/50 p-3.5 mb-3">
                         <div className="flex items-center gap-2 mb-1.5">
@@ -444,6 +606,33 @@ export function StudentSupportPanel() {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Screenshot Lightbox Modal */}
+      {previewImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200"
+          onClick={() => setPreviewImage(null)}
+        >
+          <div
+            className="relative max-w-4xl max-h-[90vh] bg-background rounded-2xl overflow-hidden shadow-2xl border border-border p-2"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setPreviewImage(null)}
+              className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/60 text-white hover:bg-black transition-colors"
+            >
+              <X size={18} weight="bold" />
+            </button>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={previewImage}
+              alt="Support Screenshot Preview"
+              className="max-h-[85vh] w-auto max-w-full rounded-xl object-contain"
+            />
+          </div>
         </div>
       )}
     </div>

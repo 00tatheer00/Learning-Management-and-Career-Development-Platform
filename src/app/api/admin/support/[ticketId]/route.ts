@@ -4,6 +4,7 @@ import { getAdminUser, unauthorizedAdminResponse } from "@/lib/auth/admin-access
 import { createApiResponse } from "@/lib/api/enrollment";
 import { prisma } from "@/lib/prisma";
 import { createNotification } from "@/lib/services/notification-service";
+import { sendSupportTicketReplyEmail } from "@/lib/notifications/support-ticket-email";
 
 export const dynamic = "force-dynamic";
 
@@ -72,22 +73,39 @@ export async function PATCH(
 
     // If ticket is resolved/closed, notify the student
     if (status === "resolved" || status === "closed") {
-      await createNotification({
-        userId: existing.studentId,
-        title: `Ticket ${existing.ticketNumber} Resolved`,
-        message: `Your support ticket "${existing.subject}" has been resolved. ${adminReply ? "Admin replied to your ticket." : ""}`,
-        type: "success",
-        linkUrl: "/student/support",
-      });
+      if (existing.studentId !== "guest") {
+        await createNotification({
+          userId: existing.studentId,
+          title: `Ticket ${existing.ticketNumber} Resolved`,
+          message: `Your support ticket "${existing.subject}" has been resolved. ${adminReply ? "Admin replied to your ticket." : ""}`,
+          type: "success",
+          linkUrl: "/student/support",
+        });
+      }
     } else if (status === "in_progress" && existing.status === "open") {
-      // Notify student that their ticket is being looked at
-      await createNotification({
-        userId: existing.studentId,
-        title: `Ticket ${existing.ticketNumber} In Progress`,
-        message: `Your support ticket "${existing.subject}" is now being reviewed.`,
-        type: "info",
-        linkUrl: "/student/support",
-      });
+      if (existing.studentId !== "guest") {
+        await createNotification({
+          userId: existing.studentId,
+          title: `Ticket ${existing.ticketNumber} In Progress`,
+          message: `Your support ticket "${existing.subject}" is now being reviewed.`,
+          type: "info",
+          linkUrl: "/student/support",
+        });
+      }
+    }
+
+    // Send email notification to ticket owner (student or guest) if admin added a reply or status changed
+    if (existing.studentEmail && (adminReply || status)) {
+      void sendSupportTicketReplyEmail({
+        to: existing.studentEmail,
+        studentName: existing.studentName,
+        ticketNumber: existing.ticketNumber,
+        subject: existing.subject,
+        category: existing.category,
+        status: status || existing.status,
+        adminReply: adminReply?.trim() || existing.adminReply || "Your support ticket status has been updated by the team.",
+        isGuest: existing.studentId === "guest",
+      }).catch((err) => console.error("[SUPPORT_TICKET] Reply email dispatch error:", err));
     }
 
     return NextResponse.json(

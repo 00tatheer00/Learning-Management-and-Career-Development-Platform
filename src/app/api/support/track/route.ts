@@ -31,6 +31,7 @@ export async function GET(request: Request) {
         description: true,
         status: true,
         adminReply: true,
+        attachmentUrl: true,
         resolvedAt: true,
         resolvedBy: true,
         createdAt: true,

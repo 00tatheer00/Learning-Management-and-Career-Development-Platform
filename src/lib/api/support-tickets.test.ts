@@ -133,4 +133,46 @@ describe("Support Tickets API (/api/support/tickets)", () => {
       })
     );
   });
+
+  it("creates ticket with attachment URL and persists in database", async () => {
+    (prisma.supportTicket.findFirst as unknown as MockFn).mockResolvedValueOnce({
+      ticketNumber: "TKT-0010",
+    });
+
+    (prisma.supportTicket.create as unknown as MockFn).mockImplementationOnce(async ({ data }: { data: Record<string, unknown> }) => ({
+      ...data,
+      id: "tkt_456",
+      status: "open",
+      priority: "medium",
+      adminReply: null,
+      resolvedAt: null,
+      resolvedBy: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }));
+
+    const req = new Request("http://localhost/api/support/tickets", {
+      method: "POST",
+      body: JSON.stringify({
+        name: "Sara Ali",
+        email: "sara@example.com",
+        category: "payment",
+        subject: "Fee screenshot attached",
+        description: "Please check my payment transaction screenshot.",
+        attachmentUrl: "https://res.cloudinary.com/demo/image/upload/sample.jpg",
+        attachmentPublicId: "eest/support-attachments/sample",
+      }),
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(201);
+    expect(prisma.supportTicket.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          attachmentUrl: "https://res.cloudinary.com/demo/image/upload/sample.jpg",
+          attachmentPublicId: "eest/support-attachments/sample",
+        }),
+      })
+    );
+  });
 });

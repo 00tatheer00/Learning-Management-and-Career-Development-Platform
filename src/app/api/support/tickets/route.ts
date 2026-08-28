@@ -44,6 +44,8 @@ const ticketSchema = z.object({
   description: z.string().min(10, "Description must be at least 10 characters").max(5000),
   name: z.string().min(2).max(100).optional(),
   email: z.string().email("Valid email is required").optional(),
+  attachmentUrl: z.string().url().max(1000).optional().or(z.literal("")),
+  attachmentPublicId: z.string().max(255).optional().or(z.literal("")),
 });
 
 /**
@@ -79,7 +81,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { category, subject, description, name, email } = parsed.data;
+    const { category, subject, description, name, email, attachmentUrl, attachmentPublicId } = parsed.data;
 
     // For guests, name and email are required
     const studentName = user?.name || name?.trim();
@@ -129,6 +131,8 @@ export async function POST(request: Request) {
         category,
         subject: subject.trim(),
         description: description.trim(),
+        attachmentUrl: attachmentUrl || null,
+        attachmentPublicId: attachmentPublicId || null,
       },
     });
 

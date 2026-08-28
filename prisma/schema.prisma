@@ -437,6 +437,8 @@ model SupportTicket {
   priority     TicketPriority @default(medium)
   status       TicketStatus   @default(open)
   adminReply   String?
+  attachmentUrl String?
+  attachmentPublicId String?
   resolvedAt   DateTime?
   resolvedBy   String?
   createdAt    DateTime       @default(now())

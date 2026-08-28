@@ -21,6 +21,7 @@ import {
   Envelope,
   Tag,
   ArrowsClockwise,
+  Image as ImageIcon,
 } from "@phosphor-icons/react";
 import { PortalPageHeader } from "@/components/portal/portal-ui";
 import { cn } from "@/lib/utils";
@@ -37,6 +38,8 @@ interface SupportTicket {
   priority: string;
   status: string;
   adminReply: string | null;
+  attachmentUrl?: string | null;
+  attachmentPublicId?: string | null;
   resolvedAt: string | null;
   resolvedBy: string | null;
   createdAt: string;
@@ -111,6 +114,7 @@ export function AdminSupportPanel() {
   const [replyStatus, setReplyStatus] = useState("resolved");
   const [updating, setUpdating] = useState(false);
   const [updateError, setUpdateError] = useState("");
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const fetchTickets = useCallback(async () => {
     try {
@@ -400,8 +404,13 @@ export function AdminSupportPanel() {
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] font-bold text-primary/70 uppercase tracking-wider">{ticket.ticketNumber}</span>
                       {ticket.adminReply && (
-                        <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                        <span title="Admin Replied" className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
                           <ShieldCheck size={10} weight="fill" />
+                        </span>
+                      )}
+                      {ticket.attachmentUrl && (
+                        <span title="Screenshot Attached" className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-primary/10 text-primary">
+                          <ImageIcon size={10} weight="fill" />
                         </span>
                       )}
                     </div>
@@ -484,6 +493,11 @@ export function AdminSupportPanel() {
                       <div className="flex items-center gap-2 mt-1 text-[10px] text-pt-faint">
                         <span className="flex items-center gap-1"><User size={10} />{ticket.studentName}</span>
                         <span>{catInfo?.emoji} {catInfo?.label}</span>
+                        {ticket.attachmentUrl && (
+                          <span className="flex items-center gap-0.5 text-primary font-medium">
+                            <ImageIcon size={10} weight="bold" /> Screenshot
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -571,6 +585,40 @@ export function AdminSupportPanel() {
                 <p className="text-[10px] font-bold uppercase tracking-widest text-pt-faint mb-2">Student&apos;s Message</p>
                 <p className="text-sm text-pt whitespace-pre-wrap leading-relaxed">{activeTicket.description}</p>
               </div>
+
+              {/* Attached Screenshot */}
+              {activeTicket.attachmentUrl && (
+                <div className="rounded-xl border border-border bg-secondary/30 p-4">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-pt-faint mb-2">Attached Screenshot</p>
+                  <div className="flex items-center gap-3">
+                    <div
+                      onClick={() => setPreviewImage(activeTicket.attachmentUrl || null)}
+                      className="relative h-20 w-32 rounded-lg overflow-hidden border border-border cursor-pointer hover:opacity-90 transition-opacity bg-background shrink-0"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={activeTicket.attachmentUrl} alt="Attached screenshot" className="h-full w-full object-cover" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <button
+                        type="button"
+                        onClick={() => setPreviewImage(activeTicket.attachmentUrl || null)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-background text-xs font-semibold text-pt hover:bg-secondary transition-colors"
+                      >
+                        <ImageIcon size={14} className="text-primary" weight="duotone" />
+                        Zoom Image
+                      </button>
+                      <a
+                        href={activeTicket.attachmentUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block text-[11px] text-primary hover:underline font-medium"
+                      >
+                        Open original ↗
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* SLA */}
               {(() => {
@@ -704,6 +752,33 @@ export function AdminSupportPanel() {
             </div>
           </div>
         </>
+      )}
+
+      {/* Screenshot Lightbox Modal */}
+      {previewImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200"
+          onClick={() => setPreviewImage(null)}
+        >
+          <div
+            className="relative max-w-4xl max-h-[90vh] bg-background rounded-2xl overflow-hidden shadow-2xl border border-border p-2"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setPreviewImage(null)}
+              className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/60 text-white hover:bg-black transition-colors"
+            >
+              <X size={18} weight="bold" />
+            </button>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={previewImage}
+              alt="Support Screenshot Preview"
+              className="max-h-[85vh] w-auto max-w-full rounded-xl object-contain"
+            />
+          </div>
+        </div>
       )}
     </div>
   );

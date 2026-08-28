@@ -3,7 +3,7 @@ import { Inter, Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import { LayoutSwitcher } from "@/components/layout/layout-switcher";
 import { AuthSessionProvider } from "@/components/providers/session-provider";
 import { ToastProvider } from "@/components/providers/toast-provider";
-import { OrganizationSchema } from "@/components/seo/json-ld";
+import { OrganizationSchema, WebSiteSchema } from "@/components/seo/json-ld";
 import { createMetadata } from "@/lib/seo/metadata";
 import { SITE_CONFIG } from "@/lib/constants";
 import { PORTAL_THEME_STORAGE_KEY } from "@/lib/constants/portal-theme";
@@ -51,6 +51,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <OrganizationSchema />
+        <WebSiteSchema />
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem("${PORTAL_THEME_STORAGE_KEY}");if(t==="dark")document.documentElement.dataset.portalThemeInit="dark"}catch(e){}})();`,
