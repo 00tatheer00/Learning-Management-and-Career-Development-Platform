@@ -170,26 +170,29 @@ export function StudentSupportPanel() {
       {/* Quick stats */}
       {!loading && tickets.length > 0 && (
         <div className="mb-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="rounded-xl border border-border bg-background p-3.5 text-center">
-            <p className="text-2xl font-black tabular-nums text-pt">{tickets.length}</p>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-pt-faint mt-0.5">Total</p>
-          </div>
-          <div className="rounded-xl border border-amber-200 bg-amber-50/50 p-3.5 text-center">
-            <p className="text-2xl font-black tabular-nums text-amber-600">{openCount}</p>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-amber-600/70 mt-0.5">Active</p>
-          </div>
-          <div className="rounded-xl border border-emerald-200 bg-emerald-50/50 p-3.5 text-center">
-            <p className="text-2xl font-black tabular-nums text-emerald-600">
-              {tickets.filter((t) => t.status === "resolved").length}
-            </p>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-600/70 mt-0.5">Resolved</p>
-          </div>
-          <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-3.5 text-center">
-            <p className="text-2xl font-black tabular-nums text-slate-500">
-              {tickets.filter((t) => t.status === "closed").length}
-            </p>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-0.5">Closed</p>
-          </div>
+          {[
+            { label: "Total Tickets", value: tickets.length, cardTone: "portal-tone-slate", iconTone: "portal-tone-icon-slate", icon: <Ticket size={16} weight="duotone" /> },
+            { label: "Active", value: openCount, cardTone: "portal-tone-amber", iconTone: "portal-tone-icon-amber", icon: <Clock size={16} weight="duotone" /> },
+            { label: "Resolved", value: tickets.filter((t) => t.status === "resolved").length, cardTone: "portal-tone-emerald", iconTone: "portal-tone-icon-emerald", icon: <CheckCircle size={16} weight="duotone" /> },
+            { label: "Closed", value: tickets.filter((t) => t.status === "closed").length, cardTone: "portal-tone-slate", iconTone: "portal-tone-icon-slate", icon: <XCircle size={16} weight="duotone" /> },
+          ].map((item) => (
+            <div
+              key={item.label}
+              className={cn(
+                "rounded-xl border p-3.5 shadow-pt transition-all duration-200",
+                item.cardTone,
+                "border-border/80"
+              )}
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <div className={cn("flex h-7 w-7 items-center justify-center rounded-lg shadow-xs", item.iconTone)}>
+                  {item.icon}
+                </div>
+                <span className="text-[11px] font-semibold text-pt-secondary truncate">{item.label}</span>
+              </div>
+              <p className="text-2xl font-bold tabular-nums text-pt">{item.value}</p>
+            </div>
+          ))}
         </div>
       )}
 

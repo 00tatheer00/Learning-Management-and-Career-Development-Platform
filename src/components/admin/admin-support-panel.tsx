@@ -22,7 +22,7 @@ import {
   Tag,
   ArrowsClockwise,
 } from "@phosphor-icons/react";
-import { PortalPageHeader, StatCard } from "@/components/portal/portal-ui";
+import { PortalPageHeader } from "@/components/portal/portal-ui";
 import { cn } from "@/lib/utils";
 
 interface SupportTicket {
@@ -202,13 +202,110 @@ export function AdminSupportPanel() {
         </button>
       </PortalPageHeader>
 
-      {/* Stats cards */}
+      {/* Stats cards — Executive Portal Tones */}
       <div className="mb-6 grid grid-cols-2 sm:grid-cols-5 gap-3">
-        <StatCard label="Total" value={stats.total} accent="slate" compact icon={<Ticket size={16} weight="fill" />} />
-        <StatCard label="Open" value={stats.open} accent="orange" compact icon={<Clock size={16} weight="fill" />} />
-        <StatCard label="In Progress" value={stats.in_progress} accent="blue" compact icon={<ArrowsClockwise size={16} weight="fill" />} />
-        <StatCard label="Resolved" value={stats.resolved} accent="green" compact icon={<CheckCircle size={16} weight="fill" />} />
-        <StatCard label="Closed" value={stats.closed} accent="slate" compact icon={<XCircle size={16} weight="fill" />} />
+        {[
+          {
+            key: "all",
+            label: "Total Tickets",
+            value: stats.total,
+            hint: "All submissions",
+            icon: <Ticket size={18} weight="duotone" />,
+            cardTone: "portal-tone-slate",
+            iconTone: "portal-tone-icon-slate",
+            highlight: false,
+          },
+          {
+            key: "open",
+            label: "Open / Pending",
+            value: stats.open,
+            hint: "Needs review",
+            icon: <Clock size={18} weight="duotone" />,
+            cardTone: "portal-tone-amber",
+            iconTone: "portal-tone-icon-amber",
+            dot: "bg-amber-500",
+            highlight: stats.open > 0,
+          },
+          {
+            key: "in_progress",
+            label: "In Progress",
+            value: stats.in_progress,
+            hint: "Under investigation",
+            icon: <ArrowsClockwise size={18} weight="duotone" />,
+            cardTone: "portal-tone-indigo",
+            iconTone: "portal-tone-icon-indigo",
+            dot: "bg-indigo-500",
+            highlight: stats.in_progress > 0,
+          },
+          {
+            key: "resolved",
+            label: "Resolved",
+            value: stats.resolved,
+            hint: "Successfully solved",
+            icon: <CheckCircle size={18} weight="duotone" />,
+            cardTone: "portal-tone-emerald",
+            iconTone: "portal-tone-icon-emerald",
+            highlight: false,
+          },
+          {
+            key: "closed",
+            label: "Closed",
+            value: stats.closed,
+            hint: "Archived & finished",
+            icon: <XCircle size={18} weight="duotone" />,
+            cardTone: "portal-tone-slate",
+            iconTone: "portal-tone-icon-slate",
+            highlight: false,
+          },
+        ].map((card) => {
+          const isSelected = filterStatus === card.key;
+          return (
+            <button
+              key={card.key}
+              type="button"
+              onClick={() => setFilterStatus(card.key)}
+              className={cn(
+                "group relative flex flex-col justify-between rounded-xl border p-4 text-left transition-all duration-200 cursor-pointer shadow-pt hover:shadow-pt-md hover:-translate-y-0.5",
+                card.cardTone,
+                isSelected
+                  ? "ring-2 ring-primary border-primary shadow-pt-md"
+                  : "border-border/80 hover:border-border"
+              )}
+            >
+              <div className="flex items-center justify-between gap-2">
+                <div
+                  className={cn(
+                    "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg shadow-xs transition-transform duration-200 group-hover:scale-105",
+                    card.iconTone
+                  )}
+                >
+                  {card.icon}
+                </div>
+                {card.highlight && (
+                  <span
+                    className={cn(
+                      "h-2 w-2 rounded-full animate-pulse",
+                      card.dot || "bg-amber-500"
+                    )}
+                    aria-hidden="true"
+                  />
+                )}
+              </div>
+
+              <div className="mt-3">
+                <p className="text-2xl font-bold tabular-nums tracking-tight text-pt">
+                  {card.value}
+                </p>
+                <p className="mt-0.5 text-xs font-semibold text-pt-secondary truncate">
+                  {card.label}
+                </p>
+                <p className="text-[10px] text-pt-faint truncate mt-0.5">
+                  {card.hint}
+                </p>
+              </div>
+            </button>
+          );
+        })}
       </div>
 
       {/* Filters */}
