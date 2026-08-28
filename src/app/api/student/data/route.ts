@@ -39,6 +39,7 @@ export async function GET() {
         assignments,
         submissions: filteredSubmissions,
         programSlug: user.programSlug,
+        level: user.level,
       },
     })
   );

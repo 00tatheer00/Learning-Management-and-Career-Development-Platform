@@ -54,11 +54,13 @@ export function canStudentAccessModuleContent(
   if (isDemoPortalStudent(options?.email)) return true;
 
   const rawContentLevel = contentLevel?.trim();
-  const contentNormalized = rawContentLevel
-    ? normalizeModuleName(rawContentLevel)
-    : normalizeModuleName(getFirstModuleName(programSlug));
+  // Content with no specific module tag is available to all enrolled students in the program
+  if (!rawContentLevel) {
+    return true;
+  }
 
-  if (!contentNormalized) return false;
+  const contentNormalized = normalizeModuleName(rawContentLevel);
+  if (!contentNormalized) return true;
 
   const normalizedApprovedList = (options?.approvedLevels ?? [])
     .map(normalizeModuleName)
@@ -68,14 +70,12 @@ export function canStudentAccessModuleContent(
     ? normalizeModuleName(studentLevel)
     : normalizedApprovedList[0] || "";
 
-  // If approved levels list is provided, verify student has approval for this content
+  // If student has approved modules, they have access to all their approved modules
   if (normalizedApprovedList.length > 0) {
-    if (!normalizedApprovedList.includes(contentNormalized)) {
-      return false;
-    }
+    return normalizedApprovedList.includes(contentNormalized);
   }
 
-  // If student has an active module selected, match that active module
+  // Fallback: if student has an active module level assigned
   if (activeLevelNormalized) {
     return activeLevelNormalized === contentNormalized;
   }
