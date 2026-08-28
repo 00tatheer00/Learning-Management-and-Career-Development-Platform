@@ -63,6 +63,7 @@ export const PORTAL_NAV: Record<UserRole, PortalNavItem[]> = {
     { href: "/admin/credentials", label: "Portal Logins", icon: Key, description: "Student login IDs & passwords" },
     { href: "/admin/attendance", label: "Attendance", icon: ListChecks, description: "Day & module-wise attendance" },
     { href: "/admin/trainers", label: "Trainers", icon: Users, description: "All trainers" },
+    { href: "/admin/support", label: "Support", icon: Lifebuoy, description: "Student tickets & issues" },
     { href: "/admin/courses", label: "Courses", icon: BookOpen, description: "Materials & content" },
     { href: "/admin/settings", label: "Settings", icon: Gear, description: "Portal settings" },
   ],
