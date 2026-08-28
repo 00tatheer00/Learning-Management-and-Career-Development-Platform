@@ -6,9 +6,9 @@ import { SITE_CONFIG } from "@/lib/constants";
 import { trainers } from "@/lib/data/trainers";
 
 export const metadata = createMetadata({
-  title: "Trainers",
+  title: "Mentors & Trainers",
   description:
-    "Meet our expert trainers and mentors — industry professionals from top tech companies guiding your learning journey.",
+    "Meet our expert mentors and instructors — industry specialists from top companies guiding your hands-on practical learning journey.",
   path: "/trainers",
 });
 

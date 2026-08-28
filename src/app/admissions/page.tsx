@@ -7,9 +7,9 @@ import { SITE_CONFIG } from "@/lib/constants";
 import { faqs } from "@/lib/data/faqs";
 
 export const metadata = createMetadata({
-  title: "Admissions & Eligibility Criteria",
+  title: "Admissions & Eligibility Criteria | EEST Training",
   description:
-    "Learn about our registration-based modular learning model, eligibility requirements, batch dates, fee structure, and how to apply to Emerging Edge School of Technology.",
+    "Learn about our registration-based modular learning model, eligibility requirements, batch dates, fee structure, and how to apply to Emerging Edge.",
   path: "/admissions",
   keywords: [
     "EEST Admissions",

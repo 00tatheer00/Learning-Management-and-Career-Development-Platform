@@ -1,4 +1,4 @@
-import { FAQSchema } from "@/components/seo/json-ld";
+import { FAQSchema, IdentitySchema, OrganizationSchema } from "@/components/seo/json-ld";
 import { faqs } from "@/lib/data/faqs";
 import { HeroSection } from "@/components/sections/hero";
 import { StatsSection } from "@/components/sections/stats";
@@ -14,6 +14,8 @@ import { CTASection } from "@/components/sections/cta";
 export default function HomePage() {
   return (
     <>
+      <OrganizationSchema />
+      <IdentitySchema />
       <FAQSchema faqs={faqs} />
       <HeroSection />
       <StatsSection />

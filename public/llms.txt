@@ -1,0 +1,23 @@
+# Emerging Edge School of Technology (EEST)
+
+> Emerging Edge School of Technology (EEST) provides industry-focused, modular technology training in Full Stack Web Development, Artificial Intelligence, Mobile App Development, Video Editing, Digital Marketing, Graphic Design, and UI/UX Design.
+
+## Key Resources
+- [Home Page](https://school.emergingedge.tech/): Overview of EEST, missions, stats, and learning journey.
+- [Programs Catalog](https://school.emergingedge.tech/programs): Modular courses, syllabi, topic lists, and module schedules.
+- [Admissions & Registration](https://school.emergingedge.tech/admissions): Eligibility criteria, registration workflow, fee structure, and FAQs.
+- [Official Credential Registry](https://school.emergingedge.tech/verify): Instant cryptographic certificate verification for recruiters and employers.
+- [Expert Mentors & Trainers](https://school.emergingedge.tech/trainers): Profiles and expertise of EEST industry instructors.
+- [Student & Guest Support](https://school.emergingedge.tech/support): 48-hour helpdesk, ticket submission, and status tracking.
+
+## Training Programs
+- [Web Development](https://school.emergingedge.tech/programs/web-development): 8-week comprehensive program covering HTML5, CSS3, JavaScript ES6+, React, Next.js, Node.js, and Prisma.
+- [App Development](https://school.emergingedge.tech/programs/app-development): Cross-platform iOS & Android mobile development with Flutter, Dart, Firebase, and Provider/GetX.
+- [Artificial Intelligence](https://school.emergingedge.tech/programs/artificial-intelligence): Applied Python, Machine Learning, LLM APIs, LangChain, and automation.
+- [Video Editing](https://school.emergingedge.tech/programs/video-editing): Commercial video editing, Adobe Premiere Pro, After Effects motion graphics, and audio mastering.
+- [Digital Marketing](https://school.emergingedge.tech/programs/digital-marketing): Social media marketing, Google Ads, SEO optimization, and analytics.
+- [Graphics Designing](https://school.emergingedge.tech/programs/graphics-designing): Visual branding, Photoshop, Illustrator, and marketing collateral.
+- [UI/UX Design](https://school.emergingedge.tech/programs/ui-ux-designing): User research, wireframing, interactive prototyping, and design systems in Figma.
+
+## Certification
+Students receive verifiable digital certificates with unique credential IDs upon module completion, verifiable at https://school.emergingedge.tech/verify.

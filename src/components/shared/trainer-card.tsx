@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { SITE_CONFIG } from "@/lib/constants";
 import { getProgramAccent } from "@/lib/constants/program-accents";
 import { ArrowRight } from "lucide-react";
 import type { Trainer } from "@/types";
@@ -48,7 +49,7 @@ function TrainerPortrait({ trainer }: { trainer: Trainer }) {
       {trainer.image ? (
         <Image
           src={trainer.image}
-          alt={trainer.name}
+          alt={`${trainer.name} — ${trainer.designation} at ${SITE_CONFIG.shortName}`}
           fill
           unoptimized={isLocalImage}
           className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"

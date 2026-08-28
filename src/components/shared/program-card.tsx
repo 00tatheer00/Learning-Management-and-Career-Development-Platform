@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils";
 import { getProgramAccent } from "@/lib/constants/program-accents";
 import { getProgramTopicCount, programHasSyllabus } from "@/lib/data/programs";
 import { MODULE_CERTIFICATE_SHORT } from "@/lib/constants/program-marketing";
+import { SITE_CONFIG } from "@/lib/constants";
 import { getProgramRegistrationFee } from "@/lib/constants/payment";
 import type { Program } from "@/types";
 
@@ -61,11 +62,10 @@ export function ProgramCard({ program, className }: ProgramCardProps) {
           {program.image && (
             <Image
               src={program.image}
-              alt=""
+              alt={`${program.title} course banner — ${SITE_CONFIG.name}`}
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-              aria-hidden="true"
             />
           )}
           <div

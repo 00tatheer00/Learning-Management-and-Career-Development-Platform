@@ -5,7 +5,7 @@ import { createMetadata } from "@/lib/seo/metadata";
 import { SITE_CONFIG } from "@/lib/constants";
 
 export const metadata: Metadata = createMetadata({
-  title: "Support & Student Helpdesk",
+  title: "Student Support & Helpdesk Center | EEST Training",
   description:
     "Need assistance? Submit a support ticket, upload screenshots, and track status anytime with our 48-hour response guarantee. No login required.",
   path: "/support",

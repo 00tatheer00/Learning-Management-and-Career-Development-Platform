@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: ProgramPageProps) {
   if (!program) return {};
 
   return createMetadata({
-    title: program.title,
+    title: `${program.title} Course & Certification | EEST`,
     description: program.description,
     path: `/programs/${slug}`,
     image: program.image || "/eest-logo.png",

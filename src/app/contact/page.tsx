@@ -4,9 +4,9 @@ import { createMetadata } from "@/lib/seo/metadata";
 import { SITE_CONFIG } from "@/lib/constants";
 
 export const metadata = createMetadata({
-  title: "Contact",
+  title: "Contact Admissions & Campus Team | EEST School",
   description:
-    "Contact Emerging Edge School of Technology for admissions inquiries, program information, and support.",
+    "Get in touch with Emerging Edge School of Technology for admissions counseling, course fee details, batch timings, and student support.",
   path: "/contact",
 });
 

@@ -4,9 +4,9 @@ import { createMetadata } from "@/lib/seo/metadata";
 import { SITE_CONFIG } from "@/lib/constants";
 
 export const metadata: Metadata = createMetadata({
-  title: "Verify Certificate & Credentials Registry",
+  title: "Verify Certificate Registry | EEST Verification",
   description:
-    "Verify official student certificates and academic credentials issued by Emerging Edge School of Technology. Instant, cryptographic verification for employers and institutions.",
+    "Verify official student certificates and academic credentials issued by Emerging Edge School of Technology with instant cryptographic check.",
   path: "/verify",
   keywords: [
     "Verify EEST Certificate",

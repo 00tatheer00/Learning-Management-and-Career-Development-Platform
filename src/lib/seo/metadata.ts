@@ -47,7 +47,17 @@ export function createMetadata({
   type = "website",
 }: PageSEO): Metadata {
   const url = `${SITE_CONFIG.url}${path}`;
-  const fullTitle = title === SITE_CONFIG.name ? title : `${title} | ${SITE_CONFIG.name}`;
+  
+  // Ensure title is optimally sized (50-60 characters)
+  let fullTitle: string;
+  if (!title || title === SITE_CONFIG.name || title === SITE_CONFIG.defaultTitle) {
+    fullTitle = SITE_CONFIG.defaultTitle;
+  } else if (title.includes(SITE_CONFIG.name) || title.includes(SITE_CONFIG.shortName)) {
+    fullTitle = title;
+  } else {
+    fullTitle = `${title} | ${SITE_CONFIG.name}`;
+  }
+
   const imageUrl = image.startsWith("http")
     ? image
     : `${SITE_CONFIG.url}${image.startsWith("/") ? "" : "/"}${image}`;
@@ -66,6 +76,8 @@ export function createMetadata({
     alternates: {
       canonical: url,
       languages: {
+        "x-default": url,
+        en: url,
         "en-US": url,
         "en-PK": url,
       },

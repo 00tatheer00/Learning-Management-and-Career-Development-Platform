@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Inter, Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import { LayoutSwitcher } from "@/components/layout/layout-switcher";
 import { AuthSessionProvider } from "@/components/providers/session-provider";
 import { ToastProvider } from "@/components/providers/toast-provider";
-import { OrganizationSchema, WebSiteSchema } from "@/components/seo/json-ld";
+import { OrganizationSchema, WebSiteSchema, IdentitySchema } from "@/components/seo/json-ld";
 import { createMetadata } from "@/lib/seo/metadata";
 import { SITE_CONFIG } from "@/lib/constants";
 import { PORTAL_THEME_STORAGE_KEY } from "@/lib/constants/portal-theme";
@@ -29,7 +30,7 @@ const plusJakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = createMetadata({
-  title: SITE_CONFIG.name,
+  title: SITE_CONFIG.defaultTitle,
   description: SITE_CONFIG.description,
   path: "/",
   manifest: "/manifest.json",
@@ -42,6 +43,8 @@ export const viewport = {
   themeColor: "#ea580c",
 };
 
+const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_ID || "G-EESTSCHOOL26";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -52,6 +55,7 @@ export default function RootLayout({
       <head>
         <OrganizationSchema />
         <WebSiteSchema />
+        <IdentitySchema />
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem("${PORTAL_THEME_STORAGE_KEY}");if(t==="dark")document.documentElement.dataset.portalThemeInit="dark"}catch(e){}})();`,
@@ -61,6 +65,26 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${geistMono.variable} ${plusJakarta.variable} antialiased bg-background text-foreground`}
       >
+        {/* Google Analytics / Website Analytics */}
+        <Script
+          strategy="afterInteractive"
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+        />
+        <Script
+          id="google-analytics-init"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', '${GA_MEASUREMENT_ID}', {
+                page_path: window.location.pathname,
+              });
+            `,
+          }}
+        />
+
         <AuthSessionProvider>
           <LayoutSwitcher>{children}</LayoutSwitcher>
           <ToastProvider />

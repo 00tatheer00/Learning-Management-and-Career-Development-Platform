@@ -1,12 +1,18 @@
 import { SITE_CONFIG } from "@/lib/constants";
+import { trainers } from "@/lib/data/trainers";
 
 export function WebSiteSchema() {
   const schema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
+    "@id": `${SITE_CONFIG.url}/#website`,
     name: SITE_CONFIG.name,
     alternateName: SITE_CONFIG.shortName,
     url: SITE_CONFIG.url,
+    description: SITE_CONFIG.description,
+    publisher: {
+      "@id": `${SITE_CONFIG.url}/#organization`,
+    },
     potentialAction: {
       "@type": "SearchAction",
       target: {
@@ -26,18 +32,20 @@ export function WebSiteSchema() {
 }
 
 export function OrganizationSchema() {
-  const schema = {
+  const orgSchema = {
     "@context": "https://schema.org",
-    "@type": ["Organization", "EducationalOrganization"],
+    "@type": ["EducationalOrganization", "Organization"],
     "@id": `${SITE_CONFIG.url}/#organization`,
     name: SITE_CONFIG.name,
-    alternateName: [SITE_CONFIG.shortName, "Emerging Edge School"],
+    legalName: SITE_CONFIG.name,
+    alternateName: [SITE_CONFIG.shortName, "Emerging Edge School", "Emerging Edge"],
     url: SITE_CONFIG.url,
     logo: {
       "@type": "ImageObject",
       url: `${SITE_CONFIG.url}${SITE_CONFIG.logo}`,
       width: 512,
       height: 512,
+      caption: `${SITE_CONFIG.name} Logo`,
     },
     image: `${SITE_CONFIG.url}${SITE_CONFIG.logo}`,
     description: SITE_CONFIG.description,
@@ -62,12 +70,79 @@ export function OrganizationSchema() {
         availableLanguage: ["English", "Urdu"],
       },
     ],
+    knowsAbout: [
+      "Web Development",
+      "Full Stack Development",
+      "Next.js and React",
+      "Flutter Mobile App Development",
+      "Artificial Intelligence and Machine Learning",
+      "Python Programming",
+      "Video Editing and Post-Production",
+      "Digital Marketing and Growth SEO",
+      "Graphic Design and UI/UX with Figma",
+    ],
   };
 
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
+    />
+  );
+}
+
+export function IdentitySchema() {
+  const graph = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": ["EducationalOrganization", "Organization"],
+        "@id": `${SITE_CONFIG.url}/#organization`,
+        name: SITE_CONFIG.name,
+        legalName: SITE_CONFIG.name,
+        alternateName: [SITE_CONFIG.shortName, "Emerging Edge School"],
+        url: SITE_CONFIG.url,
+        logo: {
+          "@type": "ImageObject",
+          url: `${SITE_CONFIG.url}${SITE_CONFIG.logo}`,
+          width: 512,
+          height: 512,
+          caption: `${SITE_CONFIG.name} Logo`,
+        },
+        image: `${SITE_CONFIG.url}${SITE_CONFIG.logo}`,
+        description: SITE_CONFIG.description,
+        slogan: SITE_CONFIG.tagline,
+        email: SITE_CONFIG.email,
+        telephone: SITE_CONFIG.phone,
+        sameAs: Object.values(SITE_CONFIG.social),
+        address: {
+          "@type": "PostalAddress",
+          addressCountry: "PK",
+          addressRegion: "Sindh",
+          addressLocality: "Karachi",
+          streetAddress: SITE_CONFIG.address,
+        },
+      },
+      ...trainers.map((trainer) => ({
+        "@type": "Person",
+        "@id": `${SITE_CONFIG.url}/trainers/#${trainer.id}`,
+        name: trainer.name,
+        jobTitle: trainer.designation,
+        worksFor: {
+          "@id": `${SITE_CONFIG.url}/#organization`,
+        },
+        description: trainer.bio,
+        knowsAbout: trainer.expertise,
+        image: trainer.image ? `${SITE_CONFIG.url}${trainer.image}` : undefined,
+        url: `${SITE_CONFIG.url}/trainers`,
+      })),
+    ],
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }}
     />
   );
 }

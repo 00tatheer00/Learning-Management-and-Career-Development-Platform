@@ -4,9 +4,9 @@ import { createMetadata } from "@/lib/seo/metadata";
 import { SITE_CONFIG } from "@/lib/constants";
 
 export const metadata = createMetadata({
-  title: "About Us",
+  title: "About Us & Educational Mission | EEST Training",
   description:
-    "Learn about Emerging Edge School of Technology — our mission, vision, and commitment to industry-focused tech education.",
+    "Learn about Emerging Edge School of Technology — our mission, vision, and commitment to practical, industry-focused tech education.",
   path: "/about",
 });
 
