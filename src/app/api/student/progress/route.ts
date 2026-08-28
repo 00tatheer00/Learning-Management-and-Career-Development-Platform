@@ -80,7 +80,7 @@ export async function POST(request: Request) {
     return NextResponse.json(createApiResponse(true, { data: progress }));
   } catch (error) {
     console.error("Watch progress save error:", error);
-    const errorMessage = error instanceof Error ? error.message : "Failed to save watch progress";
+    const errorMessage = "Failed to save watch progress";
     return NextResponse.json(
       createApiResponse(false, { error: errorMessage }),
       { status: 500 }

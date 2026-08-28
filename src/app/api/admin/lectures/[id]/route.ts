@@ -53,7 +53,7 @@ export async function DELETE(
     );
   } catch (error) {
     console.error("Lecture deletion error:", error);
-    const errorMessage = error instanceof Error ? error.message : "Failed to delete lecture";
+    const errorMessage = "Failed to delete lecture";
     return NextResponse.json(
       createApiResponse(false, { error: errorMessage }),
       { status: 500 }

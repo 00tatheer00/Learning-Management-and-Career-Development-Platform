@@ -54,7 +54,7 @@ export async function GET(request: Request) {
     return NextResponse.json(
       createApiResponse(false, {
         error: "Could not load portal logins",
-        message: error instanceof Error ? error.message : "Server error",
+        message: "Server error",
       }),
       { status: 500 }
     );

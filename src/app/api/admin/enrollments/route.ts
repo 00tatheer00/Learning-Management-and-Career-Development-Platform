@@ -120,7 +120,7 @@ export async function PATCH(request: Request) {
     return NextResponse.json(
       createApiResponse(false, {
         error: "Internal server error",
-        message: error instanceof Error ? error.message : "Approval failed",
+        message: "Approval failed",
       }),
       { status: 500 }
     );

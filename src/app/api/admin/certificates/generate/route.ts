@@ -41,7 +41,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       createApiResponse(false, {
         error: "Generation failed",
-        message: error instanceof Error ? error.message : "Failed to generate certificate",
+        message: "Failed to generate certificate",
       }),
       { status: 500 }
     );

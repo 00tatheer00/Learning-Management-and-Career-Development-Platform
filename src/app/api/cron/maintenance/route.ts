@@ -6,10 +6,10 @@ import { createApiResponse } from "@/lib/api/enrollment";
 export async function GET(req: NextRequest) {
   try {
     const authHeader = req.headers.get("authorization");
-    const cronSecret = process.env.CRON_SECRET;
+    const cronSecret = process.env.CRON_SECRET?.trim();
 
-    // Optional authorization check if CRON_SECRET is configured
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+    // CRON_SECRET is required — deny if not configured or mismatched
+    if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
       return NextResponse.json(
         createApiResponse(false, { error: "Unauthorized cron request" }),
         { status: 401 }

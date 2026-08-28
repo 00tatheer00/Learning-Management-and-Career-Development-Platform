@@ -111,7 +111,7 @@ export async function POST(request: Request) {
     }
   } catch (error) {
     console.error("Lecture finalize error:", error);
-    const errorMessage = error instanceof Error ? error.message : "Failed to finalize lecture";
+    const errorMessage = "Failed to finalize lecture";
     return NextResponse.json(
       createApiResponse(false, { error: errorMessage }),
       { status: 500 }

@@ -107,7 +107,7 @@ export async function GET(
     );
   } catch (error) {
     console.error("Lecture playback error:", error);
-    const errorMessage = error instanceof Error ? error.message : "Failed to load playback data";
+    const errorMessage = "Failed to load playback data";
     return NextResponse.json(
       createApiResponse(false, { error: errorMessage }),
       { status: 500 }

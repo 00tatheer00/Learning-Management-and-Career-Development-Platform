@@ -131,7 +131,7 @@ export async function POST(request: Request) {
     }
   } catch (error) {
     console.error("Lecture upload error:", error);
-    const errorMessage = error instanceof Error ? error.message : "Failed to process request";
+    const errorMessage = "Failed to process request";
     return NextResponse.json(
       createApiResponse(false, { error: errorMessage }),
       { status: 500 }

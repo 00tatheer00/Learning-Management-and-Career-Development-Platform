@@ -42,7 +42,7 @@ export async function POST(request: Request) {
     );
   } catch (error) {
     console.error("Lecture prepare upload error:", error);
-    const errorMessage = error instanceof Error ? error.message : "Failed to prepare upload";
+    const errorMessage = "Failed to prepare upload";
     return NextResponse.json(
       createApiResponse(false, { error: errorMessage }),
       { status: 500 }

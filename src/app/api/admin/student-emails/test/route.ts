@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     console.error("[admin/student-emails/test]", error);
     return NextResponse.json(
       createApiResponse(false, {
-        error: error instanceof Error ? error.message : "Failed to send sample emails",
+        error: "Failed to send sample emails",
       }),
       { status: 500 }
     );

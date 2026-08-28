@@ -50,7 +50,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json(createApiResponse(true, { data: syncedLectures }));
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : "Failed to load lectures";
+    const errorMessage = "Failed to load lectures";
     return NextResponse.json(
       createApiResponse(false, { error: errorMessage }),
       { status: 500 }

@@ -62,7 +62,7 @@ export async function POST(request: Request) {
     console.error("Cloudinary sign error:", error);
     return NextResponse.json(
       createApiResponse(false, {
-        error: error instanceof Error ? error.message : "Failed to generate upload signature",
+        error: "Failed to generate upload signature",
       }),
       { status: 500 }
     );

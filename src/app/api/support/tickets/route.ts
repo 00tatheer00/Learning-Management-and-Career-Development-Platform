@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { createApiResponse } from "@/lib/api/enrollment";
 import { prisma } from "@/lib/prisma";
 import { createNotification } from "@/lib/services/notification-service";
+import { rateLimitByIp } from "@/lib/security/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -39,6 +40,15 @@ const VALID_CATEGORIES = [
  * POST — Submit a new support ticket (authenticated student OR guest)
  */
 export async function POST(request: Request) {
+  // Rate limit: 3 tickets per 5 minutes per IP (prevents guest spam)
+  const isRateLimited = await rateLimitByIp(request, "support-ticket", 3, 300);
+  if (isRateLimited) {
+    return NextResponse.json(
+      createApiResponse(false, { error: "Too many requests. Please try again later." }),
+      { status: 429 }
+    );
+  }
+
   let user: { id: string; name: string; email: string } | null = null;
   try {
     const currentUser = await getCurrentUser();

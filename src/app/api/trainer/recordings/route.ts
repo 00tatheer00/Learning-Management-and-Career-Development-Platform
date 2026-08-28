@@ -48,7 +48,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json(createApiResponse(true, { data: recordings }));
   } catch (error: unknown) {
-    const errMessage = error instanceof Error ? error.message : "Trainer course not configured";
+    const errMessage = "Trainer course not configured";
     console.error("[TRAINER_RECORDINGS_GET_ERROR]", error);
     return NextResponse.json(
       createApiResponse(false, { error: errMessage }),
@@ -114,7 +114,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(createApiResponse(true, { data: recording }));
   } catch (error: unknown) {
-    const errMessage = error instanceof Error ? error.message : "Could not save recording";
+    const errMessage = "Could not save recording";
     console.error("[TRAINER_RECORDINGS_POST_ERROR]", error);
     return NextResponse.json(
       createApiResponse(false, {
@@ -153,7 +153,7 @@ export async function DELETE(request: Request) {
 
     return NextResponse.json(createApiResponse(true, { data: { deleted: true } }));
   } catch (error: unknown) {
-    const errMessage = error instanceof Error ? error.message : "Could not delete recording";
+    const errMessage = "Could not delete recording";
     console.error("[TRAINER_RECORDINGS_DELETE_ERROR]", error);
     return NextResponse.json(
       createApiResponse(false, { error: errMessage }),

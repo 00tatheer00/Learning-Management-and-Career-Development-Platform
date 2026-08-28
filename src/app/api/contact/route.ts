@@ -89,7 +89,7 @@ export async function POST(request: Request) {
   } catch (error) {
     return NextResponse.json(
       createApiResponse(false, {
-        message: error instanceof Error ? error.message : "Failed to send message",
+        message: "Failed to send message",
       }),
       { status: 500 }
     );

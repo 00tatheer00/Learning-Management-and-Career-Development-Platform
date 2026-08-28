@@ -43,7 +43,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       createApiResponse(false, {
         error: "Bulk generation failed",
-        message: error instanceof Error ? error.message : "Failed to generate certificates",
+        message: "Failed to generate certificates",
       }),
       { status: 500 }
     );

@@ -32,7 +32,7 @@ export async function GET(request: Request) {
     console.error("Admin student profile load failed:", error);
     return NextResponse.json(
       createApiResponse(false, {
-        error: error instanceof Error ? error.message : "Could not load student profile",
+        error: "Could not load student profile",
       }),
       { status: 500 }
     );
