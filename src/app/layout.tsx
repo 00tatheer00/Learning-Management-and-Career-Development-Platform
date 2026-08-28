@@ -4,7 +4,7 @@ import { Inter, Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import { LayoutSwitcher } from "@/components/layout/layout-switcher";
 import { AuthSessionProvider } from "@/components/providers/session-provider";
 import { ToastProvider } from "@/components/providers/toast-provider";
-import { OrganizationSchema, WebSiteSchema, IdentitySchema } from "@/components/seo/json-ld";
+import { OrganizationSchema, WebSiteSchema, IdentitySchema, LocalBusinessSchema } from "@/components/seo/json-ld";
 import { createMetadata } from "@/lib/seo/metadata";
 import { SITE_CONFIG } from "@/lib/constants";
 import { PORTAL_THEME_STORAGE_KEY } from "@/lib/constants/portal-theme";
@@ -53,9 +53,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <link rel="preconnect" href="https://images.unsplash.com" />
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
+        <link rel="preconnect" href="https://res.cloudinary.com" />
+        <link rel="dns-prefetch" href="https://res.cloudinary.com" />
         <OrganizationSchema />
         <WebSiteSchema />
         <IdentitySchema />
+        <LocalBusinessSchema />
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem("${PORTAL_THEME_STORAGE_KEY}");if(t==="dark")document.documentElement.dataset.portalThemeInit="dark"}catch(e){}})();`,

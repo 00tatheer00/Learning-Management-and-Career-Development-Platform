@@ -13,7 +13,7 @@ export const SITE_CONFIG = {
   logo: "/eest-logo.png",
   email: "eeschooltech@gmail.com",
   phone: OFFICIAL_PHONE_DISPLAY,
-  address: "Global Campus — Online & Hybrid",
+  address: "Main University Road, Block 13-D, Gulshan-e-Iqbal, Karachi, Sindh 75300, Pakistan",
   social: {
     twitter: "https://twitter.com/emergingedge",
     linkedin: "https://linkedin.com/company/emergingedge",

@@ -50,7 +50,7 @@ export function Footer() {
             <p className="text-lg font-semibold gradient-text mb-4">
               {SITE_CONFIG.tagline}
             </p>
-            <div className="space-y-2 text-sm text-muted">
+            <address className="not-italic space-y-2 text-sm text-muted">
               <a
                 href={`mailto:${SITE_CONFIG.email}`}
                 className="flex items-center gap-2 hover:text-primary transition-colors min-w-0"
@@ -69,7 +69,7 @@ export function Footer() {
                 <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" strokeWidth={1.75} aria-hidden="true" />
                 <span className="break-words">{SITE_CONFIG.address}</span>
               </span>
-            </div>
+            </address>
           </div>
 
           {Object.entries(footerLinks).map(([category, links]) => {

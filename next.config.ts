@@ -11,11 +11,11 @@ const securityHeaders = [
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://8x8.vc https://meet.jit.si",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://8x8.vc https://meet.jit.si https://www.googletagmanager.com https://www.google-analytics.com",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://res.cloudinary.com https://images.unsplash.com https://*.b-cdn.net https://iframe.mediadelivery.net",
+      "img-src 'self' data: blob: https://res.cloudinary.com https://images.unsplash.com https://*.b-cdn.net https://iframe.mediadelivery.net https://www.google-analytics.com https://stats.g.doubleclick.net",
       "font-src 'self' data:",
-      "connect-src 'self' https://graph.facebook.com https://res.cloudinary.com https://8x8.vc wss://8x8.vc https://meet.jit.si wss://meet.jit.si https://video.bunnycdn.com https://*.b-cdn.net https://iframe.mediadelivery.net",
+      "connect-src 'self' https://graph.facebook.com https://res.cloudinary.com https://8x8.vc wss://8x8.vc https://meet.jit.si wss://meet.jit.si https://video.bunnycdn.com https://*.b-cdn.net https://iframe.mediadelivery.net https://www.google-analytics.com https://analytics.google.com https://stats.g.doubleclick.net",
       "frame-src 'self' https://meet.google.com https://meet.jit.si https://8x8.vc https://iframe.mediadelivery.net",
       "media-src 'self' blob: https://8x8.vc https://meet.jit.si https://*.b-cdn.net https://iframe.mediadelivery.net",
     ].join("; "),
@@ -24,6 +24,10 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   images: {
+    formats: ["image/avif", "image/webp"],
+    minimumCacheTTL: 31536000,
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "res.cloudinary.com" },

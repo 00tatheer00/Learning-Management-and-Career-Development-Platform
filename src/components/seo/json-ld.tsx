@@ -31,10 +31,60 @@ export function WebSiteSchema() {
   );
 }
 
+export function LocalBusinessSchema() {
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": ["LocalBusiness", "EducationalOrganization"],
+    "@id": `${SITE_CONFIG.url}/#localbusiness`,
+    name: SITE_CONFIG.name,
+    image: `${SITE_CONFIG.url}${SITE_CONFIG.logo}`,
+    telephone: SITE_CONFIG.phone,
+    email: SITE_CONFIG.email,
+    url: SITE_CONFIG.url,
+    priceRange: "PKR 1,000 - PKR 5,000",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "Main University Road, Block 13-D, Gulshan-e-Iqbal",
+      addressLocality: "Karachi",
+      addressRegion: "Sindh",
+      postalCode: "75300",
+      addressCountry: "PK",
+    },
+    geo: {
+      "@type": "GeoCoordinates",
+      latitude: 24.9207,
+      longitude: 67.0916,
+    },
+    openingHoursSpecification: [
+      {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+        ],
+        opens: "09:00",
+        closes: "21:00",
+      },
+    ],
+    hasMap: "https://maps.google.com/?q=Karachi+Pakistan",
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  );
+}
+
 export function OrganizationSchema() {
   const orgSchema = {
     "@context": "https://schema.org",
-    "@type": ["EducationalOrganization", "Organization"],
+    "@type": ["EducationalOrganization", "Organization", "LocalBusiness"],
     "@id": `${SITE_CONFIG.url}/#organization`,
     name: SITE_CONFIG.name,
     legalName: SITE_CONFIG.name,
@@ -52,13 +102,20 @@ export function OrganizationSchema() {
     slogan: SITE_CONFIG.tagline,
     email: SITE_CONFIG.email,
     telephone: SITE_CONFIG.phone,
+    priceRange: "PKR 1,000 - PKR 5,000",
     sameAs: Object.values(SITE_CONFIG.social),
     address: {
       "@type": "PostalAddress",
-      addressCountry: "PK",
-      addressRegion: "Sindh",
+      streetAddress: "Main University Road, Block 13-D, Gulshan-e-Iqbal",
       addressLocality: "Karachi",
-      streetAddress: SITE_CONFIG.address,
+      addressRegion: "Sindh",
+      postalCode: "75300",
+      addressCountry: "PK",
+    },
+    geo: {
+      "@type": "GeoCoordinates",
+      latitude: 24.9207,
+      longitude: 67.0916,
     },
     contactPoint: [
       {
@@ -96,7 +153,7 @@ export function IdentitySchema() {
     "@context": "https://schema.org",
     "@graph": [
       {
-        "@type": ["EducationalOrganization", "Organization"],
+        "@type": ["EducationalOrganization", "Organization", "LocalBusiness"],
         "@id": `${SITE_CONFIG.url}/#organization`,
         name: SITE_CONFIG.name,
         legalName: SITE_CONFIG.name,
@@ -114,13 +171,20 @@ export function IdentitySchema() {
         slogan: SITE_CONFIG.tagline,
         email: SITE_CONFIG.email,
         telephone: SITE_CONFIG.phone,
+        priceRange: "PKR 1,000 - PKR 5,000",
         sameAs: Object.values(SITE_CONFIG.social),
         address: {
           "@type": "PostalAddress",
-          addressCountry: "PK",
-          addressRegion: "Sindh",
+          streetAddress: "Main University Road, Block 13-D, Gulshan-e-Iqbal",
           addressLocality: "Karachi",
-          streetAddress: SITE_CONFIG.address,
+          addressRegion: "Sindh",
+          postalCode: "75300",
+          addressCountry: "PK",
+        },
+        geo: {
+          "@type": "GeoCoordinates",
+          latitude: 24.9207,
+          longitude: 67.0916,
         },
       },
       ...trainers.map((trainer) => ({

@@ -1,4 +1,4 @@
-import { FAQSchema, IdentitySchema, OrganizationSchema } from "@/components/seo/json-ld";
+import { FAQSchema, IdentitySchema, OrganizationSchema, LocalBusinessSchema } from "@/components/seo/json-ld";
 import { faqs } from "@/lib/data/faqs";
 import { HeroSection } from "@/components/sections/hero";
 import { StatsSection } from "@/components/sections/stats";
@@ -16,6 +16,7 @@ export default function HomePage() {
     <>
       <OrganizationSchema />
       <IdentitySchema />
+      <LocalBusinessSchema />
       <FAQSchema faqs={faqs} />
       <HeroSection />
       <StatsSection />
