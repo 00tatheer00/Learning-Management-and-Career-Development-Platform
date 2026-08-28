@@ -36,24 +36,46 @@ const VALID_CATEGORIES = [
 ];
 
 /**
- * POST — Student submits a new support ticket
+ * POST — Submit a new support ticket (authenticated student OR guest)
  */
 export async function POST(request: Request) {
-  const user = await getCurrentUser();
-  if (!user || user.role !== "student") {
-    return NextResponse.json(
-      createApiResponse(false, { error: "Unauthorized" }),
-      { status: 403 }
-    );
+  let user: { id: string; name: string; email: string } | null = null;
+  try {
+    const currentUser = await getCurrentUser();
+    if (currentUser && currentUser.role === "student") {
+      user = { id: currentUser.id, name: currentUser.name, email: currentUser.email };
+    }
+  } catch {
+    // Not logged in — that's fine, guest submission
   }
 
   try {
     const body = await request.json();
-    const { category, subject, description } = body as {
+    const { category, subject, description, name, email } = body as {
       category?: string;
       subject?: string;
       description?: string;
+      name?: string;
+      email?: string;
     };
+
+    // For guests, name and email are required
+    const studentName = user?.name || name?.trim();
+    const studentEmail = user?.email || email?.trim();
+    const studentId = user?.id || "guest";
+
+    if (!studentName || studentName.length < 2) {
+      return NextResponse.json(
+        createApiResponse(false, { error: "Name is required" }),
+        { status: 400 }
+      );
+    }
+    if (!studentEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(studentEmail)) {
+      return NextResponse.json(
+        createApiResponse(false, { error: "Valid email is required" }),
+        { status: 400 }
+      );
+    }
 
     // Validation
     if (!category || !VALID_CATEGORIES.includes(category)) {
@@ -77,10 +99,10 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check rate limit — max 5 open tickets per student
+    // Rate limit — max 5 open tickets per student/email
     const openCount = await prisma.supportTicket.count({
       where: {
-        studentId: user.id,
+        studentEmail,
         status: { in: ["open", "in_progress"] },
       },
     });
@@ -101,9 +123,9 @@ export async function POST(request: Request) {
       data: {
         id,
         ticketNumber,
-        studentId: user.id,
-        studentName: user.name,
-        studentEmail: user.email,
+        studentId,
+        studentName,
+        studentEmail,
         category: category.trim(),
         subject: subject.trim(),
         description: description.trim(),
@@ -116,18 +138,19 @@ export async function POST(request: Request) {
       select: { id: true },
     });
 
+    const guestLabel = studentId === "guest" ? " (Guest)" : "";
     for (const admin of admins) {
       await createNotification({
         userId: admin.id,
         title: "New Support Ticket",
-        message: `${user.name} submitted ticket ${ticketNumber}: ${subject.trim()}`,
+        message: `${studentName}${guestLabel} submitted ticket ${ticketNumber}: ${subject.trim()}`,
         type: "warning",
         linkUrl: "/admin/support",
       });
     }
 
     return NextResponse.json(
-      createApiResponse(true, { data: ticket, message: "Ticket submitted successfully" }),
+      createApiResponse(true, { data: { ticketNumber: ticket.ticketNumber }, message: "Ticket submitted successfully" }),
       { status: 201 }
     );
   } catch (error) {
