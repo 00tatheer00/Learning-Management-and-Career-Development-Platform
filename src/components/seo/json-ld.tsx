@@ -44,16 +44,16 @@ export function LocalBusinessSchema() {
     priceRange: "PKR 1,000 - PKR 5,000",
     address: {
       "@type": "PostalAddress",
-      streetAddress: "Main University Road, Block 13-D, Gulshan-e-Iqbal",
-      addressLocality: "Karachi",
-      addressRegion: "Sindh",
-      postalCode: "75300",
+      streetAddress: "University Road, Hayatabad",
+      addressLocality: "Peshawar",
+      addressRegion: "Khyber Pakhtunkhwa",
+      postalCode: "25100",
       addressCountry: "PK",
     },
     geo: {
       "@type": "GeoCoordinates",
-      latitude: 24.9207,
-      longitude: 67.0916,
+      latitude: 34.0151,
+      longitude: 71.5249,
     },
     openingHoursSpecification: [
       {
@@ -70,7 +70,7 @@ export function LocalBusinessSchema() {
         closes: "21:00",
       },
     ],
-    hasMap: "https://maps.google.com/?q=Karachi+Pakistan",
+    hasMap: "https://maps.google.com/?q=Peshawar+Pakistan",
   };
 
   return (
@@ -106,16 +106,16 @@ export function OrganizationSchema() {
     sameAs: Object.values(SITE_CONFIG.social),
     address: {
       "@type": "PostalAddress",
-      streetAddress: "Main University Road, Block 13-D, Gulshan-e-Iqbal",
-      addressLocality: "Karachi",
-      addressRegion: "Sindh",
-      postalCode: "75300",
+      streetAddress: "University Road, Hayatabad",
+      addressLocality: "Peshawar",
+      addressRegion: "Khyber Pakhtunkhwa",
+      postalCode: "25100",
       addressCountry: "PK",
     },
     geo: {
       "@type": "GeoCoordinates",
-      latitude: 24.9207,
-      longitude: 67.0916,
+      latitude: 34.0151,
+      longitude: 71.5249,
     },
     contactPoint: [
       {
@@ -175,16 +175,16 @@ export function IdentitySchema() {
         sameAs: Object.values(SITE_CONFIG.social),
         address: {
           "@type": "PostalAddress",
-          streetAddress: "Main University Road, Block 13-D, Gulshan-e-Iqbal",
-          addressLocality: "Karachi",
-          addressRegion: "Sindh",
-          postalCode: "75300",
+          streetAddress: "University Road, Hayatabad",
+          addressLocality: "Peshawar",
+          addressRegion: "Khyber Pakhtunkhwa",
+          postalCode: "25100",
           addressCountry: "PK",
         },
         geo: {
           "@type": "GeoCoordinates",
-          latitude: 24.9207,
-          longitude: 67.0916,
+          latitude: 34.0151,
+          longitude: 71.5249,
         },
       },
       ...trainers.map((trainer) => ({
