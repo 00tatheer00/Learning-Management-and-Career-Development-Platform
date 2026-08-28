@@ -32,6 +32,7 @@ interface AdminAlertsContextValue {
   pendingCount: number;
   pending: PendingAlert[];
   unreadCount: number;
+  supportTicketCount: number;
   markAllSeen: () => void;
 }
 
@@ -61,6 +62,7 @@ export function AdminAlertsProvider({ children }: { children: ReactNode }) {
   const [pendingCount, setPendingCount] = useState(0);
   const [pending, setPending] = useState<PendingAlert[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [supportTicketCount, setSupportTicketCount] = useState(0);
   const knownIdsRef = useRef<Set<string>>(new Set());
   const initializedRef = useRef(false);
   const pendingRef = useRef<PendingAlert[]>([]);
@@ -95,11 +97,23 @@ export function AdminAlertsProvider({ children }: { children: ReactNode }) {
 
   const fetchAlerts = useCallback(async () => {
     try {
-      const res = await fetch("/api/admin/notifications");
-      if (!res.ok) return;
-      const data = await res.json();
-      if (data.success && data.data) {
-        applyAlerts(data.data.pending ?? [], data.data.pendingCount ?? 0);
+      const [notifRes, supportRes] = await Promise.all([
+        fetch("/api/admin/notifications"),
+        fetch("/api/admin/support?status=open").catch(() => null),
+      ]);
+
+      if (notifRes.ok) {
+        const data = await notifRes.json();
+        if (data.success && data.data) {
+          applyAlerts(data.data.pending ?? [], data.data.pendingCount ?? 0);
+        }
+      }
+
+      if (supportRes && supportRes.ok) {
+        const sData = await supportRes.json();
+        if (sData.success && sData.data?.stats) {
+          setSupportTicketCount((sData.data.stats.open ?? 0) + (sData.data.stats.in_progress ?? 0));
+        }
       }
     } catch {
       // ignore network errors
@@ -154,7 +168,7 @@ export function AdminAlertsProvider({ children }: { children: ReactNode }) {
 
   return (
     <AdminAlertsContext.Provider
-      value={{ pendingCount, pending, unreadCount, markAllSeen }}
+      value={{ pendingCount, pending, unreadCount, supportTicketCount, markAllSeen }}
     >
       {children}
     </AdminAlertsContext.Provider>

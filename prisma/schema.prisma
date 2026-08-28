@@ -412,4 +412,38 @@ model DiscussionReply {
   @@index([authorId])
 }
 
+enum TicketStatus {
+  open
+  in_progress
+  resolved
+  closed
+}
 
+enum TicketPriority {
+  low
+  medium
+  high
+}
+
+model SupportTicket {
+  id           String         @id @map("_id")
+  ticketNumber String         @unique
+  studentId    String
+  studentName  String
+  studentEmail String
+  category     String
+  subject      String
+  description  String
+  priority     TicketPriority @default(medium)
+  status       TicketStatus   @default(open)
+  adminReply   String?
+  resolvedAt   DateTime?
+  resolvedBy   String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@index([studentId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([studentEmail])
+}

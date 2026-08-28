@@ -16,6 +16,7 @@ import {
   FilmStrip,
   Certificate,
   PlayCircle,
+  Lifebuoy,
 } from "@phosphor-icons/react";
 
 import type { UserRole } from "@/types/portal";
@@ -38,6 +39,7 @@ export const PORTAL_NAV: Record<UserRole, PortalNavItem[]> = {
     { href: "/student/attendance", label: "Attendance", icon: ListChecks, description: "Your attendance %" },
     { href: "/student/certificates", label: "Certificates", icon: Certificate, description: "Module certificates" },
     { href: "/student/trainer", label: "My Trainer", icon: ChalkboardTeacher, description: "Your instructor" },
+    { href: "/student/support", label: "Support", icon: Lifebuoy, description: "Submit & track issues" },
     { href: "/student/profile", label: "Profile", icon: UserCircle, description: "Account & logins" },
   ],
   trainer: [
@@ -74,6 +76,7 @@ export const PORTAL_NAV: Record<UserRole, PortalNavItem[]> = {
     { href: "/admin/credentials", label: "Portal Logins", icon: Key, description: "Student login IDs" },
     { href: "/admin/attendance", label: "Attendance", icon: ListChecks, description: "Day & module-wise attendance" },
     { href: "/admin/trainers", label: "Trainers", icon: Users, description: "All trainers" },
+    { href: "/admin/support", label: "Support", icon: Lifebuoy, description: "Student tickets & issues" },
     { href: "/admin/courses", label: "Courses", icon: BookOpen, description: "Materials & content" },
     { href: "/admin/settings", label: "Settings", icon: Gear, description: "Portal settings" },
   ],
@@ -95,7 +98,8 @@ function groupNavItems(items: PortalNavItem[], accountHrefs: string[]): PortalNa
 
 export const PORTAL_NAV_GROUPS: Record<UserRole, PortalNavGroup[]> = {
   student: [
-    { label: "Main", items: PORTAL_NAV.student.filter((i) => i.href !== "/student/profile") },
+    { label: "Main", items: PORTAL_NAV.student.filter((i) => i.href !== "/student/profile" && i.href !== "/student/support") },
+    { label: "Help", items: PORTAL_NAV.student.filter((i) => i.href === "/student/support") },
     { label: "Account", items: PORTAL_NAV.student.filter((i) => i.href === "/student/profile") },
   ],
   trainer: groupNavItems(PORTAL_NAV.trainer, ["/trainer/settings", "/trainer/profile"]),
@@ -129,6 +133,7 @@ export const STUDENT_PAGE_TITLES: Record<string, string> = {
   "/student/attendance": "Attendance",
   "/student/certificates": "Certificates",
   "/student/trainer": "My Trainer",
+  "/student/support": "Support",
   "/student/profile": "Profile",
 };
 

@@ -436,6 +436,8 @@ function SidebarContent({
                 const Icon = item.icon;
                 const showEnrollmentBadge =
                   item.href === "/admin/enrollments" && enrollmentBadgeCount > 0;
+                const showSupportBadge =
+                  isAdmin && item.href === "/admin/support" && (adminAlerts?.supportTicketCount ?? 0) > 0;
                 const showAssignmentsBadge =
                   isStudent && item.href === "/student/assignments" && (studentBadges?.assignments ?? 0) > 0;
                 const showClassesBadge =
@@ -444,11 +446,13 @@ function SidebarContent({
                   isStudent && item.href === "/student/certificates" && (studentBadges?.certificates ?? 0) > 0;
                 const navBadgeCount = showEnrollmentBadge
                   ? enrollmentBadgeCount
-                  : showAssignmentsBadge
-                    ? studentBadges?.assignments ?? 0
-                    : showClassesBadge
-                      ? studentBadges?.classes ?? 0
-                      : 0;
+                  : showSupportBadge
+                    ? adminAlerts?.supportTicketCount ?? 0
+                    : showAssignmentsBadge
+                      ? studentBadges?.assignments ?? 0
+                      : showClassesBadge
+                        ? studentBadges?.classes ?? 0
+                        : 0;
                 const showNavBadge = navBadgeCount > 0;
 
                 return (
