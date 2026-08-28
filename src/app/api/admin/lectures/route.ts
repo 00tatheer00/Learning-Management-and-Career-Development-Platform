@@ -49,7 +49,7 @@ export async function GET(request: Request) {
     );
 
     return NextResponse.json(createApiResponse(true, { data: syncedLectures }));
-  } catch (error) {
+  } catch (_error) {
     const errorMessage = "Failed to load lectures";
     return NextResponse.json(
       createApiResponse(false, { error: errorMessage }),

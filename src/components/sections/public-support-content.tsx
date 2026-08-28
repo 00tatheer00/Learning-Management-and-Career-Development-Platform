@@ -15,8 +15,6 @@ import {
   MagnifyingGlass,
   Ticket,
   XCircle,
-  ChatDots,
-  ArrowRight,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 

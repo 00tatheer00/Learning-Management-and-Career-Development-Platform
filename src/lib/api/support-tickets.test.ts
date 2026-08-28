@@ -3,7 +3,6 @@ import { POST } from "@/app/api/support/tickets/route";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth/session";
 import { rateLimitByIp } from "@/lib/security/rate-limit";
-import { createNotification } from "@/lib/services/notification-service";
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -30,14 +29,16 @@ vi.mock("@/lib/services/notification-service", () => ({
   createNotification: vi.fn(),
 }));
 
+type MockFn = ReturnType<typeof vi.fn>;
+
 describe("Support Tickets API (/api/support/tickets)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(rateLimitByIp).mockResolvedValue(false);
     vi.mocked(getCurrentUser).mockResolvedValue(null);
-    vi.mocked(prisma.supportTicket.count).mockResolvedValue(0);
-    vi.mocked(prisma.supportTicket.findFirst).mockResolvedValue(null);
-    vi.mocked(prisma.user.findMany).mockResolvedValue([]);
+    (prisma.supportTicket.count as unknown as MockFn).mockResolvedValue(0);
+    (prisma.supportTicket.findFirst as unknown as MockFn).mockResolvedValue(null);
+    (prisma.user.findMany as unknown as MockFn).mockResolvedValue([]);
   });
 
   it("returns 429 when rate limited", async () => {
@@ -84,11 +85,11 @@ describe("Support Tickets API (/api/support/tickets)", () => {
   });
 
   it("creates ticket successfully and notifies admins", async () => {
-    vi.mocked(prisma.supportTicket.findFirst).mockResolvedValueOnce({
+    (prisma.supportTicket.findFirst as unknown as MockFn).mockResolvedValueOnce({
       ticketNumber: "TKT-0005",
-    } as unknown as { ticketNumber: string });
+    });
 
-    vi.mocked(prisma.supportTicket.create).mockImplementationOnce(async ({ data }) => ({
+    (prisma.supportTicket.create as unknown as MockFn).mockImplementationOnce(async ({ data }: { data: Record<string, unknown> }) => ({
       ...data,
       id: "tkt_123",
       status: "open",
@@ -100,10 +101,10 @@ describe("Support Tickets API (/api/support/tickets)", () => {
       updatedAt: new Date(),
     }));
 
-    vi.mocked(prisma.user.findMany).mockResolvedValueOnce([
+    (prisma.user.findMany as unknown as MockFn).mockResolvedValueOnce([
       { id: "admin-1" },
       { id: "admin-2" },
-    ] as unknown as { id: string }[]);
+    ]);
 
     const req = new Request("http://localhost/api/support/tickets", {
       method: "POST",
