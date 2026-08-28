@@ -18,7 +18,8 @@ const footerLinks = {
     { label: "Blog", href: "/blog" },
     { label: "Events", href: "/events" },
     { label: "Verify Certificate", href: "/verify" },
-    { label: "Student Portal", href: "/student-portal" },
+    { label: "Support", href: "/support" },
+    { label: "Student Login", href: "/student-portal" },
     { label: "FAQ", href: "/#faq" },
   ],
   admissions: [

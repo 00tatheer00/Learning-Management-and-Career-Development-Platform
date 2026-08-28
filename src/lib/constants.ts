@@ -29,7 +29,7 @@ export const NAV_LINKS = [
   { href: "/trainers", label: "Trainers" },
   { href: "/admissions", label: "Admissions" },
   { href: "/verify", label: "Verify" },
-  { href: "/student-portal", label: "Student Portal" },
+  { href: "/support", label: "Support" },
   { href: "/contact", label: "Contact" },
 ] as const;
 
