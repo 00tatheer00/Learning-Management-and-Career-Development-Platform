@@ -20,13 +20,13 @@ export async function generateMetadata({ params }: VerifyPageProps): Promise<Met
 
   if (cert) {
     return createMetadata({
-      title: `Verified Certificate: ${cert.studentName} — ${cert.programTitle} | EEST Registry`,
-      description: `Official verification for ${cert.studentName}'s completion of ${cert.programTitle} (${cert.level}) with Credential ID ${cert.code}.`,
+      title: `Verified Certificate: ${cert.studentName} — ${cert.courseTitle} | EEST Registry`,
+      description: `Official verification for ${cert.studentName}'s completion of ${cert.courseTitle} (${cert.moduleName}) with Credential ID ${cert.verificationCode}.`,
       path: `/verify/${encodeURIComponent(sanitizedCode)}`,
       keywords: [
-        `Certificate ${cert.code}`,
+        `Certificate ${cert.verificationCode}`,
         `${cert.studentName} Certificate`,
-        `${cert.programTitle} Credential`,
+        `${cert.courseTitle} Credential`,
         "Verified Student Certificate",
         "EEST Credential Registry",
       ],
