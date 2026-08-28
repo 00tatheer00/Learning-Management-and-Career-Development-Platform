@@ -291,6 +291,25 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
     reader.readAsDataURL(file);
   };
 
+  const FIELD_TO_STEP: Record<keyof EnrollmentFormData | "paymentScreenshot", number> = {
+    fullName: 0,
+    fatherName: 0,
+    cnic: 0,
+    whatsapp: 0,
+    email: 0,
+    institution: 1,
+    classSemester: 1,
+    fieldOfStudy: 1,
+    program: 2,
+    level: 2,
+    learningMode: 2,
+    hasLaptop: 3,
+    internetAvailable: 3,
+    paymentScreenshot: 4,
+    confirmInfoCorrect: 4,
+    agreeToPolicies: 4,
+  };
+
   const scrollToFirstError = (formErrors: FieldErrors<EnrollmentFormData>) => {
     const orderedFields: (keyof EnrollmentFormData | "paymentScreenshot")[] = [
       "fullName",
@@ -312,19 +331,28 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
 
     for (const field of orderedFields) {
       if (field === "paymentScreenshot") {
-        if (screenshotError) {
-          document
-            .getElementById("paymentScreenshot")
-            ?.scrollIntoView({ behavior: "smooth", block: "center" });
+        if (screenshotError || !screenshotFile) {
+          setMobileStep(4);
+          setTimeout(() => {
+            document
+              .getElementById("paymentScreenshot")
+              ?.scrollIntoView({ behavior: "smooth", block: "center" });
+          }, 50);
           return;
         }
         continue;
       }
       if (formErrors[field]) {
-        const target =
-          document.getElementById(String(field)) ??
-          document.querySelector(`[name="${String(field)}"]`);
-        target?.scrollIntoView({ behavior: "smooth", block: "center" });
+        const targetStep = FIELD_TO_STEP[field];
+        if (targetStep !== undefined) {
+          setMobileStep(targetStep);
+        }
+        setTimeout(() => {
+          const target =
+            document.getElementById(String(field)) ??
+            document.querySelector(`[name="${String(field)}"]`);
+          target?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 50);
         return;
       }
     }
@@ -341,15 +369,6 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
   const handleMobileNext = async () => {
     const fieldsToValidate = STEP_FIELDS[mobileStep];
     const valid = await trigger(fieldsToValidate);
-    if (mobileStep === 3) {
-      const fileValidation = validatePaymentScreenshot(screenshotFile ?? undefined);
-      if (fileValidation) {
-        setScreenshotError(fileValidation);
-        toast.error("Payment screenshot required", fileValidation);
-        document.getElementById("paymentScreenshot")?.scrollIntoView({ behavior: "smooth", block: "center" });
-        return;
-      }
-    }
     if (!valid) {
       scrollToFirstError(errors);
       return;
@@ -362,7 +381,10 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
     if (fileValidation) {
       setScreenshotError(fileValidation);
       toast.error("Payment screenshot required", fileValidation);
-      document.getElementById("paymentScreenshot")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      setMobileStep(4);
+      setTimeout(() => {
+        document.getElementById("paymentScreenshot")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 50);
       return;
     }
 
