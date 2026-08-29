@@ -69,7 +69,7 @@ const DEFAULT_SYSTEM_ACCOUNTS = [
   {
     id: "trainer-zunira",
     email: "zunira@eest.com",
-    defaultPassword: process.env.SEED_TRAINER_ZUNIRA_PASSWORD?.trim() || undefined,
+    defaultPassword: process.env.SEED_TRAINER_ZUNIRA_PASSWORD?.trim() || "zunira@321",
     role: "trainer" as const,
     name: "Zunira Rehman",
     phone: "03000000000",

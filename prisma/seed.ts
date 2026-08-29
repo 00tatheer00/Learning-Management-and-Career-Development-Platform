@@ -71,6 +71,17 @@ const DEFAULT_USERS = [
     avatarInitials: "FG",
   },
   {
+    id: "trainer-zunira",
+    email: "zunira@eest.com",
+    password: seedPassword("SEED_TRAINER_ZUNIRA_PASSWORD", "zunira@321"),
+    role: "trainer" as const,
+    name: "Zunira Rehman",
+    phone: "03000000000",
+    programSlug: "digital-marketing",
+    trainerId: "trainer-zunira",
+    avatarInitials: "ZR",
+  },
+  {
     id: "student-1",
     email: "tatheerabidi00@gmail.com",
     password: seedPassword("SEED_STUDENT_PASSWORD", "student123"),
