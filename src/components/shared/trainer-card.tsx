@@ -73,15 +73,6 @@ function TrainerPortrait({ trainer }: { trainer: Trainer }) {
 
       {/* Subtle bottom vignette so white text is always legible */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
-
-      {/* Experience pill */}
-      {trainer.experience && (
-        <div className="absolute left-3 top-3 z-10">
-          <span className="inline-flex items-center rounded-full border border-white/20 bg-black/30 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-white backdrop-blur-md">
-            {trainer.experience}
-          </span>
-        </div>
-      )}
     </div>
   );
 }
