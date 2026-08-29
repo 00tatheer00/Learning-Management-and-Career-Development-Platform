@@ -10,6 +10,7 @@ export function normalizeProgramSlug(rawSlug?: string | null): string {
   if (lower.includes("web")) return "web-development";
   if (lower.includes("app") || lower.includes("flutter")) return "app-development";
   if (lower.includes("ai") || lower.includes("artificial") || lower.includes("intelligence")) return "artificial-intelligence";
+  if (lower.includes("marketing") || lower.includes("digital") || lower.includes("seo") || lower.includes("smm")) return "digital-marketing";
   return lower;
 }
 

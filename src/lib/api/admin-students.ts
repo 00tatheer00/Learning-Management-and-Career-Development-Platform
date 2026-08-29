@@ -157,6 +157,7 @@ export function buildStudentsExportFilename(programSlug?: string, phase?: string
   const phaseSuffix = phase && phase !== "all" ? `-${phase}` : "";
   if (programSlug === "web-development") return `eest-web-students${phaseSuffix}-${stamp}.csv`;
   if (programSlug === "app-development") return `eest-app-students${phaseSuffix}-${stamp}.csv`;
+  if (programSlug === "digital-marketing") return `eest-marketing-students${phaseSuffix}-${stamp}.csv`;
   return `eest-students-all${phaseSuffix}-${stamp}.csv`;
 }
 

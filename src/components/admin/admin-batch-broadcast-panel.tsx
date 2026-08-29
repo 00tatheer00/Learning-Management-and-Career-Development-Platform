@@ -71,6 +71,7 @@ export function AdminBatchBroadcastPanel() {
             <option value="web-development">Web Development</option>
             <option value="app-development">App Development</option>
             <option value="artificial-intelligence">Artificial Intelligence</option>
+            <option value="digital-marketing">Digital Marketing with AI</option>
             <option value="all">All Programs</option>
           </select>
         </div>

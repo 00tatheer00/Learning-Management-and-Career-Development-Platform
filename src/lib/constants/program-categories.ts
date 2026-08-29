@@ -43,6 +43,15 @@ export const PROGRAM_CATEGORIES: Record<
     badgeClass: "bg-purple-500/10 text-purple-600 border-purple-500/25",
     headerGradient: "from-[#4c1d95] to-[#7c3aed]",
   },
+  "digital-marketing": {
+    slug: "digital-marketing",
+    title: "Digital Marketing with AI",
+    shortLabel: "Marketing",
+    sidebarLabel: "Digital Marketing",
+    primaryTrainerSeedId: "trainer-zunira",
+    badgeClass: "bg-emerald-500/10 text-emerald-600 border-emerald-500/25",
+    headerGradient: "from-[#065f46] to-[#10b981]",
+  },
 };
 
 export function isEnrollableProgramSlug(slug: string): slug is EnrollableProgramSlug {

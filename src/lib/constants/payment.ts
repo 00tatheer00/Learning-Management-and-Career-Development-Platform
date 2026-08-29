@@ -29,6 +29,7 @@ export const PROGRAM_FEES: Record<string, number> = {
   "web-development": 1000,
   "app-development": 1000,
   "artificial-intelligence": 1000,
+  "digital-marketing": 1000,
 };
 
 export function getProgramRegistrationFee(programSlug?: string | null): number {
@@ -40,5 +41,6 @@ export const ENROLLABLE_PROGRAM_SLUGS = [
   "web-development",
   "app-development",
   "artificial-intelligence",
+  "digital-marketing",
 ] as const;
 

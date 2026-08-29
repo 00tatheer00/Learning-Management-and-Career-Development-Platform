@@ -10,7 +10,7 @@ const footerLinks = {
     { label: "App Development", href: "/programs/app-development" },
     { label: "Artificial Intelligence", href: "/programs/artificial-intelligence" },
     { label: "Video Editing", href: "/programs/video-editing" },
-    { label: "Digital Marketing", href: "/programs/digital-marketing" },
+    { label: "Digital Marketing with AI", href: "/programs/digital-marketing" },
     { label: "Graphics Designing", href: "/programs/graphics-designing" },
     { label: "UI/UX Designing", href: "/programs/ui-ux-design" },
   ],

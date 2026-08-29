@@ -11,12 +11,13 @@ export function StudentModuleStartBanner({
 }) {
   const schedule = getStudentClassSchedule(programSlug);
   const isApp = programSlug === "app-development";
+  const isMarketing = programSlug === "digital-marketing";
 
   return (
     <div
       className={cn(
         "portal-card rounded-2xl p-4 sm:p-5",
-        isApp ? "portal-tone-indigo" : "portal-tone-amber",
+        isMarketing ? "portal-tone-emerald" : isApp ? "portal-tone-indigo" : "portal-tone-amber",
         className
       )}
     >

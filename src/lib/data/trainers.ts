@@ -97,11 +97,13 @@ export const trainers: Trainer[] = [
   },
   {
     id: "trainer-zunira",
-    name: "Zunira Rahman",
-    designation: "Digital Marketing Expert",
+    name: "Zunira Rehman",
+    designation: "Digital Marketing & AI Expert",
     programSlug: "digital-marketing",
-    expertise: ["Social Media", "Content Strategy", "Campaigns", "Analytics"],
-    bio: "Guides students in digital campaigns, content planning, social media growth, and practical marketing skills for brands and freelancers.",
+    featured: true,
+    expertise: ["Social Media Marketing", "Meta Ads", "SEO & Search Console", "AI Marketing Tools", "Content Strategy", "Client Pitching"],
+    experience: "3+ years",
+    bio: "Guides students in social media campaigns, SEO audits, Meta Ads, AI-powered content tools, and freelance client acquisition for brands and startups.",
     social: {},
   },
   {

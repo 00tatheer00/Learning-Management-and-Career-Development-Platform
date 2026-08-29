@@ -28,6 +28,14 @@ export const STUDENT_UR = {
       subline:
         "Live classes on Fri, Sat, and Sun. Class timing and links are on the portal.",
     },
+    marketing: {
+      programLabel: "Digital Marketing with AI",
+      headline: "Classes start 15 September 2026.",
+      daysLabel: "Tuesday · Thursday · Saturday",
+      startDateLabel: "Starting 15 September 2026",
+      subline:
+        "Live classes on Tue, Thu, and Sat. Check the portal for the exact time and join link.",
+    },
     bannerTitle: (program: string) => `${program} — Class Schedule`,
   },
 
@@ -84,5 +92,6 @@ export const STUDENT_UR = {
 
 export function getStudentClassSchedule(programSlug?: string | null) {
   if (programSlug === "app-development") return STUDENT_UR.schedule.app;
+  if (programSlug === "digital-marketing") return STUDENT_UR.schedule.marketing;
   return STUDENT_UR.schedule.web;
 }

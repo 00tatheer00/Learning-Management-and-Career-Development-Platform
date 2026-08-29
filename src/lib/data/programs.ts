@@ -2,6 +2,7 @@ import type { Program, ProgramModule } from "@/types";
 import { WEB_DEV_SYLLABUS } from "@/lib/data/web-dev-syllabus";
 import { FLUTTER_SYLLABUS } from "@/lib/data/flutter-syllabus";
 import { AI_SYLLABUS } from "@/lib/data/ai-syllabus";
+import { DIGITAL_MARKETING_SYLLABUS } from "@/lib/data/digital-marketing-syllabus";
 
 export const MODULE_SCHEDULE = {
   daysPerWeek: 3,
@@ -178,21 +179,43 @@ export const programs: Program[] = [
   {
     id: "digital-marketing",
     slug: "digital-marketing",
-    title: "Digital Marketing",
-    category: "future",
+    title: "Digital Marketing with AI",
+    category: "active",
     description:
-      "Master SEO, content strategy, social media, and analytics to drive measurable business growth.",
-    duration: "Coming Soon",
-    level: "Beginner",
+      "Master Social Media Marketing, SEO, Meta Ads, Client Pitching, and AI-powered marketing tools to launch your freelance career.",
+    duration: "12 weeks · 3 modules",
+    level: "Beginner to Advanced",
     image:
       "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=900&h=560&fit=crop&q=80",
     outcomes: [
-      "Develop data-driven marketing strategies",
-      "Execute SEO and content campaigns",
-      "Manage paid advertising channels",
-      "Analyze and optimize conversion funnels",
+      "Plan & execute social media campaigns with Canva, Meta Ads & content calendars",
+      "Perform full SEO audits — on-page, off-page, technical & local SEO",
+      "Use AI tools (ChatGPT, Claude, Midjourney) for content, copy & reporting",
+      "Build pitch decks, land freelance clients & launch your marketing career",
     ],
-    modules: [],
+    modules: [
+      createProgramModule(
+        "Digital Marketing & Social Media",
+        "Platforms, content strategy, Canva design, copywriting & Meta Ads",
+        "1 month",
+        MODULE_SCHEDULE,
+        DIGITAL_MARKETING_SYLLABUS["Digital Marketing & Social Media"]
+      ),
+      createProgramModule(
+        "SEO (Search Engine Optimization)",
+        "Keyword research, on-page & off-page SEO, technical audits & reporting",
+        "1 month",
+        MODULE_SCHEDULE,
+        DIGITAL_MARKETING_SYLLABUS["SEO (Search Engine Optimization)"]
+      ),
+      createProgramModule(
+        "Client Pitching & AI in Marketing",
+        "Freelancing, proposals, pitch decks, AI tools & capstone project",
+        "1 month",
+        MODULE_SCHEDULE,
+        DIGITAL_MARKETING_SYLLABUS["Client Pitching & AI in Marketing"]
+      ),
+    ],
   },
   {
     id: "graphics-designing",

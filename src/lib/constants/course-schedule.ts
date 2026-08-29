@@ -191,6 +191,59 @@ export function getStudentModuleSchedule(
     };
   }
 
+  // 4. DIGITAL MARKETING WITH AI
+  if (slug.includes("marketing") || slug.includes("digital") || slug.includes("seo")) {
+    // Module 1 (Digital Marketing & Social Media)
+    if (
+      lvl.includes("social") ||
+      lvl.includes("marketing") ||
+      lvl.includes("smm") ||
+      lvl === "1" ||
+      lvl === "" ||
+      lvl.includes("level 1") ||
+      lvl.includes("module 1")
+    ) {
+      return {
+        programLabel: "Digital Marketing with AI",
+        headline: "Classes start from 15th September, 8:00 PM",
+        subline:
+          "Live classes on Tue, Thu, and Sat from 8:00 PM to 9:30 PM (PKT). Check your student portal for class timing and live session links.",
+        daysLabel: "Tuesday · Thursday · Saturday",
+        startDateLabel: "15th September, 8:00 PM",
+      };
+    }
+
+    // Module 2 (SEO)
+    if (
+      lvl.includes("seo") ||
+      lvl.includes("search") ||
+      lvl === "2" ||
+      lvl.includes("level 2") ||
+      lvl.includes("module 2")
+    ) {
+      return {
+        programLabel: "Digital Marketing with AI",
+        headline: "Coming Soon",
+        subline:
+          "Module 2 (SEO) will start after Module 1 completion. Stay tuned for updates!",
+        daysLabel: "Schedule to be announced",
+        startDateLabel: "Coming Soon",
+        isComingSoon: true,
+      };
+    }
+
+    // Module 3 (Client Pitching & AI)
+    return {
+      programLabel: "Digital Marketing with AI",
+      headline: "Coming Soon",
+      subline:
+        "Classes for this advanced module will be announced soon. Check your portal notifications for updates.",
+      daysLabel: "Schedule to be announced",
+      startDateLabel: "Coming Soon",
+      isComingSoon: true,
+    };
+  }
+
   return {
     programLabel: "Emerging Edge Course",
     headline: "Classes Starting Soon",

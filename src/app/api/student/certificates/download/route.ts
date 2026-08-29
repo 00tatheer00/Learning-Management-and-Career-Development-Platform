@@ -4,6 +4,7 @@ import { getCertificateRenderPayload } from "@/lib/certificates/student-certific
 import { renderCertificatePdf, renderCertificatePng } from "@/lib/certificates/render-certificate";
 import { prisma } from "@/lib/prisma";
 import { formatCertificateDate } from "@/lib/certificates/certificate-ids";
+import { getProgramBySlug } from "@/lib/data/programs";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -71,7 +72,7 @@ export async function GET(request: Request) {
         payload = {
           studentName: studentUser.name,
           moduleName,
-          programTitle: programSlug === "web-development" ? "Web Development" : programSlug,
+          programTitle: getProgramBySlug(programSlug)?.title ?? programSlug,
           completionDate: formatCertificateDate(new Date()),
           certificateId: `PREVIEW-${studentId.slice(0, 6)}`,
         };

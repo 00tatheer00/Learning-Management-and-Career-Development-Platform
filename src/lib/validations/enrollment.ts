@@ -47,7 +47,7 @@ export const enrollmentSchema = z.object({
     .min(2, "Please write what you study")
     .max(100, "Too long"),
   program: z.enum(ENROLLABLE_PROGRAM_SLUGS, {
-    message: "Please choose Web or App course",
+    message: "Please choose a course to apply for",
   }),
   level: z.string().min(1, "Please choose a starting module"),
   learningMode: z.literal("online"),

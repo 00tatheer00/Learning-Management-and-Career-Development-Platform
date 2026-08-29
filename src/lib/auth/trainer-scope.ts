@@ -9,6 +9,8 @@ export function getTrainerDesignation(programSlug?: string): string {
       return "Mobile App Development Trainer";
     case "artificial-intelligence":
       return "Associate AI Engineer & Trainer";
+    case "digital-marketing":
+      return "Digital Marketing & AI Trainer";
     default:
       return "Trainer";
   }

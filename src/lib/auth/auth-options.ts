@@ -66,6 +66,16 @@ const DEFAULT_SYSTEM_ACCOUNTS = [
     programSlug: "artificial-intelligence",
     trainerId: "trainer-faiza",
   },
+  {
+    id: "trainer-zunira",
+    email: "zunira@eest.com",
+    defaultPassword: process.env.SEED_TRAINER_ZUNIRA_PASSWORD?.trim() || undefined,
+    role: "trainer" as const,
+    name: "Zunira Rehman",
+    phone: "03000000000",
+    programSlug: "digital-marketing",
+    trainerId: "trainer-zunira",
+  },
 ];
 
 export const authOptions: NextAuthOptions = {
