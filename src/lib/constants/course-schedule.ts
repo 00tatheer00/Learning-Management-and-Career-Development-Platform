@@ -205,11 +205,11 @@ export function getStudentModuleSchedule(
     ) {
       return {
         programLabel: "Digital Marketing with AI",
-        headline: "Classes start from 15th September, 8:00 PM",
+        headline: "Classes start from Monday, 9:00 PM",
         subline:
-          "Live classes on Tue, Thu, and Sat from 8:00 PM to 9:30 PM (PKT). Check your student portal for class timing and live session links.",
-        daysLabel: "Tuesday · Thursday · Saturday",
-        startDateLabel: "15th September, 8:00 PM",
+          "Live classes on Mon, Tue, and Wed from 9:00 PM to 10:00 PM (PKT). Check your student portal for class timing and live session links.",
+        daysLabel: "Monday · Tuesday · Wednesday",
+        startDateLabel: "Monday, 9:00 PM",
       };
     }
 

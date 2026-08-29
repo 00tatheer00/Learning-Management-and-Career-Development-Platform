@@ -40,11 +40,11 @@ export const PROGRAM_CLASS_CONFIG: Record<EnrollableProgramSlug, ProgramClassCon
   },
   "digital-marketing": {
     startDate: "2026-09-15",
-    classDays: [2, 4, 6],
-    startTime: "20:00",
-    endTime: "21:30",
-    timeLabel: "8:00 PM – 9:30 PM",
-    daysLabel: "Tuesday · Thursday · Saturday",
+    classDays: [1, 2, 3],
+    startTime: "21:00",
+    endTime: "22:00",
+    timeLabel: "9:00 PM – 10:00 PM",
+    daysLabel: "Monday · Tuesday · Wednesday",
     programTitle: "Digital Marketing with AI",
   },
 };

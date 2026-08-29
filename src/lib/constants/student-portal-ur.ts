@@ -30,11 +30,11 @@ export const STUDENT_UR = {
     },
     marketing: {
       programLabel: "Digital Marketing with AI",
-      headline: "Classes start 15 September 2026.",
-      daysLabel: "Tuesday · Thursday · Saturday",
-      startDateLabel: "Starting 15 September 2026",
+      headline: "Classes start Monday, 9:00 PM.",
+      daysLabel: "Monday · Tuesday · Wednesday",
+      startDateLabel: "Monday, 9:00 PM",
       subline:
-        "Live classes on Tue, Thu, and Sat. Check the portal for the exact time and join link.",
+        "Live classes on Mon, Tue, and Wed (9:00 PM – 10:00 PM). Check the portal for the exact join link.",
     },
     bannerTitle: (program: string) => `${program} — Class Schedule`,
   },

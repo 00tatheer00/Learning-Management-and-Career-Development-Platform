@@ -26,6 +26,11 @@ function createProgramModule(
   };
 }
 
+export const MARKETING_MODULE_SCHEDULE = {
+  daysPerWeek: 3,
+  hoursPerDay: 1,
+} as const;
+
 export const programs: Program[] = [
   {
     id: "web-dev",
@@ -198,21 +203,21 @@ export const programs: Program[] = [
         "Digital Marketing & Social Media",
         "Platforms, content strategy, Canva design, copywriting & Meta Ads",
         "1 month",
-        MODULE_SCHEDULE,
+        MARKETING_MODULE_SCHEDULE,
         DIGITAL_MARKETING_SYLLABUS["Digital Marketing & Social Media"]
       ),
       createProgramModule(
         "SEO (Search Engine Optimization)",
         "Keyword research, on-page & off-page SEO, technical audits & reporting",
         "1 month",
-        MODULE_SCHEDULE,
+        MARKETING_MODULE_SCHEDULE,
         DIGITAL_MARKETING_SYLLABUS["SEO (Search Engine Optimization)"]
       ),
       createProgramModule(
         "Client Pitching & AI in Marketing",
         "Freelancing, proposals, pitch decks, AI tools & capstone project",
         "1 month",
-        MODULE_SCHEDULE,
+        MARKETING_MODULE_SCHEDULE,
         DIGITAL_MARKETING_SYLLABUS["Client Pitching & AI in Marketing"]
       ),
     ],
