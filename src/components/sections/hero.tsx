@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
-import { ArrowRight, Sparkles, Code2, Cpu, Palette, Rocket } from "lucide-react";
+import { ArrowRight, Sparkles, Code2, Cpu, Palette, Megaphone } from "lucide-react";
 import { motion, type Variants } from "framer-motion";
 import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
@@ -116,9 +116,9 @@ export function HeroSection() {
           className="absolute bottom-[26%] right-6 xl:right-12 flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-white/90 backdrop-blur-md border border-emerald-200/80 shadow-xl shadow-emerald-500/10 text-slate-900 text-xs font-black"
         >
           <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-600">
-            <Rocket size={16} />
+            <Megaphone size={16} />
           </div>
-          <span>FullStack MERN</span>
+          <span>Digital Marketing with AI</span>
         </motion.div>
       </div>
 
@@ -129,10 +129,10 @@ export function HeroSection() {
           animate="visible"
           className="w-full max-w-[1140px] flex flex-col items-center"
         >
-          {/* ═══ AI COURSE LAUNCH BANNER ═══ */}
+          {/* ═══ DIGITAL MARKETING WITH AI LAUNCH BANNER ═══ */}
           <motion.div variants={itemVariants} className="mb-5">
             <Link
-              href="/programs"
+              href="/programs/digital-marketing"
               className="group relative inline-flex items-center gap-3 px-5 py-2.5 rounded-full overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/15 hover:-translate-y-0.5"
               style={{
                 background: "linear-gradient(135deg, #fff7ed 0%, #ffedd5 50%, #fef3c7 100%)",
@@ -165,12 +165,12 @@ export function HeroSection() {
                 }}
               >
                 <Sparkles size={8} />
-                New
+                New Course
               </span>
 
               {/* Title */}
               <span className="text-sm sm:text-[15px] font-bold text-slate-800 tracking-tight whitespace-nowrap">
-                AI Course Launched
+                Digital Marketing with AI Launched
               </span>
 
               {/* Separator */}
@@ -182,7 +182,7 @@ export function HeroSection() {
                 transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
                 className="hidden sm:inline-flex items-center gap-1 text-xs font-bold text-orange-600 group-hover:text-orange-700 transition-colors shrink-0"
               >
-                Explore
+                Explore Syllabus
                 <ArrowRight size={12} strokeWidth={2.5} />
               </motion.span>
 

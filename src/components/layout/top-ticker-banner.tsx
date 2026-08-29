@@ -6,11 +6,11 @@ import { X, ChevronRight, Zap } from "lucide-react";
 import { REGISTRATION_OPEN } from "@/lib/constants";
 
 const tickerItems = [
-  "🔥 Admissions Open — 2nd Module Now Enrolling",
+  "🔥 Admissions Open — Digital Marketing with AI Now Enrolling",
   "⚡ Live Interactive Classes & Weekly Assignments",
-  "🚀 Limited Seats — Apply Before July 31",
-  "💻 Web Development · App Dev · AI · Graphics · UI/UX",
-  "🎓 100% Free Course — Only Minimal Registration Fee",
+  "🚀 Limited Seats Available — Apply Now",
+  "💻 Web Development · Flutter App · AI · Digital Marketing",
+  "🎓 100% Free Tuition — Only Minimal Registration Fee",
   "🏆 Hands-On Projects · Real-World Skills · Certified Trainers",
 ];
 

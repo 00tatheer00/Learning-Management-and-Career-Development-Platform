@@ -163,25 +163,6 @@ export const programs: Program[] = [
     ],
   },
   {
-    id: "video-editing",
-    slug: "video-editing",
-    title: "Video Editing",
-    category: "future",
-    description:
-      "Learn professional video editing, motion graphics, and content creation for social media, YouTube, and digital campaigns.",
-    duration: "Coming Soon",
-    level: "Beginner to Intermediate",
-    image:
-      "https://images.unsplash.com/photo-1574710160579-8ec4fc04bd1e?w=900&h=560&fit=crop&q=80",
-    outcomes: [
-      "Edit videos with professional tools",
-      "Apply transitions, effects, and color grading",
-      "Create engaging social media content",
-      "Produce polished videos for clients and brands",
-    ],
-    modules: [],
-  },
-  {
     id: "digital-marketing",
     slug: "digital-marketing",
     title: "Digital Marketing with AI",
@@ -221,6 +202,25 @@ export const programs: Program[] = [
         DIGITAL_MARKETING_SYLLABUS["Client Pitching & AI in Marketing"]
       ),
     ],
+  },
+  {
+    id: "video-editing",
+    slug: "video-editing",
+    title: "Video Editing",
+    category: "future",
+    description:
+      "Learn professional video editing, motion graphics, and content creation for social media, YouTube, and digital campaigns.",
+    duration: "Coming Soon",
+    level: "Beginner to Intermediate",
+    image:
+      "https://images.unsplash.com/photo-1574710160579-8ec4fc04bd1e?w=900&h=560&fit=crop&q=80",
+    outcomes: [
+      "Edit videos with professional tools",
+      "Apply transitions, effects, and color grading",
+      "Create engaging social media content",
+      "Produce polished videos for clients and brands",
+    ],
+    modules: [],
   },
   {
     id: "graphics-designing",
