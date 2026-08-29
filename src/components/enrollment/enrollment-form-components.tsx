@@ -54,56 +54,34 @@ export function EnrollmentModulePicker({
             disabled={disabled}
             onClick={() => onChange(mod.name)}
             className={cn(
-              "group relative w-full overflow-hidden rounded-2xl border p-4 sm:p-5 text-left transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50",
+              "group relative flex w-full items-start justify-between gap-4 rounded-xl border p-4 sm:p-5 text-left transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50",
               isSelected
-                ? "border-2 border-orange-500 bg-gradient-to-r from-orange-500/[0.08] via-orange-500/[0.03] to-background shadow-md shadow-orange-500/10 ring-4 ring-orange-500/15 dark:border-orange-500 dark:from-orange-950/40 dark:via-background dark:to-background"
-                : "border-border/80 bg-background hover:border-orange-300 dark:hover:border-orange-600/50 hover:bg-orange-500/[0.02] hover:shadow-sm"
+                ? "border-2 border-primary bg-primary/[0.04] shadow-sm"
+                : "border-border bg-background hover:border-primary/40 hover:bg-secondary/50"
             )}
             role="radio"
             aria-checked={isSelected}
           >
-            {/* Active Left Indicator Bar */}
-            {isSelected && (
-              <span
-                className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-orange-500 to-amber-600"
-                aria-hidden="true"
-              />
-            )}
-
-            <div className="flex items-start gap-3 sm:gap-4 pl-1 sm:pl-1.5">
-              {/* Module Number Box */}
+            <div className="flex items-start gap-3.5 sm:gap-4 min-w-0 flex-1">
+              {/* Step / Module Number Badge */}
               <div
                 className={cn(
-                  "flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl text-sm font-extrabold transition-all duration-200",
+                  "flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-lg text-sm font-bold transition-colors",
                   isSelected
-                    ? "bg-gradient-to-br from-orange-500 to-amber-600 text-white shadow-md shadow-orange-500/30"
-                    : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 group-hover:border-orange-200 group-hover:text-orange-600 dark:group-hover:text-orange-400"
+                    ? "bg-primary text-primary-foreground shadow-xs"
+                    : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-border/80 group-hover:border-primary/30"
                 )}
               >
                 {index + 1}
               </div>
 
-              {/* Module Info */}
-              <div className="min-w-0 flex-1 pr-2">
+              {/* Module Text Details */}
+              <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h4
-                    className={cn(
-                      "text-sm sm:text-base font-bold transition-colors",
-                      isSelected
-                        ? "text-orange-950 dark:text-orange-100"
-                        : "text-foreground group-hover:text-orange-900 dark:group-hover:text-orange-200"
-                    )}
-                  >
+                  <h4 className="text-base font-bold text-foreground leading-snug">
                     {mod.name}
                   </h4>
-                  <span
-                    className={cn(
-                      "rounded-full px-2.5 py-0.5 text-[11px] font-semibold transition-colors",
-                      isSelected
-                        ? "bg-orange-100 dark:bg-orange-950/60 text-orange-800 dark:text-orange-300 border border-orange-200/80 dark:border-orange-800/60"
-                        : "bg-surface-muted text-muted border border-border/60"
-                    )}
-                  >
+                  <span className="rounded-full border border-border bg-secondary px-2.5 py-0.5 text-[11px] font-semibold text-muted">
                     {mod.duration}
                   </span>
                 </div>
@@ -114,43 +92,25 @@ export function EnrollmentModulePicker({
                   </p>
                 )}
 
-                <div className="mt-2.5 flex flex-wrap items-center gap-3">
-                  <p
-                    className={cn(
-                      "text-xs font-semibold flex items-center gap-1.5 transition-colors",
-                      isSelected
-                        ? "text-orange-600 dark:text-orange-400"
-                        : "text-muted group-hover:text-slate-700 dark:group-hover:text-slate-300"
-                    )}
-                  >
-                    <CalendarDots size={14} className="shrink-0 text-orange-500" />
-                    {formatModuleSchedule(mod)}
-                  </p>
+                <div className="mt-2.5 flex items-center gap-1.5 text-xs font-medium text-muted">
+                  <CalendarDots size={14} className="shrink-0 text-primary" />
+                  <span>{formatModuleSchedule(mod)}</span>
                 </div>
               </div>
+            </div>
 
-              {/* Modern Radio Button / Selection Checkmark */}
-              <div className="shrink-0 flex items-center gap-2 pt-0.5">
-                {isSelected ? (
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-orange-500 text-white px-2.5 py-1 text-xs font-bold shadow-xs">
-                    <svg
-                      className="h-3.5 w-3.5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={3}
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span className="hidden sm:inline">Selected</span>
-                  </span>
-                ) : (
-                  <div
-                    className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-slate-300 dark:border-slate-600 bg-background transition-all duration-200 group-hover:border-orange-400 group-hover:scale-105"
-                    aria-hidden="true"
-                  >
-                    <span className="h-2.5 w-2.5 rounded-full bg-transparent group-hover:bg-orange-300/40 transition-colors" />
-                  </div>
+            {/* Standard Professional Radio Button */}
+            <div className="shrink-0 pt-0.5" aria-hidden="true">
+              <div
+                className={cn(
+                  "flex h-5 w-5 items-center justify-center rounded-full transition-all duration-150",
+                  isSelected
+                    ? "border-2 border-primary bg-background"
+                    : "border-2 border-slate-300 dark:border-slate-600 bg-background group-hover:border-primary/50"
+                )}
+              >
+                {isSelected && (
+                  <div className="h-2.5 w-2.5 rounded-full bg-primary" />
                 )}
               </div>
             </div>
