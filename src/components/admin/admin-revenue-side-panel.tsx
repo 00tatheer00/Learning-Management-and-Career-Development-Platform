@@ -224,22 +224,22 @@ export function AdminRevenueSidebarCard({
     <button
       type="button"
       onClick={() => ctx.setOpen(true)}
-      className="w-full rounded-xl p-2.5 text-left transition-all duration-150 ease-out cursor-pointer select-none group border border-pt-subtle bg-pt-surface/80 hover:bg-pt-surface hover:border-emerald-500/50 shadow-pt text-pt"
+      className="w-full rounded-xl p-2.5 text-left transition-all duration-150 ease-out cursor-pointer select-none group border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 hover:bg-white dark:hover:bg-slate-900 hover:border-emerald-500/50 shadow-xs text-slate-900 dark:text-white"
     >
       <div className="flex items-center gap-2.5">
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg shadow-xs portal-tone-icon portal-tone-icon-emerald group-hover:scale-105 transition-transform">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg shadow-2xs bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400 border border-emerald-200/70 dark:border-emerald-800/40 group-hover:scale-105 transition-transform">
           <CurrencyCircleDollar size={18} weight="duotone" />
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between">
-            <p className="text-sm font-bold text-pt tracking-tight">
+            <p className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">
               Revenue
             </p>
-            <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded">
+            <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 px-1.5 py-0.5 rounded">
               PKR
             </span>
           </div>
-          <p className="text-[11px] font-medium text-pt-muted truncate">
+          <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate">
             Financial Overview
           </p>
         </div>
@@ -357,7 +357,7 @@ function AdminRevenueSidePanel() {
       <button
         type="button"
         aria-label="Close revenue panel"
-        className="absolute inset-0 bg-black/75 backdrop-blur-xs transition-opacity"
+        className="absolute inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-xs transition-opacity cursor-pointer"
         onClick={() => setOpen(false)}
       />
 
@@ -365,20 +365,22 @@ function AdminRevenueSidePanel() {
         role="dialog"
         aria-modal="true"
         aria-label="Registration Revenue"
-        className="relative flex h-full w-full max-w-[530px] flex-col bg-[#0c1017] text-slate-100 shadow-2xl border-l border-slate-800 z-10"
+        className="relative flex h-full w-full max-w-[540px] flex-col bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 shadow-2xl border-l border-slate-200 dark:border-slate-800 z-10"
       >
         {/* Top Header Card */}
-        <div className="relative shrink-0 border-b border-pt-subtle bg-pt-surface px-5 pt-5 pb-5 text-pt">
-          <div className="flex items-start justify-between gap-3 mb-3">
+        <div className="relative shrink-0 border-b border-slate-100 dark:border-slate-800/80 bg-white dark:bg-slate-950 px-6 pt-5 pb-5">
+          <div className="flex items-start justify-between gap-3 mb-3.5">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl portal-tone-icon portal-tone-icon-emerald shadow-xs">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800/50 shadow-xs">
                 <CurrencyCircleDollar size={26} weight="duotone" />
               </div>
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
                   Financial Overview
                 </p>
-                <h2 className="text-xl font-bold tracking-tight text-pt">Registration Revenue</h2>
+                <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
+                  Registration Revenue
+                </h2>
               </div>
             </div>
             <div className="flex items-center gap-1">
@@ -386,15 +388,15 @@ function AdminRevenueSidePanel() {
                 type="button"
                 onClick={() => void refresh()}
                 disabled={loading}
-                className="rounded-lg p-2 text-pt-muted hover:text-pt hover:bg-pt-surface/80 transition-colors disabled:opacity-50 cursor-pointer"
+                className="rounded-lg p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:hover:text-slate-200 dark:hover:bg-slate-800 transition-colors disabled:opacity-50 cursor-pointer"
                 aria-label="Refresh data"
               >
-                <ArrowClockwise size={18} className={loading ? "animate-spin text-emerald-500" : ""} />
+                <ArrowClockwise size={18} className={loading ? "animate-spin text-emerald-600" : ""} />
               </button>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="rounded-lg p-2 text-pt-muted hover:text-pt hover:bg-pt-surface/80 transition-colors cursor-pointer"
+                className="rounded-lg p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:hover:text-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                 aria-label="Close"
               >
                 <X size={20} weight="bold" />
@@ -402,50 +404,50 @@ function AdminRevenueSidePanel() {
             </div>
           </div>
 
-          {/* Dynamic phase split explanation styled like dashboard tones */}
+          {/* Dynamic phase split explanation styled in clean light tones */}
           {selectedPhase === "phase-1" ? (
-            <div className="portal-tone-indigo text-xs text-pt leading-relaxed border border-pt-subtle rounded-xl p-3 shadow-pt">
-              <span className="font-bold text-indigo-700 dark:text-indigo-300 uppercase text-[10px] tracking-wider bg-indigo-500/15 border border-indigo-500/30 px-2 py-0.5 rounded-md mr-2">
+            <div className="bg-indigo-50/80 border border-indigo-200/80 dark:bg-indigo-950/30 dark:border-indigo-900/40 text-xs text-slate-700 dark:text-slate-300 leading-relaxed rounded-xl p-3.5 shadow-2xs">
+              <span className="font-bold text-indigo-700 dark:text-indigo-300 uppercase text-[10px] tracking-wider bg-indigo-100 dark:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-800 px-2 py-0.5 rounded-md mr-2">
                 Phase 1 Model
               </span>
-              PKR 1,000 → <strong className="text-pt">PKR 200</strong> Mgmt (Komal) · <strong className="text-pt">PKR 800</strong> Trainer (Tatheer / Talha) · <strong className="text-pt">PKR 0</strong> School
+              PKR 1,000 → <strong className="text-slate-900 dark:text-white">PKR 200</strong> Mgmt (Komal) · <strong className="text-slate-900 dark:text-white">PKR 800</strong> Trainer (Tatheer / Talha) · <strong className="text-slate-900 dark:text-white">PKR 0</strong> School
             </div>
           ) : selectedPhase === "phase-2" ? (
-            <div className="portal-tone-emerald text-xs text-pt leading-relaxed border border-pt-subtle rounded-xl p-3 shadow-pt">
-              <span className="font-bold text-emerald-700 dark:text-emerald-300 uppercase text-[10px] tracking-wider bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 rounded-md mr-2">
+            <div className="bg-emerald-50/80 border border-emerald-200/80 dark:bg-emerald-950/30 dark:border-emerald-900/40 text-xs text-slate-700 dark:text-slate-300 leading-relaxed rounded-xl p-3.5 shadow-2xs">
+              <span className="font-bold text-emerald-700 dark:text-emerald-300 uppercase text-[10px] tracking-wider bg-emerald-100 dark:bg-emerald-900/50 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded-md mr-2">
                 Phase 2 Model
               </span>
-              PKR 1,000 → <strong className="text-pt">PKR 200</strong> Mgmt (Komal) · <strong className="text-pt">PKR 700</strong> Trainer · <strong className="text-pt">PKR 100</strong> School
+              PKR 1,000 → <strong className="text-slate-900 dark:text-white">PKR 200</strong> Mgmt (Komal) · <strong className="text-slate-900 dark:text-white">PKR 700</strong> Trainer · <strong className="text-slate-900 dark:text-white">PKR 100</strong> School
             </div>
           ) : selectedPhase === "phase-3" ? (
-            <div className="portal-tone-violet text-xs text-pt leading-relaxed border border-pt-subtle rounded-xl p-3 shadow-pt">
-              <span className="font-bold text-violet-700 dark:text-violet-300 uppercase text-[10px] tracking-wider bg-violet-500/15 border border-violet-500/30 px-2 py-0.5 rounded-md mr-2">
+            <div className="bg-purple-50/80 border border-purple-200/80 dark:bg-purple-950/30 dark:border-purple-900/40 text-xs text-slate-700 dark:text-slate-300 leading-relaxed rounded-xl p-3.5 shadow-2xs">
+              <span className="font-bold text-purple-700 dark:text-purple-300 uppercase text-[10px] tracking-wider bg-purple-100 dark:bg-purple-900/50 border border-purple-200 dark:border-purple-800 px-2 py-0.5 rounded-md mr-2">
                 Phase 3 Model
               </span>
-              PKR 1,000 → <strong className="text-pt">PKR 200</strong> Mgmt (Komal) · <strong className="text-pt">PKR 700</strong> Trainer · <strong className="text-pt">PKR 100</strong> School
+              PKR 1,000 → <strong className="text-slate-900 dark:text-white">PKR 200</strong> Mgmt (Komal) · <strong className="text-slate-900 dark:text-white">PKR 700</strong> Trainer · <strong className="text-slate-900 dark:text-white">PKR 100</strong> School
             </div>
           ) : (
-            <div className="portal-tone-slate text-xs text-pt-secondary leading-relaxed border border-pt-subtle rounded-xl p-3 shadow-pt">
-              <span className="font-bold text-indigo-600 dark:text-indigo-400">Phase 1:</span> Rs 200 Mgmt / Rs 800 Trainer · <span className="font-bold text-emerald-600 dark:text-emerald-400">Phase 2:</span> Rs 200 Mgmt / Rs 700 Trainer / Rs 100 School · <span className="font-bold text-violet-600 dark:text-violet-400">Phase 3:</span> Rs 200 Mgmt / Rs 700 Trainer / Rs 100 School
+            <div className="bg-slate-50 border border-slate-200/90 dark:bg-slate-900 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400 leading-relaxed rounded-xl p-3.5 shadow-2xs">
+              <span className="font-bold text-indigo-600 dark:text-indigo-400">Phase 1:</span> Rs 200 Mgmt / Rs 800 Trainer · <span className="font-bold text-emerald-600 dark:text-emerald-400">Phase 2:</span> Rs 200 Mgmt / Rs 700 Trainer / Rs 100 School · <span className="font-bold text-purple-600 dark:text-purple-400">Phase 3:</span> Rs 200 Mgmt / Rs 700 Trainer / Rs 100 School
             </div>
           )}
         </div>
 
         {/* Phase Filter Toggle Bar */}
         {stats && stats.phases && (
-          <div className="shrink-0 border-b border-pt-subtle bg-pt-surface/70 px-4 py-2.5 flex items-center justify-between gap-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-pt-muted shrink-0">
+          <div className="shrink-0 border-b border-slate-100 dark:border-slate-800/80 bg-slate-50/70 dark:bg-slate-900/50 px-6 py-2.5 flex items-center justify-between gap-2">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 shrink-0">
               Module Phase
             </span>
-            <div className="flex gap-1.5 bg-pt-surface border border-pt-subtle p-1 rounded-xl shadow-xs">
+            <div className="flex gap-1 bg-slate-200/70 dark:bg-slate-800 p-1 rounded-xl shadow-xs border border-slate-200/60 dark:border-slate-700">
               <button
                 type="button"
                 onClick={() => handlePhaseChange("all")}
                 className={cn(
                   "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer",
                   selectedPhase === "all"
-                    ? "bg-slate-800 text-white shadow-sm font-bold dark:bg-slate-700"
-                    : "text-pt-muted hover:text-pt hover:bg-pt-surface/60"
+                    ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs font-bold"
+                    : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
                 )}
               >
                 All ({stats.totalApproved})
@@ -456,8 +458,8 @@ function AdminRevenueSidePanel() {
                 className={cn(
                   "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer",
                   selectedPhase === "phase-1"
-                    ? "bg-indigo-600 text-white shadow-sm font-bold"
-                    : "text-pt-muted hover:text-pt hover:bg-pt-surface/60"
+                    ? "bg-indigo-600 text-white shadow-xs font-bold"
+                    : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
                 )}
               >
                 Phase 1 ({stats.phases.phase1.totalApproved})
@@ -468,8 +470,8 @@ function AdminRevenueSidePanel() {
                 className={cn(
                   "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer",
                   selectedPhase === "phase-2"
-                    ? "bg-emerald-600 text-white shadow-sm font-bold"
-                    : "text-pt-muted hover:text-pt hover:bg-pt-surface/60"
+                    ? "bg-emerald-600 text-white shadow-xs font-bold"
+                    : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
                 )}
               >
                 Phase 2 ({stats.phases.phase2.totalApproved})
@@ -480,8 +482,8 @@ function AdminRevenueSidePanel() {
                 className={cn(
                   "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer",
                   selectedPhase === "phase-3"
-                    ? "bg-violet-600 text-white shadow-sm font-bold"
-                    : "text-pt-muted hover:text-pt hover:bg-pt-surface/60"
+                    ? "bg-purple-600 text-white shadow-xs font-bold"
+                    : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
                 )}
               >
                 Phase 3 ({stats.phases.phase3?.totalApproved ?? 0})
@@ -491,7 +493,7 @@ function AdminRevenueSidePanel() {
         )}
 
         {/* Time Period Filter Bar */}
-        <div className="shrink-0 border-b border-pt-subtle bg-pt-surface px-4 py-2.5 flex gap-2 overflow-x-auto">
+        <div className="shrink-0 border-b border-slate-100 dark:border-slate-800/80 bg-white dark:bg-slate-950 px-6 py-2.5 flex gap-2 overflow-x-auto">
           {periodOptions.map((opt) => (
             <button
               key={opt.key}
@@ -500,14 +502,8 @@ function AdminRevenueSidePanel() {
               className={cn(
                 "flex-1 min-w-[80px] rounded-xl py-2 px-2.5 text-xs font-semibold transition-all cursor-pointer whitespace-nowrap text-center border",
                 period === opt.key
-                  ? selectedPhase === "phase-1"
-                    ? "bg-indigo-600 text-white border-indigo-700 shadow-sm font-bold"
-                    : selectedPhase === "phase-2"
-                      ? "bg-emerald-600 text-white border-emerald-700 shadow-sm font-bold"
-                      : selectedPhase === "phase-3"
-                        ? "bg-violet-600 text-white border-violet-700 shadow-sm font-bold"
-                        : "bg-emerald-600 text-white border-emerald-700 shadow-sm font-bold"
-                  : "bg-pt-surface/60 border-pt-subtle text-pt-muted hover:text-pt hover:bg-pt-surface"
+                  ? "bg-slate-900 text-white border-slate-900 shadow-xs font-bold dark:bg-white dark:text-slate-900 dark:border-white"
+                  : "bg-slate-50 border-slate-200/80 text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400"
               )}
             >
               {opt.label}
@@ -515,81 +511,59 @@ function AdminRevenueSidePanel() {
           ))}
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4 bg-slate-50/50 dark:bg-slate-950">
           {loading && !stats && (
-            <div className="flex flex-col items-center justify-center py-16 text-pt-muted">
-              <ArrowClockwise size={32} className="animate-spin mb-3 text-emerald-500" />
+            <div className="flex flex-col items-center justify-center py-16 text-slate-400">
+              <ArrowClockwise size={32} className="animate-spin mb-3 text-emerald-600" />
               <p className="text-sm font-medium">Loading revenue data…</p>
             </div>
           )}
 
           {stats && periodStats && (
             <>
-              {/* Gross Revenue Hero Card */}
-              <div
-                className={cn(
-                  "rounded-2xl p-5 border shadow-pt transition-all",
-                  selectedPhase === "phase-1"
-                    ? "portal-tone-indigo"
-                    : selectedPhase === "phase-2"
-                      ? "portal-tone-emerald"
-                      : selectedPhase === "phase-3"
-                        ? "portal-tone-violet"
-                        : "portal-tone-slate"
-                )}
-              >
-                <div className="flex items-center justify-between gap-3 mb-3">
+              {/* Gross Revenue Hero Card — Refined Clean Light Styling */}
+              <div className="rounded-2xl p-5 border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-all">
+                <div className="flex items-center justify-between gap-3 mb-3.5">
                   <div className="flex items-center gap-2.5">
                     <div
                       className={cn(
-                        "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg font-bold text-xs portal-tone-icon",
+                        "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg font-bold text-xs border shadow-2xs",
                         selectedPhase === "phase-1"
-                          ? "portal-tone-icon-indigo"
+                          ? "bg-indigo-50 text-indigo-700 border-indigo-200/80"
                           : selectedPhase === "phase-2"
-                            ? "portal-tone-icon-emerald"
+                            ? "bg-emerald-50 text-emerald-700 border-emerald-200/80"
                             : selectedPhase === "phase-3"
-                              ? "portal-tone-icon-violet"
-                              : "portal-tone-icon-slate"
+                              ? "bg-purple-50 text-purple-700 border-purple-200/80"
+                              : "bg-slate-100 text-slate-700 border-slate-200"
                       )}
                     >
                       {selectedPhase === "phase-1" ? "P1" : selectedPhase === "phase-2" ? "P2" : selectedPhase === "phase-3" ? "P3" : "ALL"}
                     </div>
                     <div>
-                      <h3 className="text-sm font-semibold tracking-tight text-pt">
+                      <h3 className="text-sm font-bold tracking-tight text-slate-900 dark:text-white">
                         {periodStats.label}
                       </h3>
-                      <p className="text-xs text-pt-muted">Gross Revenue Collection</p>
+                      <p className="text-xs text-slate-500 font-medium">Gross Revenue Collection</p>
                     </div>
                   </div>
-                  <span
-                    className={cn(
-                      "rounded-full px-3 py-1 text-xs font-extrabold border shadow-sm",
-                      selectedPhase === "phase-1"
-                        ? "bg-indigo-100 text-indigo-950 border-indigo-300 dark:bg-indigo-950 dark:text-indigo-200 dark:border-indigo-700"
-                        : selectedPhase === "phase-2"
-                          ? "bg-emerald-100 text-emerald-950 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-200 dark:border-emerald-700"
-                          : selectedPhase === "phase-3"
-                            ? "bg-violet-100 text-violet-950 border-violet-300 dark:bg-violet-950 dark:text-violet-200 dark:border-violet-700"
-                            : "bg-slate-100 text-slate-950 border-slate-300 dark:bg-slate-900 dark:text-slate-200 dark:border-slate-700"
-                    )}
-                  >
+                  <span className="rounded-full px-3 py-1 text-xs font-bold bg-slate-100 dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700 text-slate-700 dark:text-slate-300 shadow-2xs">
                     {periodStats.students} Paid Registrations
                   </span>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2 py-2.5 px-3 rounded-xl border border-pt-subtle bg-pt-surface/80 text-center mb-3">
+                <div className="grid grid-cols-3 gap-2 py-3 px-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/60 text-center mb-3.5">
                   <div>
-                    <p className="text-lg font-semibold tabular-nums text-pt">
+                    <p className="text-xl font-bold tabular-nums text-slate-900 dark:text-white">
                       {periodStats.students}
                     </p>
-                    <p className="text-[11px] font-medium text-emerald-700 dark:text-emerald-400">Approved</p>
+                    <p className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">Approved</p>
                   </div>
                   <div>
-                    <p className="text-lg font-semibold tabular-nums text-pt">0</p>
-                    <p className="text-[11px] font-medium text-amber-600 dark:text-amber-400">Pending</p>
+                    <p className="text-xl font-bold tabular-nums text-slate-900 dark:text-white">0</p>
+                    <p className="text-[11px] font-semibold text-amber-600 dark:text-amber-400">Pending</p>
                   </div>
                   <div>
-                    <p className="text-lg font-semibold tabular-nums text-pt">
+                    <p className="text-xl font-bold tabular-nums text-slate-900 dark:text-white">
                       {selectedPhase === "phase-1"
                         ? stats.phases.phase1.totalApproved
                         : selectedPhase === "phase-2"
@@ -598,70 +572,70 @@ function AdminRevenueSidePanel() {
                             ? (stats.phases.phase3?.totalApproved ?? 0)
                             : periodStats.students}
                     </p>
-                    <p className="text-[11px] font-medium text-pt-secondary">Active Students</p>
+                    <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Active Students</p>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between text-xs font-medium text-pt-muted pt-1">
+                <div className="flex items-center justify-between text-xs font-medium text-slate-500 pt-1">
                   <span>Gross Collected</span>
-                  <span className="text-xl sm:text-2xl font-extrabold text-emerald-700 dark:text-emerald-400 tabular-nums">
+                  <span className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 tabular-nums">
                     {formatMoney(periodStats.gross, stats.currency)}
                   </span>
                 </div>
               </div>
 
-              {/* 3 Share Cards (Management, Trainers, School) — Styled like main dashboard metric cards */}
+              {/* 3 Share Cards (Management, Trainers, School) — Light Elegant Styling */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                 {/* Management Card */}
-                <div className="portal-tone-violet rounded-2xl border border-pt-subtle p-3.5 shadow-pt">
+                <div className="rounded-2xl border border-violet-200/80 bg-violet-50/50 dark:bg-violet-950/20 dark:border-violet-900/40 p-3.5 shadow-2xs">
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg portal-tone-icon portal-tone-icon-violet">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-violet-100 text-violet-700 dark:bg-violet-900/60 dark:text-violet-300 border border-violet-200/60">
                       <Buildings size={15} weight="duotone" />
                     </div>
                     <p className="text-[10px] font-bold uppercase tracking-wider text-violet-700 dark:text-violet-300">
                       Komal (Mgmt)
                     </p>
                   </div>
-                  <p className="text-lg sm:text-xl font-bold text-pt tabular-nums">
+                  <p className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tabular-nums">
                     {formatMoney(periodStats.management, stats.currency)}
                   </p>
-                  <p className="text-[11px] font-medium text-pt-muted mt-1">
+                  <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-1">
                     Rs 200 / student
                   </p>
                 </div>
 
                 {/* Trainer Card */}
-                <div className="portal-tone-sky rounded-2xl border border-pt-subtle p-3.5 shadow-pt">
+                <div className="rounded-2xl border border-sky-200/80 bg-sky-50/50 dark:bg-sky-950/20 dark:border-sky-900/40 p-3.5 shadow-2xs">
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg portal-tone-icon portal-tone-icon-sky">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-sky-100 text-sky-700 dark:bg-sky-900/60 dark:text-sky-300 border border-sky-200/60">
                       <GraduationCap size={15} weight="duotone" />
                     </div>
                     <p className="text-[10px] font-bold uppercase tracking-wider text-sky-700 dark:text-sky-300">
                       Trainers
                     </p>
                   </div>
-                  <p className="text-lg sm:text-xl font-bold text-pt tabular-nums">
+                  <p className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tabular-nums">
                     {formatMoney(periodStats.trainer, stats.currency)}
                   </p>
-                  <p className="text-[11px] font-medium text-pt-muted mt-1">
+                  <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-1">
                     {selectedPhase === "phase-1" ? "Rs 800 / student" : "Rs 700 / student"}
                   </p>
                 </div>
 
                 {/* School Card */}
-                <div className="portal-tone-emerald rounded-2xl border border-pt-subtle p-3.5 shadow-pt">
+                <div className="rounded-2xl border border-emerald-200/80 bg-emerald-50/50 dark:bg-emerald-950/20 dark:border-emerald-900/40 p-3.5 shadow-2xs">
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg portal-tone-icon portal-tone-icon-emerald">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300 border border-emerald-200/60">
                       <Buildings size={15} weight="duotone" />
                     </div>
                     <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
                       School %
                     </p>
                   </div>
-                  <p className="text-lg sm:text-xl font-bold text-pt tabular-nums">
+                  <p className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tabular-nums">
                     {formatMoney(periodStats.school, stats.currency)}
                   </p>
-                  <p className="text-[11px] font-medium text-pt-muted mt-1">
+                  <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-1">
                     {selectedPhase === "phase-1" ? "Rs 0 (Phase 1)" : "Rs 100 / student"}
                   </p>
                 </div>
@@ -669,11 +643,11 @@ function AdminRevenueSidePanel() {
 
               {/* Distribution Bar */}
               {periodStats.gross > 0 && (
-                <div className="rounded-2xl border border-pt-subtle bg-pt-surface p-4 shadow-pt">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-pt-muted mb-2.5">
+                <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-2xs">
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2.5">
                     Revenue Distribution Share
                   </p>
-                  <div className="flex h-3 rounded-full overflow-hidden bg-slate-200 dark:bg-slate-800 gap-0.5 p-0.5 border border-pt-subtle">
+                  <div className="flex h-3 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 gap-0.5 p-0.5 border border-slate-200/60 dark:border-slate-700">
                     {periodStats.management > 0 && (
                       <div
                         className="bg-violet-600 rounded-sm transition-all"
@@ -721,7 +695,7 @@ function AdminRevenueSidePanel() {
 
               {/* Course-wise Breakdown */}
               <div className="space-y-3 pt-1">
-                <p className="text-xs font-bold uppercase tracking-wider text-pt-muted px-0.5">
+                <p className="text-xs font-bold uppercase tracking-wider text-slate-500 px-0.5">
                   Course-wise Breakdown
                 </p>
                 <div className="space-y-3.5">
@@ -731,7 +705,7 @@ function AdminRevenueSidePanel() {
                     return (
                       <div
                         key={course.programSlug}
-                        className="rounded-2xl border border-pt-subtle overflow-hidden bg-pt-surface shadow-pt transition-all hover:shadow-pt-md"
+                        className="rounded-2xl border border-slate-200/80 dark:border-slate-800 overflow-hidden bg-white dark:bg-slate-900 shadow-2xs transition-all hover:shadow-sm"
                       >
                         <div
                           className={cn(
@@ -747,7 +721,7 @@ function AdminRevenueSidePanel() {
                               </p>
                             </div>
                             <div className="text-right shrink-0 bg-black/30 backdrop-blur-xs px-2.5 py-1 rounded-lg border border-white/20">
-                              <p className="text-base sm:text-lg font-extrabold text-white">
+                              <p className="text-base sm:text-lg font-black text-white">
                                 {period === "all" ? course.uniqueStudents : cp.students}
                               </p>
                               <p className="text-[9px] uppercase tracking-wider text-white/90 font-bold">
@@ -759,48 +733,48 @@ function AdminRevenueSidePanel() {
 
                         <div className="p-4 space-y-3.5">
                           <div className="flex items-center justify-between">
-                            <span className="text-sm text-pt-muted font-semibold">Gross Collected</span>
-                            <span className="font-extrabold text-pt text-base sm:text-lg tabular-nums">
+                            <span className="text-sm text-slate-500 font-semibold">Gross Collected</span>
+                            <span className="font-black text-slate-900 dark:text-white text-base sm:text-lg tabular-nums">
                               {formatMoney(cp.gross, stats.currency)}
                             </span>
                           </div>
-                          <div className="h-px bg-pt-subtle" />
+                          <div className="h-px bg-slate-100 dark:bg-slate-800" />
                           <div className="grid grid-cols-3 gap-2">
-                            <div className="portal-tone-violet rounded-xl border border-pt-subtle p-2.5 text-center">
+                            <div className="rounded-xl border border-violet-200/70 bg-violet-50/60 dark:bg-violet-950/20 dark:border-violet-900/40 p-2.5 text-center">
                               <p className="text-[9px] font-bold uppercase text-violet-700 dark:text-violet-300">
                                 Management
                               </p>
-                              <p className="text-xs sm:text-sm font-extrabold text-pt mt-0.5 tabular-nums">
+                              <p className="text-xs sm:text-sm font-black text-slate-900 dark:text-white mt-0.5 tabular-nums">
                                 {formatMoney(cp.management, stats.currency)}
                               </p>
                             </div>
-                            <div className="portal-tone-sky rounded-xl border border-pt-subtle p-2.5 text-center">
+                            <div className="rounded-xl border border-sky-200/70 bg-sky-50/60 dark:bg-sky-950/20 dark:border-sky-900/40 p-2.5 text-center">
                               <p className="text-[9px] font-bold uppercase text-sky-700 dark:text-sky-300">
                                 {trainerShort}
                               </p>
-                              <p className="text-xs sm:text-sm font-extrabold text-pt mt-0.5 tabular-nums">
+                              <p className="text-xs sm:text-sm font-black text-slate-900 dark:text-white mt-0.5 tabular-nums">
                                 {formatMoney(cp.trainer, stats.currency)}
                               </p>
                             </div>
-                            <div className="portal-tone-emerald rounded-xl border border-pt-subtle p-2.5 text-center">
+                            <div className="rounded-xl border border-emerald-200/70 bg-emerald-50/60 dark:bg-emerald-950/20 dark:border-emerald-900/40 p-2.5 text-center">
                               <p className="text-[9px] font-bold uppercase text-emerald-700 dark:text-emerald-300">
                                 School
                               </p>
-                              <p className="text-xs sm:text-sm font-extrabold text-pt mt-0.5 tabular-nums">
+                              <p className="text-xs sm:text-sm font-black text-slate-900 dark:text-white mt-0.5 tabular-nums">
                                 {formatMoney(cp.school, stats.currency)}
                               </p>
                             </div>
                           </div>
 
                           {period === "all" && course.approvedCount !== course.uniqueStudents && (
-                            <div className="text-xs rounded-xl px-3 py-2.5 bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-200 font-medium">
+                            <div className="text-xs rounded-xl px-3 py-2.5 bg-amber-50 border border-amber-200 text-amber-900 font-medium">
                               {course.approvedCount} paid registration
                               {course.approvedCount === 1 ? "" : "s"} (
                               {course.approvedCount - course.uniqueStudents} returning / repeat enrollments)
                             </div>
                           )}
                           {period === "all" && course.thisWeekCount > 0 && (
-                            <div className="text-xs rounded-xl px-3 py-2.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-900 dark:text-emerald-200 font-medium">
+                            <div className="text-xs rounded-xl px-3 py-2.5 bg-emerald-50 border border-emerald-200 text-emerald-900 font-medium">
                               +{course.thisWeekCount} new this week (
                               {formatMoney(course.thisWeekGross, stats.currency)} gross)
                             </div>
@@ -812,8 +786,8 @@ function AdminRevenueSidePanel() {
 
                   {/* Phase 1 AI Notice */}
                   {selectedPhase === "phase-1" && (
-                    <div className="rounded-2xl border border-dashed border-pt-subtle p-4 text-center bg-pt-surface/40">
-                      <p className="text-xs text-pt-muted font-medium flex items-center justify-center gap-1.5">
+                    <div className="rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 p-4 text-center bg-slate-50/60 dark:bg-slate-900/40">
+                      <p className="text-xs text-slate-500 font-medium flex items-center justify-center gap-1.5">
                         <Sparkle size={15} weight="duotone" className="text-purple-500 shrink-0" />
                         Artificial Intelligence program was launched in Phase 2
                       </p>
