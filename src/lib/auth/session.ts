@@ -126,9 +126,7 @@ async function buildPortalUser(
 
   const approvedLevels =
     user.role === "student" && user.email
-      ? programSlugs && programSlugs.length > 1
-        ? await getApprovedEnrollmentLevelsAllPrograms(user.email, programSlugs)
-        : await getApprovedEnrollmentLevels(user.email, user.programSlug ?? "web-development")
+      ? await getApprovedEnrollmentLevels(user.email, user.programSlug ?? "web-development")
       : undefined;
 
   const portalUser: PortalUser = {

@@ -5,7 +5,6 @@ import { getClassRecordings } from "@/lib/api/class-recordings";
 import { StudentRecordingsContent } from "@/components/portal/student-recordings-content";
 import { filterByStudentModule } from "@/lib/modules/student-module-content";
 import { getStudentModuleContentContext } from "@/lib/modules/student-module-content-server";
-import { getProgramModuleNames } from "@/lib/modules/student-module-access";
 import {
   fetchMergedByProgram,
   getStudentPortalProgramSlugs,
@@ -23,7 +22,7 @@ export default async function StudentRecordingsPage() {
   let primarySlug = user.programSlug || "web-development";
   let recordings: Awaited<ReturnType<typeof getClassRecordings>> = [];
   let studentModule: string | undefined = user.level?.trim() || undefined;
-  let programModules: string[] = [];
+  let enrolledModules: string[] = [];
 
   try {
     const programSlugs = await getStudentPortalProgramSlugs(user);
@@ -43,15 +42,24 @@ export default async function StudentRecordingsPage() {
       (item) => item.programSlug
     );
 
-    programModules = getProgramModuleNames(primarySlug) || [];
+    // Strictly pass ONLY the student's approved/unlocked modules for this course
+    const approvedForCourse =
+      moduleContext.approvedLevelsByProgram?.[primarySlug] ?? moduleContext.approvedLevels;
+
+    enrolledModules =
+      approvedForCourse && approvedForCourse.length > 0
+        ? approvedForCourse
+        : studentModule
+          ? [studentModule]
+          : [];
   } catch (err) {
     console.error("[StudentRecordingsPage] Error loading recordings:", err);
     try {
       recordings = await getClassRecordings(primarySlug);
-      programModules = getProgramModuleNames(primarySlug) || [];
+      enrolledModules = studentModule ? [studentModule] : [];
     } catch {
       recordings = [];
-      programModules = [];
+      enrolledModules = [];
     }
   }
 
@@ -61,7 +69,7 @@ export default async function StudentRecordingsPage() {
         programSlug={primarySlug}
         recordings={recordings || []}
         studentModule={studentModule}
-        modules={programModules}
+        modules={enrolledModules}
       />
     </div>
   );

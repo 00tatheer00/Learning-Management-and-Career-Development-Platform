@@ -178,5 +178,47 @@ describe("Student Module Locking & Strict Per-Module Isolation", () => {
       const phase3Visible = filterByStudentModule(items, phase3Student, (i) => i.level);
       expect(phase3Visible.map((i) => i.id)).toEqual(["3"]);
     });
+
+    it("filters class recordings strictly so students only receive their enrolled module recordings", () => {
+      const allClassRecordings = [
+        { id: "rec-1", classNumber: 1, title: "HTML Basics", level: "HTML & CSS", programSlug: "web-development" },
+        { id: "rec-2", classNumber: 2, title: "CSS Flexbox", level: "HTML & CSS", programSlug: "web-development" },
+        { id: "rec-3", classNumber: 1, title: "JavaScript Variables", level: "JavaScript", programSlug: "web-development" },
+        { id: "rec-4", classNumber: 1, title: "React State", level: "React & Native", programSlug: "web-development" },
+        { id: "rec-5", classNumber: 1, title: "Flutter Widgets", level: "Dart & Flutter", programSlug: "app-development" },
+      ];
+
+      // Student enrolled in Web Dev Module 1 only
+      const webDevMod1Student = {
+        programSlug: "web-development",
+        studentLevel: "HTML & CSS",
+        approvedLevels: ["HTML & CSS"],
+        email: "webstudent@gmail.com",
+      };
+
+      const visibleForWebDev1 = filterByStudentModule(
+        allClassRecordings,
+        webDevMod1Student,
+        (r) => r.level,
+        (r) => r.programSlug
+      );
+      expect(visibleForWebDev1.map((r) => r.id)).toEqual(["rec-1", "rec-2"]);
+
+      // Student enrolled in App Dev Flutter only
+      const appDevStudent = {
+        programSlug: "app-development",
+        studentLevel: "Dart & Flutter",
+        approvedLevels: ["Dart & Flutter"],
+        email: "appstudent@gmail.com",
+      };
+
+      const visibleForAppDev = filterByStudentModule(
+        allClassRecordings,
+        appDevStudent,
+        (r) => r.level,
+        (r) => r.programSlug
+      );
+      expect(visibleForAppDev.map((r) => r.id)).toEqual(["rec-5"]);
+    });
   });
 });

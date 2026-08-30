@@ -318,8 +318,8 @@ export function StudentRecordingsContent({
           </div>
         </div>
 
-        {/* Module Filter Tabs if multiple */}
-        {availableModules.length > 0 && (
+        {/* Module Filter Tabs if multiple enrolled modules */}
+        {availableModules.length > 1 && (
           <div className="flex gap-2 overflow-x-auto pb-1 border-b border-border/60">
             <button
               type="button"
