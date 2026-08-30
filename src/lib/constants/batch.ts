@@ -5,7 +5,10 @@ export const DEFAULT_BATCH_NAME = "Batch 1";
 // Date when Phase 2 admissions officially opened (24th July 2026 00:00 PKT)
 export const PHASE_2_START_ISO = "2026-07-23T19:00:00.000Z";
 
-export type RegistrationPhase = "phase-1" | "phase-2";
+// Date when Phase 3 admissions officially opened (29th August 2026 00:00 PKT)
+export const PHASE_3_START_ISO = "2026-08-28T19:00:00.000Z";
+
+export type RegistrationPhase = "phase-1" | "phase-2" | "phase-3";
 
 export function getBatchForProgram(programSlug: string): string {
   if (ENROLLABLE_PROGRAM_SLUGS.includes(programSlug as (typeof ENROLLABLE_PROGRAM_SLUGS)[number])) {
@@ -47,6 +50,10 @@ export function getRegistrationPhase(item?: {
   if (dateVal) {
     const createdDate = dateVal instanceof Date ? dateVal : new Date(dateVal);
     if (!isNaN(createdDate.getTime())) {
+      const phase3Start = new Date(PHASE_3_START_ISO);
+      if (createdDate.getTime() >= phase3Start.getTime()) {
+        return "phase-3";
+      }
       const phase2Start = new Date(PHASE_2_START_ISO);
       return createdDate.getTime() >= phase2Start.getTime() ? "phase-2" : "phase-1";
     }
@@ -54,6 +61,9 @@ export function getRegistrationPhase(item?: {
 
   // Fallback for mock objects in tests without a date
   if (typeof item === "object" && item !== null && !(item instanceof Date)) {
+    if (item.batch?.includes("Phase 3") || item.batch?.includes("3rd Module")) {
+      return "phase-3";
+    }
     if (item.batch?.includes("Phase 2") || item.batch?.includes("2nd Module")) {
       return "phase-2";
     }
@@ -63,6 +73,15 @@ export function getRegistrationPhase(item?: {
 }
 
 export function getPhaseInfo(phase: RegistrationPhase) {
+  if (phase === "phase-3") {
+    return {
+      id: "phase-3" as const,
+      label: "Phase 3 (3rd Module)",
+      shortLabel: "Phase 3",
+      subtitle: "3rd Module Registrations",
+      badgeClass: "bg-purple-500/15 text-purple-700 dark:text-purple-300 border-purple-500/30",
+    };
+  }
   if (phase === "phase-2") {
     return {
       id: "phase-2" as const,

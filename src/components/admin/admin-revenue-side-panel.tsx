@@ -43,7 +43,7 @@ function formatMoney(amount: number, currency: string) {
 function getPeriodStats(
   stats: AdminRevenuePhaseStats,
   period: RevenuePeriod,
-  selectedPhase: "all" | "phase-1" | "phase-2"
+  selectedPhase: "all" | "phase-1" | "phase-2" | "phase-3"
 ) {
   if (period === "week") {
     return {
@@ -89,7 +89,9 @@ function getPeriodStats(
         ? "Full Phase 1 (June – July 2026)"
         : selectedPhase === "phase-2"
           ? "Full Phase 2 (July – August 2026)"
-          : "All Time (All Phases)",
+          : selectedPhase === "phase-3"
+            ? "Full Phase 3 (August 2026 onwards)"
+            : "All Time (All Phases)",
   };
 }
 
@@ -249,7 +251,7 @@ export function AdminRevenueSidebarCard({
 function AdminRevenueSidePanel() {
   const { open, setOpen, stats, loading, refresh } = useAdminRevenue();
   const [period, setPeriod] = useState<RevenuePeriod>("all");
-  const [selectedPhase, setSelectedPhase] = useState<"all" | "phase-1" | "phase-2">("all");
+  const [selectedPhase, setSelectedPhase] = useState<"all" | "phase-1" | "phase-2" | "phase-3">("all");
 
   useEffect(() => {
     if (!open) return;
@@ -264,9 +266,9 @@ function AdminRevenueSidePanel() {
     };
   }, [open, setOpen]);
 
-  const handlePhaseChange = (phase: "all" | "phase-1" | "phase-2") => {
+  const handlePhaseChange = (phase: "all" | "phase-1" | "phase-2" | "phase-3") => {
     setSelectedPhase(phase);
-    // Auto-reset period to 'all' so Phase 1 data (PKR 207,000) is never masked by August's 'month' filter
+    // Auto-reset period to 'all' so earlier phase data is not masked
     setPeriod("all");
   };
 
@@ -277,7 +279,9 @@ function AdminRevenueSidePanel() {
       ? stats.phases?.phase1 ?? stats
       : selectedPhase === "phase-2"
         ? stats.phases?.phase2 ?? stats
-        : stats
+        : selectedPhase === "phase-3"
+          ? stats.phases?.phase3 ?? stats
+          : stats
     : null;
 
   const periodStats = activeStats ? getPeriodStats(activeStats, period, selectedPhase) : null;
@@ -311,6 +315,22 @@ function AdminRevenueSidePanel() {
         }
       }
       options.push({ key: "week", label: `This week (${stats.phases.phase2.thisWeekApproved})` });
+      return options;
+    }
+
+    if (selectedPhase === "phase-3") {
+      const options: Array<{ key: string; label: string }> = [
+        { key: "all", label: `All Phase 3 (${stats.phases.phase3?.totalApproved ?? 0})` },
+        { key: "month", label: `August (${stats.phases.phase3?.thisMonthApproved ?? 0})` },
+      ];
+      if (stats.phases.phase3?.monthlyBreakdown) {
+        for (const m of stats.phases.phase3.monthlyBreakdown) {
+          if (m.monthKey !== "2026-08") {
+            options.push({ key: m.monthKey, label: `${m.label.split(" ")[0]} (${m.approvedCount})` });
+          }
+        }
+      }
+      options.push({ key: "week", label: `This week (${stats.phases.phase3?.thisWeekApproved ?? 0})` });
       return options;
     }
 
@@ -397,9 +417,16 @@ function AdminRevenueSidePanel() {
               </span>
               PKR 1,000 → <strong className="text-pt">PKR 200</strong> Mgmt (Komal) · <strong className="text-pt">PKR 700</strong> Trainer · <strong className="text-pt">PKR 100</strong> School
             </div>
+          ) : selectedPhase === "phase-3" ? (
+            <div className="portal-tone-violet text-xs text-pt leading-relaxed border border-pt-subtle rounded-xl p-3 shadow-pt">
+              <span className="font-bold text-violet-700 dark:text-violet-300 uppercase text-[10px] tracking-wider bg-violet-500/15 border border-violet-500/30 px-2 py-0.5 rounded-md mr-2">
+                Phase 3 Model
+              </span>
+              PKR 1,000 → <strong className="text-pt">PKR 200</strong> Mgmt (Komal) · <strong className="text-pt">PKR 700</strong> Trainer · <strong className="text-pt">PKR 100</strong> School
+            </div>
           ) : (
             <div className="portal-tone-slate text-xs text-pt-secondary leading-relaxed border border-pt-subtle rounded-xl p-3 shadow-pt">
-              <span className="font-bold text-indigo-600 dark:text-indigo-400">Phase 1:</span> Rs 200 Mgmt / Rs 800 Trainer · <span className="font-bold text-emerald-600 dark:text-emerald-400">Phase 2:</span> Rs 200 Mgmt / Rs 700 Trainer / Rs 100 School
+              <span className="font-bold text-indigo-600 dark:text-indigo-400">Phase 1:</span> Rs 200 Mgmt / Rs 800 Trainer · <span className="font-bold text-emerald-600 dark:text-emerald-400">Phase 2:</span> Rs 200 Mgmt / Rs 700 Trainer / Rs 100 School · <span className="font-bold text-violet-600 dark:text-violet-400">Phase 3:</span> Rs 200 Mgmt / Rs 700 Trainer / Rs 100 School
             </div>
           )}
         </div>
@@ -447,6 +474,18 @@ function AdminRevenueSidePanel() {
               >
                 Phase 2 ({stats.phases.phase2.totalApproved})
               </button>
+              <button
+                type="button"
+                onClick={() => handlePhaseChange("phase-3")}
+                className={cn(
+                  "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer",
+                  selectedPhase === "phase-3"
+                    ? "bg-violet-600 text-white shadow-sm font-bold"
+                    : "text-pt-muted hover:text-pt hover:bg-pt-surface/60"
+                )}
+              >
+                Phase 3 ({stats.phases.phase3?.totalApproved ?? 0})
+              </button>
             </div>
           </div>
         )}
@@ -463,7 +502,11 @@ function AdminRevenueSidePanel() {
                 period === opt.key
                   ? selectedPhase === "phase-1"
                     ? "bg-indigo-600 text-white border-indigo-700 shadow-sm font-bold"
-                    : "bg-emerald-600 text-white border-emerald-700 shadow-sm font-bold"
+                    : selectedPhase === "phase-2"
+                      ? "bg-emerald-600 text-white border-emerald-700 shadow-sm font-bold"
+                      : selectedPhase === "phase-3"
+                        ? "bg-violet-600 text-white border-violet-700 shadow-sm font-bold"
+                        : "bg-emerald-600 text-white border-emerald-700 shadow-sm font-bold"
                   : "bg-pt-surface/60 border-pt-subtle text-pt-muted hover:text-pt hover:bg-pt-surface"
               )}
             >
@@ -482,7 +525,7 @@ function AdminRevenueSidePanel() {
 
           {stats && periodStats && (
             <>
-              {/* Gross Revenue Hero Card — Styled exactly like main dashboard Phase 1 / Phase 2 cards */}
+              {/* Gross Revenue Hero Card */}
               <div
                 className={cn(
                   "rounded-2xl p-5 border shadow-pt transition-all",
@@ -490,7 +533,9 @@ function AdminRevenueSidePanel() {
                     ? "portal-tone-indigo"
                     : selectedPhase === "phase-2"
                       ? "portal-tone-emerald"
-                      : "portal-tone-slate"
+                      : selectedPhase === "phase-3"
+                        ? "portal-tone-violet"
+                        : "portal-tone-slate"
                 )}
               >
                 <div className="flex items-center justify-between gap-3 mb-3">
@@ -502,10 +547,12 @@ function AdminRevenueSidePanel() {
                           ? "portal-tone-icon-indigo"
                           : selectedPhase === "phase-2"
                             ? "portal-tone-icon-emerald"
-                            : "portal-tone-icon-slate"
+                            : selectedPhase === "phase-3"
+                              ? "portal-tone-icon-violet"
+                              : "portal-tone-icon-slate"
                       )}
                     >
-                      {selectedPhase === "phase-1" ? "P1" : selectedPhase === "phase-2" ? "P2" : "ALL"}
+                      {selectedPhase === "phase-1" ? "P1" : selectedPhase === "phase-2" ? "P2" : selectedPhase === "phase-3" ? "P3" : "ALL"}
                     </div>
                     <div>
                       <h3 className="text-sm font-semibold tracking-tight text-pt">
@@ -521,7 +568,9 @@ function AdminRevenueSidePanel() {
                         ? "bg-indigo-100 text-indigo-950 border-indigo-300 dark:bg-indigo-950 dark:text-indigo-200 dark:border-indigo-700"
                         : selectedPhase === "phase-2"
                           ? "bg-emerald-100 text-emerald-950 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-200 dark:border-emerald-700"
-                          : "bg-slate-100 text-slate-950 border-slate-300 dark:bg-slate-900 dark:text-slate-200 dark:border-slate-700"
+                          : selectedPhase === "phase-3"
+                            ? "bg-violet-100 text-violet-950 border-violet-300 dark:bg-violet-950 dark:text-violet-200 dark:border-violet-700"
+                            : "bg-slate-100 text-slate-950 border-slate-300 dark:bg-slate-900 dark:text-slate-200 dark:border-slate-700"
                     )}
                   >
                     {periodStats.students} Paid Registrations
@@ -545,7 +594,9 @@ function AdminRevenueSidePanel() {
                         ? stats.phases.phase1.totalApproved
                         : selectedPhase === "phase-2"
                           ? stats.phases.phase2.totalApproved
-                          : periodStats.students}
+                          : selectedPhase === "phase-3"
+                            ? (stats.phases.phase3?.totalApproved ?? 0)
+                            : periodStats.students}
                     </p>
                     <p className="text-[11px] font-medium text-pt-secondary">Active Students</p>
                   </div>

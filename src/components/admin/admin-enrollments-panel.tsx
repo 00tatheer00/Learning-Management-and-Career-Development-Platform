@@ -140,7 +140,8 @@ export function AdminEnrollmentsPanel() {
     });
     const phase1 = base.filter((e) => getRegistrationPhase(e) === "phase-1").length;
     const phase2 = base.filter((e) => getRegistrationPhase(e) === "phase-2").length;
-    return { all: base.length, phase1, phase2 };
+    const phase3 = base.filter((e) => getRegistrationPhase(e) === "phase-3").length;
+    return { all: base.length, phase1, phase2, phase3 };
   }, [enrollments, programFilter]);
 
   // Course / Program Counts: shows total applications per course in the selected phase
@@ -476,6 +477,7 @@ export function AdminEnrollmentsPanel() {
             { id: "all", label: "All Phases", count: phaseCounts.all },
             { id: "phase-1", label: "Phase 1 (Module 1)", count: phaseCounts.phase1 },
             { id: "phase-2", label: "Phase 2 (2nd Module)", count: phaseCounts.phase2 },
+            { id: "phase-3", label: "Phase 3 (3rd Module)", count: phaseCounts.phase3 },
           ].map((item) => (
             <button
               key={item.id}

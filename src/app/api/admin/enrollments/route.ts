@@ -25,7 +25,7 @@ export async function GET(request: Request) {
   if (!user) return unauthorizedAdminResponse();
 
   const { searchParams } = new URL(request.url);
-  const phase = (searchParams.get("phase") as "all" | "phase-1" | "phase-2") ?? "all";
+  const phase = (searchParams.get("phase") as "all" | "phase-1" | "phase-2" | "phase-3") ?? "all";
   const hasPaginationParams =
     searchParams.has("page") || searchParams.has("limit") || searchParams.has("status") || searchParams.has("phase");
 

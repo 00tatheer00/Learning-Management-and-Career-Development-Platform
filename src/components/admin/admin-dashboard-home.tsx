@@ -127,7 +127,7 @@ export function AdminDashboardLoader() {
 }
 
 function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
-  const [phaseFilter, setPhaseFilter] = useState<"all" | "phase-1" | "phase-2">("all");
+  const [phaseFilter, setPhaseFilter] = useState<"all" | "phase-1" | "phase-2" | "phase-3">("all");
 
   const metrics = useMemo(() => {
     if (phaseFilter === "phase-1" && data.phaseBreakdown?.phase1) {
@@ -135,6 +135,9 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
     }
     if (phaseFilter === "phase-2" && data.phaseBreakdown?.phase2) {
       return data.phaseBreakdown.phase2;
+    }
+    if (phaseFilter === "phase-3" && data.phaseBreakdown?.phase3) {
+      return data.phaseBreakdown.phase3;
     }
     return {
       totalEnrollments: data.totalEnrollments,
@@ -185,9 +188,17 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
             {phaseFilter !== "all" && (
               <span className={cn(
                 "text-xs font-bold px-2.5 py-0.5 rounded-full border",
-                phaseFilter === "phase-1" ? "bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border-indigo-500/30" : "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30"
+                phaseFilter === "phase-1"
+                  ? "bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border-indigo-500/30"
+                  : phaseFilter === "phase-2"
+                    ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30"
+                    : "bg-violet-500/15 text-violet-700 dark:text-violet-300 border-violet-500/30"
               )}>
-                {phaseFilter === "phase-1" ? "Phase 1 (Module 1)" : "Phase 2 (2nd Module)"}
+                {phaseFilter === "phase-1"
+                  ? "Phase 1 (Module 1)"
+                  : phaseFilter === "phase-2"
+                    ? "Phase 2 (2nd Module)"
+                    : "Phase 3 (3rd Module)"}
               </span>
             )}
           </h1>
@@ -238,6 +249,19 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
               <span className="h-2 w-2 rounded-full bg-emerald-400" />
               Phase 2 ({data.phaseBreakdown?.phase2.totalEnrollments ?? 0})
             </button>
+            <button
+              type="button"
+              onClick={() => setPhaseFilter("phase-3")}
+              className={cn(
+                "rounded-md px-3 py-1.5 transition-all flex items-center gap-1.5",
+                phaseFilter === "phase-3"
+                  ? "bg-violet-600 text-white shadow-sm"
+                  : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+              )}
+            >
+              <span className="h-2 w-2 rounded-full bg-violet-400" />
+              Phase 3 ({data.phaseBreakdown?.phase3?.totalEnrollments ?? 0})
+            </button>
           </div>
 
           {metrics.pendingEnrollments > 0 && (
@@ -255,8 +279,8 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
         </div>
       </div>
 
-      {/* Registration Phases Overview Cards */}
-      <div className="shrink-0 grid grid-cols-1 md:grid-cols-2 gap-3">
+      {/* Registration Phases Overview Cards — 3 Cards Grid */}
+      <div className="shrink-0 grid grid-cols-1 md:grid-cols-3 gap-3">
         {/* Phase 1 Card */}
         <div
           onClick={() => setPhaseFilter(phaseFilter === "phase-1" ? "all" : "phase-1")}
@@ -371,6 +395,65 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
             <span>Estimated Revenue</span>
             <span className="font-semibold text-emerald-700 dark:text-emerald-400 tabular-nums">
               PKR {(data.phaseBreakdown?.phase2.estimatedRevenue ?? 0).toLocaleString()}
+            </span>
+          </div>
+        </div>
+
+        {/* Phase 3 Card */}
+        <div
+          onClick={() => setPhaseFilter(phaseFilter === "phase-3" ? "all" : "phase-3")}
+          className={cn(
+            pressable,
+            "group relative rounded-xl border p-4 sm:p-5 transition-all",
+            tones.violet.card,
+            phaseFilter === "phase-3" ? "ring-2 ring-violet-500 shadow-pt-md" : ""
+          )}
+        >
+          <div className="flex items-center justify-between gap-3 mb-3">
+            <div className="flex items-center gap-2.5">
+              <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-lg font-bold text-xs", tones.violet.icon)}>
+                P3
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold tracking-tight text-pt">Phase 3 (3rd Module)</h3>
+                <p className="text-xs text-pt-muted">29th Aug+ Registrations</p>
+              </div>
+            </div>
+            <span className={cn(
+              "rounded-full px-3 py-1 text-xs font-extrabold border shadow-sm transition-all",
+              phaseFilter === "phase-3"
+                ? "bg-violet-600 text-white border-violet-700"
+                : "bg-violet-100 text-violet-950 border-violet-300 dark:bg-violet-950 dark:text-violet-200 dark:border-violet-700"
+            )}>
+              {data.phaseBreakdown?.phase3?.totalEnrollments ?? 0} Registrations
+            </span>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 py-2.5 px-3 rounded-lg border border-pt-subtle bg-pt-surface/70 text-center">
+            <div>
+              <p className="text-lg font-semibold tabular-nums text-pt">
+                <CountUp end={data.phaseBreakdown?.phase3?.approvedEnrollments ?? 0} duration={1} />
+              </p>
+              <p className="text-[11px] font-medium text-emerald-700 dark:text-emerald-400">Approved</p>
+            </div>
+            <div>
+              <p className="text-lg font-semibold tabular-nums text-pt">
+                <CountUp end={data.phaseBreakdown?.phase3?.pendingEnrollments ?? 0} duration={1} />
+              </p>
+              <p className="text-[11px] font-medium text-amber-600 dark:text-amber-400">Pending</p>
+            </div>
+            <div>
+              <p className="text-lg font-semibold tabular-nums text-pt">
+                <CountUp end={data.phaseBreakdown?.phase3?.students ?? 0} duration={1} />
+              </p>
+              <p className="text-[11px] font-medium text-pt-secondary">Active Students</p>
+            </div>
+          </div>
+
+          <div className="mt-3 flex items-center justify-between text-xs font-medium text-pt-muted">
+            <span>Estimated Revenue</span>
+            <span className="font-semibold text-emerald-700 dark:text-emerald-400 tabular-nums">
+              PKR {(data.phaseBreakdown?.phase3?.estimatedRevenue ?? 0).toLocaleString()}
             </span>
           </div>
         </div>

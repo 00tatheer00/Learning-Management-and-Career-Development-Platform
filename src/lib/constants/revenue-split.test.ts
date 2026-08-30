@@ -63,19 +63,35 @@ describe("revenue-split phase and program logic", () => {
     });
   });
 
+  it("calculates Phase 3 revenue split correctly (1000 gross, 200 management, 700 trainer, 100 school)", () => {
+    const item = {
+      program: "web-development",
+      createdAt: "2026-08-29T10:00:00.000Z", // Phase 3 date
+    };
+
+    const split = getRevenueSplitForItem(item);
+    expect(split).toEqual({
+      gross: 1000,
+      management: 200,
+      trainer: 700,
+      school: 100,
+    });
+  });
+
   it("calculates total revenue correctly across a list of enrollments", () => {
     const items = [
       { program: "artificial-intelligence", batch: "Batch 1" }, // Phase 1: 1000 gross (200 mgmt, 800 trainer, 0 school)
       { program: "artificial-intelligence", batch: "Phase 2" }, // Phase 2: 1000 gross (200 mgmt, 700 trainer, 100 school)
       { program: "app-development", batch: "Phase 2" },         // Phase 2: 1000 gross (200 mgmt, 700 trainer, 100 school)
+      { program: "web-development", createdAt: "2026-08-30T10:00:00.000Z" }, // Phase 3: 1000 gross (200 mgmt, 700 trainer, 100 school)
     ];
 
     const total = calculateTotalRevenue(items);
     expect(total).toEqual({
-      gross: 3000,
-      management: 600,
-      trainer: 2200,
-      school: 200,
+      gross: 4000,
+      management: 800,
+      trainer: 2900,
+      school: 300,
     });
   });
 });

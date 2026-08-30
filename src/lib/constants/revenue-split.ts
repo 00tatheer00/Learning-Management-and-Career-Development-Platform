@@ -36,8 +36,8 @@ export function getRevenueSplitForItem(item: RevenueSplitItem): SingleRevenueSpl
     module: item.module,
   });
 
-  if (phase === "phase-2") {
-    // Phase 2 & onwards: 700 Trainer / 100 School / 200 Management for all courses
+  if (phase === "phase-2" || phase === "phase-3") {
+    // Phase 2, 3 & onwards: 700 Trainer / 100 School / 200 Management for all courses
     return {
       gross: 1000,
       management: 200,
