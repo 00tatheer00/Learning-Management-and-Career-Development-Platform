@@ -71,13 +71,45 @@ function statusStyles(status: ClassSlot["status"]) {
 
 export function StudentRecordingsContent({
   programSlug,
-  recordings,
+  recordings = [],
   adminView = false,
   studentModule,
   modules = [],
 }: StudentRecordingsContentProps) {
-  const progress = getClassProgress(programSlug);
-  const category = getProgramCategory(programSlug);
+  const safeRecordings = useMemo(
+    () => (Array.isArray(recordings) ? recordings.filter(Boolean) : []),
+    [recordings]
+  );
+  const safeModules = useMemo(
+    () => (Array.isArray(modules) ? modules.filter(Boolean) : []),
+    [modules]
+  );
+
+  const progress = useMemo(() => {
+    try {
+      return getClassProgress(programSlug || "web-development");
+    } catch {
+      return {
+        slots: [],
+        config: null,
+        completed: [],
+        todaySlot: null,
+        liveSlot: null,
+        upcoming: [],
+        nextTwo: [],
+        currentClassNumber: 0,
+        completedCount: 0,
+      };
+    }
+  }, [programSlug]);
+
+  const category = useMemo(() => {
+    try {
+      return getProgramCategory(programSlug || "web-development");
+    } catch {
+      return null;
+    }
+  }, [programSlug]);
 
   const [selectedModule, setSelectedModule] = useState<string>(studentModule || "all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -86,73 +118,73 @@ export function StudentRecordingsContent({
 
   // Available unique modules
   const availableModules = useMemo(() => {
-    if (modules && modules.length > 0) return modules;
+    if (safeModules.length > 0) return safeModules;
     const extracted = Array.from(
-      new Set(recordings.map((r) => r.level).filter(Boolean) as string[])
+      new Set(
+        safeRecordings
+          .map((r) => r.level)
+          .filter((l): l is string => Boolean(l && typeof l === "string" && l.trim()))
+      )
     );
     return extracted;
-  }, [modules, recordings]);
+  }, [safeModules, safeRecordings]);
 
   // Filtered recordings
   const filteredRecordings = useMemo(() => {
-    return recordings.filter((r) => {
-      const matchModule =
-        selectedModule === "all" ||
-        (r.level && r.level.toLowerCase() === selectedModule.toLowerCase());
+    const selMod = (selectedModule || "all").trim().toLowerCase();
+    const query = searchQuery.trim().toLowerCase();
+
+    return safeRecordings.filter((r) => {
+      const recLevel = (r.level || "").trim().toLowerCase();
+      const matchModule = selMod === "all" || recLevel === selMod;
+
       const matchQuery =
-        !searchQuery.trim() ||
-        r.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        r.classNumber.toString() === searchQuery.trim() ||
-        (r.notes && r.notes.toLowerCase().includes(searchQuery.toLowerCase()));
+        !query ||
+        (r.title && r.title.toLowerCase().includes(query)) ||
+        (r.classNumber != null && r.classNumber.toString() === query) ||
+        (r.notes && r.notes.toLowerCase().includes(query));
+
       return matchModule && matchQuery;
     });
-  }, [recordings, selectedModule, searchQuery]);
+  }, [safeRecordings, selectedModule, searchQuery]);
 
   const recordingByClass = useMemo(() => {
-    return new Map(recordings.map((r) => [r.classNumber, r]));
-  }, [recordings]);
+    const map = new Map<number, ClassRecordingRecord>();
+    for (const r of safeRecordings) {
+      if (r.classNumber != null) {
+        map.set(r.classNumber, r);
+      }
+    }
+    return map;
+  }, [safeRecordings]);
 
-  const recentSlots = progress.slots.slice(
-    Math.max(0, progress.completedCount - 1),
-    Math.min(progress.slots.length, progress.completedCount + 4)
-  );
+  const recentSlots = useMemo(() => {
+    if (!progress?.slots || progress.slots.length === 0) return [];
+    const compCount = progress.completedCount || 0;
+    return progress.slots.slice(
+      Math.max(0, compCount - 1),
+      Math.min(progress.slots.length, compCount + 4)
+    );
+  }, [progress]);
 
   const handleCopy = (e: React.MouseEvent, rec: ClassRecordingRecord) => {
     e.preventDefault();
     e.stopPropagation();
-    navigator.clipboard.writeText(rec.driveUrl);
-    setCopiedId(rec.id);
-    toast.success("Google Drive link copied to clipboard!");
-    setTimeout(() => setCopiedId(null), 2000);
+    if (!rec?.driveUrl) return;
+    navigator.clipboard
+      .writeText(rec.driveUrl)
+      .then(() => {
+        setCopiedId(rec.id);
+        toast.success("Google Drive link copied to clipboard!");
+        setTimeout(() => setCopiedId(null), 2000);
+      })
+      .catch(() => {
+        toast.error("Failed to copy link");
+      });
   };
 
   return (
     <div className="space-y-6">
-      {/* 🚀 Quick Switch Banner to HD Video Stream */}
-      {!adminView && (
-        <div className="relative overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-surface p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm backdrop-blur-md">
-          <div className="flex items-start sm:items-center gap-3.5">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/20 text-primary border border-primary/30">
-              <FilmStrip size={22} weight="duotone" />
-            </div>
-            <div>
-              <p className="font-bold text-sm text-foreground">
-                Want HD Adaptive Video Player &amp; Smart Notes?
-              </p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Watch studio master recordings with DRM streaming, auto-resuming, and timestamped study notes.
-              </p>
-            </div>
-          </div>
-          <Button asChild size="sm" className="rounded-xl shrink-0 font-bold shadow-sm">
-            <Link href="/student/recordings" className="flex items-center gap-1.5">
-              <Sparkle size={15} weight="fill" />
-              Switch to HD Stream Player
-            </Link>
-          </Button>
-        </div>
-      )}
-
       {/* Hero Card */}
       <div
         className={cn(
@@ -165,26 +197,28 @@ export function StudentRecordingsContent({
         <div className="relative">
           <div className="flex items-center gap-2 text-white/90 text-xs font-bold uppercase tracking-widest">
             <Sparkle size={14} weight="fill" />
-            Google Drive Master Archive {studentModule ? `· ${studentModule}` : ""}
+            Class Recordings Archive {studentModule ? `· ${studentModule}` : ""}
           </div>
           <h2 className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight">
             {studentModule
-              ? `${progress.config?.programTitle ?? "Your Classes"} — ${studentModule}`
-              : progress.config?.programTitle ?? "Your Classes"}
+              ? `${progress?.config?.programTitle ?? category?.name ?? "Your Classes"} — ${studentModule}`
+              : progress?.config?.programTitle ?? category?.name ?? "Your Classes"}
           </h2>
           <p className="mt-2 text-sm text-white/90 max-w-xl">
-            Direct Google Drive class recordings, master lecture links, and timeline schedule.
+            Watch recorded live classes, download lecture notes, and review previous session archives.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <div className="rounded-2xl bg-white/15 backdrop-blur px-4 py-3 border border-white/20">
               <p className="text-[10px] uppercase tracking-wider text-white/80">Available Recordings</p>
-              <p className="text-2xl font-bold">{recordings.length}</p>
+              <p className="text-2xl font-bold">{safeRecordings.length}</p>
             </div>
-            <div className="rounded-2xl bg-white/15 backdrop-blur px-4 py-3 border border-white/20">
-              <p className="text-[10px] uppercase tracking-wider text-white/80">Completed Classes</p>
-              <p className="text-2xl font-bold">{progress.completedCount}</p>
-            </div>
-            {progress.todaySlot && (
+            {progress?.slots && progress.slots.length > 0 && (
+              <div className="rounded-2xl bg-white/15 backdrop-blur px-4 py-3 border border-white/20">
+                <p className="text-[10px] uppercase tracking-wider text-white/80">Completed Classes</p>
+                <p className="text-2xl font-bold">{progress.completedCount || 0}</p>
+              </div>
+            )}
+            {progress?.todaySlot && (
               <div className="rounded-2xl bg-white/15 backdrop-blur px-4 py-3 border border-white/20">
                 <p className="text-[10px] uppercase tracking-wider text-white/80">Today</p>
                 <p className="text-lg font-bold">Class {progress.todaySlot.classNumber}</p>
@@ -194,64 +228,66 @@ export function StudentRecordingsContent({
         </div>
       </div>
 
-      {/* Timeline Card */}
-      <div className="portal-card rounded-2xl border border-pt p-5 sm:p-6">
-        <div className="flex items-center gap-2 mb-5">
-          <VideoCamera size={20} weight="duotone" className="text-primary" />
-          <h3 className="text-lg font-bold text-pt">Your class timeline</h3>
-        </div>
-        <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory">
-          {recentSlots.map((slot) => {
-            const styles = statusStyles(slot.status);
-            const recording = recordingByClass.get(slot.classNumber);
-            return (
-              <div
-                key={slot.classNumber}
-                className={cn(
-                  "min-w-[160px] snap-start rounded-2xl border p-4 ring-1",
-                  styles.ring,
-                  styles.bg
-                )}
-              >
-                <div className="flex items-center gap-2">
-                  <span className={cn("h-2.5 w-2.5 rounded-full", styles.dot)} />
-                  <span className={cn("text-[10px] font-bold uppercase tracking-wide", styles.text)}>
-                    {styles.label}
-                  </span>
+      {/* Timeline Card (shown if program is scheduled) */}
+      {recentSlots.length > 0 && (
+        <div className="portal-card rounded-2xl border border-pt p-5 sm:p-6">
+          <div className="flex items-center gap-2 mb-5">
+            <VideoCamera size={20} weight="duotone" className="text-primary" />
+            <h3 className="text-lg font-bold text-pt">Your class timeline</h3>
+          </div>
+          <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory">
+            {recentSlots.map((slot) => {
+              const styles = statusStyles(slot.status);
+              const recording = recordingByClass.get(slot.classNumber);
+              return (
+                <div
+                  key={slot.classNumber}
+                  className={cn(
+                    "min-w-[160px] snap-start rounded-2xl border p-4 ring-1",
+                    styles.ring,
+                    styles.bg
+                  )}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className={cn("h-2.5 w-2.5 rounded-full", styles.dot)} />
+                    <span className={cn("text-[10px] font-bold uppercase tracking-wide", styles.text)}>
+                      {styles.label}
+                    </span>
+                  </div>
+                  <p className="mt-3 text-base font-bold text-pt">Class {slot.classNumber}</p>
+                  <p className="text-xs text-pt-muted mt-1">{slot.weekdayLabel}</p>
+                  <p className="text-xs text-pt-muted">{slot.dateLabel}</p>
+                  {slot.status === "done" && recording && (
+                    <p className="mt-2 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 flex items-center gap-1">
+                      <CheckCircle size={12} weight="fill" />
+                      Recording uploaded
+                    </p>
+                  )}
                 </div>
-                <p className="mt-3 text-base font-bold text-pt">Class {slot.classNumber}</p>
-                <p className="text-xs text-pt-muted mt-1">{slot.weekdayLabel}</p>
-                <p className="text-xs text-pt-muted">{slot.dateLabel}</p>
-                {slot.status === "done" && recording && (
-                  <p className="mt-2 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 flex items-center gap-1">
-                    <CheckCircle size={12} weight="fill" />
-                    Recording uploaded
-                  </p>
-                )}
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+          {progress?.todaySlot && (
+            <p className="mt-4 text-sm rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-pt-muted">
+              <strong className="text-pt">Class {progress.todaySlot.classNumber}</strong> is scheduled
+              today ({progress.todaySlot.weekdayLabel}) at{" "}
+              <strong className="text-pt">{progress.todaySlot.timeLabel}</strong>.
+              {progress.liveSlot
+                ? " Class is live right now — join from Live Classes."
+                : progress.todaySlot.status === "today"
+                  ? " Recording will appear here after class."
+                  : " Marked done after class ends."}
+            </p>
+          )}
         </div>
-        {progress.todaySlot && (
-          <p className="mt-4 text-sm rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-pt-muted">
-            <strong className="text-pt">Class {progress.todaySlot.classNumber}</strong> is scheduled
-            today ({progress.todaySlot.weekdayLabel}) at{" "}
-            <strong className="text-pt">{progress.todaySlot.timeLabel}</strong>.
-            {progress.liveSlot
-              ? " Class is live right now — join from Live Classes."
-              : progress.todaySlot.status === "today"
-                ? " Recording will appear here after class."
-                : " Marked done after class ends."}
-          </p>
-        )}
-      </div>
+      )}
 
       {/* Filter & Search Bar */}
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <h3 className="text-lg font-bold text-pt flex items-center gap-2">
             <PlayCircle size={22} weight="duotone" className="text-primary" />
-            Google Drive Class Recordings
+            Class Recordings
             <span className="text-xs font-normal text-muted-foreground">
               ({filteredRecordings.length} total)
             </span>
@@ -272,6 +308,7 @@ export function StudentRecordingsContent({
             />
             {searchQuery && (
               <button
+                type="button"
                 onClick={() => setSearchQuery("")}
                 className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
               >
@@ -285,27 +322,29 @@ export function StudentRecordingsContent({
         {availableModules.length > 0 && (
           <div className="flex gap-2 overflow-x-auto pb-1 border-b border-border/60">
             <button
+              type="button"
               onClick={() => setSelectedModule("all")}
               className={cn(
                 "rounded-xl border px-3.5 py-1.5 text-xs font-bold transition-all shrink-0 whitespace-nowrap",
-                selectedModule === "all"
+                (selectedModule || "all").toLowerCase() === "all"
                   ? "border-primary bg-primary text-primary-foreground shadow-sm"
                   : "border-border bg-background text-muted-foreground hover:bg-muted"
               )}
             >
-              All Modules ({recordings.length})
+              All Modules ({safeRecordings.length})
             </button>
             {availableModules.map((mod) => {
-              const count = recordings.filter(
-                (r) => (r.level ?? "").toLowerCase() === mod.toLowerCase()
+              const count = safeRecordings.filter(
+                (r) => (r.level ?? "").toLowerCase() === (mod || "").toLowerCase()
               ).length;
               return (
                 <button
                   key={mod}
+                  type="button"
                   onClick={() => setSelectedModule(mod)}
                   className={cn(
                     "rounded-xl border px-3.5 py-1.5 text-xs font-bold transition-all shrink-0 whitespace-nowrap",
-                    selectedModule.toLowerCase() === mod.toLowerCase()
+                    (selectedModule || "").toLowerCase() === (mod || "").toLowerCase()
                       ? "border-primary bg-primary text-primary-foreground shadow-sm"
                       : "border-border bg-background text-muted-foreground hover:bg-muted"
                   )}
@@ -321,11 +360,11 @@ export function StudentRecordingsContent({
         {filteredRecordings.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-pt p-10 text-center bg-surface/30">
             <PlayCircle size={40} className="mx-auto text-muted-foreground opacity-40 mb-3" />
-            <p className="font-semibold text-pt">No Google Drive recordings found</p>
+            <p className="font-semibold text-pt">No class recordings found</p>
             <p className="text-xs text-pt-muted mt-1 max-w-md mx-auto">
               {searchQuery
                 ? `No recordings matched "${searchQuery}". Clear your search query.`
-                : "After each class, your trainer uploads the master Google Drive link here for backup access."}
+                : "After each live session, your trainer uploads the recording link and notes here for you."}
             </p>
             {searchQuery && (
               <Button
@@ -361,9 +400,11 @@ export function StudentRecordingsContent({
                       <h4 className="mt-2 text-base sm:text-lg font-bold text-pt group-hover:text-primary transition-colors leading-snug">
                         {recording.title}
                       </h4>
-                      <p className="text-xs text-pt-muted mt-1">
-                        Instructor: <span className="font-medium text-foreground">{recording.trainerName}</span>
-                      </p>
+                      {recording.trainerName && (
+                        <p className="text-xs text-pt-muted mt-1">
+                          Instructor: <span className="font-medium text-foreground">{recording.trainerName}</span>
+                        </p>
+                      )}
                     </div>
 
                     <a
@@ -371,7 +412,7 @@ export function StudentRecordingsContent({
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-md group-hover:scale-110 transition-transform"
-                      title="Watch on Google Drive"
+                      title="Watch Recording"
                     >
                       <PlayCircle size={24} weight="fill" />
                     </a>
@@ -393,7 +434,7 @@ export function StudentRecordingsContent({
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:underline"
                   >
-                    Open in Google Drive
+                    Open Recording
                     <ArrowSquareOut size={14} />
                   </a>
 
@@ -412,7 +453,7 @@ export function StudentRecordingsContent({
                       type="button"
                       onClick={(e) => handleCopy(e, recording)}
                       className="rounded-lg p-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-surface border border-transparent hover:border-pt transition-colors flex items-center gap-1"
-                      title="Copy Google Drive Link"
+                      title="Copy Recording Link"
                     >
                       {copiedId === recording.id ? (
                         <Check size={15} className="text-emerald-500" />
@@ -429,7 +470,7 @@ export function StudentRecordingsContent({
       </div>
 
       {/* Coming Soon Slots */}
-      {progress.nextTwo.length > 0 && (
+      {progress?.nextTwo && progress.nextTwo.length > 0 && (
         <div>
           <h3 className="text-lg font-bold text-pt mb-4 flex items-center gap-2">
             <Clock size={22} weight="duotone" className="text-pt-muted" />
@@ -470,13 +511,13 @@ export function StudentRecordingsContent({
             Join live class
           </Link>
           <Link
-            href="/student/recordings"
-            className="inline-flex items-center gap-2 rounded-xl bg-primary/10 border border-primary/20 px-4 py-2.5 text-sm font-bold text-primary hover:bg-primary/20 transition-colors"
+            href="/student/assignments"
+            className="inline-flex items-center gap-2 rounded-xl border border-pt px-4 py-2.5 text-sm font-semibold text-pt hover:bg-surface transition-colors"
           >
             <FilmStrip size={16} weight="duotone" />
-            HD Video Stream Player
+            View Assignments
           </Link>
-          {progress.completedCount > 0 && (
+          {progress?.completedCount != null && progress.completedCount > 0 && (
             <div className="inline-flex items-center gap-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 px-4 py-2.5 text-sm font-semibold text-emerald-800 dark:text-emerald-200">
               <CheckCircle size={16} weight="fill" />
               {progress.completedCount} class{progress.completedCount === 1 ? "" : "es"} completed

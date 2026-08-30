@@ -2,7 +2,7 @@ import Link from "next/link";
 import { CalendarBlank } from "@phosphor-icons/react/ssr";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getAssignments, getLiveSessionsPreview } from "@/lib/api/portal-data";
-import { getLecturesByProgram, filterLecturesForStudent } from "@/lib/api/student-lectures";
+import { getClassRecordings } from "@/lib/api/class-recordings";
 import { PortalSurfaceCard } from "@/components/portal/portal-ui";
 import { StudentTrainerCard } from "@/components/portal/student-trainer-card";
 import { StudentNextClassCard } from "@/components/portal/student-next-class-card";
@@ -49,14 +49,14 @@ export default async function StudentDashboardPage() {
   const programSlugs = await getStudentPortalProgramSlugs(user);
   const primaryProgramSlug = user.programSlug ?? "web-development";
   const moduleContext = await getStudentModuleContentContext(user);
-  const [allAssignments, allSessions, allLectures] = await Promise.all([
+  const [allAssignments, allSessions, allRecordings] = await Promise.all([
     fetchMergedByProgram(programSlugs, getAssignments),
     fetchMergedByProgram(programSlugs, getLiveSessionsPreview),
-    fetchMergedByProgram(programSlugs, getLecturesByProgram),
+    fetchMergedByProgram(programSlugs, getClassRecordings),
   ]);
   const assignments = filterByStudentModule(allAssignments, moduleContext, (item) => item.level, (item) => item.programSlug);
   const sessions = filterByStudentModule(allSessions, moduleContext, (session) => session.level, (session) => session.programSlug);
-  const lectures = filterLecturesForStudent(allLectures, moduleContext);
+  const recordings = filterByStudentModule(allRecordings, moduleContext, (item) => item.level, (item) => item.programSlug);
   const enrolledModules = moduleContext.approvedLevels;
   // Aggregate module enrollments across all enrolled programs
   const moduleEnrollments = user.email
@@ -148,7 +148,7 @@ export default async function StudentDashboardPage() {
       <StudentReveal delay={0.05}>
         <StudentFeatureCards
           counts={{
-            recordings: lectures.length,
+            recordings: recordings.length,
             classes: sessions.length,
             tasks: assignments.length,
           }}

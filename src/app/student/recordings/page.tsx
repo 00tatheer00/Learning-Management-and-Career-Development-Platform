@@ -20,26 +20,47 @@ export default async function StudentRecordingsPage() {
   const user = await getCurrentUser();
   if (!user || user.role !== "student") redirect("/login");
 
-  const programSlugs = await getStudentPortalProgramSlugs(user);
-  const primarySlug = programSlugs[0] ?? user.programSlug ?? "web-development";
-  const moduleContext = await getStudentModuleContentContext(user);
+  let primarySlug = user.programSlug || "web-development";
+  let recordings: Awaited<ReturnType<typeof getClassRecordings>> = [];
+  let studentModule: string | undefined = user.level?.trim() || undefined;
+  let programModules: string[] = [];
 
-  const allRecordings = await fetchMergedByProgram(programSlugs, getClassRecordings);
-  const recordings = filterByStudentModule(
-    allRecordings,
-    moduleContext,
-    (item) => item.level,
-    (item) => item.programSlug
-  );
+  try {
+    const programSlugs = await getStudentPortalProgramSlugs(user);
+    primarySlug = programSlugs[0] ?? user.programSlug ?? "web-development";
+    const moduleContext = await getStudentModuleContentContext(user);
+    studentModule = moduleContext.studentLevel || user.level?.trim() || undefined;
 
-  const programModules = getProgramModuleNames(primarySlug);
+    const allRecordings = await fetchMergedByProgram(
+      programSlugs.length > 0 ? programSlugs : [primarySlug],
+      getClassRecordings
+    );
+
+    recordings = filterByStudentModule(
+      allRecordings || [],
+      moduleContext,
+      (item) => item.level,
+      (item) => item.programSlug
+    );
+
+    programModules = getProgramModuleNames(primarySlug) || [];
+  } catch (err) {
+    console.error("[StudentRecordingsPage] Error loading recordings:", err);
+    try {
+      recordings = await getClassRecordings(primarySlug);
+      programModules = getProgramModuleNames(primarySlug) || [];
+    } catch {
+      recordings = [];
+      programModules = [];
+    }
+  }
 
   return (
     <div className="space-y-6 pb-16">
       <StudentRecordingsContent
         programSlug={primarySlug}
-        recordings={recordings}
-        studentModule={moduleContext.studentLevel || undefined}
+        recordings={recordings || []}
+        studentModule={studentModule}
         modules={programModules}
       />
     </div>

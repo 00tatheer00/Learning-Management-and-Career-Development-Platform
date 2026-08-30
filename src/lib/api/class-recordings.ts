@@ -96,25 +96,30 @@ export async function getClassRecordings(
   programSlug: string,
   level?: string
 ): Promise<ClassRecordingRecord[]> {
-  const records = await prisma.classRecording.findMany({
-    where: { programSlug },
-    orderBy: { classNumber: "asc" },
-  });
+  try {
+    const records = await prisma.classRecording.findMany({
+      where: { programSlug },
+      orderBy: { classNumber: "asc" },
+    });
 
-  const mapped = records.map((r) => {
-    const canonicalLevel = resolveCanonicalModule(r.programSlug, r.level);
-    return {
-      ...mapRecording(r),
-      level: canonicalLevel,
-    };
-  });
+    const mapped = records.map((r) => {
+      const canonicalLevel = resolveCanonicalModule(r.programSlug, r.level);
+      return {
+        ...mapRecording(r),
+        level: canonicalLevel,
+      };
+    });
 
-  if (level && level.trim() !== "" && level.trim().toLowerCase() !== "all") {
-    const targetCanonical = resolveCanonicalModule(programSlug, level);
-    return mapped.filter((r) => r.level === targetCanonical);
+    if (level && level.trim() !== "" && level.trim().toLowerCase() !== "all") {
+      const targetCanonical = resolveCanonicalModule(programSlug, level);
+      return mapped.filter((r) => r.level === targetCanonical);
+    }
+
+    return mapped;
+  } catch (error) {
+    console.error(`[ClassRecordings] Failed to fetch recordings for ${programSlug}:`, error);
+    return [];
   }
-
-  return mapped;
 }
 
 export async function upsertClassRecording(data: {
