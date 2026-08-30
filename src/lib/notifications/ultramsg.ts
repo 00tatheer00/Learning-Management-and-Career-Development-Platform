@@ -89,7 +89,7 @@ export function formatApprovalWhatsAppMessage(params: {
   const message = [
     `🎉 *Congratulations, ${studentName}!*`,
     ``,
-    `Your registration for *${courseTitle}* (${moduleName}) has been officially *APPROVED* at Emerging Edge School!`,
+    `Your registration for *${courseTitle}* (${moduleName}) has been officially *APPROVED* at Emerging Edge School of Technology!`,
     ``,
     `📩 *Portal Credentials:*`,
     `Your official Portal Login ID, Password, and access instructions have been sent to your registered email: *${email}*.`,
@@ -98,7 +98,7 @@ export function formatApprovalWhatsAppMessage(params: {
     `Please check your Email Inbox (including Spam / Junk folder) to retrieve your login password and access your dashboard.`,
     ``,
     `Welcome aboard! 🚀`,
-    `— *Emerging Edge School*`,
+    `— *Emerging Edge School of Technology*`,
   ].join("\n");
 
   // Ensure zero links are present
