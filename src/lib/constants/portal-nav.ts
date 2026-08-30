@@ -15,7 +15,6 @@ import {
   ListChecks,
   FilmStrip,
   Certificate,
-  PlayCircle,
   Lifebuoy,
 } from "@phosphor-icons/react";
 
