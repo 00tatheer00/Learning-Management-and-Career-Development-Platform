@@ -201,8 +201,8 @@ export function StudentRecordingsContent({
           </div>
           <h2 className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight">
             {studentModule
-              ? `${progress?.config?.programTitle ?? category?.name ?? "Your Classes"} — ${studentModule}`
-              : progress?.config?.programTitle ?? category?.name ?? "Your Classes"}
+              ? `${progress?.config?.programTitle ?? category?.title ?? "Your Classes"} — ${studentModule}`
+              : progress?.config?.programTitle ?? category?.title ?? "Your Classes"}
           </h2>
           <p className="mt-2 text-sm text-white/90 max-w-xl">
             Watch recorded live classes, download lecture notes, and review previous session archives.
