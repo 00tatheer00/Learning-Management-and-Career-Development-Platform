@@ -14,6 +14,7 @@ import {
   Copy,
   ArrowCounterClockwise,
   EnvelopeSimple,
+  WhatsappLogo,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -870,6 +871,40 @@ export function AdminEnrollmentsPanel() {
                           Re-Approve &amp; Restore Account
                         </Button>
                       )}
+                      {enrollment.status === "approved" && enrollment.whatsapp && (
+                        <Button
+                          size="lg"
+                          variant="secondary"
+                          className="gap-2 border-emerald-300 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-800 dark:text-emerald-300 dark:hover:bg-emerald-950/40"
+                          disabled={resendLoading !== null || loadingId === enrollment.id || bulkLoading}
+                          onClick={async () => {
+                            setResendLoading("whatsapp");
+                            try {
+                              const res = await fetch("/api/admin/enrollments/resend-whatsapp", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ enrollmentId: enrollment.id }),
+                              });
+                              const data = await res.json();
+                              if (data.success) {
+                                toast.success(
+                                  "WhatsApp Sent",
+                                  data.data?.message || `Welcome message delivered to ${enrollment.fullName}`
+                                );
+                              } else {
+                                toast.error("WhatsApp Error", data.error || "Failed to send WhatsApp message");
+                              }
+                            } catch {
+                              toast.error("WhatsApp Error", "Network or server error.");
+                            } finally {
+                              setResendLoading(null);
+                            }
+                          }}
+                        >
+                          <WhatsappLogo size={20} weight="fill" className="text-emerald-600" />
+                          {resendLoading === "whatsapp" ? "Sending WhatsApp..." : "Resend WhatsApp Notice"}
+                        </Button>
+                      )}
                       <Button
                         size="lg"
                         variant="secondary"
@@ -1080,6 +1115,27 @@ export function AdminEnrollmentsPanel() {
               )}
             </div>
 
+            {approvedCredentials.phone && (
+              <div
+                className={cn(
+                  "mt-3 rounded-xl p-4 text-sm",
+                  approvedCredentials.whatsappSent
+                    ? "portal-callout-success"
+                    : "portal-callout-amber-subtle"
+                )}
+              >
+                <p className="font-semibold flex items-center gap-2">
+                  <WhatsappLogo size={18} weight="fill" className="text-emerald-600" />
+                  {approvedCredentials.whatsappSent
+                    ? `WhatsApp notification sent to ${approvedCredentials.phone}`
+                    : `WhatsApp notice ready / sent to ${approvedCredentials.phone}`}
+                </p>
+                {!approvedCredentials.whatsappSent && approvedCredentials.whatsappError && (
+                  <p className="mt-1 text-xs opacity-90">{approvedCredentials.whatsappError}</p>
+                )}
+              </div>
+            )}
+
             <div className="mt-4 rounded-xl border border-border bg-surface p-4 space-y-2 text-sm">
               <p>
                 <span className="text-muted">Login ID:</span>{" "}
@@ -1097,6 +1153,43 @@ export function AdminEnrollmentsPanel() {
               </p>
             </div>
             <div className="mt-6 flex flex-wrap justify-end gap-3">
+              {approvedCredentials.phone && (
+                <Button
+                  variant="secondary"
+                  className="gap-2 border-emerald-300 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-800 dark:text-emerald-300"
+                  disabled={resendLoading !== null}
+                  onClick={async () => {
+                    setResendLoading("whatsapp");
+                    try {
+                      const res = await fetch("/api/admin/enrollments/resend-whatsapp", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          enrollmentId: approvedCredentials.enrollmentId,
+                        }),
+                      });
+                      const json = await res.json();
+                      if (json.success) {
+                        toast.success(json.data?.message ?? "WhatsApp notification sent.");
+                        setApprovedCredentials((current) =>
+                          current
+                            ? { ...current, whatsappSent: true, whatsappError: undefined }
+                            : current
+                        );
+                      } else {
+                        toast.error(json.error ?? "WhatsApp resend failed");
+                      }
+                    } catch {
+                      toast.error("WhatsApp resend failed");
+                    } finally {
+                      setResendLoading(null);
+                    }
+                  }}
+                >
+                  <WhatsappLogo size={16} weight="fill" className="text-emerald-600" />
+                  {resendLoading === "whatsapp" ? "Sending WhatsApp..." : "Resend WhatsApp"}
+                </Button>
+              )}
               {!approvedCredentials.emailSent && (
                 <Button
                   variant="secondary"

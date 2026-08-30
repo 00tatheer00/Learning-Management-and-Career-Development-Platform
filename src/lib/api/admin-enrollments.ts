@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getProgramBySlug } from "@/lib/data/programs";
-import { DEFAULT_BATCH_NAME } from "@/lib/constants/batch";
+import { DEFAULT_BATCH_NAME, getRegistrationPhase } from "@/lib/constants/batch";
 import { formatAppliedDateTime } from "@/lib/utils";
 import { enrichRowsWithApplicationMeta } from "@/lib/api/enrollment-history";
 import { getPhaseCreatedAtFilter, type PhaseFilter } from "@/lib/services/phase-service";
@@ -194,6 +194,7 @@ function escapeCsv(value: string) {
 export function buildEnrollmentsCsv(rows: AdminEnrollmentRow[]) {
   const headers = [
     "Status",
+    "Phase",
     "Name",
     "Father Name",
     "Email",
@@ -209,14 +210,33 @@ export function buildEnrollmentsCsv(rows: AdminEnrollmentRow[]) {
     "Laptop",
     "Internet",
     "Applied On",
+    "Email Notification",
     "Reviewed On",
     "Reviewed By",
     "Admin Notes",
   ];
 
-  const lines = rows.map((row) =>
-    [
+  const lines = rows.map((row) => {
+    const phaseKey = getRegistrationPhase(row);
+    const phaseLabel =
+      phaseKey === "phase-1"
+        ? "Phase 1 (Module 1)"
+        : phaseKey === "phase-2"
+          ? "Phase 2 (2nd Module)"
+          : "Phase 3 (3rd Module)";
+
+    const emailStatus =
+      row.status !== "approved"
+        ? "N/A"
+        : row.approvalEmailSent
+          ? "Delivered"
+          : row.approvalEmailError
+            ? `Failed (${row.approvalEmailError})`
+            : "Pending / Queued";
+
+    return [
       row.status,
+      phaseLabel,
       row.fullName,
       row.fatherName,
       row.email,
@@ -232,13 +252,14 @@ export function buildEnrollmentsCsv(rows: AdminEnrollmentRow[]) {
       row.hasLaptop,
       row.internetAvailable,
       formatAppliedDateTime(row.createdAt),
+      emailStatus,
       row.reviewedAt ? formatAppliedDateTime(row.reviewedAt) : "",
       row.reviewerName ?? "",
       row.adminNotes ?? "",
     ]
       .map(escapeCsv)
-      .join(",")
-  );
+      .join(",");
+  });
 
   return `\uFEFF${headers.join(",")}\n${lines.join("\n")}`;
 }
