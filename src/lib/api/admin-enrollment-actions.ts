@@ -183,6 +183,9 @@ export async function approveEnrollmentAndCreateAccount(
   } else {
     parts.push(`Email failed: ${notifications.warnings.find((w) => w.toLowerCase().includes("email")) ?? "not sent"}`);
   }
+  if (notifications.whatsappSent) {
+    parts.push("WhatsApp notification sent.");
+  }
   const message = parts.join(" ");
 
   return {
