@@ -357,7 +357,7 @@ function AdminRevenueSidePanel() {
       <button
         type="button"
         aria-label="Close revenue panel"
-        className="absolute inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-xs transition-opacity cursor-pointer"
+        className="absolute inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity cursor-pointer"
         onClick={() => setOpen(false)}
       />
 
@@ -365,20 +365,20 @@ function AdminRevenueSidePanel() {
         role="dialog"
         aria-modal="true"
         aria-label="Registration Revenue"
-        className="relative flex h-full w-full max-w-[540px] flex-col bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 shadow-2xl border-l border-slate-200 dark:border-slate-800 z-10"
+        className="relative flex h-full w-full max-w-[540px] flex-col bg-white text-slate-900 shadow-2xl border-l border-slate-200 z-10"
       >
         {/* Top Header Card */}
-        <div className="relative shrink-0 border-b border-slate-100 dark:border-slate-800/80 bg-white dark:bg-slate-950 px-6 pt-5 pb-5">
+        <div className="relative shrink-0 border-b border-slate-200/80 bg-white px-6 pt-5 pb-5">
           <div className="flex items-start justify-between gap-3 mb-3.5">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800/50 shadow-xs">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200 shadow-xs">
                 <CurrencyCircleDollar size={26} weight="duotone" />
               </div>
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
+                <p className="text-[11px] font-bold uppercase tracking-widest text-emerald-600">
                   Financial Overview
                 </p>
-                <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
+                <h2 className="text-xl font-bold tracking-tight text-slate-900">
                   Registration Revenue
                 </h2>
               </div>
@@ -388,7 +388,7 @@ function AdminRevenueSidePanel() {
                 type="button"
                 onClick={() => void refresh()}
                 disabled={loading}
-                className="rounded-lg p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:hover:text-slate-200 dark:hover:bg-slate-800 transition-colors disabled:opacity-50 cursor-pointer"
+                className="rounded-lg p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors disabled:opacity-50 cursor-pointer"
                 aria-label="Refresh data"
               >
                 <ArrowClockwise size={18} className={loading ? "animate-spin text-emerald-600" : ""} />
@@ -396,7 +396,7 @@ function AdminRevenueSidePanel() {
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="rounded-lg p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:hover:text-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                className="rounded-lg p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
                 aria-label="Close"
               >
                 <X size={20} weight="bold" />
@@ -404,50 +404,50 @@ function AdminRevenueSidePanel() {
             </div>
           </div>
 
-          {/* Dynamic phase split explanation styled in clean light tones */}
+          {/* Dynamic phase split explanation in clean, soft pastel cards */}
           {selectedPhase === "phase-1" ? (
-            <div className="bg-indigo-50/80 border border-indigo-200/80 dark:bg-indigo-950/30 dark:border-indigo-900/40 text-xs text-slate-700 dark:text-slate-300 leading-relaxed rounded-xl p-3.5 shadow-2xs">
-              <span className="font-bold text-indigo-700 dark:text-indigo-300 uppercase text-[10px] tracking-wider bg-indigo-100 dark:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-800 px-2 py-0.5 rounded-md mr-2">
+            <div className="bg-indigo-50/80 border border-indigo-200/80 text-xs text-slate-700 leading-relaxed rounded-xl p-3.5 shadow-2xs">
+              <span className="font-bold text-indigo-700 uppercase text-[10px] tracking-wider bg-indigo-100 border border-indigo-200 px-2 py-0.5 rounded-md mr-2">
                 Phase 1 Model
               </span>
-              PKR 1,000 → <strong className="text-slate-900 dark:text-white">PKR 200</strong> Mgmt (Komal) · <strong className="text-slate-900 dark:text-white">PKR 800</strong> Trainer (Tatheer / Talha) · <strong className="text-slate-900 dark:text-white">PKR 0</strong> School
+              PKR 1,000 → <strong className="text-slate-900">PKR 200</strong> Mgmt (Komal) · <strong className="text-slate-900">PKR 800</strong> Trainer (Tatheer / Talha) · <strong className="text-slate-900">PKR 0</strong> School
             </div>
           ) : selectedPhase === "phase-2" ? (
-            <div className="bg-emerald-50/80 border border-emerald-200/80 dark:bg-emerald-950/30 dark:border-emerald-900/40 text-xs text-slate-700 dark:text-slate-300 leading-relaxed rounded-xl p-3.5 shadow-2xs">
-              <span className="font-bold text-emerald-700 dark:text-emerald-300 uppercase text-[10px] tracking-wider bg-emerald-100 dark:bg-emerald-900/50 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded-md mr-2">
+            <div className="bg-emerald-50/80 border border-emerald-200/80 text-xs text-slate-700 leading-relaxed rounded-xl p-3.5 shadow-2xs">
+              <span className="font-bold text-emerald-700 uppercase text-[10px] tracking-wider bg-emerald-100 border border-emerald-200 px-2 py-0.5 rounded-md mr-2">
                 Phase 2 Model
               </span>
-              PKR 1,000 → <strong className="text-slate-900 dark:text-white">PKR 200</strong> Mgmt (Komal) · <strong className="text-slate-900 dark:text-white">PKR 700</strong> Trainer · <strong className="text-slate-900 dark:text-white">PKR 100</strong> School
+              PKR 1,000 → <strong className="text-slate-900">PKR 200</strong> Mgmt (Komal) · <strong className="text-slate-900">PKR 700</strong> Trainer · <strong className="text-slate-900">PKR 100</strong> School
             </div>
           ) : selectedPhase === "phase-3" ? (
-            <div className="bg-purple-50/80 border border-purple-200/80 dark:bg-purple-950/30 dark:border-purple-900/40 text-xs text-slate-700 dark:text-slate-300 leading-relaxed rounded-xl p-3.5 shadow-2xs">
-              <span className="font-bold text-purple-700 dark:text-purple-300 uppercase text-[10px] tracking-wider bg-purple-100 dark:bg-purple-900/50 border border-purple-200 dark:border-purple-800 px-2 py-0.5 rounded-md mr-2">
+            <div className="bg-purple-50/80 border border-purple-200/80 text-xs text-slate-700 leading-relaxed rounded-xl p-3.5 shadow-2xs">
+              <span className="font-bold text-purple-700 uppercase text-[10px] tracking-wider bg-purple-100 border border-purple-200 px-2 py-0.5 rounded-md mr-2">
                 Phase 3 Model
               </span>
-              PKR 1,000 → <strong className="text-slate-900 dark:text-white">PKR 200</strong> Mgmt (Komal) · <strong className="text-slate-900 dark:text-white">PKR 700</strong> Trainer · <strong className="text-slate-900 dark:text-white">PKR 100</strong> School
+              PKR 1,000 → <strong className="text-slate-900">PKR 200</strong> Mgmt (Komal) · <strong className="text-slate-900">PKR 700</strong> Trainer · <strong className="text-slate-900">PKR 100</strong> School
             </div>
           ) : (
-            <div className="bg-slate-50 border border-slate-200/90 dark:bg-slate-900 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400 leading-relaxed rounded-xl p-3.5 shadow-2xs">
-              <span className="font-bold text-indigo-600 dark:text-indigo-400">Phase 1:</span> Rs 200 Mgmt / Rs 800 Trainer · <span className="font-bold text-emerald-600 dark:text-emerald-400">Phase 2:</span> Rs 200 Mgmt / Rs 700 Trainer / Rs 100 School · <span className="font-bold text-purple-600 dark:text-purple-400">Phase 3:</span> Rs 200 Mgmt / Rs 700 Trainer / Rs 100 School
+            <div className="bg-slate-50 border border-slate-200 text-xs text-slate-600 leading-relaxed rounded-xl p-3.5 shadow-2xs">
+              <span className="font-bold text-indigo-600">Phase 1:</span> Rs 200 Mgmt / Rs 800 Trainer · <span className="font-bold text-emerald-600">Phase 2:</span> Rs 200 Mgmt / Rs 700 Trainer / Rs 100 School · <span className="font-bold text-purple-600">Phase 3:</span> Rs 200 Mgmt / Rs 700 Trainer / Rs 100 School
             </div>
           )}
         </div>
 
         {/* Phase Filter Toggle Bar */}
         {stats && stats.phases && (
-          <div className="shrink-0 border-b border-slate-100 dark:border-slate-800/80 bg-slate-50/70 dark:bg-slate-900/50 px-6 py-2.5 flex items-center justify-between gap-2">
+          <div className="shrink-0 border-b border-slate-200/80 bg-slate-50 px-6 py-2.5 flex items-center justify-between gap-2">
             <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 shrink-0">
               Module Phase
             </span>
-            <div className="flex gap-1 bg-slate-200/70 dark:bg-slate-800 p-1 rounded-xl shadow-xs border border-slate-200/60 dark:border-slate-700">
+            <div className="flex gap-1 bg-slate-200/70 p-1 rounded-xl shadow-xs border border-slate-200">
               <button
                 type="button"
                 onClick={() => handlePhaseChange("all")}
                 className={cn(
                   "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer",
                   selectedPhase === "all"
-                    ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs font-bold"
-                    : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                    ? "bg-white text-slate-900 shadow-xs font-bold"
+                    : "text-slate-600 hover:text-slate-900"
                 )}
               >
                 All ({stats.totalApproved})
@@ -459,7 +459,7 @@ function AdminRevenueSidePanel() {
                   "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer",
                   selectedPhase === "phase-1"
                     ? "bg-indigo-600 text-white shadow-xs font-bold"
-                    : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                    : "text-slate-600 hover:text-slate-900"
                 )}
               >
                 Phase 1 ({stats.phases.phase1.totalApproved})
@@ -471,7 +471,7 @@ function AdminRevenueSidePanel() {
                   "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer",
                   selectedPhase === "phase-2"
                     ? "bg-emerald-600 text-white shadow-xs font-bold"
-                    : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                    : "text-slate-600 hover:text-slate-900"
                 )}
               >
                 Phase 2 ({stats.phases.phase2.totalApproved})
@@ -483,7 +483,7 @@ function AdminRevenueSidePanel() {
                   "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer",
                   selectedPhase === "phase-3"
                     ? "bg-purple-600 text-white shadow-xs font-bold"
-                    : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                    : "text-slate-600 hover:text-slate-900"
                 )}
               >
                 Phase 3 ({stats.phases.phase3?.totalApproved ?? 0})
@@ -493,7 +493,7 @@ function AdminRevenueSidePanel() {
         )}
 
         {/* Time Period Filter Bar */}
-        <div className="shrink-0 border-b border-slate-100 dark:border-slate-800/80 bg-white dark:bg-slate-950 px-6 py-2.5 flex gap-2 overflow-x-auto">
+        <div className="shrink-0 border-b border-slate-200/80 bg-white px-6 py-2.5 flex gap-2 overflow-x-auto">
           {periodOptions.map((opt) => (
             <button
               key={opt.key}
@@ -502,8 +502,8 @@ function AdminRevenueSidePanel() {
               className={cn(
                 "flex-1 min-w-[80px] rounded-xl py-2 px-2.5 text-xs font-semibold transition-all cursor-pointer whitespace-nowrap text-center border",
                 period === opt.key
-                  ? "bg-slate-900 text-white border-slate-900 shadow-xs font-bold dark:bg-white dark:text-slate-900 dark:border-white"
-                  : "bg-slate-50 border-slate-200/80 text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400"
+                  ? "bg-slate-900 text-white border-slate-900 shadow-xs font-bold"
+                  : "bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100"
               )}
             >
               {opt.label}
@@ -511,7 +511,7 @@ function AdminRevenueSidePanel() {
           ))}
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4 bg-slate-50/50 dark:bg-slate-950">
+        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4 bg-slate-50/60">
           {loading && !stats && (
             <div className="flex flex-col items-center justify-center py-16 text-slate-400">
               <ArrowClockwise size={32} className="animate-spin mb-3 text-emerald-600" />
@@ -521,49 +521,49 @@ function AdminRevenueSidePanel() {
 
           {stats && periodStats && (
             <>
-              {/* Gross Revenue Hero Card — Refined Clean Light Styling */}
-              <div className="rounded-2xl p-5 border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-all">
+              {/* Gross Revenue Hero Card — Pure White Card with Soft Slate Accents */}
+              <div className="rounded-2xl p-5 border border-slate-200 bg-white shadow-xs transition-all">
                 <div className="flex items-center justify-between gap-3 mb-3.5">
                   <div className="flex items-center gap-2.5">
                     <div
                       className={cn(
                         "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg font-bold text-xs border shadow-2xs",
                         selectedPhase === "phase-1"
-                          ? "bg-indigo-50 text-indigo-700 border-indigo-200/80"
+                          ? "bg-indigo-50 text-indigo-700 border-indigo-200"
                           : selectedPhase === "phase-2"
-                            ? "bg-emerald-50 text-emerald-700 border-emerald-200/80"
+                            ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                             : selectedPhase === "phase-3"
-                              ? "bg-purple-50 text-purple-700 border-purple-200/80"
+                              ? "bg-purple-50 text-purple-700 border-purple-200"
                               : "bg-slate-100 text-slate-700 border-slate-200"
                       )}
                     >
                       {selectedPhase === "phase-1" ? "P1" : selectedPhase === "phase-2" ? "P2" : selectedPhase === "phase-3" ? "P3" : "ALL"}
                     </div>
                     <div>
-                      <h3 className="text-sm font-bold tracking-tight text-slate-900 dark:text-white">
+                      <h3 className="text-sm font-bold tracking-tight text-slate-900">
                         {periodStats.label}
                       </h3>
                       <p className="text-xs text-slate-500 font-medium">Gross Revenue Collection</p>
                     </div>
                   </div>
-                  <span className="rounded-full px-3 py-1 text-xs font-bold bg-slate-100 dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700 text-slate-700 dark:text-slate-300 shadow-2xs">
+                  <span className="rounded-full px-3 py-1 text-xs font-bold bg-slate-100 border border-slate-200 text-slate-700 shadow-2xs">
                     {periodStats.students} Paid Registrations
                   </span>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2 py-3 px-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/60 text-center mb-3.5">
+                <div className="grid grid-cols-3 gap-2 py-3 px-3.5 rounded-xl border border-slate-200/80 bg-slate-50 text-center mb-3.5">
                   <div>
-                    <p className="text-xl font-bold tabular-nums text-slate-900 dark:text-white">
+                    <p className="text-xl font-bold tabular-nums text-slate-900">
                       {periodStats.students}
                     </p>
-                    <p className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">Approved</p>
+                    <p className="text-[11px] font-semibold text-emerald-600">Approved</p>
                   </div>
                   <div>
-                    <p className="text-xl font-bold tabular-nums text-slate-900 dark:text-white">0</p>
-                    <p className="text-[11px] font-semibold text-amber-600 dark:text-amber-400">Pending</p>
+                    <p className="text-xl font-bold tabular-nums text-slate-900">0</p>
+                    <p className="text-[11px] font-semibold text-amber-600">Pending</p>
                   </div>
                   <div>
-                    <p className="text-xl font-bold tabular-nums text-slate-900 dark:text-white">
+                    <p className="text-xl font-bold tabular-nums text-slate-900">
                       {selectedPhase === "phase-1"
                         ? stats.phases.phase1.totalApproved
                         : selectedPhase === "phase-2"
@@ -572,70 +572,70 @@ function AdminRevenueSidePanel() {
                             ? (stats.phases.phase3?.totalApproved ?? 0)
                             : periodStats.students}
                     </p>
-                    <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Active Students</p>
+                    <p className="text-[11px] font-semibold text-slate-500">Active Students</p>
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between text-xs font-medium text-slate-500 pt-1">
                   <span>Gross Collected</span>
-                  <span className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 tabular-nums">
+                  <span className="text-2xl sm:text-3xl font-black text-emerald-600 tabular-nums">
                     {formatMoney(periodStats.gross, stats.currency)}
                   </span>
                 </div>
               </div>
 
-              {/* 3 Share Cards (Management, Trainers, School) — Light Elegant Styling */}
+              {/* 3 Share Cards (Management, Trainers, School) — Soft Pastel Clean Theme */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                 {/* Management Card */}
-                <div className="rounded-2xl border border-violet-200/80 bg-violet-50/50 dark:bg-violet-950/20 dark:border-violet-900/40 p-3.5 shadow-2xs">
+                <div className="rounded-2xl border border-violet-200 bg-violet-50/70 p-3.5 shadow-2xs">
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-violet-100 text-violet-700 dark:bg-violet-900/60 dark:text-violet-300 border border-violet-200/60">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-violet-100 text-violet-700 border border-violet-200/60">
                       <Buildings size={15} weight="duotone" />
                     </div>
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-violet-700 dark:text-violet-300">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-violet-700">
                       Komal (Mgmt)
                     </p>
                   </div>
-                  <p className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tabular-nums">
+                  <p className="text-lg sm:text-xl font-black text-slate-900 tabular-nums">
                     {formatMoney(periodStats.management, stats.currency)}
                   </p>
-                  <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-1">
+                  <p className="text-[11px] font-medium text-slate-500 mt-1">
                     Rs 200 / student
                   </p>
                 </div>
 
                 {/* Trainer Card */}
-                <div className="rounded-2xl border border-sky-200/80 bg-sky-50/50 dark:bg-sky-950/20 dark:border-sky-900/40 p-3.5 shadow-2xs">
+                <div className="rounded-2xl border border-sky-200 bg-sky-50/70 p-3.5 shadow-2xs">
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-sky-100 text-sky-700 dark:bg-sky-900/60 dark:text-sky-300 border border-sky-200/60">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-sky-100 text-sky-700 border border-sky-200/60">
                       <GraduationCap size={15} weight="duotone" />
                     </div>
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-sky-700 dark:text-sky-300">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-sky-700">
                       Trainers
                     </p>
                   </div>
-                  <p className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tabular-nums">
+                  <p className="text-lg sm:text-xl font-black text-slate-900 tabular-nums">
                     {formatMoney(periodStats.trainer, stats.currency)}
                   </p>
-                  <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-1">
+                  <p className="text-[11px] font-medium text-slate-500 mt-1">
                     {selectedPhase === "phase-1" ? "Rs 800 / student" : "Rs 700 / student"}
                   </p>
                 </div>
 
                 {/* School Card */}
-                <div className="rounded-2xl border border-emerald-200/80 bg-emerald-50/50 dark:bg-emerald-950/20 dark:border-emerald-900/40 p-3.5 shadow-2xs">
+                <div className="rounded-2xl border border-emerald-200 bg-emerald-50/70 p-3.5 shadow-2xs">
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300 border border-emerald-200/60">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 border border-emerald-200/60">
                       <Buildings size={15} weight="duotone" />
                     </div>
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-700">
                       School %
                     </p>
                   </div>
-                  <p className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tabular-nums">
+                  <p className="text-lg sm:text-xl font-black text-slate-900 tabular-nums">
                     {formatMoney(periodStats.school, stats.currency)}
                   </p>
-                  <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-1">
+                  <p className="text-[11px] font-medium text-slate-500 mt-1">
                     {selectedPhase === "phase-1" ? "Rs 0 (Phase 1)" : "Rs 100 / student"}
                   </p>
                 </div>
@@ -643,11 +643,11 @@ function AdminRevenueSidePanel() {
 
               {/* Distribution Bar */}
               {periodStats.gross > 0 && (
-                <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-2xs">
+                <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-2xs">
                   <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2.5">
                     Revenue Distribution Share
                   </p>
-                  <div className="flex h-3 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 gap-0.5 p-0.5 border border-slate-200/60 dark:border-slate-700">
+                  <div className="flex h-3 rounded-full overflow-hidden bg-slate-100 gap-0.5 p-0.5 border border-slate-200">
                     {periodStats.management > 0 && (
                       <div
                         className="bg-violet-600 rounded-sm transition-all"
@@ -677,15 +677,15 @@ function AdminRevenueSidePanel() {
                     )}
                   </div>
                   <div className="flex flex-wrap justify-between gap-1.5 mt-3 text-xs">
-                    <span className="text-violet-700 dark:text-violet-300 font-bold flex items-center gap-1.5">
+                    <span className="text-violet-700 font-bold flex items-center gap-1.5">
                       <span className="inline-block w-2.5 h-2.5 rounded-full bg-violet-600" />
                       Management {Math.round((periodStats.management / periodStats.gross) * 100)}%
                     </span>
-                    <span className="text-sky-700 dark:text-sky-300 font-bold flex items-center gap-1.5">
+                    <span className="text-sky-700 font-bold flex items-center gap-1.5">
                       <span className="inline-block w-2.5 h-2.5 rounded-full bg-sky-600" />
                       Trainers {Math.round((periodStats.trainer / periodStats.gross) * 100)}%
                     </span>
-                    <span className="text-emerald-700 dark:text-emerald-300 font-bold flex items-center gap-1.5">
+                    <span className="text-emerald-700 font-bold flex items-center gap-1.5">
                       <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-600" />
                       School {Math.round((periodStats.school / periodStats.gross) * 100)}%
                     </span>
@@ -705,7 +705,7 @@ function AdminRevenueSidePanel() {
                     return (
                       <div
                         key={course.programSlug}
-                        className="rounded-2xl border border-slate-200/80 dark:border-slate-800 overflow-hidden bg-white dark:bg-slate-900 shadow-2xs transition-all hover:shadow-sm"
+                        className="rounded-2xl border border-slate-200 overflow-hidden bg-white shadow-2xs transition-all hover:shadow-xs"
                       >
                         <div
                           className={cn(
@@ -731,36 +731,36 @@ function AdminRevenueSidePanel() {
                           </div>
                         </div>
 
-                        <div className="p-4 space-y-3.5">
+                        <div className="p-4 space-y-3.5 bg-white">
                           <div className="flex items-center justify-between">
                             <span className="text-sm text-slate-500 font-semibold">Gross Collected</span>
-                            <span className="font-black text-slate-900 dark:text-white text-base sm:text-lg tabular-nums">
+                            <span className="font-black text-slate-900 text-base sm:text-lg tabular-nums">
                               {formatMoney(cp.gross, stats.currency)}
                             </span>
                           </div>
-                          <div className="h-px bg-slate-100 dark:bg-slate-800" />
+                          <div className="h-px bg-slate-100" />
                           <div className="grid grid-cols-3 gap-2">
-                            <div className="rounded-xl border border-violet-200/70 bg-violet-50/60 dark:bg-violet-950/20 dark:border-violet-900/40 p-2.5 text-center">
-                              <p className="text-[9px] font-bold uppercase text-violet-700 dark:text-violet-300">
+                            <div className="rounded-xl border border-violet-200/70 bg-violet-50/70 p-2.5 text-center">
+                              <p className="text-[9px] font-bold uppercase text-violet-700">
                                 Management
                               </p>
-                              <p className="text-xs sm:text-sm font-black text-slate-900 dark:text-white mt-0.5 tabular-nums">
+                              <p className="text-xs sm:text-sm font-black text-slate-900 mt-0.5 tabular-nums">
                                 {formatMoney(cp.management, stats.currency)}
                               </p>
                             </div>
-                            <div className="rounded-xl border border-sky-200/70 bg-sky-50/60 dark:bg-sky-950/20 dark:border-sky-900/40 p-2.5 text-center">
-                              <p className="text-[9px] font-bold uppercase text-sky-700 dark:text-sky-300">
+                            <div className="rounded-xl border border-sky-200/70 bg-sky-50/70 p-2.5 text-center">
+                              <p className="text-[9px] font-bold uppercase text-sky-700">
                                 {trainerShort}
                               </p>
-                              <p className="text-xs sm:text-sm font-black text-slate-900 dark:text-white mt-0.5 tabular-nums">
+                              <p className="text-xs sm:text-sm font-black text-slate-900 mt-0.5 tabular-nums">
                                 {formatMoney(cp.trainer, stats.currency)}
                               </p>
                             </div>
-                            <div className="rounded-xl border border-emerald-200/70 bg-emerald-50/60 dark:bg-emerald-950/20 dark:border-emerald-900/40 p-2.5 text-center">
-                              <p className="text-[9px] font-bold uppercase text-emerald-700 dark:text-emerald-300">
+                            <div className="rounded-xl border border-emerald-200/70 bg-emerald-50/70 p-2.5 text-center">
+                              <p className="text-[9px] font-bold uppercase text-emerald-700">
                                 School
                               </p>
-                              <p className="text-xs sm:text-sm font-black text-slate-900 dark:text-white mt-0.5 tabular-nums">
+                              <p className="text-xs sm:text-sm font-black text-slate-900 mt-0.5 tabular-nums">
                                 {formatMoney(cp.school, stats.currency)}
                               </p>
                             </div>
@@ -786,7 +786,7 @@ function AdminRevenueSidePanel() {
 
                   {/* Phase 1 AI Notice */}
                   {selectedPhase === "phase-1" && (
-                    <div className="rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 p-4 text-center bg-slate-50/60 dark:bg-slate-900/40">
+                    <div className="rounded-2xl border border-dashed border-slate-200 p-4 text-center bg-slate-50">
                       <p className="text-xs text-slate-500 font-medium flex items-center justify-center gap-1.5">
                         <Sparkle size={15} weight="duotone" className="text-purple-500 shrink-0" />
                         Artificial Intelligence program was launched in Phase 2
