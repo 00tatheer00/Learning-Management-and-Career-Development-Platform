@@ -331,13 +331,6 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
               <p className="text-[11px] font-medium text-pt-secondary">Active Students</p>
             </div>
           </div>
-
-          <div className="mt-3 flex items-center justify-between text-xs font-medium text-pt-muted">
-            <span>Estimated Revenue</span>
-            <span className="font-semibold text-emerald-700 dark:text-emerald-400 tabular-nums">
-              PKR {(data.phaseBreakdown?.phase1.estimatedRevenue ?? 0).toLocaleString()}
-            </span>
-          </div>
         </div>
 
         {/* Phase 2 Card */}
@@ -390,13 +383,6 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
               <p className="text-[11px] font-medium text-pt-secondary">Active Students</p>
             </div>
           </div>
-
-          <div className="mt-3 flex items-center justify-between text-xs font-medium text-pt-muted">
-            <span>Estimated Revenue</span>
-            <span className="font-semibold text-emerald-700 dark:text-emerald-400 tabular-nums">
-              PKR {(data.phaseBreakdown?.phase2.estimatedRevenue ?? 0).toLocaleString()}
-            </span>
-          </div>
         </div>
 
         {/* Phase 3 Card */}
@@ -448,13 +434,6 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
               </p>
               <p className="text-[11px] font-medium text-pt-secondary">Active Students</p>
             </div>
-          </div>
-
-          <div className="mt-3 flex items-center justify-between text-xs font-medium text-pt-muted">
-            <span>Estimated Revenue</span>
-            <span className="font-semibold text-emerald-700 dark:text-emerald-400 tabular-nums">
-              PKR {(data.phaseBreakdown?.phase3?.estimatedRevenue ?? 0).toLocaleString()}
-            </span>
           </div>
         </div>
       </div>
