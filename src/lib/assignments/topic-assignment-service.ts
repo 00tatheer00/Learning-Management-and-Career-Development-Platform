@@ -192,10 +192,6 @@ export async function autoAssignTopicsForWebDevStudents(): Promise<{
   let existingCount = 0;
 
   for (const student of students) {
-    // Only Module 1 students ("HTML & CSS" or null/empty which defaults to Module 1)
-    const isMod1 = !student.level || student.level.trim() === "HTML & CSS" || student.level.includes("Module 1");
-    if (!isMod1) continue;
-
     const existing = await prisma.studentTopicAssignment.findFirst({
       where: {
         studentId: student.id,
@@ -238,6 +234,7 @@ export interface StudentAutomatedAssignmentView {
     status: string;
     submittedAt: string;
     feedback?: string | null;
+    marks?: number | null;
     reviewedAt?: string | null;
   } | null;
 }
@@ -289,9 +286,6 @@ export async function getAllWebDevModule1Assignments(): Promise<StudentAutomated
   const results: StudentAutomatedAssignmentView[] = [];
 
   for (const student of students) {
-    const isMod1 = !student.level || student.level.trim() === "HTML & CSS" || student.level.includes("Module 1");
-    if (!isMod1) continue;
-
     let topicRecord = topicMap.get(student.id);
 
     // If student has no topic yet, assign on-the-fly
@@ -339,6 +333,7 @@ export async function getAllWebDevModule1Assignments(): Promise<StudentAutomated
             status: sub.status,
             submittedAt: sub.submittedAt.toISOString(),
             feedback: sub.feedback,
+            marks: sub.marks ?? null,
             reviewedAt: sub.reviewedAt ? sub.reviewedAt.toISOString() : null,
           }
         : null,

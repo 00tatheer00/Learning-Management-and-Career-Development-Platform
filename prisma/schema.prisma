@@ -157,6 +157,7 @@ model AssignmentSubmission {
   status         SubmissionStatus @default(submitted)
   submittedAt    DateTime         @default(now())
   feedback       String?
+  marks          Int?
   reviewedAt     DateTime?
 
   assignment Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)

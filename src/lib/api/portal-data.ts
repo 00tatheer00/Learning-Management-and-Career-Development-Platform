@@ -341,6 +341,7 @@ export async function updateSubmission(
       data: {
         status: updates.status,
         feedback: updates.feedback,
+        marks: updates.marks !== undefined ? updates.marks : undefined,
         liveWebsiteUrl: updates.liveWebsiteUrl,
         githubUrl: updates.githubUrl,
         portfolioUrl: updates.portfolioUrl,
@@ -547,6 +548,7 @@ function mapSubmission(submission: {
   status: "submitted" | "approved" | "needs_revision";
   submittedAt: Date;
   feedback: string | null;
+  marks?: number | null;
   reviewedAt: Date | null;
 }): AssignmentSubmission {
   return {
@@ -563,6 +565,7 @@ function mapSubmission(submission: {
     status: submission.status,
     submittedAt: submission.submittedAt.toISOString(),
     feedback: submission.feedback ?? undefined,
+    marks: submission.marks ?? undefined,
     reviewedAt: submission.reviewedAt?.toISOString(),
   };
 }

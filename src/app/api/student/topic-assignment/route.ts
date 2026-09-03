@@ -22,15 +22,16 @@ export async function GET() {
   }
 
   const programSlug = user.programSlug ?? "web-development";
-  const isWebDev = programSlug === "web-development";
-  const isMod1 = !user.level || user.level.trim() === "HTML & CSS" || user.level.includes("Module 1");
+  const isWebDev =
+    programSlug === "web-development" ||
+    (user.programSlugs?.includes("web-development") ?? false);
 
-  if (!isWebDev || !isMod1) {
+  if (!isWebDev) {
     return NextResponse.json(
       createApiResponse(true, {
         data: {
           eligible: false,
-          message: "Automated website topic assignment is for Web Development Module 1 (HTML & CSS).",
+          message: "Automated website topic assignment is for Web Development students.",
         },
       })
     );
@@ -89,6 +90,7 @@ export async function GET() {
               status: submission.status,
               submittedAt: submission.submittedAt.toISOString(),
               feedback: submission.feedback,
+              marks: submission.marks ?? null,
               reviewedAt: submission.reviewedAt ? submission.reviewedAt.toISOString() : null,
             }
           : null,

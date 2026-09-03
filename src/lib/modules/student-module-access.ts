@@ -9,6 +9,73 @@ export function getProgramModuleNames(programSlug: string): string[] {
   return getProgramBySlug(programSlug)?.modules.map((mod) => mod.name) ?? [];
 }
 
+export function resolveCanonicalModule(programSlug: string, raw?: string | null): string {
+  if (!raw || !raw.trim() || raw.trim().toLowerCase() === "all") {
+    return getFirstModuleName(programSlug) || "HTML & CSS";
+  }
+  const clean = raw.trim().toLowerCase().replace(/&amp;/g, "&").replace(/[^a-z0-9]/g, "");
+  const programModules = getProgramModuleNames(programSlug);
+  if (programModules.length === 0) return raw.trim();
+
+  // 1. Exact match on sanitized alphanumeric
+  for (const mod of programModules) {
+    const modClean = mod.toLowerCase().replace(/&amp;/g, "&").replace(/[^a-z0-9]/g, "");
+    if (modClean === clean) return mod;
+  }
+
+  // 2. Module index / prefix match (e.g. "1st module", "module1", "mod1", "phase1", "level1")
+  for (let i = 0; i < programModules.length; i++) {
+    const mod = programModules[i];
+    const modClean = mod.toLowerCase().replace(/&amp;/g, "&").replace(/[^a-z0-9]/g, "");
+    const idx = i + 1;
+    if (
+      clean === `module${idx}` ||
+      clean === `mod${idx}` ||
+      clean === `phase${idx}` ||
+      clean === `level${idx}` ||
+      clean === `${idx}stmodule` ||
+      clean === `${idx}ndmodule` ||
+      clean === `${idx}rdmodule` ||
+      clean === `${idx}thmodule` ||
+      clean.startsWith(`module${idx}`) ||
+      clean.startsWith(`mod${idx}`) ||
+      clean.startsWith(`phase${idx}`)
+    ) {
+      return mod;
+    }
+    if (clean.includes(modClean) || modClean.includes(clean)) {
+      return mod;
+    }
+  }
+
+  // 3. Keyword-based matching
+  if (clean.includes("html") || clean.includes("css") || clean.includes("beginner") || clean.includes("first")) {
+    const found = programModules.find((m) => m.toLowerCase().includes("html"));
+    if (found) return found;
+  }
+  if (clean.includes("js") || clean.includes("javascript") || clean.includes("second")) {
+    const found = programModules.find((m) => m.toLowerCase().includes("javascript"));
+    if (found) return found;
+  }
+  if (clean.includes("react") || clean.includes("third") || clean.includes("frontend")) {
+    const found = programModules.find((m) => m.toLowerCase().includes("react"));
+    if (found) return found;
+  }
+  if (
+    clean.includes("backend") ||
+    clean.includes("database") ||
+    clean.includes("node") ||
+    clean.includes("mongo") ||
+    clean.includes("fourth") ||
+    clean.includes("last")
+  ) {
+    const found = programModules.find((m) => m.toLowerCase().includes("backend"));
+    if (found) return found;
+  }
+
+  return raw.trim();
+}
+
 export function resolveActiveStudentModule(
   programSlug: string,
   userLevel: string | null | undefined,

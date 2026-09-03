@@ -28,6 +28,7 @@ export function AutomatedAssignmentsManager() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [reviewingId, setReviewingId] = useState<string | null>(null);
   const [feedbackMap, setFeedbackMap] = useState<Record<string, string>>({});
+  const [marksMap, setMarksMap] = useState<Record<string, string>>({});
 
   const loadData = async () => {
     try {
@@ -75,6 +76,17 @@ export function AutomatedAssignmentsManager() {
     submissionId: string,
     status: "approved" | "needs_revision"
   ) => {
+    const rawMarks = marksMap[submissionId]?.trim();
+    let marksNum: number | undefined = undefined;
+    if (rawMarks !== undefined && rawMarks !== "") {
+      const parsed = Number(rawMarks);
+      if (isNaN(parsed) || parsed < 0 || parsed > 100) {
+        toast.warning("Please enter valid marks between 0 and 100");
+        return;
+      }
+      marksNum = parsed;
+    }
+
     setReviewingId(submissionId);
     try {
       const res = await fetch("/api/trainer/submissions", {
@@ -84,6 +96,7 @@ export function AutomatedAssignmentsManager() {
           id: submissionId,
           status,
           feedback: feedbackMap[submissionId] || undefined,
+          marks: marksNum,
         }),
       });
       const json = await res.json();
@@ -265,6 +278,13 @@ export function AutomatedAssignmentsManager() {
                       <span>{item.assignedTopic}</span>
                     </span>
 
+                    {sub?.marks != null && (
+                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-extrabold bg-primary/20 text-primary border border-primary/30">
+                        <Sparkle size={13} weight="fill" />
+                        {sub.marks} / 100
+                      </span>
+                    )}
+
                     {sub ? (
                       isSubApproved ? (
                         <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
@@ -360,6 +380,25 @@ export function AutomatedAssignmentsManager() {
                         }
                         disabled={isReviewingThis}
                       />
+
+                      {/* Marks out of 100 input */}
+                      <div className="relative flex items-center shrink-0">
+                        <Input
+                          type="number"
+                          min={0}
+                          max={100}
+                          placeholder="Marks"
+                          className="text-xs h-10 w-24 rounded-xl font-bold text-center pr-8 border-primary/40 focus:border-primary"
+                          value={marksMap[sub.id] ?? (sub.marks != null ? String(sub.marks) : "")}
+                          onChange={(e) =>
+                            setMarksMap({ ...marksMap, [sub.id]: e.target.value })
+                          }
+                          disabled={isReviewingThis}
+                        />
+                        <span className="absolute right-2 text-[11px] font-bold text-muted-foreground pointer-events-none">
+                          /100
+                        </span>
+                      </div>
 
                       <div className="flex items-center gap-2">
                         <Button

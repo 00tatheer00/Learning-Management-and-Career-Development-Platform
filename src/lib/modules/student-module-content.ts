@@ -2,6 +2,7 @@ import { isDemoPortalStudent } from "@/lib/constants/demo-student";
 import {
   getFirstModuleName,
   resolveActiveStudentModule,
+  resolveCanonicalModule,
 } from "@/lib/modules/student-module-access";
 import {
   MODULE_CONTENT_LOCKED_MESSAGE,
@@ -59,20 +60,30 @@ export function canStudentAccessModuleContent(
     return true;
   }
 
-  const contentNormalized = normalizeModuleName(rawContentLevel);
+  const canonicalContent = resolveCanonicalModule(programSlug, rawContentLevel);
+  const contentNormalized = normalizeModuleName(canonicalContent || rawContentLevel);
   if (!contentNormalized) return true;
 
-  const normalizedApprovedList = (options?.approvedLevels ?? [])
+  const canonicalApprovedList = (options?.approvedLevels ?? [])
+    .map((l) => resolveCanonicalModule(programSlug, l))
+    .filter(Boolean);
+
+  const normalizedApprovedList = canonicalApprovedList
     .map(normalizeModuleName)
     .filter(Boolean);
 
   const activeLevelNormalized = studentLevel?.trim()
-    ? normalizeModuleName(studentLevel)
+    ? normalizeModuleName(resolveCanonicalModule(programSlug, studentLevel) || studentLevel)
     : normalizedApprovedList[0] || "";
 
   // If student has approved modules, they have access to all their approved modules
   if (normalizedApprovedList.length > 0) {
-    return normalizedApprovedList.includes(contentNormalized);
+    return (
+      normalizedApprovedList.includes(contentNormalized) ||
+      (options?.approvedLevels ?? []).some(
+        (l) => normalizeModuleName(l) === normalizeModuleName(rawContentLevel)
+      )
+    );
   }
 
   // Fallback: if student has an active module level assigned
@@ -81,7 +92,6 @@ export function canStudentAccessModuleContent(
   }
 
   // No approved levels and no active level — deny access to tagged content.
-  // This prevents data leaks when enrollment data is missing/corrupt.
   return false;
 }
 

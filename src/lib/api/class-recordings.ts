@@ -1,7 +1,13 @@
 import "server-only";
 
 import { prisma } from "@/lib/prisma";
-import { getProgramModuleNames, getFirstModuleName } from "@/lib/modules/student-module-access";
+import {
+  getProgramModuleNames,
+  getFirstModuleName,
+  resolveCanonicalModule,
+} from "@/lib/modules/student-module-access";
+
+export { resolveCanonicalModule };
 
 export interface ClassRecordingRecord {
   id: string;
@@ -43,53 +49,6 @@ function mapRecording(record: {
     createdAt: record.createdAt.toISOString(),
     updatedAt: record.updatedAt.toISOString(),
   };
-}
-
-export function resolveCanonicalModule(programSlug: string, raw?: string | null): string {
-  if (!raw || !raw.trim() || raw.trim().toLowerCase() === "all") {
-    return getFirstModuleName(programSlug) || "HTML & CSS";
-  }
-  const clean = raw.trim().toLowerCase().replace(/&amp;/g, "&").replace(/[^a-z0-9]/g, "");
-  const programModules = getProgramModuleNames(programSlug);
-  if (programModules.length === 0) return raw.trim();
-
-  // Try exact match on sanitized alphanumeric
-  for (const mod of programModules) {
-    const modClean = mod.toLowerCase().replace(/&amp;/g, "&").replace(/[^a-z0-9]/g, "");
-    if (modClean === clean) return mod;
-  }
-
-  // Try module index / prefix match (e.g. "module1", "mod1", "module2", "mod2")
-  for (let i = 0; i < programModules.length; i++) {
-    const mod = programModules[i];
-    const modClean = mod.toLowerCase().replace(/&amp;/g, "&").replace(/[^a-z0-9]/g, "");
-    if (clean === `module${i + 1}` || clean === `mod${i + 1}`) {
-      return mod;
-    }
-    if (clean.includes(modClean) || modClean.includes(clean)) {
-      return mod;
-    }
-  }
-
-  // Keyword-based fallback
-  if (clean.includes("html") || clean.includes("css")) {
-    const found = programModules.find((m) => m.toLowerCase().includes("html"));
-    if (found) return found;
-  }
-  if (clean.includes("js") || clean.includes("javascript")) {
-    const found = programModules.find((m) => m.toLowerCase().includes("javascript"));
-    if (found) return found;
-  }
-  if (clean.includes("react")) {
-    const found = programModules.find((m) => m.toLowerCase().includes("react"));
-    if (found) return found;
-  }
-  if (clean.includes("backend") || clean.includes("node") || clean.includes("mongo")) {
-    const found = programModules.find((m) => m.toLowerCase().includes("backend"));
-    if (found) return found;
-  }
-
-  return raw.trim();
 }
 
 export async function getClassRecordings(

@@ -76,6 +76,7 @@ export interface AssignmentSubmission {
   status: "submitted" | "approved" | "needs_revision";
   submittedAt: string;
   feedback?: string;
+  marks?: number | null;
   reviewedAt?: string;
 }
 

@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import {
   getProgramModuleNames,
   resolveActiveStudentModule,
+  resolveCanonicalModule,
 } from "@/lib/modules/student-module-access";
 import { isDemoPortalStudent } from "@/lib/constants/demo-student";
 import { DEMO_STUDENT_PROGRAM_SLUGS } from "@/lib/student-portal/program-scope";
@@ -19,46 +20,77 @@ export async function getApprovedEnrollmentLevels(
   const normSlug = normalizeProgramSlug(programSlug);
   const normalizedEmail = email.trim().toLowerCase();
 
-  const [enrollmentRows, moduleEnrollmentRows] = await Promise.all([
+  const [enrollmentRows, moduleEnrollmentRows, userRecord] = await Promise.all([
     prisma.enrollment.findMany({
       where: {
         status: "approved",
+        email: { equals: normalizedEmail, mode: "insensitive" },
       },
       select: { program: true, level: true, email: true },
     }),
     prisma.moduleEnrollment.findMany({
       where: {
         status: "active",
+        email: { equals: normalizedEmail, mode: "insensitive" },
       },
       select: { programSlug: true, moduleName: true, email: true },
+    }),
+    prisma.user.findFirst({
+      where: {
+        email: { equals: normalizedEmail, mode: "insensitive" },
+      },
+      select: { programSlug: true, level: true },
     }),
   ]);
 
   const studentEnrollmentRows = enrollmentRows.filter(
-    (row) =>
-      row.email &&
-      row.email.trim().toLowerCase() === normalizedEmail &&
-      normalizeProgramSlug(row.program) === normSlug
+    (row) => normalizeProgramSlug(row.program) === normSlug
   );
 
   const studentModuleRows = moduleEnrollmentRows.filter(
-    (row) =>
-      row.email &&
-      row.email.trim().toLowerCase() === normalizedEmail &&
-      normalizeProgramSlug(row.programSlug) === normSlug
+    (row) => normalizeProgramSlug(row.programSlug) === normSlug
   );
 
   const order = getProgramModuleNames(normSlug);
   const lowerLevels = new Set<string>();
 
   for (const row of studentEnrollmentRows) {
-    if (row.level?.trim()) lowerLevels.add(row.level.trim().toLowerCase());
+    if (row.level?.trim()) {
+      const canonical = resolveCanonicalModule(normSlug, row.level.trim());
+      if (canonical) lowerLevels.add(canonical.trim().toLowerCase());
+      lowerLevels.add(row.level.trim().toLowerCase());
+    }
   }
   for (const row of studentModuleRows) {
-    if (row.moduleName?.trim()) lowerLevels.add(row.moduleName.trim().toLowerCase());
+    if (row.moduleName?.trim()) {
+      const canonical = resolveCanonicalModule(normSlug, row.moduleName.trim());
+      if (canonical) lowerLevels.add(canonical.trim().toLowerCase());
+      lowerLevels.add(row.moduleName.trim().toLowerCase());
+    }
   }
 
-  return order.filter((moduleName) => lowerLevels.has(moduleName.trim().toLowerCase()));
+  if (userRecord && normalizeProgramSlug(userRecord.programSlug ?? "") === normSlug && userRecord.level?.trim()) {
+    const canonical = resolveCanonicalModule(normSlug, userRecord.level.trim());
+    if (canonical) lowerLevels.add(canonical.trim().toLowerCase());
+    lowerLevels.add(userRecord.level.trim().toLowerCase());
+  }
+
+  const matched = order.filter((moduleName) => lowerLevels.has(moduleName.trim().toLowerCase()));
+
+  // Ensure foundational Module 1 is always accessible for any student enrolled in this course
+  if (order.length > 0 && (matched.length > 0 || studentEnrollmentRows.length > 0 || studentModuleRows.length > 0)) {
+    if (!matched.includes(order[0])) {
+      matched.unshift(order[0]);
+    }
+    return matched;
+  }
+
+  // Fallback: if student has an approved enrollment for this program but string didn't match directly, default to first module
+  if (studentEnrollmentRows.length > 0 && order.length > 0) {
+    return [order[0]];
+  }
+
+  return [];
 }
 
 /**

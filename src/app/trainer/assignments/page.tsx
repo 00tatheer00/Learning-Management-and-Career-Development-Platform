@@ -39,6 +39,7 @@ export default function TrainerAssignmentsPage() {
   const [reviewingId, setReviewingId] = useState<string | null>(null);
   const [form, setForm] = useState({ title: "", description: "", dueDate: "", level: "" });
   const [feedbackMap, setFeedbackMap] = useState<Record<string, string>>({});
+  const [marksMap, setMarksMap] = useState<Record<string, string>>({});
   const [selectedModule, setSelectedModule] = useState<string>("all");
 
   const load = useCallback(() => {
@@ -97,12 +98,23 @@ export default function TrainerAssignmentsPage() {
   };
 
   const reviewSubmission = async (id: string, status: "approved" | "needs_revision") => {
+    const rawMarks = marksMap[id]?.trim();
+    let marksNum: number | undefined = undefined;
+    if (rawMarks !== undefined && rawMarks !== "") {
+      const parsed = Number(rawMarks);
+      if (isNaN(parsed) || parsed < 0 || parsed > 100) {
+        toast.warning("Please enter valid marks between 0 and 100");
+        return;
+      }
+      marksNum = parsed;
+    }
+
     setReviewingId(id);
     try {
       const res = await fetch("/api/trainer/submissions", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, status, feedback: feedbackMap[id] ?? "" }),
+        body: JSON.stringify({ id, status, feedback: feedbackMap[id] ?? "", marks: marksNum }),
       });
       const data = await res.json();
       if (data.success) {
@@ -286,7 +298,22 @@ export default function TrainerAssignmentsPage() {
                 onChange={(e) => setFeedbackMap({ ...feedbackMap, [sub.id]: e.target.value })}
                 disabled={reviewingId === sub.id}
               />
-              <div className="flex flex-col sm:flex-row gap-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="relative flex items-center">
+                  <Input
+                    type="number"
+                    min={0}
+                    max={100}
+                    placeholder="Marks"
+                    className="text-xs h-10 w-24 rounded-xl font-bold text-center pr-8 bg-white"
+                    value={marksMap[sub.id] ?? ""}
+                    onChange={(e) => setMarksMap({ ...marksMap, [sub.id]: e.target.value })}
+                    disabled={reviewingId === sub.id}
+                  />
+                  <span className="absolute right-2 text-[11px] font-bold text-muted-foreground pointer-events-none">
+                    /100
+                  </span>
+                </div>
                 <Button
                   onClick={() => reviewSubmission(sub.id, "approved")}
                   className="gap-2"

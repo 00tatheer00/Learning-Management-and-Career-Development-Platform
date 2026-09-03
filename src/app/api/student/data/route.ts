@@ -24,20 +24,30 @@ export async function GET() {
     getSubmissions(user.id),
   ]);
 
-  const assignments = filterByStudentModule(
+  const submittedAssignmentIds = new Set(submissions.map((s) => s.assignmentId));
+  const moduleFilteredAssignments = filterByStudentModule(
     allAssignments,
     context,
     (item) => item.level,
     (item) => item.programSlug
   );
-  const assignmentIds = new Set(assignments.map((item) => item.id));
-  const filteredSubmissions = submissions.filter((item) => assignmentIds.has(item.assignmentId));
+  // Guarantee that any assignment the student has already submitted to is visible along with module assignments
+  const visibleAssignmentMap = new Map<string, typeof allAssignments[0]>();
+  for (const a of moduleFilteredAssignments) {
+    visibleAssignmentMap.set(a.id, a);
+  }
+  for (const a of allAssignments) {
+    if (submittedAssignmentIds.has(a.id)) {
+      visibleAssignmentMap.set(a.id, a);
+    }
+  }
+  const assignments = Array.from(visibleAssignmentMap.values());
 
   return NextResponse.json(
     createApiResponse(true, {
       data: {
         assignments,
-        submissions: filteredSubmissions,
+        submissions,
         programSlug: user.programSlug,
         level: user.level,
       },

@@ -11,6 +11,11 @@ const schema = z.object({
   id: z.string(),
   status: z.enum(["approved", "needs_revision"]),
   feedback: z.string().optional(),
+  marks: z
+    .union([z.number(), z.string().regex(/^\d+$/).transform(Number)])
+    .refine((v) => v >= 0 && v <= 100, { message: "Marks must be between 0 and 100" })
+    .optional()
+    .nullable(),
 });
 
 export async function PATCH(request: Request) {
@@ -26,7 +31,7 @@ export async function PATCH(request: Request) {
     const programSlug = isAdmin ? undefined : requireTrainerProgram(user);
     const parsed = schema.safeParse(await request.json());
     if (!parsed.success) {
-      return NextResponse.json(createApiResponse(false, { message: "Invalid data" }), {
+      return NextResponse.json(createApiResponse(false, { message: parsed.error.issues[0]?.message || "Invalid data" }), {
         status: 400,
       });
     }
@@ -51,6 +56,7 @@ export async function PATCH(request: Request) {
     const submission = await updateSubmission(parsed.data.id, {
       status: parsed.data.status,
       feedback: parsed.data.feedback,
+      marks: parsed.data.marks !== undefined ? parsed.data.marks : undefined,
     });
 
     if (!submission) {

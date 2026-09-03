@@ -42,6 +42,7 @@ interface Submission {
   notes?: string;
   status: string;
   feedback?: string;
+  marks?: number | null;
   submittedAt?: string;
 }
 
@@ -174,15 +175,7 @@ export default function StudentAssignmentsPage() {
     if (!automatedData?.assignment?.id) return;
 
     if (!autoForm.liveWebsiteUrl.trim()) {
-      toast.warning("Please enter your Live Website URL");
-      return;
-    }
-    if (!autoForm.githubUrl.trim()) {
-      toast.warning("Please enter your GitHub Repository URL");
-      return;
-    }
-    if (!autoForm.portfolioUrl.trim()) {
-      toast.warning("Please enter your Personal Portfolio Website URL");
+      toast.warning("Please enter your Deployed Live Website URL");
       return;
     }
 
@@ -203,11 +196,11 @@ export default function StudentAssignmentsPage() {
 
       const data = await res.json();
       if (data.success) {
-        toast.success("Assignment Submitted Successfully!", "Your trainer will review your website and portfolio.");
+        toast.success("Assignment Submitted Successfully!", "Your trainer will review and grade your deployed project.");
         setIsEditingAutomated(false);
         await loadStudentData();
       } else {
-        toast.error(data.message || data.error || "Submission failed. Please check your URLs.");
+        toast.error(data.message || data.error || "Submission failed. Please check your URL.");
       }
     } catch {
       toast.error("Submission failed due to a network error.");
@@ -284,8 +277,14 @@ export default function StudentAssignmentsPage() {
               </div>
             </div>
 
-            {/* Submission Status Badge */}
-            <div>
+            {/* Submission Status & Marks Badge */}
+            <div className="flex items-center gap-2.5 flex-wrap sm:justify-end">
+              {automatedSubmission?.marks != null && (
+                <span className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-extrabold bg-primary/15 text-primary border border-primary/30 shadow-sm">
+                  <Sparkle size={16} weight="fill" />
+                  Marks: {automatedSubmission.marks} / 100
+                </span>
+              )}
               {automatedSubmission ? (
                 automatedSubmission.status === "approved" ? (
                   <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
@@ -358,16 +357,15 @@ export default function StudentAssignmentsPage() {
             </div>
           </div>
 
-          {/* Mandatory Personal Portfolio Callout */}
-          <div className="rounded-2xl border-2 border-dashed border-primary/40 bg-primary/5 p-4 sm:p-5 flex items-start gap-3">
+          {/* Submission Guidelines Note */}
+          <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4 sm:p-5 flex items-start gap-3">
             <div className="h-10 w-10 shrink-0 rounded-xl bg-primary/20 text-primary flex items-center justify-center font-bold">
-              💼
+              🚀
             </div>
             <div className="space-y-1 text-sm">
-              <h4 className="font-bold text-foreground">Mandatory Requirement: Personal Portfolio Website</h4>
+              <h4 className="font-bold text-foreground">Project Submission Guidelines</h4>
               <p className="text-muted-foreground text-xs sm:text-sm">
-                Along with your assigned project website, you must also have a live <strong>Personal Developer Portfolio</strong>{" "}
-                showcasing your skills, intro, projects, and this assignment. You will submit both links below.
+                Deploy your assigned project website on <strong>Vercel</strong>, <strong>Netlify</strong>, or <strong>GitHub Pages</strong>. Simply submit your live deployed URL below. Your trainer will evaluate your project and assign marks out of <strong>100</strong>.
               </p>
             </div>
           </div>
@@ -460,14 +458,24 @@ export default function StudentAssignmentsPage() {
                 </div>
               )}
 
-              {/* Trainer Feedback Box */}
-              {automatedSubmission.feedback && (
-                <div className="rounded-xl bg-primary/10 border border-primary/20 p-4 space-y-1">
-                  <div className="flex items-center gap-2 text-primary font-bold text-sm">
-                    <ChatCircleText size={18} weight="duotone" />
-                    Trainer Feedback:
+              {/* Trainer Evaluation & Feedback Box */}
+              {(automatedSubmission.feedback || automatedSubmission.marks != null) && (
+                <div className="rounded-xl bg-primary/10 border border-primary/20 p-4 space-y-2">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <div className="flex items-center gap-2 text-primary font-bold text-sm">
+                      <ChatCircleText size={18} weight="duotone" />
+                      Trainer Evaluation & Feedback:
+                    </div>
+                    {automatedSubmission.marks != null && (
+                      <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-xl text-xs font-extrabold bg-primary text-primary-foreground shadow-sm">
+                        <Sparkle size={14} weight="fill" />
+                        Score: {automatedSubmission.marks} / 100
+                      </span>
+                    )}
                   </div>
-                  <p className="text-sm text-foreground leading-relaxed">{automatedSubmission.feedback}</p>
+                  {automatedSubmission.feedback && (
+                    <p className="text-sm text-foreground leading-relaxed">{automatedSubmission.feedback}</p>
+                  )}
                 </div>
               )}
             </div>
@@ -480,65 +488,65 @@ export default function StudentAssignmentsPage() {
                   {isEditingAutomated ? "Edit Assignment Submission" : "Submit Your Assignment"}
                 </h3>
                 <p className="text-xs text-muted-foreground">
-                  Provide your deployed website, GitHub code repository, and personal portfolio links.
+                  Paste your live deployed website link below. Your trainer will test the live project and grade it out of 100 marks.
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="space-y-4">
                 <div>
                   <Label className="text-xs font-bold flex items-center gap-1.5 mb-1.5">
                     <Globe size={16} className="text-primary" />
-                    1. Live Website URL *
+                    Deployed Live Website Link *
                   </Label>
                   <Input
-                    placeholder="https://your-site.vercel.app"
+                    placeholder="https://your-project.vercel.app (or Netlify / GitHub Pages)"
                     value={autoForm.liveWebsiteUrl}
                     onChange={(e) => setAutoForm({ ...autoForm, liveWebsiteUrl: e.target.value })}
                     required
                   />
-                  <p className="text-[11px] text-muted-foreground mt-1">Vercel, Netlify, or GitHub Pages link</p>
+                  <p className="text-[11px] text-muted-foreground mt-1">
+                    Enter your live deployed project link. Only this live link is required for submission.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  <div>
+                    <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5 mb-1.5">
+                      <GithubLogo size={16} />
+                      GitHub Repository URL (Optional)
+                    </Label>
+                    <Input
+                      placeholder="https://github.com/username/repo"
+                      value={autoForm.githubUrl}
+                      onChange={(e) => setAutoForm({ ...autoForm, githubUrl: e.target.value })}
+                    />
+                  </div>
+
+                  <div>
+                    <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5 mb-1.5">
+                      <User size={16} />
+                      Personal Portfolio URL (Optional)
+                    </Label>
+                    <Input
+                      placeholder="https://your-portfolio.com"
+                      value={autoForm.portfolioUrl}
+                      onChange={(e) => setAutoForm({ ...autoForm, portfolioUrl: e.target.value })}
+                    />
+                  </div>
                 </div>
 
                 <div>
                   <Label className="text-xs font-bold flex items-center gap-1.5 mb-1.5">
-                    <GithubLogo size={16} className="text-primary" />
-                    2. GitHub Repository URL *
+                    <ChatCircleText size={16} className="text-primary" />
+                    Student Notes / Remarks (Optional)
                   </Label>
-                  <Input
-                    placeholder="https://github.com/username/repo"
-                    value={autoForm.githubUrl}
-                    onChange={(e) => setAutoForm({ ...autoForm, githubUrl: e.target.value })}
-                    required
+                  <textarea
+                    className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 min-h-[70px]"
+                    placeholder="Mention any custom features, animations, or notes for the trainer..."
+                    value={autoForm.notes}
+                    onChange={(e) => setAutoForm({ ...autoForm, notes: e.target.value })}
                   />
-                  <p className="text-[11px] text-muted-foreground mt-1">Public repository with clean code</p>
                 </div>
-
-                <div>
-                  <Label className="text-xs font-bold flex items-center gap-1.5 mb-1.5">
-                    <User size={16} className="text-primary" />
-                    3. Personal Portfolio URL *
-                  </Label>
-                  <Input
-                    placeholder="https://your-portfolio.com"
-                    value={autoForm.portfolioUrl}
-                    onChange={(e) => setAutoForm({ ...autoForm, portfolioUrl: e.target.value })}
-                    required
-                  />
-                  <p className="text-[11px] text-muted-foreground mt-1">Your live developer portfolio</p>
-                </div>
-              </div>
-
-              <div>
-                <Label className="text-xs font-bold flex items-center gap-1.5 mb-1.5">
-                  <ChatCircleText size={16} className="text-primary" />
-                  4. Optional Remarks / Student Notes
-                </Label>
-                <textarea
-                  className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 min-h-[70px]"
-                  placeholder="Mention any custom features, animations, or notes for the trainer..."
-                  value={autoForm.notes}
-                  onChange={(e) => setAutoForm({ ...autoForm, notes: e.target.value })}
-                />
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3 pt-2">
@@ -605,7 +613,14 @@ export default function StudentAssignmentsPage() {
 
                   {submission ? (
                     <div className="rounded-xl bg-pt-muted border border-pt-subtle p-4 space-y-2">
-                      <p className="text-sm font-semibold text-pt">Your submission:</p>
+                      <div className="flex items-center justify-between flex-wrap gap-2">
+                        <p className="text-sm font-semibold text-pt">Your submission:</p>
+                        {submission.marks != null && (
+                          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-extrabold bg-primary/20 text-primary border border-primary/30">
+                            Marks: {submission.marks} / 100
+                          </span>
+                        )}
+                      </div>
                       <p className="text-sm text-pt-secondary whitespace-pre-wrap">{submission.content}</p>
                       {submission.feedback && (
                         <p className="text-sm text-primary mt-2">
