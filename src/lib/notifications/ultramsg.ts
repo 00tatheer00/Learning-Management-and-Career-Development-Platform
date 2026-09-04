@@ -114,60 +114,11 @@ export async function sendUltraMsgChatMessage(params: {
   to: string;
   body: string;
 }): Promise<{ success: boolean; messageId?: string; error?: string }> {
-  const config = getUltraMsgConfig();
-
-  if (!config.isConfigured) {
-    return {
-      success: false,
-      error: "UltraMsg is not configured (missing ULTRAMSG_INSTANCE_ID or ULTRAMSG_TOKEN)",
-    };
-  }
-
-  const cleanPhone = sanitizeWhatsAppPhone(params.to);
-  if (!cleanPhone) {
-    return {
-      success: false,
-      error: `Invalid phone number format: ${params.to}`,
-    };
-  }
-
-  try {
-    const url = `https://api.ultramsg.com/${config.instanceId}/messages/chat`;
-    const formData = new URLSearchParams();
-    formData.append("token", config.token);
-    formData.append("to", cleanPhone);
-    formData.append("body", params.body);
-    formData.append("priority", "10");
-
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: formData.toString(),
-    });
-
-    const data = await response.json();
-
-    if (data && (data.sent === "true" || data.sent === true || data.id)) {
-      return {
-        success: true,
-        messageId: String(data.id ?? ""),
-      };
-    }
-
-    const errorDetail = data?.message || data?.error || JSON.stringify(data);
-    return {
-      success: false,
-      error: `UltraMsg error: ${errorDetail}`,
-    };
-  } catch (err) {
-    const errorMsg = err instanceof Error ? err.message : "UltraMsg request failed";
-    return {
-      success: false,
-      error: errorMsg,
-    };
-  }
+  // Automated WhatsApp network dispatch has been disabled in favor of manual staff template sending.
+  return {
+    success: false,
+    error: "Automated WhatsApp sending has been disabled. Please use manual staff templates.",
+  };
 }
 
 /**

@@ -24,6 +24,7 @@ import { PORTAL_VIEWPORT_PANEL } from "@/lib/constants/portal-layout";
 import { toast } from "@/lib/ui/toast";
 import { useAdminPermissions } from "@/components/admin/admin-permissions";
 import { OpenStudentProfileButton, AdminStudentProfileButton } from "@/components/admin/admin-student-profile-drawer";
+import { WhatsAppTemplatePill } from "@/components/admin/whatsapp-template-pill";
 import type { AdminCredentialRow } from "@/lib/api/admin-credentials";
 import { revealEnrollmentPassword } from "@/lib/api/admin-client";
 
@@ -653,7 +654,21 @@ export function AdminCredentialsPanel() {
                 )}
               </div>
               <p className="text-xs text-muted">{row.course} · {row.module}</p>
-              <p className="text-xs font-mono truncate">{row.email}</p>
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-xs font-mono truncate">{row.email}</p>
+                {row.whatsapp && row.whatsapp !== "—" && (
+                  <WhatsAppTemplatePill
+                    studentName={row.name}
+                    phone={row.whatsapp}
+                    email={row.email}
+                    courseTitle={row.course}
+                    moduleName={row.module}
+                    status="approved"
+                    portalUrl={row.loginUrl}
+                    size="xs"
+                  />
+                )}
+              </div>
               <p className="text-xs text-muted">
                 Login: {row.hasLoggedIn ? "Done" : "Pending"}
                 {row.hasStoredPassword ? " · Password saved" : " · No password"}
@@ -732,17 +747,29 @@ export function AdminCredentialsPanel() {
                         </div>
                       </td>
                       <td className="px-3 py-2.5">
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1.5">
                           <span className="text-xs">{row.whatsapp}</span>
                           {row.whatsapp !== "—" && (
-                            <button
-                              type="button"
-                              title="Copy WhatsApp"
-                              onClick={() => void copyText("WhatsApp", row.whatsapp)}
-                              className="rounded p-1 hover:bg-surface shrink-0 text-muted"
-                            >
-                              <Copy size={12} />
-                            </button>
+                            <>
+                              <WhatsAppTemplatePill
+                                studentName={row.name}
+                                phone={row.whatsapp}
+                                email={row.email}
+                                courseTitle={row.course}
+                                moduleName={row.module}
+                                status="approved"
+                                portalUrl={row.loginUrl}
+                                size="xs"
+                              />
+                              <button
+                                type="button"
+                                title="Copy WhatsApp"
+                                onClick={() => void copyText("WhatsApp", row.whatsapp)}
+                                className="rounded p-1 hover:bg-surface shrink-0 text-muted"
+                              >
+                                <Copy size={12} />
+                              </button>
+                            </>
                           )}
                         </div>
                       </td>

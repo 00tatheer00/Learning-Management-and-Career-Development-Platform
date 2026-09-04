@@ -30,6 +30,7 @@ import { playPortalSound, primePortalSounds } from "@/lib/ui/portal-sounds";
 import { Alert } from "@/components/ui/alert";
 import { useAdminPermissions } from "@/components/admin/admin-permissions";
 import { OpenStudentProfileButton, AdminStudentProfileButton } from "@/components/admin/admin-student-profile-drawer";
+import { WhatsAppTemplatePill } from "@/components/admin/whatsapp-template-pill";
 import {
   getRegistrationPhase,
   getPhaseInfo,
@@ -88,7 +89,7 @@ export function AdminEnrollmentsPanel() {
     whatsappSent?: boolean;
     whatsappError?: string;
   } | null>(null);
-  const [resendLoading, setResendLoading] = useState<"email" | "whatsapp" | null>(null);
+  const [resendLoading, setResendLoading] = useState<"email" | null>(null);
   const [zoomScreenshot, setZoomScreenshot] = useState<{ url: string; caption: string } | null>(
     null
   );
@@ -697,22 +698,34 @@ export function AdminEnrollmentsPanel() {
                             <p className="text-[10px] font-bold uppercase tracking-wider text-muted">Phone</p>
                             <p className="font-mono text-sm font-semibold">{enrollment.whatsapp}</p>
                           </div>
-                          <button
-                            type="button"
-                            onClick={async () => {
-                              try {
-                                await navigator.clipboard.writeText(enrollment.whatsapp);
-                                toast.success("Phone copied");
-                              } catch {
-                                toast.error("Could not copy phone");
-                              }
-                            }}
-                            className="inline-flex items-center gap-1 rounded-lg bg-surface hover:bg-border/60 border border-border px-2 py-1 text-xs font-bold text-foreground transition-all shadow-2xs"
-                            title="Copy phone number"
-                          >
-                            <Copy size={13} />
-                            Copy
-                          </button>
+                          <div className="flex items-center gap-1.5">
+                            <WhatsAppTemplatePill
+                              studentName={enrollment.fullName}
+                              phone={enrollment.whatsapp}
+                              email={enrollment.email}
+                              courseTitle={enrollment.courseTitle}
+                              moduleName={enrollment.level}
+                              status={enrollment.status}
+                              adminNotes={enrollment.adminNotes}
+                              size="xs"
+                            />
+                            <button
+                              type="button"
+                              onClick={async () => {
+                                try {
+                                  await navigator.clipboard.writeText(enrollment.whatsapp);
+                                  toast.success("Phone copied");
+                                } catch {
+                                  toast.error("Could not copy phone");
+                                }
+                              }}
+                              className="inline-flex items-center gap-1 rounded-lg bg-surface hover:bg-border/60 border border-border px-2 py-1 text-xs font-bold text-foreground transition-all shadow-2xs"
+                              title="Copy phone number"
+                            >
+                              <Copy size={13} />
+                              Copy
+                            </button>
+                          </div>
                         </div>
                         <Field label="CNIC" value={enrollment.cnic} mono />
                         <Field label="Institution" value={enrollment.institution} />
@@ -871,39 +884,18 @@ export function AdminEnrollmentsPanel() {
                           Re-Approve &amp; Restore Account
                         </Button>
                       )}
-                      {enrollment.status === "approved" && enrollment.whatsapp && (
-                        <Button
+                      {enrollment.whatsapp && (
+                        <WhatsAppTemplatePill
+                          studentName={enrollment.fullName}
+                          phone={enrollment.whatsapp}
+                          email={enrollment.email}
+                          courseTitle={enrollment.courseTitle}
+                          moduleName={enrollment.level}
+                          status={enrollment.status}
+                          adminNotes={enrollment.adminNotes}
+                          variant="button"
                           size="lg"
-                          variant="secondary"
-                          className="gap-2 border-emerald-300 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-800 dark:text-emerald-300 dark:hover:bg-emerald-950/40"
-                          disabled={resendLoading !== null || loadingId === enrollment.id || bulkLoading}
-                          onClick={async () => {
-                            setResendLoading("whatsapp");
-                            try {
-                              const res = await fetch("/api/admin/enrollments/resend-whatsapp", {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({ enrollmentId: enrollment.id }),
-                              });
-                              const data = await res.json();
-                              if (data.success) {
-                                toast.success(
-                                  "WhatsApp Sent",
-                                  data.data?.message || `Welcome message delivered to ${enrollment.fullName}`
-                                );
-                              } else {
-                                toast.error("WhatsApp Error", data.error || "Failed to send WhatsApp message");
-                              }
-                            } catch {
-                              toast.error("WhatsApp Error", "Network or server error.");
-                            } finally {
-                              setResendLoading(null);
-                            }
-                          }}
-                        >
-                          <WhatsappLogo size={20} weight="fill" className="text-emerald-600" />
-                          {resendLoading === "whatsapp" ? "Sending WhatsApp..." : "Resend WhatsApp Notice"}
-                        </Button>
+                        />
                       )}
                       <Button
                         size="lg"
@@ -952,7 +944,7 @@ export function AdminEnrollmentsPanel() {
         <p className="text-sm text-muted">
           Approve <strong>{pendingSelectedCount}</strong> pending registration
           {pendingSelectedCount === 1 ? "" : "s"}? Each student gets a portal account, password
-          saved under Portal Logins, login credentials by email, and an info message on WhatsApp.
+          saved under Portal Logins, and login credentials emailed to each student. You can also copy or send WhatsApp templates manually.
         </p>
         <p className="mt-3 text-sm rounded-xl portal-callout-amber px-3 py-2">
           Review payment screenshots first — especially returning students with a 2nd application.
@@ -984,8 +976,7 @@ export function AdminEnrollmentsPanel() {
           <>
             <p className="text-sm text-muted">
               Approve <strong>{pendingAction.name}</strong> and create their student account?
-              Login credentials will be emailed to their registered address, and a WhatsApp info
-              message will tell them to check email and visit the portal.
+              Login credentials will be emailed to their registered address, and you can copy the WhatsApp approval template from the WhatsApp button.
             </p>
             <div className="mt-6 flex justify-end gap-3">
               <Button variant="secondary" onClick={() => setPendingAction(null)}>
@@ -1000,7 +991,7 @@ export function AdminEnrollmentsPanel() {
           <>
             <p className="text-sm text-muted">
               Reject <strong>{pendingAction?.name}</strong>? The student will be notified on
-              WhatsApp with your reason.
+              rejection template ready to copy or send via WhatsApp with your reason.
             </p>
             <label className="mt-4 block text-sm font-medium">
               Rejection reason
@@ -1116,23 +1107,30 @@ export function AdminEnrollmentsPanel() {
             </div>
 
             {approvedCredentials.phone && (
-              <div
-                className={cn(
-                  "mt-3 rounded-xl p-4 text-sm",
-                  approvedCredentials.whatsappSent
-                    ? "portal-callout-success"
-                    : "portal-callout-amber-subtle"
-                )}
-              >
-                <p className="font-semibold flex items-center gap-2">
-                  <WhatsappLogo size={18} weight="fill" className="text-emerald-600" />
-                  {approvedCredentials.whatsappSent
-                    ? `WhatsApp notification sent to ${approvedCredentials.phone}`
-                    : `WhatsApp notice ready / sent to ${approvedCredentials.phone}`}
-                </p>
-                {!approvedCredentials.whatsappSent && approvedCredentials.whatsappError && (
-                  <p className="mt-1 text-xs opacity-90">{approvedCredentials.whatsappError}</p>
-                )}
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50/60 dark:bg-emerald-950/20 p-3.5">
+                <div className="flex items-center gap-2.5">
+                  <WhatsappLogo size={20} weight="fill" className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+                  <div>
+                    <p className="text-xs font-bold text-emerald-900 dark:text-emerald-200">
+                      WhatsApp Approval Template Ready
+                    </p>
+                    <p className="text-[11px] text-emerald-700/90 dark:text-emerald-300/80">
+                      Formatted for {approvedCredentials.phone} with login password included.
+                    </p>
+                  </div>
+                </div>
+                <WhatsAppTemplatePill
+                  studentName={approvedCredentials.name}
+                  phone={approvedCredentials.phone}
+                  email={approvedCredentials.loginId}
+                  courseTitle={approvedCredentials.courseTitle}
+                  moduleName={approvedCredentials.moduleLevel}
+                  status="approved"
+                  plainPassword={approvedCredentials.password}
+                  portalUrl={approvedCredentials.loginUrl}
+                  variant="button"
+                  size="xs"
+                />
               </div>
             )}
 
@@ -1154,41 +1152,18 @@ export function AdminEnrollmentsPanel() {
             </div>
             <div className="mt-6 flex flex-wrap justify-end gap-3">
               {approvedCredentials.phone && (
-                <Button
-                  variant="secondary"
-                  className="gap-2 border-emerald-300 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-800 dark:text-emerald-300"
-                  disabled={resendLoading !== null}
-                  onClick={async () => {
-                    setResendLoading("whatsapp");
-                    try {
-                      const res = await fetch("/api/admin/enrollments/resend-whatsapp", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                          enrollmentId: approvedCredentials.enrollmentId,
-                        }),
-                      });
-                      const json = await res.json();
-                      if (json.success) {
-                        toast.success(json.data?.message ?? "WhatsApp notification sent.");
-                        setApprovedCredentials((current) =>
-                          current
-                            ? { ...current, whatsappSent: true, whatsappError: undefined }
-                            : current
-                        );
-                      } else {
-                        toast.error(json.error ?? "WhatsApp resend failed");
-                      }
-                    } catch {
-                      toast.error("WhatsApp resend failed");
-                    } finally {
-                      setResendLoading(null);
-                    }
-                  }}
-                >
-                  <WhatsappLogo size={16} weight="fill" className="text-emerald-600" />
-                  {resendLoading === "whatsapp" ? "Sending WhatsApp..." : "Resend WhatsApp"}
-                </Button>
+                <WhatsAppTemplatePill
+                  studentName={approvedCredentials.name}
+                  phone={approvedCredentials.phone}
+                  email={approvedCredentials.loginId}
+                  courseTitle={approvedCredentials.courseTitle}
+                  moduleName={approvedCredentials.moduleLevel}
+                  status="approved"
+                  plainPassword={approvedCredentials.password}
+                  portalUrl={approvedCredentials.loginUrl}
+                  variant="button"
+                  size="sm"
+                />
               )}
               {!approvedCredentials.emailSent && (
                 <Button

@@ -28,6 +28,7 @@ import { formatAppliedDate, cn } from "@/lib/utils";
 import { toast } from "@/lib/ui/toast";
 import { useAdminPermissions } from "@/components/admin/admin-permissions";
 import { OpenStudentProfileButton, AdminStudentProfileButton } from "@/components/admin/admin-student-profile-drawer";
+import { WhatsAppTemplatePill } from "@/components/admin/whatsapp-template-pill";
 import type { AdminStudentRow } from "@/lib/api/admin-students";
 
 interface AdminStudentsTableProps {
@@ -490,7 +491,18 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
                 </OpenStudentProfileButton>
                 <p className="text-xs text-muted mt-0.5">{student.fatherName}</p>
                 <p className="text-sm text-muted mt-2 break-all">{student.email}</p>
-                <p className="text-sm text-muted">{student.whatsapp}</p>
+                <div className="mt-1 flex items-center gap-2">
+                  <p className="text-sm text-muted">{student.whatsapp}</p>
+                  <WhatsAppTemplatePill
+                    studentName={student.name}
+                    phone={student.whatsapp}
+                    email={student.email}
+                    courseTitle={student.course}
+                    moduleName={student.module}
+                    status={student.isActive ? "approved" : "pending"}
+                    size="xs"
+                  />
+                </div>
               </div>
               <span
                 className={`shrink-0 inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${
@@ -607,7 +619,18 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
                   </td>
                   <td className="px-4 py-4">
                     <p>{student.email}</p>
-                    <p className="mt-1 text-muted">{student.whatsapp}</p>
+                    <div className="mt-1 flex items-center gap-2">
+                      <span className="text-muted">{student.whatsapp}</span>
+                      <WhatsAppTemplatePill
+                        studentName={student.name}
+                        phone={student.whatsapp}
+                        email={student.email}
+                        courseTitle={student.course}
+                        moduleName={student.module}
+                        status={student.isActive ? "approved" : "pending"}
+                        size="xs"
+                      />
+                    </div>
                   </td>
                   <td className="px-4 py-4 font-mono text-xs">{student.cnic}</td>
                   <td className="px-4 py-4">
@@ -652,7 +675,16 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
                     </p>
                   </td>
                   <td className="px-4 py-4">
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <WhatsAppTemplatePill
+                        studentName={student.name}
+                        phone={student.whatsapp}
+                        email={student.email}
+                        courseTitle={student.course}
+                        moduleName={student.module}
+                        status={student.isActive ? "approved" : "pending"}
+                        variant="compact"
+                      />
                       <AdminStudentProfileButton target={{ enrollmentId: student.id }} compact />
                       {canWrite && (
                         <>

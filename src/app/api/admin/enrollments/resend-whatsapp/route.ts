@@ -49,28 +49,11 @@ export async function POST(request: Request) {
       );
     }
 
-    const result = await sendApprovalWhatsAppNotification({
-      fullName: enrollment.fullName,
-      whatsapp: enrollment.whatsapp,
-      program: enrollment.program,
-      level: enrollment.level,
-      email: enrollment.email,
-    });
-
-    if (!result.sent) {
-      return NextResponse.json(
-        createApiResponse(false, {
-          error: result.error || "Failed to deliver WhatsApp message via UltraMsg",
-        }),
-        { status: 502 }
-      );
-    }
-
     return NextResponse.json(
-      createApiResponse(true, {
-        message: `WhatsApp notification successfully sent to ${enrollment.fullName} (${enrollment.whatsapp})`,
-        data: { messageId: result.messageId },
-      })
+      createApiResponse(false, {
+        error: "Automated WhatsApp sending has been disabled. Please use the WhatsApp Template Pill to copy or send messages manually.",
+      }),
+      { status: 400 }
     );
   } catch (err) {
     const errorMsg = err instanceof Error ? err.message : "Internal server error";

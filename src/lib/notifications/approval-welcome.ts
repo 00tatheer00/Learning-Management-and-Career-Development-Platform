@@ -1,5 +1,4 @@
 import { enqueueApprovalEmail } from "@/lib/notifications/email-handlers";
-import { sendApprovalWhatsAppNotification } from "@/lib/notifications/ultramsg";
 
 interface EnrollmentNotificationRecord {
   fullName: string;
@@ -15,7 +14,7 @@ export async function sendApprovalWelcomeNotifications(
 ): Promise<{ emailSent: boolean; whatsappSent: boolean; warnings: string[] }> {
   const warnings: string[] = [];
   let emailSent = false;
-  let whatsappSent = false;
+  const whatsappSent = false;
 
   // 1. Dispatch Email (with credentials & portal link)
   try {
@@ -31,26 +30,7 @@ export async function sendApprovalWelcomeNotifications(
     warnings.push(`Email error: ${errorMsg}`);
   }
 
-  // 2. Dispatch Zero-Link WhatsApp Notification via UltraMsg
-  if (enrollment.whatsapp && enrollment.whatsapp.trim()) {
-    try {
-      const waResult = await sendApprovalWhatsAppNotification({
-        fullName: enrollment.fullName,
-        whatsapp: enrollment.whatsapp,
-        program: enrollment.program,
-        level: enrollment.level,
-        email: enrollment.email,
-      });
-
-      whatsappSent = waResult.sent;
-      if (!waResult.sent && waResult.error) {
-        warnings.push(`WhatsApp: ${waResult.error}`);
-      }
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : "WhatsApp dispatch error";
-      warnings.push(`WhatsApp error: ${errorMsg}`);
-    }
-  }
+  // Automated WhatsApp dispatch has been completely removed in favor of manual staff template sending.
 
   return {
     emailSent,

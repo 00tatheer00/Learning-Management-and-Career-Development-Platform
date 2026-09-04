@@ -25,6 +25,7 @@ import {
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { useAdminPermissions } from "@/components/admin/admin-permissions";
+import { WhatsAppTemplatePill } from "@/components/admin/whatsapp-template-pill";
 import type { AdminStudentProfile } from "@/lib/api/admin-student-profile";
 import { paymentScreenshotHref, revealEnrollmentPassword, revealStudentPassword } from "@/lib/api/admin-client";
 import { cn, formatAppliedDateTime } from "@/lib/utils";
@@ -399,7 +400,25 @@ function AdminStudentProfileDrawer() {
                 <SectionTitle icon={<UserCircle size={16} weight="duotone" />} title="Contact" />
                 <div className="mt-2 space-y-2">
                   <CopyRow label="Email" value={profile.email} />
-                  <CopyRow label="Phone" value={profile.whatsapp} />
+                  <CopyRow
+                    label="Phone"
+                    value={profile.whatsapp}
+                    action={
+                      profile.whatsapp && profile.whatsapp !== "—" ? (
+                        <WhatsAppTemplatePill
+                          studentName={profile.name}
+                          phone={profile.whatsapp}
+                          email={profile.email}
+                          courseTitle={profile.course}
+                          moduleName={profile.module}
+                          status={profile.isActive ? "approved" : "pending"}
+                          plainPassword={revealedPassword ?? undefined}
+                          portalUrl={profile.loginUrl}
+                          size="xs"
+                        />
+                      ) : null
+                    }
+                  />
                   {profile.cnic && <CopyRow label="CNIC" value={profile.cnic} mono />}
                   {profile.fatherName && (
                     <InfoRow label="Father" value={profile.fatherName} />
@@ -595,32 +614,50 @@ function AdminStudentProfileDrawer() {
           )}
         </div>
 
-        {profile && canWrite && profile.studentId && (
-          <div className="shrink-0 border-t border-pt px-5 py-4 flex flex-wrap gap-2">
-            <Button
-              size="sm"
-              variant="secondary"
-              className="gap-1.5"
-              disabled={Boolean(actionLoading)}
-              onClick={() => void runStudentAction("resetPassword", "Password reset")}
-            >
-              <ArrowClockwise size={15} />
-              Reset password
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              className="gap-1.5 border-pt"
-              disabled={Boolean(actionLoading)}
-              onClick={() =>
-                void runStudentAction(
-                  profile.isActive ? "deactivate" : "activate",
-                  profile.isActive ? "Deactivation" : "Activation"
-                )
-              }
-            >
-              {profile.isActive ? "Deactivate" : "Activate"}
-            </Button>
+        {profile && (
+          <div className="shrink-0 border-t border-pt px-5 py-4 flex flex-wrap items-center gap-2">
+            {profile.whatsapp && profile.whatsapp !== "—" && (
+              <WhatsAppTemplatePill
+                studentName={profile.name}
+                phone={profile.whatsapp}
+                email={profile.email}
+                courseTitle={profile.course}
+                moduleName={profile.module}
+                status={profile.isActive ? "approved" : "pending"}
+                plainPassword={revealedPassword ?? undefined}
+                portalUrl={profile.loginUrl}
+                variant="button"
+                size="sm"
+              />
+            )}
+            {canWrite && profile.studentId && (
+              <>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="gap-1.5"
+                  disabled={Boolean(actionLoading)}
+                  onClick={() => void runStudentAction("resetPassword", "Password reset")}
+                >
+                  <ArrowClockwise size={15} />
+                  Reset password
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="gap-1.5 border-pt"
+                  disabled={Boolean(actionLoading)}
+                  onClick={() =>
+                    void runStudentAction(
+                      profile.isActive ? "deactivate" : "activate",
+                      profile.isActive ? "Deactivation" : "Activation"
+                    )
+                  }
+                >
+                  {profile.isActive ? "Deactivate" : "Activate"}
+                </Button>
+              </>
+            )}
             <Button size="sm" variant="ghost" asChild className="ml-auto">
               <Link href="/admin/students" onClick={closeProfile}>
                 Open students
@@ -651,7 +688,17 @@ function InfoRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-function CopyRow({ label, value, mono = false }: { label: string; value: string; mono?: boolean }) {
+function CopyRow({
+  label,
+  value,
+  mono = false,
+  action,
+}: {
+  label: string;
+  value: string;
+  mono?: boolean;
+  action?: ReactNode;
+}) {
   return (
     <div className="flex items-start justify-between gap-2">
       <div className="min-w-0">
@@ -660,14 +707,17 @@ function CopyRow({ label, value, mono = false }: { label: string; value: string;
           {value}
         </p>
       </div>
-      <button
-        type="button"
-        onClick={() => void copyText(label, value)}
-        className="shrink-0 rounded-lg p-2 hover:bg-pt-muted text-pt-muted"
-        aria-label={`Copy ${label}`}
-      >
-        <Copy size={15} />
-      </button>
+      <div className="flex items-center gap-1 shrink-0">
+        {action}
+        <button
+          type="button"
+          onClick={() => void copyText(label, value)}
+          className="shrink-0 rounded-lg p-2 hover:bg-pt-muted text-pt-muted"
+          aria-label={`Copy ${label}`}
+        >
+          <Copy size={15} />
+        </button>
+      </div>
     </div>
   );
 }
