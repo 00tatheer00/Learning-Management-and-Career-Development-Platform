@@ -107,7 +107,10 @@ export default async function ProgramDetailPage({ params }: ProgramPageProps) {
                   Each module includes live classes — typically 3 days per week, 1.5 hours per class.
                 </p>
               </div>
-              <ProgramModuleTimeline modules={program.modules} />
+              <ProgramModuleTimeline
+                modules={program.modules}
+                activeModuleName={program.modules[2]?.name}
+              />
             </div>
           ) : null}
 

@@ -6,7 +6,7 @@ import { X, ChevronRight, Zap } from "lucide-react";
 import { REGISTRATION_OPEN } from "@/lib/constants";
 
 const tickerItems = [
-  "🔥 Admissions Open — Digital Marketing with AI Now Enrolling",
+  "🔥 Admissions Open — Module 3 Now Live & Enrolling Across All Courses",
   "⚡ Live Interactive Classes & Weekly Assignments",
   "🚀 Limited Seats Available — Apply Now",
   "💻 Web Development · Flutter App · AI · Digital Marketing",

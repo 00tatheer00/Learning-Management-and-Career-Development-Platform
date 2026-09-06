@@ -84,6 +84,15 @@ export function EnrollmentModulePicker({
                   <span className="rounded-full border border-border bg-secondary px-2.5 py-0.5 text-[11px] font-semibold text-muted">
                     {mod.duration}
                   </span>
+                  {index === 2 ? (
+                    <span className="rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-0.5 text-[10px] font-extrabold text-emerald-700 dark:text-emerald-300 uppercase tracking-wide">
+                      Live Now
+                    </span>
+                  ) : index < 2 ? (
+                    <span className="rounded-full bg-slate-100 dark:bg-slate-800 border border-border/70 px-2.5 py-0.5 text-[10px] font-medium text-muted">
+                      Recordings Available
+                    </span>
+                  ) : null}
                 </div>
 
                 {mod.subtitle && (

@@ -200,8 +200,15 @@ export function CourseModulesSyllabus({
                 />
               </div>
               {isActive && (
-                <span className="mt-3 inline-block rounded-full bg-primary px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary-foreground">
-                  Your current module
+                <span
+                  className={cn(
+                    "mt-3 inline-block rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide",
+                    isStudentCopy
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300"
+                  )}
+                >
+                  {isStudentCopy ? "Your current module" : "Live Now (Module 3)"}
                 </span>
               )}
               {isLocked && (

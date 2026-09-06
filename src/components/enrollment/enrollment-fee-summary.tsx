@@ -27,7 +27,7 @@ export function EnrollmentFeeSummary({
           )}
         </div>
         <span className="px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs font-black">
-          Phase 2 Active
+          Module 3 Live
         </span>
       </div>
 

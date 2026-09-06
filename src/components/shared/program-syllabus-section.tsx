@@ -69,7 +69,7 @@ export function ProgramSyllabusSection({
         </div>
       </div>
 
-      <CourseModulesSyllabus program={program} />
+      <CourseModulesSyllabus program={program} activeModuleName={program.modules[2]?.name} />
 
       {showViewProgramLink && (
         <p className="mt-4 text-sm text-muted">

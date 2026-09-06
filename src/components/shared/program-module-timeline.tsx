@@ -42,8 +42,8 @@ export function ProgramModuleTimeline({
                       Module {index + 1}
                     </p>
                     {isActive && (
-                      <span className="rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary-foreground">
-                        Current
+                      <span className="rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
+                        Live Now
                       </span>
                     )}
                   </div>
