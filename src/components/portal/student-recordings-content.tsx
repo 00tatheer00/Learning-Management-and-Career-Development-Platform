@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import Link from "next/link";
 import {
   CheckCircle,
@@ -18,6 +18,7 @@ import {
   X,
 } from "@phosphor-icons/react";
 import type { ClassRecordingRecord } from "@/lib/api/class-recordings";
+import { resolveCanonicalModule } from "@/lib/modules/student-module-access";
 import { getClassProgress, type ClassSlot } from "@/lib/class-schedule";
 import { getProgramCategory, PREMIUM_HEADER_GRADIENT_FALLBACK } from "@/lib/constants/program-categories";
 import { cn } from "@/lib/utils";
@@ -111,42 +112,91 @@ export function StudentRecordingsContent({
     }
   }, [programSlug]);
 
-  const [selectedModule, setSelectedModule] = useState<string>(studentModule || "all");
+  const [selectedModule, setSelectedModule] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [activeNotesRecording, setActiveNotesRecording] = useState<ClassRecordingRecord | null>(null);
 
-  // Available unique modules
+  const matchesModule = useCallback(
+    (
+      recordingLevel: string | undefined | null,
+      targetModule: string,
+      recProgramSlug?: string
+    ) => {
+      if (!targetModule || targetModule.trim().toLowerCase() === "all") return true;
+      if (!recordingLevel || !recordingLevel.trim()) return true;
+
+      const pSlug = recProgramSlug || programSlug;
+      const recTrim = recordingLevel.trim().toLowerCase();
+      const targetTrim = targetModule.trim().toLowerCase();
+
+      if (recTrim === targetTrim) return true;
+
+      try {
+        const canRec = resolveCanonicalModule(pSlug, recordingLevel).trim().toLowerCase();
+        const canTarget = resolveCanonicalModule(pSlug, targetModule).trim().toLowerCase();
+        if (canRec === canTarget) return true;
+      } catch {}
+
+      const normRec = recTrim.replace(/[^a-z0-9]/g, "");
+      const normTarget = targetTrim.replace(/[^a-z0-9]/g, "");
+      if (normRec && normTarget) {
+        if (normRec === normTarget) return true;
+        if (normRec.includes(normTarget) || normTarget.includes(normRec)) return true;
+      }
+
+      return false;
+    },
+    [programSlug]
+  );
+
+  // Available unique canonical modules
   const availableModules = useMemo(() => {
-    if (safeModules.length > 0) return safeModules;
-    const extracted = Array.from(
-      new Set(
-        safeRecordings
-          .map((r) => r.level)
-          .filter((l): l is string => Boolean(l && typeof l === "string" && l.trim()))
-      )
-    );
-    return extracted;
-  }, [safeModules, safeRecordings]);
+    const canonicalSet = new Set<string>();
+
+    for (const m of safeModules) {
+      if (m && typeof m === "string" && m.trim()) {
+        try {
+          const canon = resolveCanonicalModule(programSlug, m);
+          canonicalSet.add(canon || m.trim());
+        } catch {
+          canonicalSet.add(m.trim());
+        }
+      }
+    }
+
+    for (const r of safeRecordings) {
+      if (r.level && typeof r.level === "string" && r.level.trim()) {
+        try {
+          const canon = resolveCanonicalModule(r.programSlug || programSlug, r.level);
+          canonicalSet.add(canon || r.level.trim());
+        } catch {
+          canonicalSet.add(r.level.trim());
+        }
+      }
+    }
+
+    return Array.from(canonicalSet);
+  }, [safeModules, safeRecordings, programSlug]);
 
   // Filtered recordings
   const filteredRecordings = useMemo(() => {
-    const selMod = (selectedModule || "all").trim().toLowerCase();
     const query = searchQuery.trim().toLowerCase();
 
     return safeRecordings.filter((r) => {
-      const recLevel = (r.level || "").trim().toLowerCase();
-      const matchModule = selMod === "all" || recLevel === selMod;
+      const matchModule = matchesModule(r.level, selectedModule, r.programSlug);
 
       const matchQuery =
         !query ||
         (r.title && r.title.toLowerCase().includes(query)) ||
         (r.classNumber != null && r.classNumber.toString() === query) ||
-        (r.notes && r.notes.toLowerCase().includes(query));
+        (r.notes && r.notes.toLowerCase().includes(query)) ||
+        (r.level && r.level.toLowerCase().includes(query)) ||
+        (r.trainerName && r.trainerName.toLowerCase().includes(query));
 
       return matchModule && matchQuery;
     });
-  }, [safeRecordings, selectedModule, searchQuery]);
+  }, [safeRecordings, selectedModule, searchQuery, matchesModule]);
 
   const recordingByClass = useMemo(() => {
     const map = new Map<number, ClassRecordingRecord>();
@@ -318,14 +368,14 @@ export function StudentRecordingsContent({
           </div>
         </div>
 
-        {/* Module Filter Tabs if multiple enrolled modules */}
-        {availableModules.length > 1 && (
+        {/* Module Filter Tabs */}
+        {availableModules.length > 0 && (
           <div className="flex gap-2 overflow-x-auto pb-1 border-b border-border/60">
             <button
               type="button"
               onClick={() => setSelectedModule("all")}
               className={cn(
-                "rounded-xl border px-3.5 py-1.5 text-xs font-bold transition-all shrink-0 whitespace-nowrap",
+                "rounded-xl border px-3.5 py-1.5 text-xs font-bold transition-all shrink-0 whitespace-nowrap cursor-pointer",
                 (selectedModule || "all").toLowerCase() === "all"
                   ? "border-primary bg-primary text-primary-foreground shadow-sm"
                   : "border-border bg-background text-muted-foreground hover:bg-muted"
@@ -334,17 +384,20 @@ export function StudentRecordingsContent({
               All Modules ({safeRecordings.length})
             </button>
             {availableModules.map((mod) => {
-              const count = safeRecordings.filter(
-                (r) => (r.level ?? "").toLowerCase() === (mod || "").toLowerCase()
+              const count = safeRecordings.filter((r) =>
+                matchesModule(r.level, mod, r.programSlug)
               ).length;
+              const isSelected =
+                (selectedModule || "").toLowerCase() !== "all" &&
+                matchesModule(selectedModule, mod);
               return (
                 <button
                   key={mod}
                   type="button"
                   onClick={() => setSelectedModule(mod)}
                   className={cn(
-                    "rounded-xl border px-3.5 py-1.5 text-xs font-bold transition-all shrink-0 whitespace-nowrap",
-                    (selectedModule || "").toLowerCase() === (mod || "").toLowerCase()
+                    "rounded-xl border px-3.5 py-1.5 text-xs font-bold transition-all shrink-0 whitespace-nowrap cursor-pointer",
+                    isSelected
                       ? "border-primary bg-primary text-primary-foreground shadow-sm"
                       : "border-border bg-background text-muted-foreground hover:bg-muted"
                   )}
@@ -364,18 +417,31 @@ export function StudentRecordingsContent({
             <p className="text-xs text-pt-muted mt-1 max-w-md mx-auto">
               {searchQuery
                 ? `No recordings matched "${searchQuery}". Clear your search query.`
-                : "After each live session, your trainer uploads the recording link and notes here for you."}
+                : selectedModule.toLowerCase() !== "all" && safeRecordings.length > 0
+                  ? `No recordings uploaded yet for "${selectedModule}". You have ${safeRecordings.length} total recording(s) available across other modules.`
+                  : "After each live session, your trainer uploads the recording link and notes here for you."}
             </p>
-            {searchQuery && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="mt-3 text-xs"
-                onClick={() => setSearchQuery("")}
-              >
-                Clear Search
-              </Button>
-            )}
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+              {searchQuery && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-xs"
+                  onClick={() => setSearchQuery("")}
+                >
+                  Clear Search
+                </Button>
+              )}
+              {selectedModule.toLowerCase() !== "all" && safeRecordings.length > 0 && (
+                <Button
+                  size="sm"
+                  className="text-xs"
+                  onClick={() => setSelectedModule("all")}
+                >
+                  Show All Recordings ({safeRecordings.length})
+                </Button>
+              )}
+            </div>
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2">

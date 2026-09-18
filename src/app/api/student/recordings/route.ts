@@ -3,12 +3,8 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { getClassRecordings } from "@/lib/api/class-recordings";
 import { getClassProgress } from "@/lib/class-schedule";
 import { createApiResponse } from "@/lib/api/enrollment";
-import {
-  filterByStudentModule,
-  studentHasModuleLiveContent,
-} from "@/lib/modules/student-module-content";
+import { filterByStudentModule } from "@/lib/modules/student-module-content";
 import { getStudentModuleContentContext } from "@/lib/modules/student-module-content-server";
-import { getLiveSessionsPreview } from "@/lib/api/portal-data";
 import {
   fetchMergedByProgram,
   getStudentPortalProgramSlugs,
@@ -23,21 +19,6 @@ export async function GET() {
   const context = await getStudentModuleContentContext(user);
   const programSlugs = await getStudentPortalProgramSlugs(user);
   const primaryProgramSlug = context.programSlug;
-  const sessions = await fetchMergedByProgram(programSlugs, getLiveSessionsPreview);
-  const canAccess = studentHasModuleLiveContent(context, sessions);
-
-  if (!canAccess) {
-    return NextResponse.json(
-      createApiResponse(true, {
-        data: {
-          recordings: [],
-          progress: getClassProgress(primaryProgramSlug),
-          programSlug: primaryProgramSlug,
-        },
-      })
-    );
-  }
-
   const allRecordings = await fetchMergedByProgram(programSlugs, getClassRecordings);
   const recordings = filterByStudentModule(
     allRecordings,

@@ -46,6 +46,21 @@ export function getStudentActiveModule(
   return studentLevel?.trim() || null;
 }
 
+export function isAllModulesLevel(level?: string | null): boolean {
+  if (!level) return false;
+  const cleaned = level.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+  return (
+    cleaned === "all" ||
+    cleaned === "allmodules" ||
+    cleaned === "complete" ||
+    cleaned === "completecourse" ||
+    cleaned === "completeprogram" ||
+    cleaned === "fullcourse" ||
+    cleaned === "fullstack" ||
+    cleaned === "fullprogram"
+  );
+}
+
 export function canStudentAccessModuleContent(
   programSlug: string,
   studentLevel: string | null | undefined,
@@ -55,8 +70,16 @@ export function canStudentAccessModuleContent(
   if (isDemoPortalStudent(options?.email)) return true;
 
   const rawContentLevel = contentLevel?.trim();
-  // Content with no specific module tag is available to all enrolled students in the program
-  if (!rawContentLevel) {
+  // Content with no specific module tag or 'all' tag is available to all enrolled students in the program
+  if (!rawContentLevel || isAllModulesLevel(rawContentLevel)) {
+    return true;
+  }
+
+  // If student has all-modules access, they can access all content in the program
+  if (
+    isAllModulesLevel(studentLevel) ||
+    (options?.approvedLevels ?? []).some(isAllModulesLevel)
+  ) {
     return true;
   }
 
@@ -74,21 +97,45 @@ export function canStudentAccessModuleContent(
 
   const activeLevelNormalized = studentLevel?.trim()
     ? normalizeModuleName(resolveCanonicalModule(programSlug, studentLevel) || studentLevel)
-    : normalizedApprovedList[0] || "";
+    : "";
 
-  // If student has approved modules, they have access to all their approved modules
+  // If student has approved modules, check if this content matches any approved module
   if (normalizedApprovedList.length > 0) {
-    return (
-      normalizedApprovedList.includes(contentNormalized) ||
-      (options?.approvedLevels ?? []).some(
-        (l) => normalizeModuleName(l) === normalizeModuleName(rawContentLevel)
-      )
+    const directCanonical = normalizedApprovedList.includes(contentNormalized);
+    const directRaw = (options?.approvedLevels ?? []).some(
+      (l) => normalizeModuleName(l) === normalizeModuleName(rawContentLevel)
     );
+    const fuzzyMatch = (options?.approvedLevels ?? []).some((l) => {
+      const cleanL = (l || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+      const cleanContent = rawContentLevel.toLowerCase().replace(/[^a-z0-9]/g, "");
+      const cleanCanonical = (canonicalContent || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+      return (
+        cleanL === cleanContent ||
+        cleanL === cleanCanonical ||
+        cleanL.includes(cleanContent) ||
+        cleanContent.includes(cleanL)
+      );
+    });
+
+    if (directCanonical || directRaw || fuzzyMatch) {
+      return true;
+    }
   }
 
   // Fallback: if student has an active module level assigned
   if (activeLevelNormalized) {
-    return activeLevelNormalized === contentNormalized;
+    if (activeLevelNormalized === contentNormalized) return true;
+    const cleanActive = (studentLevel || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+    const cleanContent = rawContentLevel.toLowerCase().replace(/[^a-z0-9]/g, "");
+    const cleanCanonical = (canonicalContent || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+    if (
+      cleanActive === cleanContent ||
+      cleanActive === cleanCanonical ||
+      cleanActive.includes(cleanContent) ||
+      cleanContent.includes(cleanActive)
+    ) {
+      return true;
+    }
   }
 
   // No approved levels and no active level — deny access to tagged content.
@@ -140,10 +187,18 @@ export function studentHasModuleLiveContent(
   if (isDemoPortalStudent(context.email)) return true;
 
   const activeLevel = context.studentLevel?.trim();
-  if (!activeLevel) return true;
+  if (!activeLevel || isAllModulesLevel(activeLevel)) return true;
 
   const normalizedApproved = (context.approvedLevels ?? []).map((l) => l.trim().toLowerCase());
-  if (normalizedApproved.length > 0 && normalizedApproved.includes(activeLevel.toLowerCase())) {
+  if (
+    normalizedApproved.length > 0 &&
+    (normalizedApproved.includes(activeLevel.toLowerCase()) ||
+      normalizedApproved.some(
+        (l) =>
+          resolveCanonicalModule(context.programSlug, l).toLowerCase() ===
+          resolveCanonicalModule(context.programSlug, activeLevel).toLowerCase()
+      ))
+  ) {
     return true;
   }
 

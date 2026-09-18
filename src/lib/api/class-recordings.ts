@@ -6,6 +6,7 @@ import {
   getFirstModuleName,
   resolveCanonicalModule,
 } from "@/lib/modules/student-module-access";
+import { normalizeProgramSlug } from "@/lib/auth/program-assignment";
 
 export { resolveCanonicalModule };
 
@@ -56,22 +57,35 @@ export async function getClassRecordings(
   level?: string
 ): Promise<ClassRecordingRecord[]> {
   try {
+    const normSlug = normalizeProgramSlug(programSlug);
     const records = await prisma.classRecording.findMany({
-      where: { programSlug },
+      where: {
+        OR: [
+          { programSlug: normSlug },
+          { programSlug: programSlug },
+        ],
+      },
       orderBy: { classNumber: "asc" },
     });
 
     const mapped = records.map((r) => {
-      const canonicalLevel = resolveCanonicalModule(r.programSlug, r.level);
+      const canonicalLevel = resolveCanonicalModule(normSlug, r.level);
       return {
         ...mapRecording(r),
+        programSlug: normSlug,
         level: canonicalLevel,
       };
     });
 
     if (level && level.trim() !== "" && level.trim().toLowerCase() !== "all") {
-      const targetCanonical = resolveCanonicalModule(programSlug, level);
-      return mapped.filter((r) => r.level === targetCanonical);
+      const targetCanonical = resolveCanonicalModule(normSlug, level);
+      return mapped.filter((r) => {
+        const itemCanonical = resolveCanonicalModule(normSlug, r.level);
+        return (
+          itemCanonical === targetCanonical ||
+          (r.level && r.level.trim().toLowerCase() === level.trim().toLowerCase())
+        );
+      });
     }
 
     return mapped;
@@ -91,16 +105,24 @@ export async function upsertClassRecording(data: {
   trainerName: string;
   notes?: string;
 }): Promise<ClassRecordingRecord> {
-  const normalizedLevel = resolveCanonicalModule(data.programSlug, data.level);
+  const normSlug = normalizeProgramSlug(data.programSlug);
+  const normalizedLevel = resolveCanonicalModule(normSlug, data.level);
 
   // Search existing recording by programSlug, level, AND classNumber
   const existing = await prisma.classRecording.findFirst({
     where: {
-      programSlug: data.programSlug,
-      classNumber: data.classNumber,
       OR: [
-        { level: normalizedLevel },
-        ...(data.level ? [{ level: data.level }] : []),
+        { programSlug: normSlug },
+        { programSlug: data.programSlug },
+      ],
+      classNumber: data.classNumber,
+      AND: [
+        {
+          OR: [
+            { level: normalizedLevel },
+            ...(data.level ? [{ level: data.level }] : []),
+          ],
+        },
       ],
     },
   });
@@ -127,7 +149,7 @@ export async function upsertClassRecording(data: {
     const created = await prisma.classRecording.create({
       data: {
         id: crypto.randomUUID(),
-        programSlug: data.programSlug,
+        programSlug: normSlug,
         level: normalizedLevel,
         classNumber: data.classNumber,
         title: data.title.trim(),
@@ -150,7 +172,10 @@ export async function upsertClassRecording(data: {
     if (isConflict) {
       const conflict = await prisma.classRecording.findFirst({
         where: {
-          programSlug: data.programSlug,
+          OR: [
+            { programSlug: normSlug },
+            { programSlug: data.programSlug },
+          ],
           level: normalizedLevel,
           classNumber: data.classNumber,
         },

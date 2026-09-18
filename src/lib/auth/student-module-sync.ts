@@ -6,6 +6,7 @@ import {
 } from "@/lib/modules/student-module-access";
 import { isDemoPortalStudent } from "@/lib/constants/demo-student";
 import { DEMO_STUDENT_PROGRAM_SLUGS } from "@/lib/student-portal/program-scope";
+import { isAllModulesLevel } from "@/lib/modules/student-module-content";
 
 import { normalizeProgramSlug } from "@/lib/auth/program-assignment";
 
@@ -51,7 +52,21 @@ export async function getApprovedEnrollmentLevels(
     (row) => normalizeProgramSlug(row.programSlug) === normSlug
   );
 
+  const isUserInProgram = Boolean(
+    userRecord && normalizeProgramSlug(userRecord.programSlug ?? "") === normSlug
+  );
+
+  // If student has full course / all modules access in enrollment, moduleEnrollment, or user record
+  const hasAllAccess =
+    studentEnrollmentRows.some((r) => isAllModulesLevel(r.level)) ||
+    studentModuleRows.some((r) => isAllModulesLevel(r.moduleName)) ||
+    (isUserInProgram && isAllModulesLevel(userRecord?.level));
+
   const order = getProgramModuleNames(normSlug);
+  if (hasAllAccess && order.length > 0) {
+    return [...order];
+  }
+
   const lowerLevels = new Set<string>();
 
   for (const row of studentEnrollmentRows) {
@@ -69,7 +84,7 @@ export async function getApprovedEnrollmentLevels(
     }
   }
 
-  if (userRecord && normalizeProgramSlug(userRecord.programSlug ?? "") === normSlug && userRecord.level?.trim()) {
+  if (isUserInProgram && userRecord?.level?.trim()) {
     const canonical = resolveCanonicalModule(normSlug, userRecord.level.trim());
     if (canonical) lowerLevels.add(canonical.trim().toLowerCase());
     lowerLevels.add(userRecord.level.trim().toLowerCase());
@@ -78,7 +93,13 @@ export async function getApprovedEnrollmentLevels(
   const matched = order.filter((moduleName) => lowerLevels.has(moduleName.trim().toLowerCase()));
 
   // Ensure foundational Module 1 is always accessible for any student enrolled in this course
-  if (order.length > 0 && (matched.length > 0 || studentEnrollmentRows.length > 0 || studentModuleRows.length > 0)) {
+  if (
+    order.length > 0 &&
+    (matched.length > 0 ||
+      studentEnrollmentRows.length > 0 ||
+      studentModuleRows.length > 0 ||
+      isUserInProgram)
+  ) {
     if (!matched.includes(order[0])) {
       matched.unshift(order[0]);
     }
@@ -86,7 +107,7 @@ export async function getApprovedEnrollmentLevels(
   }
 
   // Fallback: if student has an approved enrollment for this program but string didn't match directly, default to first module
-  if (studentEnrollmentRows.length > 0 && order.length > 0) {
+  if ((studentEnrollmentRows.length > 0 || isUserInProgram) && order.length > 0) {
     return [order[0]];
   }
 

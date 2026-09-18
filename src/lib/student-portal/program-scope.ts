@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { isDemoPortalStudent } from "@/lib/constants/demo-student";
+import { normalizeProgramSlug } from "@/lib/auth/program-assignment";
 import type { PortalUser } from "@/types/portal";
 
 /** Demo student sees active scheduled programs in the portal. */
@@ -22,7 +23,7 @@ export async function getApprovedProgramSlugs(email: string): Promise<string[]> 
     (row) => row.email && row.email.trim().toLowerCase() === normalizedEmail
   );
 
-  const slugs = [...new Set(studentRows.map((row) => row.program))];
+  const slugs = [...new Set(studentRows.map((row) => normalizeProgramSlug(row.program)))];
   return slugs.length > 0 ? slugs : [];
 }
 

@@ -2,7 +2,7 @@ import "server-only";
 
 import Link from "next/link";
 import { CheckCircle, Clock, FilmStrip, PlayCircle } from "@phosphor-icons/react/ssr";
-import { getClassRecordings } from "@/lib/api/class-recordings";
+import { getClassRecordings, resolveCanonicalModule } from "@/lib/api/class-recordings";
 import { getClassProgress } from "@/lib/class-schedule";
 import { getProgramCategory, PREMIUM_HEADER_GRADIENT_FALLBACK } from "@/lib/constants/program-categories";
 import { cn } from "@/lib/utils";
@@ -17,7 +17,12 @@ export async function StudentClassProgressCard({
   studentLevel,
 }: StudentClassProgressCardProps) {
   const progress = getClassProgress(programSlug);
-  const recordings = await getClassRecordings(programSlug, studentLevel ?? undefined);
+  const allRecordings = await getClassRecordings(programSlug);
+  const targetCanonical = studentLevel ? resolveCanonicalModule(programSlug, studentLevel) : null;
+  const moduleRecordings = targetCanonical
+    ? allRecordings.filter((r) => resolveCanonicalModule(programSlug, r.level) === targetCanonical)
+    : allRecordings;
+  const recordings = moduleRecordings.length > 0 ? moduleRecordings : allRecordings;
   const category = getProgramCategory(programSlug);
 
   if (!progress.config) return null;
