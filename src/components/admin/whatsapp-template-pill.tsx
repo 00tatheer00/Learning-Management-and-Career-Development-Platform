@@ -16,7 +16,6 @@ import { ADMIN_REJECT_PRESETS } from "@/lib/constants/admin-reject-reasons";
 import {
   formatApprovalWhatsAppMessage,
   formatRejectionWhatsAppMessage,
-  sanitizeWhatsAppPhone,
   buildWhatsAppChatUrl,
 } from "@/lib/notifications/whatsapp-templates";
 import { toast } from "@/lib/ui/toast";
@@ -67,8 +66,6 @@ export function WhatsAppTemplatePill({
 
   // Approval custom password override
   const [passwordInput, setPasswordInput] = useState(plainPassword ?? "");
-
-  const cleanPhone = useMemo(() => sanitizeWhatsAppPhone(phone), [phone]);
 
   const approvalMessage = useMemo(() => {
     return formatApprovalWhatsAppMessage({

@@ -818,7 +818,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
                   </div>
                 ) : (
                   <p className="text-xs text-muted mt-1.5">
-                    Currently open: Web Development, Mobile App (Flutter) Development &amp; Artificial Intelligence
+                    Currently open: Web Development, App Development, Artificial Intelligence, Digital Marketing, Ecommerce &amp; Graphics Designing
                   </p>
                 )}
               </div>

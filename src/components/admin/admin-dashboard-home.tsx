@@ -299,8 +299,8 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
         </div>
       </div>
 
-      {/* Registration Phases Overview Cards — 3 Cards Grid */}
-      <div className="shrink-0 grid grid-cols-1 md:grid-cols-3 gap-3">
+      {/* Registration Phases Overview Cards — 4 Cards Grid */}
+      <div className="shrink-0 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
         {/* Phase 1 Card */}
         <div
           onClick={() => setPhaseFilter(phaseFilter === "phase-1" ? "all" : "phase-1")}
@@ -451,6 +451,58 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
             <div>
               <p className="text-lg font-semibold tabular-nums text-pt">
                 <CountUp end={data.phaseBreakdown?.phase3?.students ?? 0} duration={1} />
+              </p>
+              <p className="text-[11px] font-medium text-pt-secondary">Active Students</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Phase 4 Card */}
+        <div
+          onClick={() => setPhaseFilter(phaseFilter === "phase-4" ? "all" : "phase-4")}
+          className={cn(
+            pressable,
+            "group relative rounded-xl border p-4 sm:p-5 transition-all",
+            tones.amber.card,
+            phaseFilter === "phase-4" ? "ring-2 ring-amber-500 shadow-pt-md" : ""
+          )}
+        >
+          <div className="flex items-center justify-between gap-3 mb-3">
+            <div className="flex items-center gap-2.5">
+              <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-lg font-bold text-xs", tones.amber.icon)}>
+                P4
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold tracking-tight text-pt">Phase 4 (4th Module)</h3>
+                <p className="text-xs text-pt-muted">19th Sep+ Registrations</p>
+              </div>
+            </div>
+            <span className={cn(
+              "rounded-full px-3 py-1 text-xs font-extrabold border shadow-sm transition-all",
+              phaseFilter === "phase-4"
+                ? "bg-amber-600 text-white border-amber-700"
+                : "bg-amber-100 text-amber-950 border-amber-300 dark:bg-amber-950 dark:text-amber-200 dark:border-amber-700"
+            )}>
+              {data.phaseBreakdown?.phase4?.totalEnrollments ?? 0} Registrations
+            </span>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 py-2.5 px-3 rounded-lg border border-pt-subtle bg-pt-surface/70 text-center">
+            <div>
+              <p className="text-lg font-semibold tabular-nums text-pt">
+                <CountUp end={data.phaseBreakdown?.phase4?.approvedEnrollments ?? 0} duration={1} />
+              </p>
+              <p className="text-[11px] font-medium text-emerald-700 dark:text-emerald-400">Approved</p>
+            </div>
+            <div>
+              <p className="text-lg font-semibold tabular-nums text-pt">
+                <CountUp end={data.phaseBreakdown?.phase4?.pendingEnrollments ?? 0} duration={1} />
+              </p>
+              <p className="text-[11px] font-medium text-amber-600 dark:text-amber-400">Pending</p>
+            </div>
+            <div>
+              <p className="text-lg font-semibold tabular-nums text-pt">
+                <CountUp end={data.phaseBreakdown?.phase4?.students ?? 0} duration={1} />
               </p>
               <p className="text-[11px] font-medium text-pt-secondary">Active Students</p>
             </div>

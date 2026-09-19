@@ -60,7 +60,8 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
     const phase1 = students.filter((s) => getRegistrationPhase(s) === "phase-1").length;
     const phase2 = students.filter((s) => getRegistrationPhase(s) === "phase-2").length;
     const phase3 = students.filter((s) => getRegistrationPhase(s) === "phase-3").length;
-    return { all: students.length, phase1, phase2, phase3 };
+    const phase4 = students.filter((s) => getRegistrationPhase(s) === "phase-4").length;
+    return { all: students.length, phase1, phase2, phase3, phase4 };
   }, [students]);
 
   const courseStudentCounts = useMemo(() => {
@@ -350,6 +351,7 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
           { id: "phase-1", label: "Phase 1 (Module 1)", count: phaseCounts.phase1 },
           { id: "phase-2", label: "Phase 2 (2nd Module)", count: phaseCounts.phase2 },
           { id: "phase-3", label: "Phase 3 (3rd Module)", count: phaseCounts.phase3 },
+          { id: "phase-4", label: "Phase 4 (4th Module)", count: phaseCounts.phase4 },
         ].map((item) => (
           <button
             key={item.id}

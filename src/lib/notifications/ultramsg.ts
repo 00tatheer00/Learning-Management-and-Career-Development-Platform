@@ -110,7 +110,7 @@ export function formatApprovalWhatsAppMessage(params: {
 /**
  * Sends a WhatsApp chat message via UltraMsg API
  */
-export async function sendUltraMsgChatMessage(params: {
+export async function sendUltraMsgChatMessage(_params: {
   to: string;
   body: string;
 }): Promise<{ success: boolean; messageId?: string; error?: string }> {

@@ -1,11 +1,7 @@
 import "server-only";
 
 import { prisma } from "@/lib/prisma";
-import {
-  getProgramModuleNames,
-  getFirstModuleName,
-  resolveCanonicalModule,
-} from "@/lib/modules/student-module-access";
+import { resolveCanonicalModule } from "@/lib/modules/student-module-access";
 import { normalizeProgramSlug } from "@/lib/auth/program-assignment";
 
 export { resolveCanonicalModule };

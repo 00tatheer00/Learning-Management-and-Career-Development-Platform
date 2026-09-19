@@ -80,7 +80,7 @@ export function TrainerStudentsPanel({
       );
       if (match) setModuleFilter(match.name);
     }
-    if (initialPhase && (initialPhase === "phase-1" || initialPhase === "phase-2" || initialPhase === "phase-3")) {
+    if (initialPhase && (initialPhase === "phase-1" || initialPhase === "phase-2" || initialPhase === "phase-3" || initialPhase === "phase-4")) {
       setPhaseFilter(initialPhase);
     }
   }, [initialModule, activeModule, initialPhase, moduleOptions]);
@@ -197,6 +197,7 @@ export function TrainerStudentsPanel({
           { id: "phase-1", label: "Phase 1 (Module 1)" },
           { id: "phase-2", label: "Phase 2 (2nd Module)" },
           { id: "phase-3", label: "Phase 3 (3rd Module)" },
+          { id: "phase-4", label: "Phase 4 (4th Module)" },
         ].map((item) => (
           <button
             key={item.id}

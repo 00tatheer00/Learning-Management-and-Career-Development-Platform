@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAdminUser } from "@/lib/auth/admin-access";
 import { getEnrollmentById } from "@/lib/api/portal-data";
-import { sendApprovalWhatsAppNotification } from "@/lib/notifications/ultramsg";
 import { createApiResponse } from "@/lib/api/enrollment";
 
 export async function POST(request: Request) {
