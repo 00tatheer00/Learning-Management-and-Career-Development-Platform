@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EEST Student Acquisition & Growth Playbook 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --secondary: #0f172a;
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --accent-purple: #8b5cf6;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --surface: #ffffff;
+      --surface-subtle: #f8fafc;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --text-muted: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #f1f5f9;
+      color: var(--text);
+      line-height: 1.6;
+      padding: 30px 15px;
+    }
+
+    .doc-container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 40px -10px rgba(15, 23, 42, 0.1);
+      border: 1px solid var(--border);
+    }
+
+    /* Print Controls Bar */
+    .action-bar {
+      background: #1e293b;
+      padding: 16px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .action-bar span {
+      color: #94a3b8;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .print-btn {
+      background: linear-gradient(135deg, #2563eb, #06b6d4);
+      color: #ffffff;
+      border: none;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .print-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+    }
+
+    /* Header Banner */
+    .header-banner {
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #1e3a8a 100%);
+      color: #ffffff;
+      padding: 50px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    .header-banner::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.25) 0%, rgba(255,255,255,0) 70%);
+      pointer-events: none;
+    }
+    .badge-top {
+      display: inline-block;
+      background: rgba(6, 182, 212, 0.2);
+      border: 1px solid rgba(6, 182, 212, 0.5);
+      color: #38bdf8;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 999px;
+      margin-bottom: 16px;
+    }
+    .header-banner h1 {
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+    .header-banner p {
+      color: #cbd5e1;
+      font-size: 16px;
+      max-width: 650px;
+      line-height: 1.5;
+    }
+    .meta-bar {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      font-size: 13px;
+      color: #94a3b8;
+    }
+    .meta-bar strong {
+      color: #ffffff;
+    }
+
+    /* Content Area */
+    .content-body {
+      padding: 40px 40px;
+    }
+
+    .section-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--secondary);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-sub {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+
+    /* Warning Callout Box */
+    .callout-warning {
+      background: #fff1f2;
+      border-left: 5px solid var(--accent-rose);
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-bottom: 36px;
+    }
+    .callout-warning h4 {
+      color: #9f1239;
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .callout-warning p, .callout-warning li {
+      color: #4c0519;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .callout-warning ul {
+      margin-left: 20px;
+      margin-top: 8px;
+    }
+
+    /* Comparison Table */
+    .table-container {
+      overflow-x: auto;
+      margin-bottom: 40px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+    table.comp-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+    table.comp-table th {
+      background: #f8fafc;
+      padding: 14px 18px;
+      color: var(--secondary);
+      font-weight: 700;
+      border-bottom: 1px solid var(--border);
+    }
+    table.comp-table td {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      color: #334155;
+    }
+    table.comp-table tr:last-child td {
+      border-bottom: none;
+    }
+    .tag-danger {
+      background: #fee2e2;
+      color: #b91c1c;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 11px;
+    }
+    .tag-success {
+      background: #dcfce7;
+      color: #15803d;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 11px;
+    }
+
+    /* Strategy Cards Grid */
+    .strategy-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    .strategy-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      position: relative;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    }
+    .strategy-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 24px -6px rgba(15, 23, 42, 0.08);
+    }
+    .card-stripe {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-bottom: 14px;
+    }
+    .strategy-card h3 {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--secondary);
+      margin-bottom: 8px;
+    }
+    .strategy-card p {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.55;
+      margin-bottom: 14px;
+    }
+    .card-steps {
+      background: var(--surface-subtle);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 12px;
+      color: #334155;
+    }
+    .card-steps ol {
+      margin-left: 18px;
+      line-height: 1.6;
+    }
+    .card-kpi {
+      margin-top: 12px;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      color: var(--primary);
+    }
+
+    /* Themes for cards */
+    .theme-blue .card-stripe { background: #eff6ff; color: #2563eb; }
+    .theme-purple .card-stripe { background: #f5f3ff; color: #7c3aed; }
+    .theme-emerald .card-stripe { background: #ecfdf5; color: #059669; }
+    .theme-amber .card-stripe { background: #fffbeb; color: #d97706; }
+    .theme-cyan .card-stripe { background: #ecfeff; color: #0891b2; }
+    .theme-rose .card-stripe { background: #fff1f2; color: #e11d48; }
+
+    /* 30-Day Roadmap Timeline */
+    .timeline-box {
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px;
+      margin-bottom: 36px;
+    }
+    .timeline-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--secondary);
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .timeline-weeks {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    .week-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      text-align: left;
+    }
+    .week-badge {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: #2563eb;
+      background: #eff6ff;
+      padding: 2px 8px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+    .week-card h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--secondary);
+      margin-bottom: 6px;
+    }
+    .week-card ul {
+      margin-left: 16px;
+      font-size: 12px;
+      color: #64748b;
+      line-height: 1.5;
+    }
+
+    /* Footer */
+    .doc-footer {
+      background: #f8fafc;
+      border-top: 1px solid var(--border);
+      padding: 24px 40px;
+      text-align: center;
+      font-size: 12px;
+      color: #94a3b8;
+    }
+    .doc-footer strong {
+      color: var(--secondary);
+    }
+
+    /* Print media styling */
+    @media print {
+      body {
+        background: #ffffff !important;
+        padding: 0 !important;
+      }
+      .doc-container {
+        box-shadow: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+        max-width: 100% !important;
+      }
+      .action-bar {
+        display: none !important;
+      }
+      .header-banner {
+        background: #0f172a !important;
+        color: #ffffff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        padding: 30px 20px !important;
+      }
+      .strategy-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 14px !important;
+      }
+      .strategy-card {
+        page-break-inside: avoid;
+        box-shadow: none !important;
+        border: 1px solid #cbd5e1 !important;
+      }
+      .timeline-weeks {
+        grid-template-columns: repeat(2, 1fr) !important;
+      }
+      .page-break {
+        page-break-before: always;
+      }
+    }
+
+    @media screen and (max-width: 650px) {
+      .header-banner { padding: 30px 20px; }
+      .header-banner h1 { font-size: 24px; }
+      .content-body { padding: 24px 18px; }
+      .strategy-grid { grid-template-columns: 1fr; }
+      .timeline-weeks { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="doc-container">
+
+    <!-- TOP PRINT BAR -->
+    <div class="action-bar">
+      <span>📄 Emerging Edge School of Technology &middot; Strategy Document</span>
+      <button class="print-btn" onclick="window.print()">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2m-8 0v4h8v-4H8z"/></svg>
+        Save / Print as PDF
+      </button>
+    </div>
+
+    <!-- HEADER BANNER -->
+    <div class="header-banner">
+      <span class="badge-top">Growth Strategy &middot; Phase 4</span>
+      <h1>EEST Student Acquisition &amp; Growth Playbook 2026</h1>
+      <p>
+        Battle-tested inbound funnels, viral university loops, and conversion playbooks to scale from 400+ to 1,500+ enrolled students across Pakistan without risking domain reputation.
+      </p>
+
+      <div class="meta-bar">
+        <div>Author: <strong>Strategy &amp; Admissions Team</strong></div>
+        <div>Lead Trainer: <strong>Sir Tatheer (Master Trainer, Arfa Karim Incubators)</strong></div>
+        <div>Platform: <strong>Emerging Edge School of Technology (EEST)</strong></div>
+        <div>Target: <strong>1,000+ Enrolled Students</strong></div>
+      </div>
+    </div>
+
+    <!-- CONTENT BODY -->
+    <div class="content-body">
+
+      <!-- SECTION 1: THE COLD SCRAPING TRAP -->
+      <div class="section-title">
+        <span>🛑</span> Why "Email Scraping" Fails in Pakistan
+      </div>
+      <p class="section-sub">
+        Understanding why scraping personal emails creates severe technical and financial damage to academy domains.
+      </p>
+
+      <div class="callout-warning">
+        <h4>⚠️ Severe Consequences of Scraping Student Lists:</h4>
+        <p>Internet scraping extracts outdated, inactive, and honeypot email addresses. When cold blast emails are dispatched to unsuspecting students:</p>
+        <ul>
+          <li><strong>Domain Blacklisting (Spamhaus / Barracuda):</strong> High spam complaint rates permanently ban your sending domain (<code>emergingedge.tech</code>), sending even normal transactional emails to spam.</li>
+          <li><strong>Bounce Rate Penalty:</strong> 60%+ scraped emails bounce, triggering automatic suspension on email services (Google Workspace, Resend, Brevo).</li>
+          <li><strong>Zero Trust &amp; Zero Enrollment:</strong> Pakistani students do not trust cold marketing emails from unknown senders and treat them as phishing.</li>
+        </ul>
+      </div>
+
+      <!-- COMPARISON TABLE -->
+      <div class="table-container">
+        <table class="comp-table">
+          <thead>
+            <tr>
+              <th>Evaluation Parameter</th>
+              <th>Cold Email Scraping ❌</th>
+              <th>Inbound Educational Funnel ✅</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Deliverability &amp; Reputation</strong></td>
+              <td><span class="tag-danger">Blacklist Risk (95%)</span></td>
+              <td><span class="tag-success">Inbox Delivery (99%)</span></td>
+            </tr>
+            <tr>
+              <td><strong>Student Intent &amp; Interest</strong></td>
+              <td>Zero intent; perceived as spam</td>
+              <td>High intent; students actively opted in</td>
+            </tr>
+            <tr>
+              <td><strong>Open Rate Average</strong></td>
+              <td>2% &ndash; 4% (mostly filtered to spam)</td>
+              <td>35% &ndash; 55% (high curiosity &amp; engagement)</td>
+            </tr>
+            <tr>
+              <td><strong>WhatsApp Follow-up</strong></td>
+              <td>Banned for unauthorized messaging</td>
+              <td>Permitted opt-in for class reminders</td>
+            </tr>
+            <tr>
+              <td><strong>Admission Conversion</strong></td>
+              <td>&lt; 0.1% (Near zero enrollments)</td>
+              <td><strong>8% &ndash; 15% Verified Admissions</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- SECTION 2: THE 6 CORE GROWTH ENGINES -->
+      <div class="section-title">
+        <span>⚡</span> 6 High-Impact Student Acquisition Strategies
+      </div>
+      <p class="section-sub">
+        Actionable frameworks that attract thousands of enthusiastic students willingly submitting their contact details.
+      </p>
+
+      <div class="strategy-grid">
+
+        <!-- STRATEGY 1 -->
+        <div class="strategy-card theme-blue">
+          <div class="card-stripe">🎓</div>
+          <h3>1. The "Free 2-Hour Live Masterclass" Funnel</h3>
+          <p>
+            Offer a 1-day free workshop hosted by Sir Tatheer: <em>"Build &amp; Deploy Your First Web App Live in 90 Minutes"</em>. Students must register on the EEST portal to receive the live meeting link.
+          </p>
+          <div class="card-steps">
+            <strong>Execution Steps:</strong>
+            <ol>
+              <li>Create a simple landing page: <code>/masterclass</code></li>
+              <li>Ask for Name, Email, WhatsApp &amp; University.</li>
+              <li>Auto-redirect to an official WhatsApp Announcement Group.</li>
+              <li>During the live class, announce the complete course discount.</li>
+            </ol>
+          </div>
+          <div class="card-kpi">
+            <span>Expected Lead Volume:</span>
+            <span>300 &ndash; 600 Opt-ins / Masterclass</span>
+          </div>
+        </div>
+
+        <!-- STRATEGY 2 -->
+        <div class="strategy-card theme-purple">
+          <div class="card-stripe">🏛️</div>
+          <h3>2. Campus Ambassador Network</h3>
+          <p>
+            Recruit 2 energetic student representatives per university in Peshawar, Islamabad, and nationwide (UET, FAST, CECOS, Islamia College, UoP, NUST).
+          </p>
+          <div class="card-steps">
+            <strong>Execution Steps:</strong>
+            <ol>
+              <li>Offer ambassadors free course access &amp; official certificates.</li>
+              <li>Provide them with branded WhatsApp flyers &amp; status templates.</li>
+              <li>Give each ambassador a unique referral code/link.</li>
+              <li>Ambassadors post in official batch WhatsApp groups.</li>
+            </ol>
+          </div>
+          <div class="card-kpi">
+            <span>Expected Lead Volume:</span>
+            <span>40 &ndash; 80 Students per Ambassador</span>
+          </div>
+        </div>
+
+        <!-- STRATEGY 3 -->
+        <div class="strategy-card theme-emerald">
+          <div class="card-stripe">🎯</div>
+          <h3>3. Meta &amp; TikTok Micro-Budget Lead Ads</h3>
+          <p>
+            Run hyper-targeted Facebook &amp; Instagram Lead Ads with an instant-fill form. Budget: Just PKR 2,000 &ndash; 3,000 to test.
+          </p>
+          <div class="card-steps">
+            <strong>Execution Steps:</strong>
+            <ol>
+              <li>Targeting: Pakistan, Age 17&ndash;25, Interest: CS / IT / Coding.</li>
+              <li>Hook: <em>"Learn Web Dev, AI &amp; Flutter from Arfa Karim Incubator Master Trainer"</em>.</li>
+              <li>Instant form captures Name, WhatsApp &amp; Email in 1 tap.</li>
+              <li>Leads auto-sync to your admissions call/message list.</li>
+            </ol>
+          </div>
+          <div class="card-kpi">
+            <span>Cost per Lead:</span>
+            <span>PKR 8 &ndash; 15 per Verified Student</span>
+          </div>
+        </div>
+
+        <!-- STRATEGY 4 -->
+        <div class="strategy-card theme-amber">
+          <div class="card-stripe">🤝</div>
+          <h3>4. University Tech Society Partnerships</h3>
+          <p>
+            Collaborate with student chapters of IEEE, ACM, GDG (Google Developer Groups), and computing societies for joint co-branded webinars.
+          </p>
+          <div class="card-steps">
+            <strong>Execution Steps:</strong>
+            <ol>
+              <li>Reach out to society presidents via LinkedIn or campus visits.</li>
+              <li>Offer a free 1-day tech session on Modern Full-Stack or AI.</li>
+              <li>Society officially broadcasts the registration link to 1,000+ members.</li>
+              <li>Provide co-branded participation certificates.</li>
+            </ol>
+          </div>
+          <div class="card-kpi">
+            <span>Trust Factor:</span>
+            <span>Maximum (Official Endorsement)</span>
+          </div>
+        </div>
+
+        <!-- STRATEGY 5 -->
+        <div class="strategy-card theme-cyan">
+          <div class="card-stripe">📥</div>
+          <h3>5. The "Tech Roadmap &amp; Salary Guide" Lead Magnet</h3>
+          <p>
+            Create a highly valuable 5-page PDF: <em>"Pakistan 2026 Tech Salary Guide &amp; Full-Stack Roadmap"</em>. Students download it by entering their email and WhatsApp.
+          </p>
+          <div class="card-steps">
+            <strong>Execution Steps:</strong>
+            <ol>
+              <li>Place a popup/banner on EEST website &amp; social profiles.</li>
+              <li>Share snippets of salary ranges on LinkedIn &amp; Facebook.</li>
+              <li>Student downloads PDF &rarr; Lead enters EEST nurture sequence.</li>
+              <li>Follow up with invite to upcoming course orientation.</li>
+            </ol>
+          </div>
+          <div class="card-kpi">
+            <span>Viral Potential:</span>
+            <span>High (Students share roadmaps in groups)</span>
+          </div>
+        </div>
+
+        <!-- STRATEGY 6 -->
+        <div class="strategy-card theme-rose">
+          <div class="card-stripe">🔄</div>
+          <h3>6. The "Bring a Study Partner" Referral Loop</h3>
+          <p>
+            Turn existing 426 students into active promoters. Every student enrolled in Phase 1&ndash;3 has dozens of university classmates.
+          </p>
+          <div class="card-steps">
+            <strong>Execution Steps:</strong>
+            <ol>
+              <li>Send WhatsApp blast to 426 existing students.</li>
+              <li>Offer: <em>"Refer a friend for Phase 4 and get Module 2 free access"</em>.</li>
+              <li>Students personally vouch for EEST quality to their friends.</li>
+              <li>Word-of-mouth creates zero-cost high-trust enrollments.</li>
+            </ol>
+          </div>
+          <div class="card-kpi">
+            <span>Referral Yield:</span>
+            <span>15% &ndash; 25% of Existing Student Base</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SECTION 3: 30-DAY EXECUTION TIMELINE -->
+      <div class="timeline-box">
+        <div class="timeline-title">📅 30-Day Team Execution Roadmap</div>
+        <div class="timeline-weeks">
+
+          <div class="week-card">
+            <span class="week-badge">Week 1</span>
+            <h4>Asset Setup</h4>
+            <ul>
+              <li>Finalize Masterclass title &amp; syllabus</li>
+              <li>Setup Lead capture page on portal</li>
+              <li>Publish 2026 Tech Roadmap PDF</li>
+            </ul>
+          </div>
+
+          <div class="week-card">
+            <span class="week-badge">Week 2</span>
+            <h4>Campus Outreach</h4>
+            <ul>
+              <li>Onboard 10 Campus Ambassadors</li>
+              <li>Distribute flyers to university groups</li>
+              <li>Launch PKR 2,000 Meta Lead Ad</li>
+            </ul>
+          </div>
+
+          <div class="week-card">
+            <span class="week-badge">Week 3</span>
+            <h4>Live Masterclass</h4>
+            <ul>
+              <li>Host 90-min Live Zoom/Meet with Sir Tatheer</li>
+              <li>Demonstrate real project building</li>
+              <li>Open Phase 4 admissions live with discount</li>
+            </ul>
+          </div>
+
+          <div class="week-card">
+            <span class="week-badge">Week 4</span>
+            <h4>Conversion &amp; Onboarding</h4>
+            <ul>
+              <li>WhatsApp follow-up with attendees</li>
+              <li>Verify fees and grant portal access</li>
+              <li>Orientation lecture for new batches</li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- SECTION 4: TEAM ROLES & RESPONSIBILITIES -->
+      <div class="section-title">
+        <span>👥</span> Team Roles &amp; Allocation
+      </div>
+      <p class="section-sub">
+        Clear accountability matrix for EEST administrative and marketing staff.
+      </p>
+
+      <div class="table-container">
+        <table class="comp-table">
+          <thead>
+            <tr>
+              <th>Role</th>
+              <th>Key Responsibility</th>
+              <th>Weekly KPI</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Lead Instructor (Sir Tatheer)</strong></td>
+              <td>Deliver high-energy live masterclass &amp; short video clips</td>
+              <td>1 Live Session + 2 Short Videos</td>
+            </tr>
+            <tr>
+              <td><strong>Admissions Desk (WhatsApp)</strong></td>
+              <td>Respond to student inquiries &amp; guide through portal registration</td>
+              <td>&lt; 10 min response time on WhatsApp</td>
+            </tr>
+            <tr>
+              <td><strong>Campus Coordinator</strong></td>
+              <td>Manage Campus Ambassadors &amp; university society connections</td>
+              <td>5 University WhatsApp broadcasts/week</td>
+            </tr>
+            <tr>
+              <td><strong>Portal Administrator</strong></td>
+              <td>Verify payment screenshots &amp; approve batch admissions</td>
+              <td>100% Zero Data Loss &amp; fast verification</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="doc-footer">
+      <p>
+        <strong>Emerging Edge School of Technology (EEST)</strong> &middot; Official Strategy Playbook<br />
+        Campus: University Road, Hayatabad, Peshawar, Khyber Pakhtunkhwa &middot; Portal: <a href="https://school.emergingedge.tech" style="color: #2563eb; text-decoration: none;">school.emergingedge.tech</a><br />
+        &copy; 2026 Emerging Edge School. Confidential &middot; For Internal Team Use.
+      </p>
+    </div>
+
+  </div>
+
+</body>
+</html>
