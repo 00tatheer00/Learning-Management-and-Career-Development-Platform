@@ -27,12 +27,26 @@ export async function GET() {
     (item) => item.programSlug
   );
 
+  // Collect all approved modules across all programs for the response
+  const allApprovedModules: string[] = [];
+  if (context.approvedLevelsByProgram) {
+    for (const levels of Object.values(context.approvedLevelsByProgram)) {
+      allApprovedModules.push(...levels);
+    }
+  }
+  const enrolledModules =
+    allApprovedModules.length > 0
+      ? [...new Set(allApprovedModules)]
+      : context.approvedLevels;
+
   return NextResponse.json(
     createApiResponse(true, {
       data: {
         recordings,
         progress: getClassProgress(primaryProgramSlug),
         programSlug: primaryProgramSlug,
+        programSlugs,
+        enrolledModules,
       },
     })
   );

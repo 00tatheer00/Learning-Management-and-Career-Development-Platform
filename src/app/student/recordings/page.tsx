@@ -42,16 +42,23 @@ export default async function StudentRecordingsPage() {
       (item) => item.programSlug
     );
 
-    // Strictly pass ONLY the student's approved/unlocked modules for this course
-    const approvedForCourse =
-      moduleContext.approvedLevelsByProgram?.[primarySlug] ?? moduleContext.approvedLevels;
+    // Collect approved modules from ALL enrolled programs (not just primary)
+    // so the UI module filter tabs show modules from every enrolled program.
+    const allApprovedModules: string[] = [];
+    if (moduleContext.approvedLevelsByProgram) {
+      for (const levels of Object.values(moduleContext.approvedLevelsByProgram)) {
+        allApprovedModules.push(...levels);
+      }
+    }
 
     enrolledModules =
-      approvedForCourse && approvedForCourse.length > 0
-        ? approvedForCourse
-        : studentModule
-          ? [studentModule]
-          : [];
+      allApprovedModules.length > 0
+        ? [...new Set(allApprovedModules)]
+        : moduleContext.approvedLevels.length > 0
+          ? moduleContext.approvedLevels
+          : studentModule
+            ? [studentModule]
+            : [];
   } catch (err) {
     console.error("[StudentRecordingsPage] Error loading recordings:", err);
     try {

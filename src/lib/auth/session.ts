@@ -124,10 +124,14 @@ async function buildPortalUser(
       ? await getApprovedProgramSlugs(user.email)
       : undefined;
 
+  // Use cross-program approved levels so students enrolled in multiple
+  // programs (e.g. Web Dev + App Dev) see modules from ALL their programs.
   const approvedLevels =
-    user.role === "student" && user.email
-      ? await getApprovedEnrollmentLevels(user.email, user.programSlug ?? "web-development")
-      : undefined;
+    user.role === "student" && user.email && programSlugs && programSlugs.length > 0
+      ? await getApprovedEnrollmentLevelsAllPrograms(user.email, programSlugs)
+      : user.role === "student" && user.email
+        ? await getApprovedEnrollmentLevels(user.email, user.programSlug ?? "web-development")
+        : undefined;
 
   const portalUser: PortalUser = {
     id: user.id,
