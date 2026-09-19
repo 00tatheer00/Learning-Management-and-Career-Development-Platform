@@ -13,6 +13,22 @@ export const PHASE_4_START_ISO = "2026-09-18T19:00:00.000Z";
 
 export type RegistrationPhase = "phase-1" | "phase-2" | "phase-3" | "phase-4";
 
+export function getProgramsForPhase(phase: "all" | RegistrationPhase): readonly string[] {
+  switch (phase) {
+    case "phase-1":
+      return ["web-development", "app-development"] as const;
+    case "phase-2":
+      return ["web-development", "app-development", "artificial-intelligence"] as const;
+    case "phase-3":
+      return ["web-development", "app-development", "artificial-intelligence"] as const;
+    case "phase-4":
+      return ["digital-marketing", "ecommerce", "graphics-designing"] as const;
+    case "all":
+    default:
+      return ENROLLABLE_PROGRAM_SLUGS;
+  }
+}
+
 export function getBatchForProgram(programSlug: string): string {
   if (ENROLLABLE_PROGRAM_SLUGS.includes(programSlug as (typeof ENROLLABLE_PROGRAM_SLUGS)[number])) {
     return DEFAULT_BATCH_NAME;

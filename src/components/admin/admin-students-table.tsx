@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   DownloadSimple,
   MagnifyingGlass,
@@ -21,6 +21,7 @@ import {
   DEFAULT_BATCH_NAME,
   getRegistrationPhase,
   getPhaseInfo,
+  getProgramsForPhase,
   type RegistrationPhase,
 } from "@/lib/constants/batch";
 import { getProgramBySlug } from "@/lib/data/programs";
@@ -56,6 +57,14 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
   const [editBatch, setEditBatch] = useState(DEFAULT_BATCH_NAME);
   const [deleteTarget, setDeleteTarget] = useState<AdminStudentRow | null>(null);
 
+  // If courseFilter is not applicable in the selected phase, reset to "all"
+  useEffect(() => {
+    const allowed = getProgramsForPhase(phaseFilter);
+    if (courseFilter !== "all" && !allowed.includes(courseFilter)) {
+      setCourseFilter("all");
+    }
+  }, [phaseFilter, courseFilter]);
+
   const phaseCounts = useMemo(() => {
     const phase1 = students.filter((s) => getRegistrationPhase(s) === "phase-1").length;
     const phase2 = students.filter((s) => getRegistrationPhase(s) === "phase-2").length;
@@ -64,13 +73,18 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
     return { all: students.length, phase1, phase2, phase3, phase4 };
   }, [students]);
 
+  const phaseFilteredStudents = useMemo(() => {
+    if (phaseFilter === "all") return students;
+    return students.filter((s) => getRegistrationPhase(s) === phaseFilter);
+  }, [students, phaseFilter]);
+
   const courseStudentCounts = useMemo(() => {
     const counts: Record<string, number> = {};
-    for (const slug of ENROLLABLE_PROGRAM_SLUGS) {
-      counts[slug] = students.filter((student) => student.programSlug === slug).length;
+    for (const slug of getProgramsForPhase(phaseFilter)) {
+      counts[slug] = phaseFilteredStudents.filter((student) => student.programSlug === slug).length;
     }
     return counts;
-  }, [students]);
+  }, [phaseFilteredStudents, phaseFilter]);
 
   const moduleCounts = useMemo(() => {
     if (!selectedCourse) return [];
@@ -210,7 +224,7 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
         <div className="space-y-4">
           <p className="text-sm text-muted">Choose a course to browse students by module.</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {ENROLLABLE_PROGRAM_SLUGS.map((slug) => {
+            {getProgramsForPhase(phaseFilter).map((slug) => {
               const category = getProgramCategory(slug);
               const program = getProgramBySlug(slug);
               const count = courseStudentCounts[slug] ?? 0;
@@ -348,10 +362,10 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
         </span>
         {[
           { id: "all", label: "All Phases", count: phaseCounts.all },
-          { id: "phase-1", label: "Phase 1 (Module 1)", count: phaseCounts.phase1 },
-          { id: "phase-2", label: "Phase 2 (2nd Module)", count: phaseCounts.phase2 },
-          { id: "phase-3", label: "Phase 3 (Web & App 3rd Module)", count: phaseCounts.phase3 },
-          { id: "phase-4", label: "Phase 4 (Marketing, Ecommerce, Graphics)", count: phaseCounts.phase4 },
+          { id: "phase-1", label: "Phase 1 (Web & App 1st Module)", count: phaseCounts.phase1 },
+          { id: "phase-2", label: "Phase 2 (Web/App 2nd & AI 1st)", count: phaseCounts.phase2 },
+          { id: "phase-3", label: "Phase 3 (Web/App 3rd & AI 2nd)", count: phaseCounts.phase3 },
+          { id: "phase-4", label: "Phase 4 (Marketing, Ecommerce & Graphics)", count: phaseCounts.phase4 },
         ].map((item) => (
           <button
             key={item.id}
@@ -392,11 +406,11 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
               : "border border-border bg-background text-muted hover:text-foreground"
           }`}
         >
-          All Students ({students.length})
+          All Students ({phaseFilteredStudents.length})
         </button>
-        {ENROLLABLE_PROGRAM_SLUGS.map((slug) => {
+        {getProgramsForPhase(phaseFilter).map((slug) => {
           const category = getProgramCategory(slug);
-          const count = students.filter((student) => student.programSlug === slug).length;
+          const count = phaseFilteredStudents.filter((student) => student.programSlug === slug).length;
           return (
             <button
               key={slug}

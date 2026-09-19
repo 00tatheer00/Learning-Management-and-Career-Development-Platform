@@ -34,6 +34,7 @@ import { WhatsAppTemplatePill } from "@/components/admin/whatsapp-template-pill"
 import {
   getRegistrationPhase,
   getPhaseInfo,
+  getProgramsForPhase,
   type RegistrationPhase,
 } from "@/lib/constants/batch";
 import type { AdminEnrollmentRow } from "@/lib/api/admin-enrollments";
@@ -67,6 +68,14 @@ export function AdminEnrollmentsPanel() {
   const [quickFilter, setQuickFilter] = useState<QuickFilter>("all");
   const [search, setSearch] = useState("");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  // If programFilter is not applicable in the selected phase, reset to "all"
+  useEffect(() => {
+    const allowed = getProgramsForPhase(phaseFilter);
+    if (programFilter !== "all" && !allowed.includes(programFilter)) {
+      setProgramFilter("all");
+    }
+  }, [phaseFilter, programFilter]);
   const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
   const [rejectReason, setRejectReason] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<{
@@ -156,7 +165,8 @@ export function AdminEnrollmentsPanel() {
 
     const all = base.length;
     const perProgram: Record<string, number> = {};
-    for (const slug of ENROLLABLE_PROGRAM_SLUGS) {
+    const relevantSlugs = getProgramsForPhase(phaseFilter);
+    for (const slug of relevantSlugs) {
       perProgram[slug] = base.filter((enrollment) => enrollment.program === slug).length;
     }
 
@@ -417,7 +427,7 @@ export function AdminEnrollmentsPanel() {
           <div className="inline-flex rounded-xl bg-secondary/60 p-1 text-xs sm:text-sm min-w-max">
             {[
               { value: "all", label: "All courses", count: programCounts.all },
-              ...ENROLLABLE_PROGRAM_SLUGS.map((slug) => ({
+              ...getProgramsForPhase(phaseFilter).map((slug) => ({
                 value: slug,
                 label: getProgramCategory(slug)?.shortLabel ?? slug,
                 count: programCounts.perProgram[slug] ?? 0,
@@ -478,10 +488,10 @@ export function AdminEnrollmentsPanel() {
           </span>
           {[
             { id: "all", label: "All Phases", count: phaseCounts.all },
-            { id: "phase-1", label: "Phase 1 (Module 1)", count: phaseCounts.phase1 },
-            { id: "phase-2", label: "Phase 2 (2nd Module)", count: phaseCounts.phase2 },
-            { id: "phase-3", label: "Phase 3 (Web & App 3rd Module)", count: phaseCounts.phase3 },
-            { id: "phase-4", label: "Phase 4 (Marketing, Ecommerce, Graphics)", count: phaseCounts.phase4 },
+            { id: "phase-1", label: "Phase 1 (Web & App 1st Module)", count: phaseCounts.phase1 },
+            { id: "phase-2", label: "Phase 2 (Web/App 2nd & AI 1st)", count: phaseCounts.phase2 },
+            { id: "phase-3", label: "Phase 3 (Web/App 3rd & AI 2nd)", count: phaseCounts.phase3 },
+            { id: "phase-4", label: "Phase 4 (Marketing, Ecommerce & Graphics)", count: phaseCounts.phase4 },
           ].map((item) => (
             <button
               key={item.id}

@@ -26,6 +26,7 @@ import type {
 } from "@/lib/api/admin-revenue";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { getProgramsForPhase } from "@/lib/constants/batch";
 
 type RevenuePeriod = "all" | "week" | "month" | string;
 
@@ -383,34 +384,10 @@ function AdminRevenueSidePanel() {
 
   const periodOptions = getPeriodOptions();
 
-  // Filter courses for active phase (Phase 1 had only Web & App Dev, Phase 2 & 3 had Web, App, AI; Phase 4 has Marketing, Ecommerce, Graphics)
+  // Filter courses for active phase: Phase 1 (Web, App), Phase 2 & 3 (Web, App, AI), Phase 4 (Marketing, Ecommerce, Graphics)
   const coursesToDisplay = activeStats?.byCourse.filter((c) => {
-    if (selectedPhase === "phase-1") {
-      return c.programSlug === "web-development" || c.programSlug === "app-development";
-    }
-    if (selectedPhase === "phase-2") {
-      return (
-        c.programSlug === "web-development" ||
-        c.programSlug === "app-development" ||
-        c.programSlug === "artificial-intelligence"
-      );
-    }
-    if (selectedPhase === "phase-3") {
-      return (
-        c.programSlug === "web-development" ||
-        c.programSlug === "app-development" ||
-        c.programSlug === "artificial-intelligence"
-      );
-    }
-    if (selectedPhase === "phase-4") {
-      return (
-        c.programSlug === "digital-marketing" ||
-        c.programSlug === "ecommerce" ||
-        c.programSlug === "graphics-designing" ||
-        c.approvedCount > 0
-      );
-    }
-    return true;
+    if (selectedPhase === "all") return true;
+    return getProgramsForPhase(selectedPhase).includes(c.programSlug);
   });
 
   const handleCopyTrainerPayouts = () => {

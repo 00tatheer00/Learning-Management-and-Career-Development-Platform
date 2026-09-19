@@ -15,6 +15,22 @@ export const PHASE_4_START_DATE = new Date(PHASE_4_START_ISO);
 export type RegistrationPhase = "phase-1" | "phase-2" | "phase-3" | "phase-4";
 export type PhaseFilter = "all" | "phase-1" | "phase-2" | "phase-3" | "phase-4";
 
+export function getProgramsForPhase(phase: PhaseFilter): readonly string[] {
+  switch (phase) {
+    case "phase-1":
+      return ["web-development", "app-development"] as const;
+    case "phase-2":
+      return ["web-development", "app-development", "artificial-intelligence"] as const;
+    case "phase-3":
+      return ["web-development", "app-development", "artificial-intelligence"] as const;
+    case "phase-4":
+      return ["digital-marketing", "ecommerce", "graphics-designing"] as const;
+    case "all":
+    default:
+      return ENROLLABLE_PROGRAM_SLUGS;
+  }
+}
+
 /**
  * PhaseService — ADMISSIONS DOMAIN AUTHORITY
  *
