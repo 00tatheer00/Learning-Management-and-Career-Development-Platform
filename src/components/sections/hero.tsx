@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
-import { ArrowRight, Sparkles, Code2, Cpu, Palette, Megaphone } from "lucide-react";
+import { ArrowRight, Sparkles, Code2, Cpu, Palette, Megaphone, ShoppingCart } from "lucide-react";
 import { motion, type Variants } from "framer-motion";
 import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
@@ -97,28 +97,28 @@ export function HeroSection() {
           <span>AI &amp; Automation</span>
         </motion.div>
 
-        {/* Badge 3: Bottom Left */}
+        {/* Badge 3: Bottom Left - Ecommerce */}
         <motion.div
           animate={{ y: [0, -12, 0] }}
           transition={{ duration: 5.2, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          className="absolute bottom-[28%] left-6 xl:left-12 flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-white/90 backdrop-blur-md border border-indigo-200/80 shadow-xl shadow-indigo-500/10 text-slate-900 text-xs font-black"
+          className="absolute bottom-[28%] left-6 xl:left-12 flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-white/90 backdrop-blur-md border border-amber-200/80 shadow-xl shadow-amber-500/10 text-slate-900 text-xs font-black"
         >
-          <div className="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-600">
-            <Palette size={16} />
+          <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-600">
+            <ShoppingCart size={16} />
           </div>
-          <span>UI/UX Design</span>
+          <span>Ecommerce &amp; Shopify</span>
         </motion.div>
 
-        {/* Badge 4: Bottom Right */}
+        {/* Badge 4: Bottom Right - Graphics Designing */}
         <motion.div
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
-          className="absolute bottom-[26%] right-6 xl:right-12 flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-white/90 backdrop-blur-md border border-emerald-200/80 shadow-xl shadow-emerald-500/10 text-slate-900 text-xs font-black"
+          className="absolute bottom-[26%] right-6 xl:right-12 flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-white/90 backdrop-blur-md border border-rose-200/80 shadow-xl shadow-rose-500/10 text-slate-900 text-xs font-black"
         >
-          <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-600">
-            <Megaphone size={16} />
+          <div className="p-1.5 rounded-lg bg-rose-500/10 text-rose-600">
+            <Palette size={16} />
           </div>
-          <span>Digital Marketing with AI</span>
+          <span>Graphics Designing</span>
         </motion.div>
       </div>
 
@@ -129,34 +129,20 @@ export function HeroSection() {
           animate="visible"
           className="w-full max-w-[1140px] flex flex-col items-center"
         >
-          {/* ═══ DIGITAL MARKETING WITH AI LAUNCH BANNER ═══ */}
-          <motion.div variants={itemVariants} className="mb-5">
-            <Link
-              href="/programs/digital-marketing"
-              className="group relative inline-flex items-center gap-3 px-5 py-2.5 rounded-full overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/15 hover:-translate-y-0.5"
+          {/* ═══ 3 NEW COURSES FEATURED SHOWCASE ═══ */}
+          <motion.div variants={itemVariants} className="mb-4">
+            <div
+              className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full overflow-hidden text-xs sm:text-sm font-extrabold shadow-sm"
               style={{
                 background: "linear-gradient(135deg, #fff7ed 0%, #ffedd5 50%, #fef3c7 100%)",
-                border: "1px solid rgba(234,88,12,0.18)",
+                border: "1px solid rgba(234,88,12,0.22)",
                 boxShadow: "0 2px 12px rgba(234,88,12,0.08)",
               }}
             >
-              {/* Shimmer sweep */}
-              <motion.div
-                animate={{ x: ["-150%", "250%"] }}
-                transition={{ duration: 2.8, repeat: Infinity, ease: "linear", repeatDelay: 3 }}
-                className="absolute inset-y-0 w-1/4 pointer-events-none"
-                style={{
-                  background: "linear-gradient(90deg, transparent, rgba(249,115,22,0.12), transparent)",
-                }}
-              />
-
-              {/* Pulsing dot */}
               <span className="relative flex h-2 w-2 shrink-0">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-500 opacity-50" />
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-500 opacity-60" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-orange-500" />
               </span>
-
-              {/* NEW pill */}
               <span
                 className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest text-white shrink-0"
                 style={{
@@ -165,29 +151,89 @@ export function HeroSection() {
                 }}
               >
                 <Sparkles size={8} />
-                New Course
+                Now Live
               </span>
-
-              {/* Title */}
-              <span className="text-sm sm:text-[15px] font-bold text-slate-800 tracking-tight whitespace-nowrap">
-                Digital Marketing with AI Launched
+              <span className="text-slate-900 font-extrabold tracking-tight">
+                3 New Bootcamps Launched for Admissions
               </span>
+            </div>
+          </motion.div>
 
-              {/* Separator */}
-              <span className="hidden sm:block w-px h-4 bg-orange-300/60 shrink-0" />
+          {/* 3 Featured Course Cards */}
+          <motion.div
+            variants={itemVariants}
+            className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 w-full max-w-3xl mb-6"
+          >
+            {/* 1. Digital Marketing */}
+            <Link
+              href="/programs/digital-marketing"
+              className="group relative flex items-center gap-3 p-3 rounded-2xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-emerald-300/70 dark:border-emerald-700/60 shadow-md shadow-emerald-500/5 hover:shadow-xl hover:shadow-emerald-500/15 hover:-translate-y-1 transition-all duration-200 text-left"
+            >
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400 group-hover:scale-105 transition-transform">
+                <Megaphone size={18} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs sm:text-sm font-black text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors truncate">
+                    Digital Marketing
+                  </span>
+                  <span className="px-1.5 py-0.2 rounded-full text-[8px] font-black uppercase tracking-wider bg-emerald-600 text-white shrink-0">
+                    New
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate">
+                  SEO, SMM &amp; AI Tools
+                </p>
+              </div>
+              <ArrowRight size={14} className="text-emerald-500 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0" />
+            </Link>
 
-              {/* CTA */}
-              <motion.span
-                animate={{ x: [0, 3, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                className="hidden sm:inline-flex items-center gap-1 text-xs font-bold text-orange-600 group-hover:text-orange-700 transition-colors shrink-0"
-              >
-                Explore Syllabus
-                <ArrowRight size={12} strokeWidth={2.5} />
-              </motion.span>
+            {/* 2. Graphics Designing */}
+            <Link
+              href="/programs/graphics-designing"
+              className="group relative flex items-center gap-3 p-3 rounded-2xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-rose-300/70 dark:border-rose-700/60 shadow-md shadow-rose-500/5 hover:shadow-xl hover:shadow-rose-500/15 hover:-translate-y-1 transition-all duration-200 text-left"
+            >
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-500/10 text-rose-600 dark:bg-rose-500/20 dark:text-rose-400 group-hover:scale-105 transition-transform">
+                <Palette size={18} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs sm:text-sm font-black text-slate-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors truncate">
+                    Graphics Designing
+                  </span>
+                  <span className="px-1.5 py-0.2 rounded-full text-[8px] font-black uppercase tracking-wider bg-rose-600 text-white shrink-0">
+                    New
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate">
+                  Photoshop &amp; Branding
+                </p>
+              </div>
+              <ArrowRight size={14} className="text-rose-500 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0" />
+            </Link>
 
-              {/* Mobile arrow only */}
-              <ArrowRight size={14} strokeWidth={2.5} className="sm:hidden text-orange-500 shrink-0" />
+            {/* 3. Ecommerce */}
+            <Link
+              href="/programs/ecommerce"
+              className="group relative flex items-center gap-3 p-3 rounded-2xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-amber-300/70 dark:border-amber-700/60 shadow-md shadow-amber-500/5 hover:shadow-xl hover:shadow-amber-500/15 hover:-translate-y-1 transition-all duration-200 text-left"
+            >
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400 group-hover:scale-105 transition-transform">
+                <ShoppingCart size={18} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs sm:text-sm font-black text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors truncate">
+                    Ecommerce
+                  </span>
+                  <span className="px-1.5 py-0.2 rounded-full text-[8px] font-black uppercase tracking-wider bg-amber-600 text-white shrink-0">
+                    New
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate">
+                  Shopify &amp; Store Setup
+                </p>
+              </div>
+              <ArrowRight size={14} className="text-amber-500 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0" />
             </Link>
           </motion.div>
 
@@ -216,8 +262,8 @@ export function HeroSection() {
             variants={itemVariants}
             className="text-lg sm:text-xl text-slate-700 max-w-2xl mx-auto mb-6 leading-relaxed font-semibold"
           >
-            Web, App, AI, Video Editing, Digital Marketing, Graphics &amp; UI/UX
-            courses. All courses include live interactive classes, assignments, and portal access.
+            Web, App, AI, Digital Marketing, Graphics Designing &amp; Ecommerce
+            bootcamps. All courses include live interactive classes, assignments, and portal access.
           </motion.p>
 
           {/* Pricing Highlight Pill - Prominent Main Page Pricing */}

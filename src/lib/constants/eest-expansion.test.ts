@@ -42,11 +42,15 @@ describe("EEST Portal Course Expansion & Phase 4 Verification", () => {
     expect(usman).toBeDefined();
     expect(usman?.programSlug).toBe("ecommerce");
     expect(usman?.designation).toBe("Ecommerce Trainer");
+    expect(getTrainerDesignation("ecommerce")).toBe("Ecommerce Trainer");
+    expect(getTrainersByProgramSlug("ecommerce")).toHaveLength(1);
 
     const fazal = trainers.find((t) => t.id === "trainer-fazal");
     expect(fazal).toBeDefined();
     expect(fazal?.programSlug).toBe("graphics-designing");
     expect(fazal?.designation).toBe("Graphics Designing Trainer");
+    expect(getTrainerDesignation("graphics-designing")).toBe("Graphics Designing Trainer");
+    expect(getTrainersByProgramSlug("graphics-designing")).toHaveLength(1);
   });
 
   it("normalizes program slugs reliably for all 6 courses", () => {
@@ -59,13 +63,17 @@ describe("EEST Portal Course Expansion & Phase 4 Verification", () => {
   });
 
   it("verifies active courses have populated modules in programs catalog", () => {
+    expect(programs.filter((p) => p.category === "active")).toHaveLength(6);
+
     const ecom = getProgramBySlug("ecommerce");
     expect(ecom?.category).toBe("active");
     expect(ecom?.modules.length).toBeGreaterThanOrEqual(3);
+    expect(getProgramModuleNames("ecommerce")).toHaveLength(3);
 
     const graphics = getProgramBySlug("graphics-designing");
     expect(graphics?.category).toBe("active");
     expect(graphics?.modules.length).toBeGreaterThanOrEqual(3);
+    expect(getProgramModuleNames("graphics-designing")).toHaveLength(3);
   });
 
   it("resolves canonical modules accurately for Ecommerce and Graphics Designing", () => {
