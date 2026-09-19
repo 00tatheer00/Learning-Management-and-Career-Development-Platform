@@ -3,6 +3,7 @@ import {
   getRegistrationPhase,
   PHASE_2_START_ISO,
   PHASE_3_START_ISO,
+  PHASE_4_START_ISO,
 } from "@/lib/services/phase-service";
 
 describe("PhaseService - Centralized Phase Classification", () => {
@@ -26,7 +27,7 @@ describe("PhaseService - Centralized Phase Classification", () => {
     expect(getRegistrationPhase(justBeforePhase3)).toBe("phase-2");
   });
 
-  it("classifies registration created exactly at or after 29 August 2026 00:00 PKT (19:00 UTC August 28) as phase-3", () => {
+  it("classifies registration created between 29 August and 18 September 2026 as phase-3", () => {
     const exactStart = PHASE_3_START_ISO;
     expect(getRegistrationPhase(exactStart)).toBe("phase-3");
     expect(getRegistrationPhase(new Date(exactStart))).toBe("phase-3");
@@ -34,6 +35,19 @@ describe("PhaseService - Centralized Phase Classification", () => {
     const afterStart = "2026-08-29T10:00:00.000Z";
     expect(getRegistrationPhase(afterStart)).toBe("phase-3");
     expect(getRegistrationPhase({ createdAt: afterStart })).toBe("phase-3");
+
+    const justBeforePhase4 = "2026-09-18T18:59:59.999Z";
+    expect(getRegistrationPhase(justBeforePhase4)).toBe("phase-3");
+  });
+
+  it("classifies registration created at or after 19 September 2026 (Phase 4) as phase-4", () => {
+    const exactStart = PHASE_4_START_ISO;
+    expect(getRegistrationPhase(exactStart)).toBe("phase-4");
+    expect(getRegistrationPhase(new Date(exactStart))).toBe("phase-4");
+
+    const afterStart = "2026-09-19T10:00:00.000Z";
+    expect(getRegistrationPhase(afterStart)).toBe("phase-4");
+    expect(getRegistrationPhase({ createdAt: afterStart })).toBe("phase-4");
   });
 
   it("relies strictly on date regardless of extra properties", () => {

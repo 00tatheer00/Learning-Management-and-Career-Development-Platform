@@ -76,6 +76,26 @@ const DEFAULT_SYSTEM_ACCOUNTS = [
     programSlug: "digital-marketing",
     trainerId: "trainer-zunira",
   },
+  {
+    id: "trainer-usman",
+    email: "usman@eest.com",
+    defaultPassword: process.env.SEED_TRAINER_USMAN_PASSWORD?.trim() || "usman@321",
+    role: "trainer" as const,
+    name: "M Usman",
+    phone: "03000000000",
+    programSlug: "ecommerce",
+    trainerId: "trainer-usman",
+  },
+  {
+    id: "trainer-fazal",
+    email: "fazal@eest.com",
+    defaultPassword: process.env.SEED_TRAINER_FAZAL_PASSWORD?.trim() || "fazal@321",
+    role: "trainer" as const,
+    name: "Fazal ur Rehman",
+    phone: "03000000000",
+    programSlug: "graphics-designing",
+    trainerId: "trainer-fazal",
+  },
 ];
 
 export const authOptions: NextAuthOptions = {

@@ -11,6 +11,7 @@ import {
   Layout,
   Megaphone,
   PaintBrushBroad,
+  ShoppingCart,
   CalendarDots,
   ListBullets,
   Stack,
@@ -32,6 +33,7 @@ const PROGRAM_ICONS: Record<string, Icon> = {
   "artificial-intelligence": Brain,
   "video-editing": FilmStrip,
   "digital-marketing": Megaphone,
+  "ecommerce": ShoppingCart,
   "graphics-designing": PaintBrushBroad,
   "ui-ux-design": Layout,
 };

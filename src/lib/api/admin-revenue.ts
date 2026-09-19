@@ -76,6 +76,7 @@ export interface AdminRevenueStats extends AdminRevenuePhaseStats {
     phase1: AdminRevenuePhaseStats;
     phase2: AdminRevenuePhaseStats;
     phase3: AdminRevenuePhaseStats;
+    phase4: AdminRevenuePhaseStats;
   };
 }
 
@@ -275,11 +276,13 @@ export async function getAdminRevenueStats(): Promise<AdminRevenueStats> {
   const phase1Rows = dated.filter((row) => getRegistrationPhase(row.createdAt) === "phase-1");
   const phase2Rows = dated.filter((row) => getRegistrationPhase(row.createdAt) === "phase-2");
   const phase3Rows = dated.filter((row) => getRegistrationPhase(row.createdAt) === "phase-3");
+  const phase4Rows = dated.filter((row) => getRegistrationPhase(row.createdAt) === "phase-4");
 
   const overall = buildStatsForRows(dated, weekStart, monthStart);
   const phase1 = buildStatsForRows(phase1Rows, weekStart, monthStart);
   const phase2 = buildStatsForRows(phase2Rows, weekStart, monthStart);
   const phase3 = buildStatsForRows(phase3Rows, weekStart, monthStart);
+  const phase4 = buildStatsForRows(phase4Rows, weekStart, monthStart);
 
   return {
     registrationFee: REVENUE_SPLIT.registrationFee,
@@ -292,6 +295,7 @@ export async function getAdminRevenueStats(): Promise<AdminRevenueStats> {
       phase1,
       phase2,
       phase3,
+      phase4,
     },
   };
 }

@@ -36,6 +36,22 @@ export const STUDENT_UR = {
       subline:
         "Live classes on Mon, Tue, and Wed (9:00 PM – 10:00 PM). Check the portal for the exact join link.",
     },
+    ecommerce: {
+      programLabel: "Ecommerce",
+      headline: "Classes starting soon.",
+      daysLabel: "Schedule in Portal",
+      startDateLabel: "Starting Soon",
+      subline:
+        "Check your student portal for class schedule and live session links.",
+    },
+    graphics: {
+      programLabel: "Graphics Designing",
+      headline: "Classes starting soon.",
+      daysLabel: "Schedule in Portal",
+      startDateLabel: "Starting Soon",
+      subline:
+        "Check your student portal for class schedule and live session links.",
+    },
     bannerTitle: (program: string) => `${program} — Class Schedule`,
   },
 
@@ -93,5 +109,7 @@ export const STUDENT_UR = {
 export function getStudentClassSchedule(programSlug?: string | null) {
   if (programSlug === "app-development") return STUDENT_UR.schedule.app;
   if (programSlug === "digital-marketing") return STUDENT_UR.schedule.marketing;
+  if (programSlug === "ecommerce") return STUDENT_UR.schedule.ecommerce;
+  if (programSlug === "graphics-designing") return STUDENT_UR.schedule.graphics;
   return STUDENT_UR.schedule.web;
 }

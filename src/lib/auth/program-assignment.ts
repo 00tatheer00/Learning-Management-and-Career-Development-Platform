@@ -11,6 +11,8 @@ export function normalizeProgramSlug(rawSlug?: string | null): string {
   if (lower.includes("app") || lower.includes("flutter")) return "app-development";
   if (lower.includes("ai") || lower.includes("artificial") || lower.includes("intelligence")) return "artificial-intelligence";
   if (lower.includes("marketing") || lower.includes("digital") || lower.includes("seo") || lower.includes("smm")) return "digital-marketing";
+  if (lower.includes("ecommerce") || lower.includes("e-commerce") || lower.includes("shopify") || lower.includes("store")) return "ecommerce";
+  if (lower.includes("graphic") || lower.includes("designing") || lower.includes("photoshop") || lower.includes("illustrator")) return "graphics-designing";
   return lower;
 }
 

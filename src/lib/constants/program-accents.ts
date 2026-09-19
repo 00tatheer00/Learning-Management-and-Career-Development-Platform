@@ -12,6 +12,11 @@ export const PROGRAM_ACCENTS: Record<
     glow: "group-hover:shadow-indigo-600/20",
     iconBg: "bg-indigo-500/10 text-indigo-600",
   },
+  "ecommerce": {
+    gradient: "from-orange-500 via-amber-600 to-orange-900",
+    glow: "group-hover:shadow-orange-500/20",
+    iconBg: "bg-orange-500/10 text-orange-600",
+  },
   "graphics-designing": {
     gradient: "from-rose-500 via-pink-600 to-rose-900",
     glow: "group-hover:shadow-rose-500/20",

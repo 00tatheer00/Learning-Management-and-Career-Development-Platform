@@ -223,13 +223,51 @@ export const programs: Program[] = [
     modules: [],
   },
   {
+    id: "ecommerce",
+    slug: "ecommerce",
+    title: "Ecommerce",
+    category: "active",
+    description:
+      "Learn to build, manage, and scale profitable online stores — from product listing and store setup to digital marketing and sales optimization.",
+    duration: "~3 months · 3 modules",
+    level: "Beginner to Advanced",
+    image:
+      "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=900&h=560&fit=crop&q=80",
+    outcomes: [
+      "Understand ecommerce business models and platforms",
+      "Set up and manage an online store from scratch",
+      "Implement product listing, pricing, and inventory strategies",
+      "Drive sales with digital marketing and analytics",
+    ],
+    modules: [
+      createProgramModule(
+        "Ecommerce Fundamentals",
+        "Business models, platforms, and store planning",
+        "1 month",
+        MODULE_SCHEDULE
+      ),
+      createProgramModule(
+        "Store Setup & Product Management",
+        "Building, listing, and managing your online store",
+        "1 month",
+        MODULE_SCHEDULE
+      ),
+      createProgramModule(
+        "Marketing & Sales Optimization",
+        "Digital marketing, ads, analytics, and scaling",
+        "1 month",
+        MODULE_SCHEDULE
+      ),
+    ],
+  },
+  {
     id: "graphics-designing",
     slug: "graphics-designing",
     title: "Graphics Designing",
-    category: "future",
+    category: "active",
     description:
       "Build strong visual design skills for branding, social media, print, and digital marketing creatives.",
-    duration: "Coming Soon",
+    duration: "~3 months · 3 modules",
     level: "Beginner to Intermediate",
     image:
       "https://images.unsplash.com/photo-1626785774573-ac980107945f?w=900&h=560&fit=crop&q=80",
@@ -239,7 +277,26 @@ export const programs: Program[] = [
       "Use industry-standard design tools",
       "Develop a professional design portfolio",
     ],
-    modules: [],
+    modules: [
+      createProgramModule(
+        "Design Fundamentals & Tools",
+        "Core design principles, color theory, and tool mastery",
+        "1 month",
+        MODULE_SCHEDULE
+      ),
+      createProgramModule(
+        "Branding & Visual Identity",
+        "Logo design, brand guides, and marketing creatives",
+        "1 month",
+        MODULE_SCHEDULE
+      ),
+      createProgramModule(
+        "Portfolio & Client Projects",
+        "Real-world projects, portfolio building, and freelancing",
+        "1 month",
+        MODULE_SCHEDULE
+      ),
+    ],
   },
   {
     id: "ui-ux",

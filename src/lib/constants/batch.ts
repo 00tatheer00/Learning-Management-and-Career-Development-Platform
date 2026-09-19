@@ -8,7 +8,10 @@ export const PHASE_2_START_ISO = "2026-07-23T19:00:00.000Z";
 // Date when Phase 3 admissions officially opened (29th August 2026 00:00 PKT)
 export const PHASE_3_START_ISO = "2026-08-28T19:00:00.000Z";
 
-export type RegistrationPhase = "phase-1" | "phase-2" | "phase-3";
+// Date when Phase 4 admissions officially opened (19th September 2026 00:00 PKT)
+export const PHASE_4_START_ISO = "2026-09-18T19:00:00.000Z";
+
+export type RegistrationPhase = "phase-1" | "phase-2" | "phase-3" | "phase-4";
 
 export function getBatchForProgram(programSlug: string): string {
   if (ENROLLABLE_PROGRAM_SLUGS.includes(programSlug as (typeof ENROLLABLE_PROGRAM_SLUGS)[number])) {
@@ -50,6 +53,10 @@ export function getRegistrationPhase(item?: {
   if (dateVal) {
     const createdDate = dateVal instanceof Date ? dateVal : new Date(dateVal);
     if (!isNaN(createdDate.getTime())) {
+      const phase4Start = new Date(PHASE_4_START_ISO);
+      if (createdDate.getTime() >= phase4Start.getTime()) {
+        return "phase-4";
+      }
       const phase3Start = new Date(PHASE_3_START_ISO);
       if (createdDate.getTime() >= phase3Start.getTime()) {
         return "phase-3";
@@ -61,6 +68,9 @@ export function getRegistrationPhase(item?: {
 
   // Fallback for mock objects in tests without a date
   if (typeof item === "object" && item !== null && !(item instanceof Date)) {
+    if (item.batch?.includes("Phase 4") || item.batch?.includes("4th Module")) {
+      return "phase-4";
+    }
     if (item.batch?.includes("Phase 3") || item.batch?.includes("3rd Module")) {
       return "phase-3";
     }
@@ -73,6 +83,15 @@ export function getRegistrationPhase(item?: {
 }
 
 export function getPhaseInfo(phase: RegistrationPhase) {
+  if (phase === "phase-4") {
+    return {
+      id: "phase-4" as const,
+      label: "Phase 4 (4th Module)",
+      shortLabel: "Phase 4",
+      subtitle: "4th Module Registrations",
+      badgeClass: "bg-orange-500/15 text-orange-700 dark:text-orange-300 border-orange-500/30",
+    };
+  }
   if (phase === "phase-3") {
     return {
       id: "phase-3" as const,

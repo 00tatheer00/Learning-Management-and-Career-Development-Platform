@@ -127,7 +127,7 @@ export function AdminDashboardLoader() {
 }
 
 function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
-  const [phaseFilter, setPhaseFilter] = useState<"all" | "phase-1" | "phase-2" | "phase-3">("all");
+  const [phaseFilter, setPhaseFilter] = useState<"all" | "phase-1" | "phase-2" | "phase-3" | "phase-4">("all");
 
   const metrics = useMemo(() => {
     if (phaseFilter === "phase-1" && data.phaseBreakdown?.phase1) {
@@ -138,6 +138,9 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
     }
     if (phaseFilter === "phase-3" && data.phaseBreakdown?.phase3) {
       return data.phaseBreakdown.phase3;
+    }
+    if (phaseFilter === "phase-4" && data.phaseBreakdown?.phase4) {
+      return data.phaseBreakdown.phase4;
     }
     return {
       totalEnrollments: data.totalEnrollments,
@@ -192,13 +195,17 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
                   ? "bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border-indigo-500/30"
                   : phaseFilter === "phase-2"
                     ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30"
-                    : "bg-violet-500/15 text-violet-700 dark:text-violet-300 border-violet-500/30"
+                    : phaseFilter === "phase-4"
+                      ? "bg-orange-500/15 text-orange-700 dark:text-orange-300 border-orange-500/30"
+                      : "bg-violet-500/15 text-violet-700 dark:text-violet-300 border-violet-500/30"
               )}>
                 {phaseFilter === "phase-1"
                   ? "Phase 1 (Module 1)"
                   : phaseFilter === "phase-2"
                     ? "Phase 2 (2nd Module)"
-                    : "Phase 3 (3rd Module)"}
+                    : phaseFilter === "phase-4"
+                      ? "Phase 4 (4th Module)"
+                      : "Phase 3 (3rd Module)"}
               </span>
             )}
           </h1>
@@ -261,6 +268,19 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
             >
               <span className="h-2 w-2 rounded-full bg-violet-400" />
               Phase 3 ({data.phaseBreakdown?.phase3?.totalEnrollments ?? 0})
+            </button>
+            <button
+              type="button"
+              onClick={() => setPhaseFilter("phase-4")}
+              className={cn(
+                "rounded-md px-3 py-1.5 transition-all flex items-center gap-1.5",
+                phaseFilter === "phase-4"
+                  ? "bg-orange-600 text-white shadow-sm"
+                  : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+              )}
+            >
+              <span className="h-2 w-2 rounded-full bg-orange-400" />
+              Phase 4 ({data.phaseBreakdown?.phase4?.totalEnrollments ?? 0})
             </button>
           </div>
 

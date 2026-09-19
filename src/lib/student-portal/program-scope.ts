@@ -4,7 +4,14 @@ import { normalizeProgramSlug } from "@/lib/auth/program-assignment";
 import type { PortalUser } from "@/types/portal";
 
 /** Demo student sees active scheduled programs in the portal. */
-export const DEMO_STUDENT_PROGRAM_SLUGS = ["web-development", "app-development", "artificial-intelligence", "digital-marketing"] as const;
+export const DEMO_STUDENT_PROGRAM_SLUGS = [
+  "web-development",
+  "app-development",
+  "artificial-intelligence",
+  "digital-marketing",
+  "ecommerce",
+  "graphics-designing",
+] as const;
 
 /**
  * Returns all distinct program slugs a student is approved for,

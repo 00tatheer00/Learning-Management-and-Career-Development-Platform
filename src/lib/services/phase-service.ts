@@ -9,8 +9,11 @@ export const PHASE_2_START_DATE = new Date(PHASE_2_START_ISO);
 export const PHASE_3_START_ISO = "2026-08-28T19:00:00.000Z";
 export const PHASE_3_START_DATE = new Date(PHASE_3_START_ISO);
 
-export type RegistrationPhase = "phase-1" | "phase-2" | "phase-3";
-export type PhaseFilter = "all" | "phase-1" | "phase-2" | "phase-3";
+export const PHASE_4_START_ISO = "2026-09-18T19:00:00.000Z";
+export const PHASE_4_START_DATE = new Date(PHASE_4_START_ISO);
+
+export type RegistrationPhase = "phase-1" | "phase-2" | "phase-3" | "phase-4";
+export type PhaseFilter = "all" | "phase-1" | "phase-2" | "phase-3" | "phase-4";
 
 /**
  * PhaseService — ADMISSIONS DOMAIN AUTHORITY
@@ -43,6 +46,9 @@ export function getRegistrationPhase(item: {
   }
 
   if (dateVal && !isNaN(dateVal.getTime())) {
+    if (dateVal.getTime() >= PHASE_4_START_DATE.getTime()) {
+      return "phase-4";
+    }
     if (dateVal.getTime() >= PHASE_3_START_DATE.getTime()) {
       return "phase-3";
     }
@@ -51,6 +57,9 @@ export function getRegistrationPhase(item: {
 
   // Fallback for mock objects in tests without a date
   if (typeof item === "object" && item !== null && !(item instanceof Date)) {
+    if (item.batch?.includes("Phase 4") || item.batch?.includes("4th Module")) {
+      return "phase-4";
+    }
     if (item.batch?.includes("Phase 3") || item.batch?.includes("3rd Module")) {
       return "phase-3";
     }
@@ -67,8 +76,11 @@ export function getRegistrationPhase(item: {
  */
 export function getPhaseCreatedAtFilter(phase?: PhaseFilter) {
   if (!phase || phase === "all") return undefined;
+  if (phase === "phase-4") {
+    return { gte: PHASE_4_START_DATE };
+  }
   if (phase === "phase-3") {
-    return { gte: PHASE_3_START_DATE };
+    return { gte: PHASE_3_START_DATE, lt: PHASE_4_START_DATE };
   }
   if (phase === "phase-2") {
     return { gte: PHASE_2_START_DATE, lt: PHASE_3_START_DATE };
@@ -177,6 +189,7 @@ export async function getAllPhaseMetrics(): Promise<{
   phase1: CentralPhaseMetrics;
   phase2: CentralPhaseMetrics;
   phase3: CentralPhaseMetrics;
+  phase4: CentralPhaseMetrics;
 }> {
   const [enrollments, allStudentUsers] = await Promise.all([
     prisma.enrollment.findMany({
@@ -201,6 +214,7 @@ export async function getAllPhaseMetrics(): Promise<{
 
   const p2Time = PHASE_2_START_DATE.getTime();
   const p3Time = PHASE_3_START_DATE.getTime();
+  const p4Time = PHASE_4_START_DATE.getTime();
 
   const phase1Enrollments = enrollments.filter(
     (e) => new Date(e.createdAt).getTime() < p2Time
@@ -209,8 +223,12 @@ export async function getAllPhaseMetrics(): Promise<{
     const t = new Date(e.createdAt).getTime();
     return t >= p2Time && t < p3Time;
   });
-  const phase3Enrollments = enrollments.filter(
-    (e) => new Date(e.createdAt).getTime() >= p3Time
+  const phase3Enrollments = enrollments.filter((e) => {
+    const t = new Date(e.createdAt).getTime();
+    return t >= p3Time && t < p4Time;
+  });
+  const phase4Enrollments = enrollments.filter(
+    (e) => new Date(e.createdAt).getTime() >= p4Time
   );
 
   return {
@@ -218,6 +236,7 @@ export async function getAllPhaseMetrics(): Promise<{
     phase1: computeMetricsFromData(phase1Enrollments, allStudentUsers, true),
     phase2: computeMetricsFromData(phase2Enrollments, allStudentUsers, true),
     phase3: computeMetricsFromData(phase3Enrollments, allStudentUsers, true),
+    phase4: computeMetricsFromData(phase4Enrollments, allStudentUsers, true),
   };
 }
 
@@ -229,5 +248,6 @@ export async function getCentralPhaseMetrics(phase: PhaseFilter): Promise<Centra
   if (phase === "phase-1") return allMetrics.phase1;
   if (phase === "phase-2") return allMetrics.phase2;
   if (phase === "phase-3") return allMetrics.phase3;
+  if (phase === "phase-4") return allMetrics.phase4;
   return allMetrics.all;
 }

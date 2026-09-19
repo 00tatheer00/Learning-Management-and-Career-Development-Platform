@@ -275,6 +275,68 @@ export function getStudentModuleSchedule(
     };
   }
 
+  // 5. ECOMMERCE
+  if (slug.includes("ecommerce") || slug.includes("e-commerce") || slug.includes("store")) {
+    // Module 1 (Ecommerce Fundamentals)
+    if (
+      lvl.includes("fundamental") ||
+      lvl === "1" ||
+      lvl.includes("level 1") ||
+      lvl.includes("module 1")
+    ) {
+      return {
+        programLabel: "Ecommerce",
+        headline: "Module 1 (Ecommerce Fundamentals) is Live Now",
+        subline:
+          "Check the portal for class timing and live session links.",
+        daysLabel: "Schedule in Portal",
+        startDateLabel: "Live Now",
+      };
+    }
+
+    // Default fallback for Ecommerce
+    return {
+      programLabel: "Ecommerce",
+      headline: "Classes Starting Soon",
+      subline:
+        "Check your student portal for class schedule and live session links.",
+      daysLabel: "Schedule in Portal",
+      startDateLabel: "Starting Soon",
+    };
+  }
+
+  // 6. GRAPHICS DESIGNING
+  if (slug.includes("graphic") || slug.includes("designing")) {
+    // Module 1 (Design Fundamentals & Tools)
+    if (
+      lvl.includes("fundamental") ||
+      lvl.includes("design") ||
+      lvl.includes("tool") ||
+      lvl === "1" ||
+      lvl.includes("level 1") ||
+      lvl.includes("module 1")
+    ) {
+      return {
+        programLabel: "Graphics Designing",
+        headline: "Module 1 (Design Fundamentals & Tools) is Live Now",
+        subline:
+          "Check the portal for class timing and live session links.",
+        daysLabel: "Schedule in Portal",
+        startDateLabel: "Live Now",
+      };
+    }
+
+    // Default fallback for Graphics Designing
+    return {
+      programLabel: "Graphics Designing",
+      headline: "Classes Starting Soon",
+      subline:
+        "Check your student portal for class schedule and live session links.",
+      daysLabel: "Schedule in Portal",
+      startDateLabel: "Starting Soon",
+    };
+  }
+
   return {
     programLabel: "Emerging Edge Course",
     headline: "Classes Starting Soon",

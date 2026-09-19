@@ -52,6 +52,24 @@ export const PROGRAM_CATEGORIES: Record<
     badgeClass: "bg-emerald-500/10 text-emerald-600 border-emerald-500/25",
     headerGradient: "from-[#065f46] to-[#10b981]",
   },
+  "ecommerce": {
+    slug: "ecommerce",
+    title: "Ecommerce",
+    shortLabel: "Ecommerce",
+    sidebarLabel: "Ecommerce",
+    primaryTrainerSeedId: "trainer-usman",
+    badgeClass: "bg-orange-500/10 text-orange-600 border-orange-500/25",
+    headerGradient: "from-[#9a3412] to-[#f97316]",
+  },
+  "graphics-designing": {
+    slug: "graphics-designing",
+    title: "Graphics Designing",
+    shortLabel: "Graphics",
+    sidebarLabel: "Graphics Designing",
+    primaryTrainerSeedId: "trainer-fazal",
+    badgeClass: "bg-rose-500/10 text-rose-600 border-rose-500/25",
+    headerGradient: "from-[#9f1239] to-[#f43f5e]",
+  },
 };
 
 export function isEnrollableProgramSlug(slug: string): slug is EnrollableProgramSlug {

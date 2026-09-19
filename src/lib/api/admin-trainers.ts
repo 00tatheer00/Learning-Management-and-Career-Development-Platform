@@ -47,6 +47,8 @@ export async function getTrainerStudentCounts(): Promise<Map<string, number>> {
       else if (student.programSlug === "app-development") key = "trainer-talha";
       else if (student.programSlug === "web-development") key = "trainer-tatheer";
       else if (student.programSlug === "digital-marketing") key = "trainer-zunira";
+      else if (student.programSlug === "ecommerce") key = "trainer-usman";
+      else if (student.programSlug === "graphics-designing") key = "trainer-fazal";
     }
     if (key) {
       counts.set(key, (counts.get(key) ?? 0) + 1);
