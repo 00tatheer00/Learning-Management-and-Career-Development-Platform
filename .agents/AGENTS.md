@@ -2,6 +2,7 @@
 
 - **Automatic Git Push**: Whenever fixes, features, or tasks are completed and committed, automatically run `git push origin main` (or the active branch) without asking for user confirmation.
 - **Persistent Project Memory**: Maintain full awareness of this project's architecture, database schema, user roles, API endpoints, and configuration across all sessions.
+- **Zero Data Loss & Strict Historical Preservation**: From Day 1 of EEST onwards, NEVER delete, overwrite, corrupt, or destructively alter any existing production data — including student accounts, enrollment applications, module progression, payment screenshots, logs, or financial figures. All database operations, migrations, and feature updates MUST be strictly additive, backward-compatible, and non-destructive.
 
 ## Project Memory & Context Summary
 
