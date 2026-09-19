@@ -21,7 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
 import { ImageLightbox } from "@/components/ui/image-lightbox";
 import { PortalPageHeader } from "@/components/portal/portal-ui";
-import { ENROLLABLE_PROGRAM_SLUGS, getProgramRegistrationFee } from "@/lib/constants/payment";
+import { getProgramRegistrationFee } from "@/lib/constants/payment";
 import { ADMIN_REJECT_PRESETS } from "@/lib/constants/admin-reject-reasons";
 import { getProgramCategory } from "@/lib/constants/program-categories";
 import { formatAppliedDate, formatAppliedDateTime, formatAppliedTime, cn } from "@/lib/utils";

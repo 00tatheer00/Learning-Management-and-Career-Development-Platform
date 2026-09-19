@@ -281,6 +281,7 @@ function AdminRevenueSidePanel() {
   const { open, setOpen, stats, loading, refresh } = useAdminRevenue();
   const [period, setPeriod] = useState<RevenuePeriod>("all");
   const [selectedPhase, setSelectedPhase] = useState<"all" | "phase-1" | "phase-2" | "phase-3" | "phase-4">("all");
+  const [copiedPayout, setCopiedPayout] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -315,7 +316,6 @@ function AdminRevenueSidePanel() {
             : stats
     : null;
 
-  const [copiedPayout, setCopiedPayout] = useState(false);
   const periodStats = activeStats ? getPeriodStats(activeStats, period, selectedPhase) : null;
 
   // Build intelligent period options based on the active phase
