@@ -87,14 +87,24 @@ const DEFAULT_SYSTEM_ACCOUNTS = [
     trainerId: "trainer-usman",
   },
   {
+    id: "trainer-faisal",
+    email: "faisal@eest.com",
+    defaultPassword: process.env.SEED_TRAINER_FAISAL_PASSWORD?.trim() || "faisal@321",
+    role: "trainer" as const,
+    name: "Faisal Habib",
+    phone: "03000000000",
+    programSlug: "graphics-designing",
+    trainerId: "trainer-faisal",
+  },
+  {
     id: "trainer-fazal",
     email: "fazal@eest.com",
     defaultPassword: process.env.SEED_TRAINER_FAZAL_PASSWORD?.trim() || "fazal@321",
     role: "trainer" as const,
-    name: "Fazal ur Rehman",
+    name: "Faisal Habib",
     phone: "03000000000",
     programSlug: "graphics-designing",
-    trainerId: "trainer-fazal",
+    trainerId: "trainer-faisal",
   },
 ];
 

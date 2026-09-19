@@ -66,7 +66,7 @@ export const PROGRAM_CATEGORIES: Record<
     title: "Graphics Designing",
     shortLabel: "Graphics",
     sidebarLabel: "Graphics Designing",
-    primaryTrainerSeedId: "trainer-fazal",
+    primaryTrainerSeedId: "trainer-faisal",
     badgeClass: "bg-rose-500/10 text-rose-600 border-rose-500/25",
     headerGradient: "from-[#9f1239] to-[#f43f5e]",
   },

@@ -34,7 +34,7 @@ describe("EEST Portal Course Expansion & Phase 4 Verification", () => {
     expect(PROGRAM_CATEGORIES["artificial-intelligence"].primaryTrainerSeedId).toBe("trainer-faiza");
     expect(PROGRAM_CATEGORIES["digital-marketing"].primaryTrainerSeedId).toBe("trainer-zunira");
     expect(PROGRAM_CATEGORIES["ecommerce"].primaryTrainerSeedId).toBe("trainer-usman");
-    expect(PROGRAM_CATEGORIES["graphics-designing"].primaryTrainerSeedId).toBe("trainer-fazal");
+    expect(PROGRAM_CATEGORIES["graphics-designing"].primaryTrainerSeedId).toBe("trainer-faisal");
   });
 
   it("verifies trainers exist with active designations", () => {
@@ -45,10 +45,12 @@ describe("EEST Portal Course Expansion & Phase 4 Verification", () => {
     expect(getTrainerDesignation("ecommerce")).toBe("Ecommerce Trainer");
     expect(getTrainersByProgramSlug("ecommerce")).toHaveLength(1);
 
-    const fazal = trainers.find((t) => t.id === "trainer-fazal");
-    expect(fazal).toBeDefined();
-    expect(fazal?.programSlug).toBe("graphics-designing");
-    expect(fazal?.designation).toBe("Graphics Designing Trainer");
+    const faisal = trainers.find((t) => t.id === "trainer-faisal");
+    expect(faisal).toBeDefined();
+    expect(faisal?.name).toBe("Faisal Habib");
+    expect(faisal?.programSlug).toBe("graphics-designing");
+    expect(faisal?.designation).toBe("Graphics Designing Trainer");
+    expect(faisal?.image).toBe("/trainers/faisal-habib.png");
     expect(getTrainerDesignation("graphics-designing")).toBe("Graphics Designing Trainer");
     expect(getTrainersByProgramSlug("graphics-designing")).toHaveLength(1);
   });

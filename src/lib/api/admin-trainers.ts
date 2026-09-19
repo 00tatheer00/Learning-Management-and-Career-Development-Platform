@@ -25,7 +25,9 @@ export interface AdminTrainerRow {
 }
 
 function resolveProfileKey(trainer: { id: string; trainerId: string | null }) {
-  return trainer.trainerId ?? trainer.id;
+  const key = trainer.trainerId ?? trainer.id;
+  if (key === "trainer-fazal") return "trainer-faisal";
+  return key;
 }
 
 export async function getTrainerStudentCounts(): Promise<Map<string, number>> {
@@ -48,7 +50,7 @@ export async function getTrainerStudentCounts(): Promise<Map<string, number>> {
       else if (student.programSlug === "web-development") key = "trainer-tatheer";
       else if (student.programSlug === "digital-marketing") key = "trainer-zunira";
       else if (student.programSlug === "ecommerce") key = "trainer-usman";
-      else if (student.programSlug === "graphics-designing") key = "trainer-fazal";
+      else if (student.programSlug === "graphics-designing") key = "trainer-faisal";
     }
     if (key) {
       counts.set(key, (counts.get(key) ?? 0) + 1);
