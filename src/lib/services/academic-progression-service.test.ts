@@ -1,5 +1,31 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { getStudentAcademicOverview, getModuleAcademicStats } from "./academic-progression-service";
+
+vi.mock("@/lib/prisma", () => ({
+  prisma: {
+    user: {
+      findUnique: vi.fn().mockImplementation(async ({ where }) => {
+        if (where.id === "nonexistent-student-id") return null;
+        return {
+          id: where.id,
+          email: "student@example.com",
+          name: "Test Student",
+          programSlug: "web-development",
+          level: "HTML & CSS",
+        };
+      }),
+    },
+    classAttendance: { count: vi.fn().mockResolvedValue(10) },
+    assignmentSubmission: { findMany: vi.fn().mockResolvedValue([{ status: "approved" }]) },
+    watchProgress: { count: vi.fn().mockResolvedValue(5) },
+    moduleEnrollment: {
+      findMany: vi.fn().mockResolvedValue([
+        { status: "active" },
+        { status: "completed" },
+      ]),
+    },
+  },
+}));
 
 describe("AcademicProgressionService - Independent Academic Progression Domain", () => {
   it("queries student academic overview independently of admissions data", async () => {
@@ -16,3 +42,4 @@ describe("AcademicProgressionService - Independent Academic Progression Domain",
     expect(typeof stats.completedStudents).toBe("number");
   });
 });
+

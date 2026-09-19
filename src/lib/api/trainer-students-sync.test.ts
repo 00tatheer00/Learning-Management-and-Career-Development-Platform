@@ -1,5 +1,39 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { getTrainerApprovedStudents } from "@/lib/api/trainer-students-sync";
+
+vi.mock("@/lib/prisma", () => ({
+  prisma: {
+    enrollment: {
+      findMany: vi.fn().mockResolvedValue([
+        {
+          id: "enr-1",
+          email: "student1@example.com",
+          name: "Test Student",
+          phone: "03001234567",
+          level: "HTML & CSS",
+          batch: "Batch 1",
+          program: "web-development",
+          status: "approved",
+          createdAt: new Date("2026-08-01"),
+        },
+      ]),
+    },
+    user: {
+      findMany: vi.fn().mockResolvedValue([
+        {
+          id: "usr-1",
+          email: "student1@example.com",
+          name: "Test Student",
+          phone: "03001234567",
+          avatarUrl: null,
+          avatarInitials: "TS",
+          programSlug: "web-development",
+          level: "HTML & CSS",
+        },
+      ]),
+    },
+  },
+}));
 
 describe("Trainer Approved Students Sync & Deduplication", () => {
   it("returns an array of approved students for a course slug without throwing", async () => {
@@ -18,3 +52,4 @@ describe("Trainer Approved Students Sync & Deduplication", () => {
     expect(Array.isArray(students)).toBe(true);
   });
 });
+

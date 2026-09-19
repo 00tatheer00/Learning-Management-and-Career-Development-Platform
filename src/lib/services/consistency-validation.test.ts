@@ -1,5 +1,65 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+const { mockEnrollments, mockStudentUsers } = vi.hoisted(() => ({
+  mockEnrollments: [
+    {
+      id: "e1",
+      email: "p1@example.com",
+      status: "approved",
+      program: "web-development",
+      createdAt: new Date("2026-07-20T10:00:00.000Z"),
+    },
+    {
+      id: "e2",
+      email: "p2@example.com",
+      status: "pending",
+      program: "app-development",
+      createdAt: new Date("2026-08-01T10:00:00.000Z"),
+    },
+    {
+      id: "e3",
+      email: "p3@example.com",
+      status: "rejected",
+      program: "web-development",
+      createdAt: new Date("2026-09-01T10:00:00.000Z"),
+    },
+    {
+      id: "e4",
+      email: "p4@example.com",
+      status: "approved",
+      program: "artificial-intelligence",
+      createdAt: new Date("2026-09-19T10:00:00.000Z"),
+    },
+  ],
+  mockStudentUsers: [
+    {
+      id: "u1",
+      email: "p1@example.com",
+      firstLoginAt: new Date("2026-07-21T10:00:00.000Z"),
+      programSlug: "web-development",
+    },
+    {
+      id: "u4",
+      email: "p4@example.com",
+      firstLoginAt: null,
+      programSlug: "artificial-intelligence",
+    },
+  ],
+}));
+
+vi.mock("@/lib/prisma", () => ({
+  prisma: {
+    enrollment: {
+      findMany: vi.fn().mockResolvedValue(mockEnrollments),
+    },
+    user: {
+      findMany: vi.fn().mockResolvedValue(mockStudentUsers),
+    },
+  },
+}));
+
 import { getCentralPhaseMetrics, getRegistrationPhase } from "@/lib/services/phase-service";
+
 
 describe("Step 10 — System-Wide Mathematical Consistency Validation", () => {
   it("guarantees mathematical identity: Phase 1 + Phase 2 + Phase 3 + Phase 4 === All for registrations", async () => {
@@ -30,3 +90,4 @@ describe("Step 10 — System-Wide Mathematical Consistency Validation", () => {
     expect(getRegistrationPhase({ createdAt: phase4Date })).toBe("phase-4");
   });
 });
+

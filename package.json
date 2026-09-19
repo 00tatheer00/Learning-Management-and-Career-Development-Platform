@@ -13,7 +13,8 @@
     "postinstall": "prisma generate",
     "db:push": "dotenv -e .env.local -- prisma db push",
     "db:seed": "dotenv -e .env.local -- tsx -r ./scripts/suppress-server-only.cjs prisma/seed.ts",
-    "db:backfill-modules": "dotenv -e .env.local -- tsx -r ./scripts/suppress-server-only.cjs scripts/backfill-module-enrollments.ts"
+    "db:backfill-modules": "dotenv -e .env.local -- tsx -r ./scripts/suppress-server-only.cjs scripts/backfill-module-enrollments.ts",
+    "assets:optimize": "node scripts/optimize-assets.mjs"
   },
   "dependencies": {
     "@fontsource/dancing-script": "^5.3.0",
