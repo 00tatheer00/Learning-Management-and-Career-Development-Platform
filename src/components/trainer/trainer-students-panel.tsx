@@ -196,8 +196,8 @@ export function TrainerStudentsPanel({
           { id: "all", label: "All Phases" },
           { id: "phase-1", label: "Phase 1 (Module 1)" },
           { id: "phase-2", label: "Phase 2 (2nd Module)" },
-          { id: "phase-3", label: "Phase 3 (3rd Module)" },
-          { id: "phase-4", label: "Phase 4 (4th Module)" },
+          { id: "phase-3", label: "Phase 3 (Web & App 3rd Module)" },
+          { id: "phase-4", label: "Phase 4 (Marketing, Ecommerce, Graphics)" },
         ].map((item) => (
           <button
             key={item.id}

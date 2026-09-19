@@ -50,21 +50,32 @@ describe("PhaseService - Centralized Phase Classification", () => {
     expect(getRegistrationPhase({ createdAt: afterStart })).toBe("phase-4");
   });
 
-  it("relies strictly on date regardless of extra properties", () => {
-    // Even if level says JavaScript or React, if created before July 24, phase is phase-1
-    const phase1Item = {
-      createdAt: "2026-07-15T08:00:00.000Z",
-      level: "JavaScript (Module 2)",
-      batch: "Batch 2",
+  it("keeps Web and App 3rd module strictly in Phase 3 regardless of registration date", () => {
+    const web3rdModule = {
+      program: "web-development",
+      level: "React",
+      createdAt: "2026-09-20T10:00:00.000Z",
     };
-    expect(getRegistrationPhase(phase1Item)).toBe("phase-1");
+    expect(getRegistrationPhase(web3rdModule)).toBe("phase-3");
 
-    // If created on August 30, phase is phase-3
-    const phase3Item = {
-      createdAt: "2026-08-30T08:00:00.000Z",
-      level: "Module 1",
-      batch: "Batch 1",
+    const app3rdModule = {
+      program: "app-development",
+      level: "Firebase & APIs",
+      createdAt: "2026-09-21T10:00:00.000Z",
     };
-    expect(getRegistrationPhase(phase3Item)).toBe("phase-3");
+    expect(getRegistrationPhase(app3rdModule)).toBe("phase-3");
+  });
+
+  it("classifies Digital Marketing, Ecommerce, and Graphics Designing strictly as Phase 4", () => {
+    expect(getRegistrationPhase({ program: "digital-marketing" })).toBe("phase-4");
+    expect(getRegistrationPhase({ program: "ecommerce" })).toBe("phase-4");
+    expect(getRegistrationPhase({ program: "graphics-designing" })).toBe("phase-4");
+
+    const marketingStudent = {
+      programSlug: "digital-marketing",
+      level: "Module 1",
+      createdAt: "2026-09-19T10:00:00.000Z",
+    };
+    expect(getRegistrationPhase(marketingStudent)).toBe("phase-4");
   });
 });

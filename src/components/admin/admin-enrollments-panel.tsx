@@ -480,8 +480,8 @@ export function AdminEnrollmentsPanel() {
             { id: "all", label: "All Phases", count: phaseCounts.all },
             { id: "phase-1", label: "Phase 1 (Module 1)", count: phaseCounts.phase1 },
             { id: "phase-2", label: "Phase 2 (2nd Module)", count: phaseCounts.phase2 },
-            { id: "phase-3", label: "Phase 3 (3rd Module)", count: phaseCounts.phase3 },
-            { id: "phase-4", label: "Phase 4 (4th Module)", count: phaseCounts.phase4 },
+            { id: "phase-3", label: "Phase 3 (Web & App 3rd Module)", count: phaseCounts.phase3 },
+            { id: "phase-4", label: "Phase 4 (Marketing, Ecommerce, Graphics)", count: phaseCounts.phase4 },
           ].map((item) => (
             <button
               key={item.id}

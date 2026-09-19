@@ -30,9 +30,29 @@ export function getRegistrationPhase(item: {
   createdAt?: string | Date | null;
   appliedAt?: string | Date | null;
   batch?: string | null;
+  program?: string | null;
+  programSlug?: string | null;
+  level?: string | null;
+  module?: string | null;
 } | Date | string | null | undefined): RegistrationPhase {
   if (!item) return "phase-1";
 
+  // If program is Digital Marketing, Ecommerce, or Graphics Designing, it is strictly Phase 4
+  if (typeof item === "object" && !(item instanceof Date)) {
+    const rawProgram = (item.program || item.programSlug || "").trim().toLowerCase();
+    if (
+      rawProgram === "digital-marketing" ||
+      rawProgram === "ecommerce" ||
+      rawProgram === "graphics-designing" ||
+      rawProgram.includes("digital marketing") ||
+      rawProgram.includes("ecommerce") ||
+      rawProgram.includes("graphics")
+    ) {
+      return "phase-4";
+    }
+  }
+
+  // Extract date if available
   let dateVal: Date | null = null;
   if (item instanceof Date) {
     dateVal = item;
@@ -46,24 +66,94 @@ export function getRegistrationPhase(item: {
   }
 
   if (dateVal && !isNaN(dateVal.getTime())) {
-    if (dateVal.getTime() >= PHASE_4_START_DATE.getTime()) {
+    const time = dateVal.getTime();
+    const p2Time = PHASE_2_START_DATE.getTime();
+    const p3Time = PHASE_3_START_DATE.getTime();
+    const p4Time = PHASE_4_START_DATE.getTime();
+
+    if (time < p2Time) {
+      return "phase-1";
+    }
+    if (time < p3Time) {
+      return "phase-2";
+    }
+
+    // On or after Phase 4 start date
+    if (time >= p4Time) {
+      if (typeof item === "object" && !(item instanceof Date)) {
+        const rawProgram = (item.program || item.programSlug || "").trim().toLowerCase();
+        const rawLevel = (item.level || item.module || "").trim().toLowerCase();
+        const rawBatch = (item.batch || "").trim().toLowerCase();
+
+        const isWebOrApp =
+          rawProgram === "web-development" ||
+          rawProgram === "app-development" ||
+          rawProgram.includes("web") ||
+          rawProgram.includes("flutter") ||
+          rawProgram.includes("app");
+
+        const is3rdModule =
+          rawLevel.includes("react") ||
+          rawLevel.includes("firebase") ||
+          rawLevel.includes("3rd module") ||
+          rawLevel.includes("module 3") ||
+          rawLevel === "3" ||
+          rawBatch.includes("3rd module") ||
+          rawBatch.includes("phase 3");
+
+        // Web and App 3rd module stays strictly in Phase 3
+        if (isWebOrApp && is3rdModule) {
+          return "phase-3";
+        }
+      }
       return "phase-4";
     }
-    if (dateVal.getTime() >= PHASE_3_START_DATE.getTime()) {
-      return "phase-3";
-    }
-    return dateVal.getTime() >= PHASE_2_START_DATE.getTime() ? "phase-2" : "phase-1";
+
+    // Between Phase 3 and Phase 4
+    return "phase-3";
   }
 
-  // Fallback for mock objects in tests without a date
-  if (typeof item === "object" && item !== null && !(item instanceof Date)) {
-    if (item.batch?.includes("Phase 4") || item.batch?.includes("4th Module")) {
+  // Fallback for mock objects without dates
+  if (typeof item === "object" && !(item instanceof Date)) {
+    const rawProgram = (item.program || item.programSlug || "").trim().toLowerCase();
+    const rawLevel = (item.level || item.module || "").trim().toLowerCase();
+    const rawBatch = (item.batch || "").trim().toLowerCase();
+
+    if (
+      rawProgram === "digital-marketing" ||
+      rawProgram === "ecommerce" ||
+      rawProgram === "graphics-designing" ||
+      rawBatch.includes("phase 4") ||
+      rawBatch.includes("4th module") ||
+      rawLevel.includes("4th module")
+    ) {
       return "phase-4";
     }
-    if (item.batch?.includes("Phase 3") || item.batch?.includes("3rd Module")) {
+
+    const isWebOrApp =
+      rawProgram === "web-development" ||
+      rawProgram === "app-development" ||
+      rawProgram.includes("web") ||
+      rawProgram.includes("flutter") ||
+      rawProgram.includes("app");
+
+    const is3rdModule =
+      rawLevel.includes("react") ||
+      rawLevel.includes("firebase") ||
+      rawLevel.includes("3rd module") ||
+      rawLevel.includes("module 3") ||
+      rawLevel === "3" ||
+      rawBatch.includes("3rd module") ||
+      rawBatch.includes("phase 3");
+
+    if (isWebOrApp && is3rdModule) {
       return "phase-3";
     }
-    if (item.batch?.includes("Phase 2") || item.batch?.includes("2nd Module")) {
+
+    if (rawBatch.includes("phase 3") || rawBatch.includes("3rd module") || is3rdModule) {
+      return "phase-3";
+    }
+    if (rawBatch.includes("phase 2") || rawBatch.includes("2nd module") || rawLevel.includes("javascript")) {
       return "phase-2";
     }
   }
@@ -198,6 +288,8 @@ export async function getAllPhaseMetrics(): Promise<{
         email: true,
         status: true,
         program: true,
+        level: true,
+        batch: true,
         createdAt: true,
       },
     }),
@@ -212,24 +304,10 @@ export async function getAllPhaseMetrics(): Promise<{
     }),
   ]);
 
-  const p2Time = PHASE_2_START_DATE.getTime();
-  const p3Time = PHASE_3_START_DATE.getTime();
-  const p4Time = PHASE_4_START_DATE.getTime();
-
-  const phase1Enrollments = enrollments.filter(
-    (e) => new Date(e.createdAt).getTime() < p2Time
-  );
-  const phase2Enrollments = enrollments.filter((e) => {
-    const t = new Date(e.createdAt).getTime();
-    return t >= p2Time && t < p3Time;
-  });
-  const phase3Enrollments = enrollments.filter((e) => {
-    const t = new Date(e.createdAt).getTime();
-    return t >= p3Time && t < p4Time;
-  });
-  const phase4Enrollments = enrollments.filter(
-    (e) => new Date(e.createdAt).getTime() >= p4Time
-  );
+  const phase1Enrollments = enrollments.filter((e) => getRegistrationPhase(e) === "phase-1");
+  const phase2Enrollments = enrollments.filter((e) => getRegistrationPhase(e) === "phase-2");
+  const phase3Enrollments = enrollments.filter((e) => getRegistrationPhase(e) === "phase-3");
+  const phase4Enrollments = enrollments.filter((e) => getRegistrationPhase(e) === "phase-4");
 
   return {
     all: computeMetricsFromData(enrollments, allStudentUsers, false),

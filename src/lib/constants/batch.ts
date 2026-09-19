@@ -38,43 +38,121 @@ export function getRegistrationPhase(item?: {
   createdAt?: string | Date | null;
   appliedAt?: string | Date | null;
   batch?: string | null;
+  program?: string | null;
+  programSlug?: string | null;
   level?: string | null;
   module?: string | null;
 } | Date | string | null): RegistrationPhase {
   if (!item) return "phase-1";
 
-  const dateVal =
-    item instanceof Date
-      ? item
-      : typeof item === "string"
-        ? new Date(item)
-        : item.createdAt || item.appliedAt;
-
-  if (dateVal) {
-    const createdDate = dateVal instanceof Date ? dateVal : new Date(dateVal);
-    if (!isNaN(createdDate.getTime())) {
-      const phase4Start = new Date(PHASE_4_START_ISO);
-      if (createdDate.getTime() >= phase4Start.getTime()) {
-        return "phase-4";
-      }
-      const phase3Start = new Date(PHASE_3_START_ISO);
-      if (createdDate.getTime() >= phase3Start.getTime()) {
-        return "phase-3";
-      }
-      const phase2Start = new Date(PHASE_2_START_ISO);
-      return createdDate.getTime() >= phase2Start.getTime() ? "phase-2" : "phase-1";
+  // Check if Digital Marketing, Ecommerce, or Graphics Designing (strictly Phase 4 courses)
+  if (typeof item === "object" && !(item instanceof Date)) {
+    const rawProgram = (item.program || item.programSlug || "").trim().toLowerCase();
+    if (
+      rawProgram === "digital-marketing" ||
+      rawProgram === "ecommerce" ||
+      rawProgram === "graphics-designing" ||
+      rawProgram.includes("digital marketing") ||
+      rawProgram.includes("ecommerce") ||
+      rawProgram.includes("graphics")
+    ) {
+      return "phase-4";
     }
   }
 
-  // Fallback for mock objects in tests without a date
-  if (typeof item === "object" && item !== null && !(item instanceof Date)) {
-    if (item.batch?.includes("Phase 4") || item.batch?.includes("4th Module")) {
+  // Extract date if available
+  let dateVal: Date | null = null;
+  if (item instanceof Date) {
+    dateVal = item;
+  } else if (typeof item === "string") {
+    dateVal = new Date(item);
+  } else if (typeof item === "object") {
+    const raw = item.createdAt || item.appliedAt;
+    if (raw) {
+      dateVal = raw instanceof Date ? raw : new Date(raw);
+    }
+  }
+
+  if (dateVal && !isNaN(dateVal.getTime())) {
+    const time = dateVal.getTime();
+    const p2Time = new Date(PHASE_2_START_ISO).getTime();
+    const p3Time = new Date(PHASE_3_START_ISO).getTime();
+    const p4Time = new Date(PHASE_4_START_ISO).getTime();
+
+    if (time < p2Time) {
+      return "phase-1";
+    }
+    if (time < p3Time) {
+      return "phase-2";
+    }
+
+    // On or after Phase 4 start date
+    if (time >= p4Time) {
+      if (typeof item === "object" && !(item instanceof Date)) {
+        const rawProgram = (item.program || item.programSlug || "").trim().toLowerCase();
+        const rawLevel = (item.level || item.module || "").trim().toLowerCase();
+        const rawBatch = (item.batch || "").trim().toLowerCase();
+
+        const isWebOrApp =
+          rawProgram === "web-development" ||
+          rawProgram === "app-development" ||
+          rawProgram.includes("web") ||
+          rawProgram.includes("flutter") ||
+          rawProgram.includes("app");
+
+        const is3rdModule =
+          rawLevel.includes("react") ||
+          rawLevel.includes("firebase") ||
+          rawLevel.includes("3rd module") ||
+          rawLevel.includes("module 3") ||
+          rawLevel === "3" ||
+          rawBatch.includes("3rd module") ||
+          rawBatch.includes("phase 3");
+
+        // Web and App 3rd module stays strictly in Phase 3
+        if (isWebOrApp && is3rdModule) {
+          return "phase-3";
+        }
+      }
       return "phase-4";
     }
-    if (item.batch?.includes("Phase 3") || item.batch?.includes("3rd Module")) {
+
+    // Between Phase 3 and Phase 4
+    return "phase-3";
+  }
+
+  // Fallback for mock objects without dates
+  if (typeof item === "object" && !(item instanceof Date)) {
+    const rawProgram = (item.program || item.programSlug || "").trim().toLowerCase();
+    const rawLevel = (item.level || item.module || "").trim().toLowerCase();
+    const rawBatch = (item.batch || "").trim().toLowerCase();
+
+    if (
+      rawProgram === "digital-marketing" ||
+      rawProgram === "ecommerce" ||
+      rawProgram === "graphics-designing" ||
+      rawBatch.includes("phase 4") ||
+      rawBatch.includes("4th module") ||
+      rawLevel.includes("4th module")
+    ) {
+      return "phase-4";
+    }
+
+    if (
+      rawBatch.includes("phase 3") ||
+      rawBatch.includes("3rd module") ||
+      rawLevel.includes("react") ||
+      rawLevel.includes("firebase")
+    ) {
       return "phase-3";
     }
-    if (item.batch?.includes("Phase 2") || item.batch?.includes("2nd Module")) {
+
+    if (
+      rawBatch.includes("phase 2") ||
+      rawBatch.includes("2nd module") ||
+      rawLevel.includes("javascript") ||
+      rawLevel.includes("flutter frontend")
+    ) {
       return "phase-2";
     }
   }
@@ -86,18 +164,18 @@ export function getPhaseInfo(phase: RegistrationPhase) {
   if (phase === "phase-4") {
     return {
       id: "phase-4" as const,
-      label: "Phase 4 (4th Module)",
+      label: "Phase 4 (Marketing, Ecommerce, Graphics)",
       shortLabel: "Phase 4",
-      subtitle: "4th Module Registrations",
+      subtitle: "Digital Marketing, Ecommerce & Graphics Designing",
       badgeClass: "bg-orange-500/15 text-orange-700 dark:text-orange-300 border-orange-500/30",
     };
   }
   if (phase === "phase-3") {
     return {
       id: "phase-3" as const,
-      label: "Phase 3 (3rd Module)",
+      label: "Phase 3 (Web & App 3rd Module)",
       shortLabel: "Phase 3",
-      subtitle: "3rd Module Registrations",
+      subtitle: "Web Dev (React) & Flutter (Firebase & APIs)",
       badgeClass: "bg-purple-500/15 text-purple-700 dark:text-purple-300 border-purple-500/30",
     };
   }

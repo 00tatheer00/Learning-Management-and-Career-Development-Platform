@@ -204,8 +204,8 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
                   : phaseFilter === "phase-2"
                     ? "Phase 2 (2nd Module)"
                     : phaseFilter === "phase-4"
-                      ? "Phase 4 (4th Module)"
-                      : "Phase 3 (3rd Module)"}
+                      ? "Phase 4 (Marketing, Ecommerce & Graphics)"
+                      : "Phase 3 (Web & App 3rd Module)"}
               </span>
             )}
           </h1>
@@ -421,8 +421,8 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
                 P3
               </div>
               <div>
-                <h3 className="text-sm font-semibold tracking-tight text-pt">Phase 3 (3rd Module)</h3>
-                <p className="text-xs text-pt-muted">29th Aug+ Registrations</p>
+                <h3 className="text-sm font-semibold tracking-tight text-pt">Phase 3 (Web &amp; App 3rd Module)</h3>
+                <p className="text-xs text-pt-muted">Web Dev (React) &amp; Flutter (Firebase)</p>
               </div>
             </div>
             <span className={cn(
@@ -473,8 +473,8 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
                 P4
               </div>
               <div>
-                <h3 className="text-sm font-semibold tracking-tight text-pt">Phase 4 (4th Module)</h3>
-                <p className="text-xs text-pt-muted">19th Sep+ Registrations</p>
+                <h3 className="text-sm font-semibold tracking-tight text-pt">Phase 4 (Marketing, Ecommerce &amp; Graphics)</h3>
+                <p className="text-xs text-pt-muted">Digital Marketing, Ecommerce &amp; Graphics</p>
               </div>
             </div>
             <span className={cn(
