@@ -34,7 +34,7 @@ export const trainers: Trainer[] = [
     experience: "4+ years",
     bio: "Full-stack mentor — from front-end fundamentals to production apps with modern stacks, databases, testing, and deployment.",
     image: "/trainers/tatheer-hussain.png",
-    imagePosition: "center 15%",
+    imagePosition: "center 20%",
     social: {},
   },
   {
