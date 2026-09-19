@@ -520,17 +520,17 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
             </span>
             <div className="flex flex-wrap items-baseline gap-2 mt-0.5">
               <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight uppercase leading-none">
-                3rd MODULE
+                Phase 4 &amp; New Batches
               </h2>
               <span className="font-serif italic font-extrabold text-orange-500 text-lg sm:text-xl">
                 Live Now!
               </span>
               <span className="rounded-full bg-orange-100 border border-orange-200 px-2.5 py-0.5 text-xs font-bold text-orange-700">
-                Module 1 &amp; 2 Recordings Included
+                Live Classes + Recordings Included
               </span>
             </div>
             <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
-              Complete the form below to reserve your seat today. Full <strong>video recordings &amp; tasks for previous modules (Module 1 &amp; Module 2)</strong> are unlocked immediately upon registration!
+              Complete the form below to reserve your seat today. Full <strong>live classes, assignments, and lecture video recordings</strong> are unlocked immediately upon registration!
             </p>
           </div>
         </div>
