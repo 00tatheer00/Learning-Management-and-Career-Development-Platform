@@ -4,6 +4,7 @@ import { Inter, Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import { LayoutSwitcher } from "@/components/layout/layout-switcher";
 import { AuthSessionProvider } from "@/components/providers/session-provider";
 import { ToastProvider } from "@/components/providers/toast-provider";
+import { ChunkErrorHandler } from "@/components/providers/chunk-error-handler";
 import { OrganizationSchema, WebSiteSchema, IdentitySchema, LocalBusinessSchema } from "@/components/seo/json-ld";
 import { createMetadata } from "@/lib/seo/metadata";
 import { SITE_CONFIG } from "@/lib/constants";
@@ -91,6 +92,7 @@ export default function RootLayout({
         />
 
         <AuthSessionProvider>
+          <ChunkErrorHandler />
           <LayoutSwitcher>{children}</LayoutSwitcher>
           <ToastProvider />
         </AuthSessionProvider>

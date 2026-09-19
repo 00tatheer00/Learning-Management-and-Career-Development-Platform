@@ -12,9 +12,35 @@ export default function TrainerError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const errMsg = (error?.message || "").toLowerCase();
+  const errName = (error?.name || "").toLowerCase();
+  const isChunkError =
+    errName.includes("chunkloaderror") ||
+    errMsg.includes("loading chunk") ||
+    errMsg.includes("failed to fetch dynamically imported module") ||
+    errMsg.includes("connection reset") ||
+    errMsg.includes("err_http2");
+
   useEffect(() => {
     console.error("Trainer portal error caught:", error);
-  }, [error]);
+    if (isChunkError) {
+      const key = "eest_trainer_chunk_retry";
+      const last = sessionStorage.getItem(key);
+      const now = Date.now();
+      if (!last || now - parseInt(last, 10) > 10000) {
+        sessionStorage.setItem(key, now.toString());
+        window.location.reload();
+      }
+    }
+  }, [error, isChunkError]);
+
+  const handleRetry = () => {
+    if (isChunkError) {
+      window.location.reload();
+    } else {
+      reset();
+    }
+  };
 
   return (
     <div className="min-h-[60vh] flex flex-col items-center justify-center p-6 text-center">
@@ -23,17 +49,19 @@ export default function TrainerError({
       </div>
 
       <h2 className="text-xl sm:text-2xl font-black tracking-tight mb-2">
-        Trainer Portal Error
+        {isChunkError ? "Portal Update Available" : "Trainer Portal Error"}
       </h2>
 
       <p className="text-sm text-slate-500 max-w-sm mb-6 leading-relaxed">
-        Could not load trainer dashboard. Please retry or navigate back to dashboard main.
+        {isChunkError
+          ? "A new portal update was deployed. Please reload to access your updated trainer dashboard."
+          : "Could not load trainer dashboard. Please retry or navigate back to dashboard main."}
       </p>
 
       <div className="flex items-center gap-3">
-        <Button onClick={() => reset()} size="sm" className="gap-2 font-bold">
+        <Button onClick={handleRetry} size="sm" className="gap-2 font-bold">
           <RefreshCw size={14} />
-          Retry
+          {isChunkError ? "Reload Portal" : "Retry"}
         </Button>
 
         <Button variant="outline" size="sm" asChild className="gap-2 font-bold">
