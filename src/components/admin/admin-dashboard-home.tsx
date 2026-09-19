@@ -205,7 +205,7 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
                     ? "Phase 2 (2nd Module)"
                     : phaseFilter === "phase-4"
                       ? "Phase 4 (Marketing, Ecommerce & Graphics)"
-                      : "Phase 3 (Web & App 3rd Module)"}
+                      : "Phase 3 (Web/App 3rd & AI 2nd Module)"}
               </span>
             )}
           </h1>
@@ -421,8 +421,8 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
                 P3
               </div>
               <div className="min-w-0">
-                <h3 className="text-sm font-semibold tracking-tight text-pt">Phase 3 (Web &amp; App 3rd Module)</h3>
-                <p className="text-xs text-pt-muted">Web Dev (React) &amp; Flutter (Firebase)</p>
+                <h3 className="text-sm font-semibold tracking-tight text-pt">Phase 3 (Web/App 3rd &amp; AI 2nd)</h3>
+                <p className="text-xs text-pt-muted">Web (React), App (Firebase) &amp; AI (ML)</p>
               </div>
             </div>
             <span className={cn(

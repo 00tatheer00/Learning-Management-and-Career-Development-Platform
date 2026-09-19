@@ -50,7 +50,7 @@ describe("PhaseService - Centralized Phase Classification", () => {
     expect(getRegistrationPhase({ createdAt: afterStart })).toBe("phase-4");
   });
 
-  it("keeps Web and App 3rd module strictly in Phase 3 regardless of registration date", () => {
+  it("keeps Web 3rd module, App 3rd module, and AI 2nd module strictly in Phase 3 regardless of registration date", () => {
     const web3rdModule = {
       program: "web-development",
       level: "React",
@@ -64,6 +64,13 @@ describe("PhaseService - Centralized Phase Classification", () => {
       createdAt: "2026-09-21T10:00:00.000Z",
     };
     expect(getRegistrationPhase(app3rdModule)).toBe("phase-3");
+
+    const ai2ndModule = {
+      program: "artificial-intelligence",
+      level: "Module 2: Data to ML Engineer",
+      createdAt: "2026-07-30T16:02:16.363Z",
+    };
+    expect(getRegistrationPhase(ai2ndModule)).toBe("phase-3");
   });
 
   it("classifies Digital Marketing, Ecommerce, and Graphics Designing strictly as Phase 4", () => {

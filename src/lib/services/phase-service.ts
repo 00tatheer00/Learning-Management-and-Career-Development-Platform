@@ -37,18 +37,60 @@ export function getRegistrationPhase(item: {
 } | Date | string | null | undefined): RegistrationPhase {
   if (!item) return "phase-1";
 
-  // If program is Digital Marketing, Ecommerce, or Graphics Designing, it is strictly Phase 4
+  // 1. If program is Digital Marketing, Ecommerce, or Graphics Designing, it is strictly Phase 4
   if (typeof item === "object" && !(item instanceof Date)) {
     const rawProgram = (item.program || item.programSlug || "").trim().toLowerCase();
+    const rawLevel = (item.level || item.module || "").trim().toLowerCase();
+    const rawBatch = (item.batch || "").trim().toLowerCase();
+
     if (
       rawProgram === "digital-marketing" ||
       rawProgram === "ecommerce" ||
       rawProgram === "graphics-designing" ||
       rawProgram.includes("digital marketing") ||
       rawProgram.includes("ecommerce") ||
-      rawProgram.includes("graphics")
+      rawProgram.includes("graphic") ||
+      rawBatch.includes("phase 4") ||
+      rawBatch.includes("4th module") ||
+      rawLevel.includes("4th module")
     ) {
       return "phase-4";
+    }
+
+    // 2. Phase 3: Web & App 3rd module, and AI 2nd module ONLY
+    const isWeb =
+      rawProgram === "web-development" ||
+      rawProgram.includes("web");
+    const isWeb3rd =
+      isWeb &&
+      (rawLevel.includes("react") ||
+        rawLevel.includes("3rd module") ||
+        rawLevel.includes("module 3"));
+
+    const isApp =
+      rawProgram === "app-development" ||
+      rawProgram.includes("app") ||
+      rawProgram.includes("flutter");
+    const isApp3rd =
+      isApp &&
+      (rawLevel.includes("firebase") ||
+        rawLevel.includes("api") ||
+        rawLevel.includes("3rd module") ||
+        rawLevel.includes("module 3"));
+
+    const isAI =
+      rawProgram === "artificial-intelligence" ||
+      rawProgram.includes("ai") ||
+      rawProgram.includes("artificial");
+    const isAI2nd =
+      isAI &&
+      (rawLevel.includes("module 2") ||
+        rawLevel.includes("data to ml") ||
+        rawLevel.includes("ml engineer") ||
+        rawLevel.includes("2nd module"));
+
+    if (isWeb3rd || isApp3rd || isAI2nd || rawBatch.includes("phase 3") || rawBatch.includes("3rd module")) {
+      return "phase-3";
     }
   }
 
@@ -78,82 +120,48 @@ export function getRegistrationPhase(item: {
       return "phase-2";
     }
 
-    // On or after Phase 4 start date
-    if (time >= p4Time) {
-      if (typeof item === "object" && !(item instanceof Date)) {
-        const rawProgram = (item.program || item.programSlug || "").trim().toLowerCase();
-        const rawLevel = (item.level || item.module || "").trim().toLowerCase();
-        const rawBatch = (item.batch || "").trim().toLowerCase();
+    // If an object with explicit level reached here without matching Phase 3/4
+    if (typeof item === "object" && !(item instanceof Date)) {
+      const rawLevel = (item.level || item.module || "").trim().toLowerCase();
 
-        const isWebOrApp =
-          rawProgram === "web-development" ||
-          rawProgram === "app-development" ||
-          rawProgram.includes("web") ||
-          rawProgram.includes("flutter") ||
-          rawProgram.includes("app");
-
-        const is3rdModule =
-          rawLevel.includes("react") ||
-          rawLevel.includes("firebase") ||
-          rawLevel.includes("3rd module") ||
-          rawLevel.includes("module 3") ||
-          rawLevel === "3" ||
-          rawBatch.includes("3rd module") ||
-          rawBatch.includes("phase 3");
-
-        // Web and App 3rd module stays strictly in Phase 3
-        if (isWebOrApp && is3rdModule) {
-          return "phase-3";
-        }
+      if (
+        rawLevel.includes("javascript") ||
+        rawLevel.includes("flutter frontend") ||
+        rawLevel.includes("2nd module")
+      ) {
+        return "phase-2";
       }
+
+      if (
+        rawLevel.includes("html") ||
+        rawLevel.includes("dart") ||
+        rawLevel.includes("launchpad") ||
+        rawLevel.includes("1st module") ||
+        rawLevel.includes("module 1")
+      ) {
+        return "phase-1";
+      }
+    }
+
+    if (time >= p4Time) {
       return "phase-4";
     }
 
-    // Between Phase 3 and Phase 4
+    // Fallback for date-only calls
     return "phase-3";
   }
 
   // Fallback for mock objects without dates
   if (typeof item === "object" && !(item instanceof Date)) {
-    const rawProgram = (item.program || item.programSlug || "").trim().toLowerCase();
-    const rawLevel = (item.level || item.module || "").trim().toLowerCase();
     const rawBatch = (item.batch || "").trim().toLowerCase();
+    const rawLevel = (item.level || item.module || "").trim().toLowerCase();
 
     if (
-      rawProgram === "digital-marketing" ||
-      rawProgram === "ecommerce" ||
-      rawProgram === "graphics-designing" ||
-      rawBatch.includes("phase 4") ||
-      rawBatch.includes("4th module") ||
-      rawLevel.includes("4th module")
+      rawBatch.includes("phase 2") ||
+      rawBatch.includes("2nd module") ||
+      rawLevel.includes("javascript") ||
+      rawLevel.includes("flutter frontend")
     ) {
-      return "phase-4";
-    }
-
-    const isWebOrApp =
-      rawProgram === "web-development" ||
-      rawProgram === "app-development" ||
-      rawProgram.includes("web") ||
-      rawProgram.includes("flutter") ||
-      rawProgram.includes("app");
-
-    const is3rdModule =
-      rawLevel.includes("react") ||
-      rawLevel.includes("firebase") ||
-      rawLevel.includes("3rd module") ||
-      rawLevel.includes("module 3") ||
-      rawLevel === "3" ||
-      rawBatch.includes("3rd module") ||
-      rawBatch.includes("phase 3");
-
-    if (isWebOrApp && is3rdModule) {
-      return "phase-3";
-    }
-
-    if (rawBatch.includes("phase 3") || rawBatch.includes("3rd module") || is3rdModule) {
-      return "phase-3";
-    }
-    if (rawBatch.includes("phase 2") || rawBatch.includes("2nd module") || rawLevel.includes("javascript")) {
       return "phase-2";
     }
   }
