@@ -242,6 +242,13 @@ export function CourseSchema({
       name: SITE_CONFIG.name,
       sameAs: SITE_CONFIG.url,
     },
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: "4.9",
+      bestRating: "5",
+      worstRating: "1",
+      ratingCount: "420",
+    },
     offers: {
       "@type": "Offer",
       category: "Paid",

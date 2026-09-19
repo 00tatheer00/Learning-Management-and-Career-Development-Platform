@@ -5,14 +5,17 @@ export function getDatabaseUrl(): string {
     throw new Error("DATABASE_URL is not set");
   }
 
-  if (process.env.NODE_ENV === "production") {
-    return url;
+  const activeUrl =
+    process.env.NODE_ENV !== "production" && process.env.DATABASE_URL_DIRECT?.trim()
+      ? process.env.DATABASE_URL_DIRECT.trim()
+      : url;
+
+  // Add optimal connection pooling parameters for serverless MongoDB Atlas if missing
+  if (activeUrl.startsWith("mongodb+srv://") && !activeUrl.includes("maxPoolSize=")) {
+    const separator = activeUrl.includes("?") ? "&" : "?";
+    return `${activeUrl}${separator}maxPoolSize=15&serverSelectionTimeoutMS=5000`;
   }
 
-  const direct = process.env.DATABASE_URL_DIRECT?.trim();
-  if (direct) {
-    return direct;
-  }
-
-  return url;
+  return activeUrl;
 }
+
