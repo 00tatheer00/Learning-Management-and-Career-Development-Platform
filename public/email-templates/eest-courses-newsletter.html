@@ -3,110 +3,172 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Admissions Open — Emerging Edge School of Technology</title>
   <style type="text/css">
-    /* Reset styles */
-    body, p, h1, h2, h3, h4, table, td, div {
+    /* Base typography & resets */
+    body, table, td, p, a, li, blockquote, div {
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
     body {
-      background-color: #0b0f19;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      width: 100% !important;
-      height: 100% !important;
+      background-color: #f1f5f9;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      color: #334155;
+      line-height: 1.6;
     }
-    a {
+    img {
+      border: 0;
+      outline: none;
       text-decoration: none;
+      display: block;
     }
-    /* Mobile responsive adjustments */
+    table {
+      border-collapse: collapse !important;
+    }
+
+    /* Interactive Hover Transitions */
+    .btn-primary {
+      background-color: #2563eb !important;
+      color: #ffffff !important;
+      transition: all 0.25s ease-in-out !important;
+    }
+    .btn-primary:hover {
+      background-color: #1d4ed8 !important;
+      transform: translateY(-2px) !important;
+      box-shadow: 0 10px 25px -4px rgba(37, 99, 235, 0.35) !important;
+    }
+
+    .btn-secondary {
+      background-color: #0f172a !important;
+      color: #ffffff !important;
+      transition: all 0.25s ease-in-out !important;
+    }
+    .btn-secondary:hover {
+      background-color: #1e293b !important;
+      transform: translateY(-2px) !important;
+      box-shadow: 0 10px 20px -4px rgba(15, 23, 42, 0.2) !important;
+    }
+
+    .btn-whatsapp {
+      background-color: #16a34a !important;
+      color: #ffffff !important;
+      transition: all 0.25s ease-in-out !important;
+    }
+    .btn-whatsapp:hover {
+      background-color: #15803d !important;
+      transform: translateY(-2px) !important;
+      box-shadow: 0 10px 22px -4px rgba(22, 163, 74, 0.35) !important;
+    }
+
+    .course-card {
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease !important;
+    }
+    .course-card:hover {
+      border-color: #94a3b8 !important;
+      transform: translateY(-3px) !important;
+      box-shadow: 0 14px 28px -6px rgba(15, 23, 42, 0.08) !important;
+    }
+
+    .nav-link:hover {
+      color: #2563eb !important;
+      text-decoration: underline !important;
+    }
+
+    /* Mobile Responsive Rules */
     @media only screen and (max-width: 620px) {
-      .email-wrapper {
+      .email-container {
         width: 100% !important;
-        padding: 10px !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+        border-left: none !important;
+        border-right: none !important;
       }
-      .content-cell {
-        padding: 24px 16px !important;
+      .mobile-padding {
+        padding-left: 20px !important;
+        padding-right: 20px !important;
       }
-      .course-card {
-        padding: 16px !important;
+      .header-logo {
+        max-width: 150px !important;
       }
-      .header-padding {
-        padding: 30px 16px 20px 16px !important;
+      .headline-main {
+        font-size: 24px !important;
+        line-height: 32px !important;
       }
       .btn-full {
         display: block !important;
         width: 100% !important;
         text-align: center !important;
-      }
-      .headline {
-        font-size: 24px !important;
-        line-height: 32px !important;
+        padding: 14px 18px !important;
       }
     }
   </style>
 </head>
-<body style="background-color: #0b0f19; margin: 0; padding: 0; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
-  
-  <!-- PREHEADER TEXT (Invisible preview in inbox) -->
-  <div style="display: none; font-size: 1px; color: #0b0f19; line-height: 1px; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden;">
-    Admissions Open at EEST! Explore Web Dev, Flutter, AI, Digital Marketing, Ecommerce &amp; Graphics Designing with expert industry trainers.
+<body style="background-color: #f1f5f9; margin: 0; padding: 0; width: 100% !important;">
+
+  <!-- HIDDEN PREHEADER TEXT -->
+  <div style="display: none; font-size: 1px; color: #f1f5f9; line-height: 1px; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden;">
+    Admissions Open at EEST: 6 Specialized Career Programs in Web, Mobile, AI, Digital Marketing, Ecommerce &amp; Graphics Designing.
   </div>
 
-  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #0b0f19; table-layout: fixed;">
+  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f1f5f9; table-layout: fixed;">
     <tr>
-      <td align="center" style="padding: 24px 10px 40px 10px;">
+      <td align="center" style="padding: 32px 12px 48px 12px;">
 
-        <!-- MAIN CONTAINER (600px) -->
-        <table border="0" cellpadding="0" cellspacing="0" width="600" class="email-wrapper" style="max-width: 600px; width: 100%; background-color: #111827; border: 1px solid #1f2937; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5);">
+        <!-- MAIN CONTAINER (600px, Clean White Theme) -->
+        <table border="0" cellpadding="0" cellspacing="0" width="600" class="email-container" style="max-width: 600px; width: 100%; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);">
 
-          <!-- HEADER SECTION WITH LOGO -->
+          <!-- TOP ACCENT BAR -->
           <tr>
-            <td align="center" class="header-padding" style="background: linear-gradient(180deg, #1e1b4b 0%, #111827 100%); padding: 36px 24px 24px 24px; border-bottom: 1px solid #1f2937;">
-              <!-- OFFICIAL LOGO -->
+            <td height="5" style="background: linear-gradient(90deg, #2563eb 0%, #06b6d4 50%, #10b981 100%); font-size: 0; line-height: 0;">&nbsp;</td>
+          </tr>
+
+          <!-- HEADER WITH ORIGINAL LOGO -->
+          <tr>
+            <td align="center" style="padding: 32px 28px 24px 28px; background-color: #ffffff; border-bottom: 1px solid #f1f5f9;">
               <a href="https://school.emergingedge.tech" target="_blank" style="display: inline-block;">
-                <img src="https://school.emergingedge.tech/eest-logo.png" alt="Emerging Edge School of Technology Logo" width="180" style="display: block; border: 0; max-width: 180px; height: auto;" />
+                <img src="https://school.emergingedge.tech/eest-logo.png" alt="Emerging Edge School of Technology" width="180" class="header-logo" style="display: block; width: 180px; max-width: 180px; height: auto;" />
               </a>
-              <p style="color: #94a3b8; font-size: 13px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; margin-top: 14px;">
-                Learn &middot; Build &middot; Lead
+              <p style="color: #64748b; font-size: 12px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; margin-top: 10px;">
+                Emerging Edge School of Technology
               </p>
             </td>
           </tr>
 
-          <!-- HERO BANNER -->
+          <!-- HERO SECTION -->
           <tr>
-            <td class="content-cell" style="padding: 36px 32px 20px 32px; text-align: center;">
-              
-              <!-- Announcement Badge -->
-              <table border="0" cellpadding="0" cellspacing="0" align="center" style="margin-bottom: 16px;">
+            <td class="mobile-padding" style="padding: 36px 36px 20px 36px; text-align: center; background-color: #ffffff;">
+
+              <!-- Status Badge -->
+              <table border="0" cellpadding="0" cellspacing="0" align="center" style="margin: 0 auto 16px auto;">
                 <tr>
-                  <td style="background: rgba(99, 102, 241, 0.15); border: 1px solid #6366f1; padding: 6px 18px; border-radius: 999px;">
-                    <span style="color: #818cf8; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;">
-                      ⚡ Admissions Open &middot; New Batch
+                  <td style="background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 20px; padding: 5px 16px;">
+                    <span style="color: #1d4ed8; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;">
+                      Admissions Open &middot; Upcoming Batches
                     </span>
                   </td>
                 </tr>
               </table>
 
-              <!-- Main Title -->
-              <h1 class="headline" style="color: #ffffff; font-size: 28px; line-height: 36px; font-weight: 800; margin: 0 0 12px 0;">
-                Master High-Income Tech &amp; Creative Skills
+              <!-- Main Heading -->
+              <h1 class="headline-main" style="color: #0f172a; font-size: 28px; font-weight: 800; line-height: 36px; margin: 0 0 12px 0; letter-spacing: -0.5px;">
+                Build High-Demand Industry Skills with Expert Mentorship
               </h1>
 
-              <!-- Subtitle -->
-              <p style="color: #94a3b8; font-size: 15px; line-height: 24px; margin: 0 auto; max-width: 480px;">
-                Emerging Edge School of Technology (EEST) ke naye batches shuru ho chuke hain. Live practical classes, real client projects, aur industry experts ki rehnumai mein seekhein.
+              <!-- Description -->
+              <p style="color: #475569; font-size: 15px; line-height: 24px; margin: 0 auto 26px auto; max-width: 490px;">
+                Emerging Edge School of Technology is launching specialized practical tracks. Learn modern tools, work on real-world projects, and gain direct mentorship from active software engineers and industry specialists.
               </p>
 
-              <!-- Hero Primary CTA Button -->
-              <table border="0" cellpadding="0" cellspacing="0" align="center" style="margin-top: 24px; margin-bottom: 12px;">
+              <!-- Hero Call to Action -->
+              <table border="0" cellpadding="0" cellspacing="0" align="center" style="margin: 0 auto 12px auto;">
                 <tr>
-                  <td align="center" style="border-radius: 8px; background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);">
-                    <a href="https://school.emergingedge.tech/enrollment" target="_blank" class="btn-full" style="font-size: 16px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 14px 34px; display: inline-block; border-radius: 8px; letter-spacing: 0.3px;">
-                      Apply Online &middot; Start Learning &rarr;
+                  <td align="center" style="border-radius: 8px;">
+                    <a href="https://school.emergingedge.tech/enrollment" target="_blank" class="btn-primary btn-full" style="display: inline-block; background-color: #2563eb; color: #ffffff; text-decoration: none; font-size: 15px; font-weight: 700; padding: 14px 32px; border-radius: 8px; letter-spacing: 0.2px;">
+                      Apply Online &middot; Register on Website &rarr;
                     </a>
                   </td>
                 </tr>
@@ -115,213 +177,228 @@
             </td>
           </tr>
 
-          <!-- DIVIDER -->
+          <!-- SECTION DIVIDER -->
           <tr>
-            <td style="padding: 0 32px;">
-              <hr style="border: 0; height: 1px; background-color: #1f2937; margin: 10px 0 24px 0;" />
+            <td style="padding: 0 36px;">
+              <div style="height: 1px; background-color: #e2e8f0; width: 100%;"></div>
             </td>
           </tr>
 
-          <!-- SECTION: 6 COURSES & TRAINERS -->
+          <!-- COURSES LISTING SECTION -->
           <tr>
-            <td class="content-cell" style="padding: 0 32px 10px 32px;">
-              
-              <div style="text-align: left; margin-bottom: 20px;">
-                <h2 style="color: #ffffff; font-size: 20px; font-weight: 700; margin: 0 0 6px 0;">
-                  Featured Courses &amp; Industry Mentors
+            <td class="mobile-padding" style="padding: 30px 36px 12px 36px; background-color: #ffffff;">
+
+              <!-- Section Title -->
+              <div style="margin-bottom: 22px;">
+                <h2 style="color: #0f172a; font-size: 19px; font-weight: 700; margin: 0 0 4px 0; letter-spacing: -0.3px;">
+                  Specialized Programs &amp; Faculty
                 </h2>
                 <p style="color: #64748b; font-size: 13px; margin: 0;">
-                  Apne career aur interest ke mutabiq best program select karein:
+                  Choose the specialized learning path that matches your professional goals:
                 </p>
               </div>
 
-              <!-- COURSE 1: WEB DEVELOPMENT -->
-              <table border="0" cellpadding="0" cellspacing="0" width="100%" class="course-card" style="background-color: #0b0f19; border: 1px solid #1f2937; border-left: 4px solid #38bdf8; border-radius: 10px; padding: 18px; margin-bottom: 16px;">
+              <!-- PROGRAM 1: WEB DEVELOPMENT -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" class="course-card" style="background-color: #ffffff; border: 1px solid #e2e8f0; border-left: 4px solid #2563eb; border-radius: 10px; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);">
                 <tr>
-                  <td>
-                    <span style="display: inline-block; background: rgba(56, 189, 248, 0.15); color: #38bdf8; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; margin-bottom: 6px;">
-                      Full-Stack Track
-                    </span>
-                    <h3 style="color: #ffffff; font-size: 17px; font-weight: 700; margin: 4px 0 6px 0;">
-                      💻 Web Development
-                    </h3>
-                    <p style="color: #94a3b8; font-size: 13px; line-height: 19px; margin: 0 0 10px 0;">
-                      HTML5, CSS3, Modern JavaScript, React.js, Node.js, Express, MongoDB, REST APIs, aur production deployments.
-                    </p>
-                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-top: 1px dashed #1e293b; padding-top: 8px;">
-                      <tr>
-                        <td>
-                          <p style="color: #cbd5e1; font-size: 12px; margin: 0;">
-                            <strong style="color: #38bdf8;">Lead Trainers:</strong> S Tatheer Hussain &middot; Muhammad Ali
-                          </p>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
-
-              <!-- COURSE 2: MOBILE APP DEVELOPMENT -->
-              <table border="0" cellpadding="0" cellspacing="0" width="100%" class="course-card" style="background-color: #0b0f19; border: 1px solid #1f2937; border-left: 4px solid #60a5fa; border-radius: 10px; padding: 18px; margin-bottom: 16px;">
-                <tr>
-                  <td>
-                    <span style="display: inline-block; background: rgba(96, 165, 250, 0.15); color: #60a5fa; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; margin-bottom: 6px;">
-                      Mobile Engineering
-                    </span>
-                    <h3 style="color: #ffffff; font-size: 17px; font-weight: 700; margin: 4px 0 6px 0;">
-                      📱 Mobile App Development (Flutter)
-                    </h3>
-                    <p style="color: #94a3b8; font-size: 13px; line-height: 19px; margin: 0 0 10px 0;">
-                      Flutter &amp; Dart se Android aur iOS ke liye modern cross-platform mobile apps, Firebase backend, State Management, aur store launch.
-                    </p>
-                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-top: 1px dashed #1e293b; padding-top: 8px;">
-                      <tr>
-                        <td>
-                          <p style="color: #cbd5e1; font-size: 12px; margin: 0;">
-                            <strong style="color: #60a5fa;">Lead Trainers:</strong> Talha Iqbal &middot; Faras
-                          </p>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
-
-              <!-- COURSE 3: ARTIFICIAL INTELLIGENCE -->
-              <table border="0" cellpadding="0" cellspacing="0" width="100%" class="course-card" style="background-color: #0b0f19; border: 1px solid #1f2937; border-left: 4px solid #a855f7; border-radius: 10px; padding: 18px; margin-bottom: 16px;">
-                <tr>
-                  <td>
-                    <span style="display: inline-block; background: rgba(168, 85, 247, 0.15); color: #c084fc; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; margin-bottom: 6px;">
-                      Next-Gen Tech
-                    </span>
-                    <h3 style="color: #ffffff; font-size: 17px; font-weight: 700; margin: 4px 0 6px 0;">
-                      🤖 Artificial Intelligence &amp; Data
-                    </h3>
-                    <p style="color: #94a3b8; font-size: 13px; line-height: 19px; margin: 0 0 10px 0;">
-                      Machine Learning fundamentals, Python programming, practical AI workflows, Prompt Engineering, aur intelligent tools ka istemal.
-                    </p>
-                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-top: 1px dashed #1e293b; padding-top: 8px;">
-                      <tr>
-                        <td>
-                          <p style="color: #cbd5e1; font-size: 12px; margin: 0;">
-                            <strong style="color: #c084fc;">Lead Trainer:</strong> Faiza Ghaffar (Associate AI Engineer)
-                          </p>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
-
-              <!-- COURSE 4: DIGITAL MARKETING WITH AI -->
-              <table border="0" cellpadding="0" cellspacing="0" width="100%" class="course-card" style="background-color: #0b0f19; border: 1px solid #1f2937; border-left: 4px solid #f59e0b; border-radius: 10px; padding: 18px; margin-bottom: 16px;">
-                <tr>
-                  <td>
-                    <span style="display: inline-block; background: rgba(245, 158, 11, 0.15); color: #fbbf24; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; margin-bottom: 6px;">
-                      High-Growth &middot; Featured
-                    </span>
-                    <h3 style="color: #ffffff; font-size: 17px; font-weight: 700; margin: 4px 0 6px 0;">
-                      📢 Digital Marketing with AI
-                    </h3>
-                    <p style="color: #94a3b8; font-size: 13px; line-height: 19px; margin: 0 0 10px 0;">
-                      Meta Ads (Facebook &amp; Instagram), SEO, Search Console, AI Content Strategy, Analytics, aur international clients ko pitch karna.
-                    </p>
-                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-top: 1px dashed #1e293b; padding-top: 8px;">
-                      <tr>
-                        <td>
-                          <p style="color: #cbd5e1; font-size: 12px; margin: 0;">
-                            <strong style="color: #fbbf24;">Lead Trainer:</strong> Zunira Rehman (Digital Marketing &amp; AI Expert)
-                          </p>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
-
-              <!-- COURSE 5: ECOMMERCE & DROPSHIPPING -->
-              <table border="0" cellpadding="0" cellspacing="0" width="100%" class="course-card" style="background-color: #0b0f19; border: 1px solid #1f2937; border-left: 4px solid #10b981; border-radius: 10px; padding: 18px; margin-bottom: 16px;">
-                <tr>
-                  <td>
-                    <span style="display: inline-block; background: rgba(16, 185, 129, 0.15); color: #34d399; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; margin-bottom: 6px;">
-                      Business &amp; Sales &middot; New Track
-                    </span>
-                    <h3 style="color: #ffffff; font-size: 17px; font-weight: 700; margin: 4px 0 6px 0;">
-                      🛒 Ecommerce &amp; Dropshipping
-                    </h3>
-                    <p style="color: #94a3b8; font-size: 13px; line-height: 19px; margin: 0 0 10px 0;">
-                      Shopify store setup, winning product hunting, supplier sourcing, local &amp; international dropshipping, marketing, aur scaling.
-                    </p>
-                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-top: 1px dashed #1e293b; padding-top: 8px;">
-                      <tr>
-                        <td>
-                          <p style="color: #cbd5e1; font-size: 12px; margin: 0;">
-                            <strong style="color: #34d399;">Lead Trainer:</strong> M Usman (Ecommerce Specialist)
-                          </p>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
-
-              <!-- COURSE 6: GRAPHICS DESIGNING -->
-              <table border="0" cellpadding="0" cellspacing="0" width="100%" class="course-card" style="background-color: #0b0f19; border: 1px solid #1f2937; border-left: 4px solid #ec4899; border-radius: 10px; padding: 18px; margin-bottom: 24px;">
-                <tr>
-                  <td>
-                    <span style="display: inline-block; background: rgba(236, 72, 153, 0.15); color: #f472b6; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; margin-bottom: 6px;">
-                      Creative Arts &middot; New Track
-                    </span>
-                    <h3 style="color: #ffffff; font-size: 17px; font-weight: 700; margin: 4px 0 6px 0;">
-                      🎨 Graphics Designing &amp; Visual Branding
-                    </h3>
-                    <p style="color: #94a3b8; font-size: 13px; line-height: 19px; margin: 0 0 10px 0;">
-                      Adobe Photoshop, Illustrator, Social Media Creatives, Logo &amp; Brand Identity Design, aur Freelancing clients ke liye portfolio build karna.
-                    </p>
-                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-top: 1px dashed #1e293b; padding-top: 8px;">
-                      <tr>
-                        <td>
-                          <p style="color: #cbd5e1; font-size: 12px; margin: 0;">
-                            <strong style="color: #f472b6;">Lead Trainer:</strong> Fazal ur Rehman (Creative Director &amp; Designer)
-                          </p>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
-
-            </td>
-          </tr>
-
-          <!-- KEY BENEFITS CARD -->
-          <tr>
-            <td style="padding: 0 32px 24px 32px;">
-              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background: linear-gradient(135deg, rgba(30, 27, 75, 0.5) 0%, rgba(15, 23, 42, 0.7) 100%); border: 1px solid #312e81; border-radius: 12px; padding: 20px;">
-                <tr>
-                  <td>
-                    <h4 style="color: #c7d2fe; font-size: 15px; font-weight: 700; margin: 0 0 12px 0;">
-                      🌟 EEST Portal ke Khaas Fawaid:
-                    </h4>
+                  <td style="padding: 18px 20px;">
                     <table border="0" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
-                        <td style="color: #e2e8f0; font-size: 13px; line-height: 22px; padding: 3px 0;">
-                          &bull; <strong>Live Interactive Lectures</strong> &middot; Real-time question-answer sessions.
+                        <td>
+                          <span style="display: inline-block; background-color: #eff6ff; color: #1d4ed8; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase;">
+                            Full-Stack Track
+                          </span>
+                          <h3 style="color: #0f172a; font-size: 17px; font-weight: 700; margin: 6px 0 6px 0;">
+                            Web Development
+                          </h3>
+                          <p style="color: #475569; font-size: 13px; line-height: 20px; margin: 0 0 12px 0;">
+                            From front-end fundamentals to production web applications: HTML5, CSS3, Modern JavaScript, React.js, Node.js, Express, MongoDB, RESTful APIs, and cloud deployment.
+                          </p>
+                          <div style="border-top: 1px solid #f1f5f9; padding-top: 10px;">
+                            <span style="color: #64748b; font-size: 12px; font-weight: 500;">Lead Trainers: </span>
+                            <strong style="color: #0f172a; font-size: 12px;">S Tatheer Hussain</strong>
+                            <span style="color: #94a3b8; font-size: 12px;"> &middot; </span>
+                            <strong style="color: #0f172a; font-size: 12px;">Muhammad Ali</strong>
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- PROGRAM 2: MOBILE APP DEVELOPMENT -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" class="course-card" style="background-color: #ffffff; border: 1px solid #e2e8f0; border-left: 4px solid #0284c7; border-radius: 10px; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);">
+                <tr>
+                  <td style="padding: 18px 20px;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td>
+                          <span style="display: inline-block; background-color: #f0f9ff; color: #0369a1; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase;">
+                            Cross-Platform Mobile
+                          </span>
+                          <h3 style="color: #0f172a; font-size: 17px; font-weight: 700; margin: 6px 0 6px 0;">
+                            Mobile App Development (Flutter)
+                          </h3>
+                          <p style="color: #475569; font-size: 13px; line-height: 20px; margin: 0 0 12px 0;">
+                            Build cross-platform mobile apps for Android and iOS using Flutter and Dart. Covers State Management, Firebase integration, responsive UI design, API communication, and app store deployment.
+                          </p>
+                          <div style="border-top: 1px solid #f1f5f9; padding-top: 10px;">
+                            <span style="color: #64748b; font-size: 12px; font-weight: 500;">Lead Trainers: </span>
+                            <strong style="color: #0f172a; font-size: 12px;">Talha Iqbal</strong>
+                            <span style="color: #94a3b8; font-size: 12px;"> &middot; </span>
+                            <strong style="color: #0f172a; font-size: 12px;">Faras</strong>
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- PROGRAM 3: ARTIFICIAL INTELLIGENCE -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" class="course-card" style="background-color: #ffffff; border: 1px solid #e2e8f0; border-left: 4px solid #7c3aed; border-radius: 10px; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);">
+                <tr>
+                  <td style="padding: 18px 20px;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td>
+                          <span style="display: inline-block; background-color: #f5f3ff; color: #6d28d9; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase;">
+                            Data &amp; Intelligence
+                          </span>
+                          <h3 style="color: #0f172a; font-size: 17px; font-weight: 700; margin: 6px 0 6px 0;">
+                            Artificial Intelligence &amp; Data
+                          </h3>
+                          <p style="color: #475569; font-size: 13px; line-height: 20px; margin: 0 0 12px 0;">
+                            Hands-on Machine Learning foundations, Python for data science, neural model architectures, prompt engineering, and integrating practical AI APIs into production systems.
+                          </p>
+                          <div style="border-top: 1px solid #f1f5f9; padding-top: 10px;">
+                            <span style="color: #64748b; font-size: 12px; font-weight: 500;">Lead Trainer: </span>
+                            <strong style="color: #0f172a; font-size: 12px;">Faiza Ghaffar</strong>
+                            <span style="color: #64748b; font-size: 12px;"> (Associate AI Engineer)</span>
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- PROGRAM 4: DIGITAL MARKETING WITH AI -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" class="course-card" style="background-color: #ffffff; border: 1px solid #e2e8f0; border-left: 4px solid #d97706; border-radius: 10px; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);">
+                <tr>
+                  <td style="padding: 18px 20px;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td>
+                          <span style="display: inline-block; background-color: #fffbeb; color: #b45309; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase;">
+                            Growth &amp; Brand Strategy
+                          </span>
+                          <h3 style="color: #0f172a; font-size: 17px; font-weight: 700; margin: 6px 0 6px 0;">
+                            Digital Marketing with AI
+                          </h3>
+                          <p style="color: #475569; font-size: 13px; line-height: 20px; margin: 0 0 12px 0;">
+                            Performance advertising with Meta Ads (Facebook &amp; Instagram), technical SEO and Search Console, AI-assisted content strategy, analytics tracking, and freelance client acquisition.
+                          </p>
+                          <div style="border-top: 1px solid #f1f5f9; padding-top: 10px;">
+                            <span style="color: #64748b; font-size: 12px; font-weight: 500;">Lead Trainer: </span>
+                            <strong style="color: #0f172a; font-size: 12px;">Zunira Rehman</strong>
+                            <span style="color: #64748b; font-size: 12px;"> (Digital Marketing &amp; AI Specialist)</span>
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- PROGRAM 5: ECOMMERCE & DROPSHIPPING -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" class="course-card" style="background-color: #ffffff; border: 1px solid #e2e8f0; border-left: 4px solid #059669; border-radius: 10px; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);">
+                <tr>
+                  <td style="padding: 18px 20px;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td>
+                          <span style="display: inline-block; background-color: #ecfdf5; color: #047857; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase;">
+                            Ecommerce &amp; Business
+                          </span>
+                          <h3 style="color: #0f172a; font-size: 17px; font-weight: 700; margin: 6px 0 6px 0;">
+                            Ecommerce &amp; Dropshipping
+                          </h3>
+                          <p style="color: #475569; font-size: 13px; line-height: 20px; margin: 0 0 12px 0;">
+                            Complete store launch on Shopify and WooCommerce: winning product research, domestic and international supplier sourcing, inventory management, ad scaling, and customer fulfillment.
+                          </p>
+                          <div style="border-top: 1px solid #f1f5f9; padding-top: 10px;">
+                            <span style="color: #64748b; font-size: 12px; font-weight: 500;">Lead Trainer: </span>
+                            <strong style="color: #0f172a; font-size: 12px;">M Usman</strong>
+                            <span style="color: #64748b; font-size: 12px;"> (Ecommerce Specialist)</span>
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- PROGRAM 6: GRAPHICS DESIGNING -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" class="course-card" style="background-color: #ffffff; border: 1px solid #e2e8f0; border-left: 4px solid #db2777; border-radius: 10px; margin-bottom: 24px; box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);">
+                <tr>
+                  <td style="padding: 18px 20px;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td>
+                          <span style="display: inline-block; background-color: #fdf2f8; color: #be185d; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase;">
+                            Creative Design &amp; Brand Identity
+                          </span>
+                          <h3 style="color: #0f172a; font-size: 17px; font-weight: 700; margin: 6px 0 6px 0;">
+                            Graphics Designing &amp; Visual Branding
+                          </h3>
+                          <p style="color: #475569; font-size: 13px; line-height: 20px; margin: 0 0 12px 0;">
+                            Professional visual design with Adobe Photoshop and Illustrator. Master brand typography, vector art, social media campaign graphics, UI fundamentals, and building a high-converting client portfolio.
+                          </p>
+                          <div style="border-top: 1px solid #f1f5f9; padding-top: 10px;">
+                            <span style="color: #64748b; font-size: 12px; font-weight: 500;">Lead Trainer: </span>
+                            <strong style="color: #0f172a; font-size: 12px;">Fazal ur Rehman</strong>
+                            <span style="color: #64748b; font-size: 12px;"> (Visual Designer &amp; Creative Mentor)</span>
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+          <!-- INSTITUTIONAL VALUE PROPOSITION -->
+          <tr>
+            <td class="mobile-padding" style="padding: 0 36px 28px 36px;">
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px;">
+                <tr>
+                  <td>
+                    <p style="color: #0f172a; font-size: 14px; font-weight: 700; margin: 0 0 10px 0;">
+                      The EEST Learning Experience:
+                    </p>
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td style="color: #475569; font-size: 13px; line-height: 22px; padding: 3px 0;">
+                          &check; <strong>Live Interactive Lectures</strong> with interactive Q&amp;A sessions.
                         </td>
                       </tr>
                       <tr>
-                        <td style="color: #e2e8f0; font-size: 13px; line-height: 22px; padding: 3px 0;">
-                          &bull; <strong>Lifetime Portal Recordings</strong> &middot; Agar class miss ho jaye toh kabhi bhi dekhein.
+                        <td style="color: #475569; font-size: 13px; line-height: 22px; padding: 3px 0;">
+                          &check; <strong>Lifetime Student Portal Access</strong> to full class video recordings and resources.
                         </td>
                       </tr>
                       <tr>
-                        <td style="color: #e2e8f0; font-size: 13px; line-height: 22px; padding: 3px 0;">
-                          &bull; <strong>Hands-on Assignments &amp; Projects</strong> &middot; Portfolio tayyar karein.
+                        <td style="color: #475569; font-size: 13px; line-height: 22px; padding: 3px 0;">
+                          &check; <strong>Real-World Project Labs</strong> to build verified portfolio work.
                         </td>
                       </tr>
                       <tr>
-                        <td style="color: #e2e8f0; font-size: 13px; line-height: 22px; padding: 3px 0;">
-                          &bull; <strong>Verifiable Certificate</strong> &middot; EEST Academy ki janib se verified certificate.
+                        <td style="color: #475569; font-size: 13px; line-height: 22px; padding: 3px 0;">
+                          &check; <strong>Institutional Verification</strong> with verifiable certificates upon completion.
                         </td>
                       </tr>
                     </table>
@@ -331,44 +408,44 @@
             </td>
           </tr>
 
-          <!-- PRIMARY APPLY BUTTON -->
+          <!-- PRIMARY APPLY BUTTON BLOCK -->
           <tr>
-            <td align="center" style="padding: 10px 32px 30px 32px;">
-              <table border="0" cellpadding="0" cellspacing="0" align="center" style="width: 100%; max-width: 400px;">
+            <td align="center" class="mobile-padding" style="padding: 0 36px 32px 36px;">
+              <table border="0" cellpadding="0" cellspacing="0" align="center" style="width: 100%; max-width: 440px;">
                 <tr>
-                  <td align="center" style="border-radius: 8px; background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%); box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4);">
-                    <a href="https://school.emergingedge.tech/enrollment" target="_blank" class="btn-full" style="font-size: 16px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 16px 36px; display: block; border-radius: 8px; text-align: center;">
-                      Website Par Apply Karein &rarr;
+                  <td align="center">
+                    <a href="https://school.emergingedge.tech/enrollment" target="_blank" class="btn-primary btn-full" style="display: block; background-color: #2563eb; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 700; padding: 16px 32px; border-radius: 8px; text-align: center; letter-spacing: 0.3px;">
+                      Register Online &middot; Apply for Admission &rarr;
                     </a>
                   </td>
                 </tr>
               </table>
               <p style="color: #64748b; font-size: 12px; margin-top: 10px;">
-                Seats mehdood hain — Admission pehle aaiye pehle paiye ki bunyad par hoga.
+                Limited seats per batch to maintain direct student-to-mentor interaction.
               </p>
             </td>
           </tr>
 
-          <!-- WHATSAPP CONTACT CARD (MA'AM KOMAL) -->
+          <!-- WHATSAPP ADMISSIONS HELPDESK (NO PERSONAL NAME) -->
           <tr>
-            <td style="padding: 0 32px 32px 32px;">
-              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #0b0f19; border: 1px solid #16a34a; border-radius: 12px; padding: 20px;">
+            <td class="mobile-padding" style="padding: 0 36px 36px 36px;">
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; border: 1px solid #bbf7d0; border-radius: 12px; padding: 22px; text-align: center;">
                 <tr>
-                  <td align="center">
-                    <p style="color: #22c55e; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 6px 0;">
-                      💬 Admission Support &amp; Information
-                    </p>
-                    <h3 style="color: #ffffff; font-size: 16px; font-weight: 700; margin: 0 0 8px 0;">
-                      Kisi bhi sawal ke liye Ma'am Komal se WhatsApp par rabta karein
+                  <td>
+                    <span style="display: inline-block; background-color: #dcfce7; color: #15803d; font-size: 11px; font-weight: 700; padding: 3px 12px; border-radius: 999px; text-transform: uppercase; margin-bottom: 8px;">
+                      Direct WhatsApp Support
+                    </span>
+                    <h3 style="color: #0f172a; font-size: 17px; font-weight: 700; margin: 0 0 6px 0;">
+                      Have Questions About Course Timings or Curriculum?
                     </h3>
-                    <p style="color: #94a3b8; font-size: 13px; margin: 0 0 14px 0;">
-                      Timing, syllabus, ya registration se mutalliq rahnumai ke liye:
+                    <p style="color: #475569; font-size: 13px; line-height: 20px; margin: 0 0 16px 0;">
+                      Reach out directly to our official admissions desk on WhatsApp for program schedules, syllabus outlines, and registration assistance.
                     </p>
                     <table border="0" cellpadding="0" cellspacing="0" align="center">
                       <tr>
-                        <td align="center" style="background-color: #16a34a; border-radius: 8px;">
-                          <a href="https://wa.me/923215919502?text=Assalam%20o%20Alaikum%20Maam%20Komal%2C%20I%20want%20to%20get%20details%20about%20EEST%20courses." target="_blank" style="display: inline-block; padding: 12px 24px; color: #ffffff; font-size: 14px; font-weight: 700; text-decoration: none; border-radius: 8px;">
-                            📲 WhatsApp Ma'am Komal: +92 321 5919502
+                        <td align="center" style="border-radius: 8px;">
+                          <a href="https://wa.me/923215919502?text=Assalam%20o%20Alaikum!%20I%20need%20details%20regarding%20EEST%20courses." target="_blank" class="btn-whatsapp" style="display: inline-block; background-color: #16a34a; color: #ffffff; font-size: 14px; font-weight: 700; text-decoration: none; padding: 12px 26px; border-radius: 8px;">
+                            WhatsApp Admissions Helpdesk: +92 321 5919502
                           </a>
                         </td>
                       </tr>
@@ -381,17 +458,17 @@
 
           <!-- FOOTER -->
           <tr>
-            <td style="background-color: #0b0f19; padding: 28px 24px; text-align: center; border-top: 1px solid #1f2937;">
-              <p style="color: #cbd5e1; font-size: 13px; font-weight: 600; margin: 0 0 6px 0;">
+            <td style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 30px 28px; text-align: center;">
+              <p style="color: #0f172a; font-size: 13px; font-weight: 700; margin: 0 0 4px 0;">
                 Emerging Edge School of Technology
               </p>
-              <p style="color: #64748b; font-size: 12px; line-height: 18px; margin: 0 0 14px 0;">
+              <p style="color: #64748b; font-size: 12px; line-height: 18px; margin: 0 0 12px 0;">
                 University Road, Hayatabad, Peshawar, Khyber Pakhtunkhwa, Pakistan<br />
-                Official Website: <a href="https://school.emergingedge.tech" target="_blank" style="color: #818cf8; text-decoration: underline;">school.emergingedge.tech</a>
+                Official Portal: <a href="https://school.emergingedge.tech" target="_blank" class="nav-link" style="color: #2563eb; text-decoration: none; font-weight: 600;">school.emergingedge.tech</a>
               </p>
-              <p style="color: #475569; font-size: 11px; line-height: 16px; margin: 0;">
-                &copy; 2026 Emerging Edge School. All rights reserved.<br />
-                Aapko yeh email EEST student directory ka hissa hone par bheji gayi hai.
+              <p style="color: #94a3b8; font-size: 11px; line-height: 16px; margin: 0;">
+                &copy; 2026 Emerging Edge School of Technology. All rights reserved.<br />
+                You received this announcement as an enrolled or registered student in the EEST academic community.
               </p>
             </td>
           </tr>
