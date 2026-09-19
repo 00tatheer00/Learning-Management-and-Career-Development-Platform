@@ -273,10 +273,10 @@ export async function getAdminRevenueStats(): Promise<AdminRevenueStats> {
     at: row.createdAt,
   }));
 
-  const phase1Rows = dated.filter((row) => getRegistrationPhase(row.createdAt) === "phase-1");
-  const phase2Rows = dated.filter((row) => getRegistrationPhase(row.createdAt) === "phase-2");
-  const phase3Rows = dated.filter((row) => getRegistrationPhase(row.createdAt) === "phase-3");
-  const phase4Rows = dated.filter((row) => getRegistrationPhase(row.createdAt) === "phase-4");
+  const phase1Rows = dated.filter((row) => getRegistrationPhase(row) === "phase-1");
+  const phase2Rows = dated.filter((row) => getRegistrationPhase(row) === "phase-2");
+  const phase3Rows = dated.filter((row) => getRegistrationPhase(row) === "phase-3");
+  const phase4Rows = dated.filter((row) => getRegistrationPhase(row) === "phase-4");
 
   const overall = buildStatsForRows(dated, weekStart, monthStart);
   const phase1 = buildStatsForRows(phase1Rows, weekStart, monthStart);

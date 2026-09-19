@@ -29,6 +29,8 @@ export interface SingleRevenueSplit {
 
 export function getRevenueSplitForItem(item: RevenueSplitItem): SingleRevenueSplit {
   const phase = getRegistrationPhase({
+    program: item.program,
+    programSlug: item.programSlug,
     createdAt: item.createdAt || item.appliedAt,
     appliedAt: item.appliedAt,
     batch: item.batch,

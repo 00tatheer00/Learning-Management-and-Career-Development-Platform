@@ -15,6 +15,9 @@ import {
   Buildings,
   GraduationCap,
   Sparkle,
+  Wallet,
+  Copy,
+  Check,
 } from "@phosphor-icons/react";
 import type {
   AdminRevenueStats,
@@ -62,7 +65,7 @@ function getPeriodStats(
       management: stats.thisMonthManagement,
       trainer: stats.thisMonthTrainer,
       school: stats.thisMonthSchool,
-      label: "This month (August 2026)",
+      label: `This month (${new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric" }).format(new Date())})`,
     };
   }
   if (stats.monthlyBreakdown && stats.monthlyBreakdown.length > 0) {
@@ -86,15 +89,38 @@ function getPeriodStats(
     school: stats.totalSchool,
     label:
       selectedPhase === "phase-1"
-        ? "Full Phase 1 (June – July 2026)"
+        ? "Phase 1 (Web & App 1st Module)"
         : selectedPhase === "phase-2"
-          ? "Full Phase 2 (July – August 2026)"
+          ? "Phase 2 (Web & App 2nd, AI 1st Module)"
           : selectedPhase === "phase-3"
-            ? "Full Phase 3 (August – September 2026)"
+            ? "Phase 3 (Web & App 3rd, AI 2nd Module)"
             : selectedPhase === "phase-4"
-              ? "Full Phase 4 (September 2026 onwards)"
+              ? "Phase 4 (Marketing, Ecommerce & Graphics)"
               : "All Time (All Phases)",
   };
+}
+
+function getCoursePhaseModuleSubtitle(programSlug: string, selectedPhase: string): string | null {
+  if (selectedPhase === "phase-3") {
+    if (programSlug === "web-development") return "Module 3 · React.js & Modern Frontend";
+    if (programSlug === "app-development") return "Module 3 · Flutter, Firebase & Cloud APIs";
+    if (programSlug === "artificial-intelligence") return "Module 2 · Python Data Science to ML";
+  }
+  if (selectedPhase === "phase-4") {
+    if (programSlug === "digital-marketing") return "Phase 4 · Social Media, Ads & AI Marketing";
+    if (programSlug === "ecommerce") return "Phase 4 · Shopify, Stores & Digital Commerce";
+    if (programSlug === "graphics-designing") return "Phase 4 · Visual Identity, Branding & UI";
+  }
+  if (selectedPhase === "phase-2") {
+    if (programSlug === "web-development") return "Module 2 · JavaScript & Modern Web";
+    if (programSlug === "app-development") return "Module 2 · Flutter UI & Widgets";
+    if (programSlug === "artificial-intelligence") return "Module 1 · AI Foundations & Python";
+  }
+  if (selectedPhase === "phase-1") {
+    if (programSlug === "web-development") return "Module 1 · HTML5 & CSS3 Fundamentals";
+    if (programSlug === "app-development") return "Module 1 · Dart Programming & OOP";
+  }
+  return null;
 }
 
 function getCoursePeriodStats(
@@ -288,11 +314,13 @@ function AdminRevenueSidePanel() {
             : stats
     : null;
 
+  const [copiedPayout, setCopiedPayout] = useState(false);
   const periodStats = activeStats ? getPeriodStats(activeStats, period, selectedPhase) : null;
 
   // Build intelligent period options based on the active phase
   const getPeriodOptions = () => {
     if (!stats || !activeStats) return [];
+    const currentMonthLabel = new Intl.DateTimeFormat("en-US", { month: "long" }).format(new Date());
 
     if (selectedPhase === "phase-1") {
       const options: Array<{ key: string; label: string }> = [
@@ -309,13 +337,10 @@ function AdminRevenueSidePanel() {
     if (selectedPhase === "phase-2") {
       const options: Array<{ key: string; label: string }> = [
         { key: "all", label: `All Phase 2 (${stats.phases.phase2.totalApproved})` },
-        { key: "month", label: `August (${stats.phases.phase2.thisMonthApproved})` },
       ];
       if (stats.phases.phase2.monthlyBreakdown) {
         for (const m of stats.phases.phase2.monthlyBreakdown) {
-          if (m.monthKey !== "2026-08") {
-            options.push({ key: m.monthKey, label: `${m.label.split(" ")[0]} (${m.approvedCount})` });
-          }
+          options.push({ key: m.monthKey, label: `${m.label.split(" ")[0]} (${m.approvedCount})` });
         }
       }
       options.push({ key: "week", label: `This week (${stats.phases.phase2.thisWeekApproved})` });
@@ -325,13 +350,10 @@ function AdminRevenueSidePanel() {
     if (selectedPhase === "phase-3") {
       const options: Array<{ key: string; label: string }> = [
         { key: "all", label: `All Phase 3 (${stats.phases.phase3?.totalApproved ?? 0})` },
-        { key: "month", label: `August (${stats.phases.phase3?.thisMonthApproved ?? 0})` },
       ];
       if (stats.phases.phase3?.monthlyBreakdown) {
         for (const m of stats.phases.phase3.monthlyBreakdown) {
-          if (m.monthKey !== "2026-08") {
-            options.push({ key: m.monthKey, label: `${m.label.split(" ")[0]} (${m.approvedCount})` });
-          }
+          options.push({ key: m.monthKey, label: `${m.label.split(" ")[0]} (${m.approvedCount})` });
         }
       }
       options.push({ key: "week", label: `This week (${stats.phases.phase3?.thisWeekApproved ?? 0})` });
@@ -341,13 +363,10 @@ function AdminRevenueSidePanel() {
     if (selectedPhase === "phase-4") {
       const options: Array<{ key: string; label: string }> = [
         { key: "all", label: `All Phase 4 (${stats.phases.phase4?.totalApproved ?? 0})` },
-        { key: "month", label: `September (${stats.phases.phase4?.thisMonthApproved ?? 0})` },
       ];
       if (stats.phases.phase4?.monthlyBreakdown) {
         for (const m of stats.phases.phase4.monthlyBreakdown) {
-          if (m.monthKey !== "2026-09") {
-            options.push({ key: m.monthKey, label: `${m.label.split(" ")[0]} (${m.approvedCount})` });
-          }
+          options.push({ key: m.monthKey, label: `${m.label.split(" ")[0]} (${m.approvedCount})` });
         }
       }
       options.push({ key: "week", label: `This week (${stats.phases.phase4?.thisWeekApproved ?? 0})` });
@@ -357,20 +376,62 @@ function AdminRevenueSidePanel() {
     // "all" phases
     return [
       { key: "all", label: `All time (${stats.totalApproved})` },
-      { key: "month", label: `August (${stats.thisMonthApproved})` },
+      { key: "month", label: `${currentMonthLabel} (${stats.thisMonthApproved})` },
       { key: "week", label: `This week (${stats.thisWeekApproved})` },
     ];
   };
 
   const periodOptions = getPeriodOptions();
 
-  // Filter courses for active phase (Phase 1 had only Web & App Dev, AI was 0)
+  // Filter courses for active phase (Phase 1 had only Web & App Dev, Phase 2 & 3 had Web, App, AI; Phase 4 has Marketing, Ecommerce, Graphics)
   const coursesToDisplay = activeStats?.byCourse.filter((c) => {
     if (selectedPhase === "phase-1") {
-      return c.approvedCount > 0;
+      return c.programSlug === "web-development" || c.programSlug === "app-development";
+    }
+    if (selectedPhase === "phase-2") {
+      return (
+        c.programSlug === "web-development" ||
+        c.programSlug === "app-development" ||
+        c.programSlug === "artificial-intelligence"
+      );
+    }
+    if (selectedPhase === "phase-3") {
+      return (
+        c.programSlug === "web-development" ||
+        c.programSlug === "app-development" ||
+        c.programSlug === "artificial-intelligence"
+      );
+    }
+    if (selectedPhase === "phase-4") {
+      return (
+        c.programSlug === "digital-marketing" ||
+        c.programSlug === "ecommerce" ||
+        c.programSlug === "graphics-designing" ||
+        c.approvedCount > 0
+      );
     }
     return true;
   });
+
+  const handleCopyTrainerPayouts = () => {
+    if (!coursesToDisplay || !periodStats || !stats) return;
+    const rate = selectedPhase === "phase-1" ? 800 : 700;
+    const lines = [
+      `EEST Trainer Salary Payouts — ${periodStats.label}`,
+      `Rate: PKR ${rate} per approved student`,
+      `----------------------------------------`,
+    ];
+    for (const course of coursesToDisplay) {
+      const cp = getCoursePeriodStats(course, period);
+      const studentCount = period === "all" ? course.uniqueStudents : cp.students;
+      lines.push(`${course.trainerName} (${course.courseTitle}): ${studentCount} students × PKR ${rate} = PKR ${cp.trainer.toLocaleString("en-PK")}`);
+    }
+    lines.push(`----------------------------------------`);
+    lines.push(`Total Trainer Salaries Payable: PKR ${periodStats.trainer.toLocaleString("en-PK")}`);
+    navigator.clipboard.writeText(lines.join("\n"));
+    setCopiedPayout(true);
+    setTimeout(() => setCopiedPayout(false), 2500);
+  };
 
   return (
     <div className="fixed inset-0 z-[60] flex justify-end">
@@ -427,31 +488,59 @@ function AdminRevenueSidePanel() {
           {/* Dynamic phase split explanation in clean, soft pastel cards */}
           {selectedPhase === "phase-1" ? (
             <div className="bg-indigo-50/80 border border-indigo-200/80 text-xs text-slate-700 leading-relaxed rounded-xl p-3.5 shadow-2xs">
-              <span className="font-bold text-indigo-700 uppercase text-[10px] tracking-wider bg-indigo-100 border border-indigo-200 px-2 py-0.5 rounded-md mr-2">
-                Phase 1 Model
-              </span>
-              PKR 1,000 → <strong className="text-slate-900">PKR 200</strong> Mgmt (Komal) · <strong className="text-slate-900">PKR 800</strong> Trainer (Tatheer / Talha) · <strong className="text-slate-900">PKR 0</strong> School
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <span className="font-bold text-indigo-700 uppercase text-[10px] tracking-wider bg-indigo-100 border border-indigo-200 px-2 py-0.5 rounded-md">
+                  Phase 1 Model (Web & App 1st Module)
+                </span>
+                <span className="text-[11px] font-semibold text-indigo-800">
+                  Rs 800 / student
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-600">
+                PKR 1,000 → <strong className="text-slate-900">PKR 200</strong> Mgmt (Komal) · <strong className="text-indigo-700 font-bold">PKR 800</strong> Trainer (Tatheer / Talha) · <strong className="text-slate-900">PKR 0</strong> School
+              </p>
             </div>
           ) : selectedPhase === "phase-2" ? (
             <div className="bg-emerald-50/80 border border-emerald-200/80 text-xs text-slate-700 leading-relaxed rounded-xl p-3.5 shadow-2xs">
-              <span className="font-bold text-emerald-700 uppercase text-[10px] tracking-wider bg-emerald-100 border border-emerald-200 px-2 py-0.5 rounded-md mr-2">
-                Phase 2 Model
-              </span>
-              PKR 1,000 → <strong className="text-slate-900">PKR 200</strong> Mgmt (Komal) · <strong className="text-slate-900">PKR 700</strong> Trainer · <strong className="text-slate-900">PKR 100</strong> School
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <span className="font-bold text-emerald-700 uppercase text-[10px] tracking-wider bg-emerald-100 border border-emerald-200 px-2 py-0.5 rounded-md">
+                  Phase 2 Model (Web & App 2nd Module · AI 1st Module)
+                </span>
+                <span className="text-[11px] font-semibold text-emerald-800">
+                  Rs 700 / student
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-600">
+                PKR 1,000 → <strong className="text-slate-900">PKR 200</strong> Mgmt (Komal) · <strong className="text-emerald-700 font-bold">PKR 700</strong> Trainer (Tatheer / Talha / Faiza) · <strong className="text-slate-900">PKR 100</strong> School
+              </p>
             </div>
           ) : selectedPhase === "phase-3" ? (
             <div className="bg-purple-50/80 border border-purple-200/80 text-xs text-slate-700 leading-relaxed rounded-xl p-3.5 shadow-2xs">
-              <span className="font-bold text-purple-700 uppercase text-[10px] tracking-wider bg-purple-100 border border-purple-200 px-2 py-0.5 rounded-md mr-2">
-                Phase 3 Model
-              </span>
-              PKR 1,000 → <strong className="text-slate-900">PKR 200</strong> Mgmt (Komal) · <strong className="text-slate-900">PKR 700</strong> Trainer · <strong className="text-slate-900">PKR 100</strong> School
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <span className="font-bold text-purple-700 uppercase text-[10px] tracking-wider bg-purple-100 border border-purple-200 px-2 py-0.5 rounded-md">
+                  Phase 3 Model (Web & App 3rd Module · AI 2nd Module)
+                </span>
+                <span className="text-[11px] font-semibold text-purple-800">
+                  Rs 700 / student
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-600">
+                PKR 1,000 → <strong className="text-slate-900">PKR 200</strong> Mgmt (Komal) · <strong className="text-purple-700 font-bold">PKR 700</strong> Trainer (Tatheer / Talha / Faiza) · <strong className="text-slate-900">PKR 100</strong> School
+              </p>
             </div>
           ) : selectedPhase === "phase-4" ? (
             <div className="bg-orange-50/80 border border-orange-200/80 text-xs text-slate-700 leading-relaxed rounded-xl p-3.5 shadow-2xs">
-              <span className="font-bold text-orange-700 uppercase text-[10px] tracking-wider bg-orange-100 border border-orange-200 px-2 py-0.5 rounded-md mr-2">
-                Phase 4 Model
-              </span>
-              PKR 1,000 → <strong className="text-slate-900">PKR 200</strong> Mgmt (Komal) · <strong className="text-slate-900">PKR 700</strong> Trainer · <strong className="text-slate-900">PKR 100</strong> School
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <span className="font-bold text-orange-700 uppercase text-[10px] tracking-wider bg-orange-100 border border-orange-200 px-2 py-0.5 rounded-md">
+                  Phase 4 Model (Digital Marketing · Ecommerce · Graphics)
+                </span>
+                <span className="text-[11px] font-semibold text-orange-800">
+                  Rs 700 / student
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-600">
+                PKR 1,000 → <strong className="text-slate-900">PKR 200</strong> Mgmt (Komal) · <strong className="text-orange-700 font-bold">PKR 700</strong> Trainer (Zunira / Usman / Faisal) · <strong className="text-slate-900">PKR 100</strong> School
+              </p>
             </div>
           ) : (
             <div className="bg-slate-50 border border-slate-200 text-xs text-slate-600 leading-relaxed rounded-xl p-3.5 shadow-2xs">
@@ -736,6 +825,84 @@ function AdminRevenueSidePanel() {
                 </div>
               )}
 
+              {/* Trainer Salary Payout Sheet — Designed for Immediate Payroll Execution */}
+              <div className="rounded-2xl border border-sky-200 bg-white p-4 shadow-2xs space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-sky-100 text-sky-700">
+                      <Wallet size={16} weight="duotone" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900">
+                        Trainer Salary Payouts
+                      </h4>
+                      <p className="text-[11px] text-slate-500 font-medium">
+                        {selectedPhase === "phase-1" ? "Rs 800" : "Rs 700"} / student · {periodStats.label}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handleCopyTrainerPayouts}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 transition-all cursor-pointer shadow-2xs"
+                      title="Copy salary breakdown to clipboard"
+                    >
+                      {copiedPayout ? (
+                        <>
+                          <Check size={13} weight="bold" className="text-emerald-600" />
+                          <span className="text-emerald-600 font-bold text-[11px]">Copied</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy size={13} weight="bold" className="text-slate-500" />
+                          <span className="text-[11px]">Copy Slip</span>
+                        </>
+                      )}
+                    </button>
+                    <span className="text-xs font-bold text-sky-700 bg-sky-50 border border-sky-200 px-2.5 py-1 rounded-lg tabular-nums">
+                      {formatMoney(periodStats.trainer, stats.currency)}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="divide-y divide-slate-100 rounded-xl border border-slate-200/80 bg-slate-50/50 overflow-hidden">
+                  {coursesToDisplay?.map((course) => {
+                    const cp = getCoursePeriodStats(course, period);
+                    const studentCount = period === "all" ? course.uniqueStudents : cp.students;
+                    const subtitle = getCoursePhaseModuleSubtitle(course.programSlug, selectedPhase);
+                    return (
+                      <div
+                        key={course.programSlug}
+                        className="flex items-center justify-between p-3 transition-colors hover:bg-white"
+                      >
+                        <div className="min-w-0 pr-2">
+                          <div className="flex items-center gap-2">
+                            <p className="text-xs font-bold text-slate-900 truncate">
+                              {course.trainerName}
+                            </p>
+                            <span className="text-[10px] font-semibold px-2 py-0.5 bg-slate-100 border border-slate-200 rounded-md text-slate-600">
+                              {course.shortLabel}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-500 truncate mt-0.5">
+                            {subtitle ?? course.courseTitle} · <span className="font-semibold text-slate-700">{studentCount} students</span>
+                          </p>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <p className="text-xs sm:text-sm font-black text-slate-900 tabular-nums">
+                            {formatMoney(cp.trainer, stats.currency)}
+                          </p>
+                          <p className="text-[10px] text-emerald-600 font-semibold">
+                            Payable Salary
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
               {/* Course-wise Breakdown */}
               <div className="space-y-3 pt-1">
                 <p className="text-xs font-bold uppercase tracking-wider text-slate-500 px-0.5">
@@ -745,6 +912,7 @@ function AdminRevenueSidePanel() {
                   {coursesToDisplay?.map((course) => {
                     const cp = getCoursePeriodStats(course, period);
                     const trainerShort = course.trainerName.split(" ").slice(-1)[0];
+                    const subtitle = getCoursePhaseModuleSubtitle(course.programSlug, selectedPhase);
                     return (
                       <div
                         key={course.programSlug}
@@ -759,6 +927,11 @@ function AdminRevenueSidePanel() {
                           <div className="flex items-center justify-between gap-2">
                             <div>
                               <p className="font-bold text-sm tracking-tight text-white">{course.courseTitle}</p>
+                              {subtitle && (
+                                <p className="text-[11px] text-white/90 font-medium">
+                                  {subtitle}
+                                </p>
+                              )}
                               <p className="text-xs text-white/90 mt-0.5 font-medium">
                                 Trainer: {course.trainerName}
                               </p>
