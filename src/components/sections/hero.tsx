@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
-import { ArrowRight, Sparkles, Code2, Cpu, Palette, Megaphone, ShoppingCart } from "lucide-react";
+import { ArrowRight, Sparkles, Code2, Cpu, Palette, Megaphone, ShoppingCart, Smartphone, CheckCircle2, Users, Video } from "lucide-react";
 import { motion, type Variants } from "framer-motion";
 import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
@@ -18,19 +18,43 @@ const containerVariants: Variants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.12,
-      delayChildren: 0.08,
+      staggerChildren: 0.1,
+      delayChildren: 0.05,
     },
   },
 };
 
 const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 24 },
+  hidden: { opacity: 0, y: 18 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.55, ease: [0.215, 0.61, 0.355, 1] },
+    transition: { duration: 0.5, ease: [0.215, 0.61, 0.355, 1] },
   },
+};
+
+const PROGRAMS = [
+  { name: "Web Development", icon: Code2, color: "orange", href: "/programs/web-development", isNew: false },
+  { name: "App Development", icon: Smartphone, color: "sky", href: "/programs/app-development", isNew: false },
+  { name: "AI & Automation", icon: Cpu, color: "violet", href: "/programs/artificial-intelligence", isNew: false },
+  { name: "Digital Marketing", icon: Megaphone, color: "emerald", href: "/programs/digital-marketing", isNew: true },
+  { name: "Graphics Design", icon: Palette, color: "rose", href: "/programs/graphics-designing", isNew: true },
+  { name: "Ecommerce", icon: ShoppingCart, color: "amber", href: "/programs/ecommerce", isNew: true },
+] as const;
+
+const STATS = [
+  { icon: Users, label: "Live Classes", value: "Weekly" },
+  { icon: CheckCircle2, label: "Course Fee", value: "FREE" },
+  { icon: Video, label: "Recordings", value: "Included" },
+] as const;
+
+const colorMap: Record<string, { bg: string; text: string; border: string; dot: string }> = {
+  orange: { bg: "bg-orange-50", text: "text-orange-600", border: "border-orange-200/60", dot: "bg-orange-500" },
+  sky: { bg: "bg-sky-50", text: "text-sky-600", border: "border-sky-200/60", dot: "bg-sky-500" },
+  violet: { bg: "bg-violet-50", text: "text-violet-600", border: "border-violet-200/60", dot: "bg-violet-500" },
+  emerald: { bg: "bg-emerald-50", text: "text-emerald-600", border: "border-emerald-200/60", dot: "bg-emerald-500" },
+  rose: { bg: "bg-rose-50", text: "text-rose-600", border: "border-rose-200/60", dot: "bg-rose-500" },
+  amber: { bg: "bg-amber-50", text: "text-amber-600", border: "border-amber-200/60", dot: "bg-amber-500" },
 };
 
 export function HeroSection() {
@@ -54,259 +78,132 @@ export function HeroSection() {
   return (
     <section
       ref={sectionRef}
-      className="hero-section relative flex flex-col justify-center min-h-screen overflow-x-clip pt-28 pb-28 lg:pt-36 lg:pb-36 bg-gradient-to-b from-surface via-background to-surface"
+      className="hero-section relative flex flex-col justify-center overflow-x-clip pt-24 pb-16 lg:pt-28 lg:pb-20 bg-gradient-to-b from-white via-orange-50/30 to-white"
       aria-labelledby="hero-heading"
     >
       {/* Interactive Lightweight Canvas Background */}
       <HeroParticleCanvas />
 
-      {/* Grid Overlay & Glow Effects */}
+      {/* Subtle Grid Overlay */}
       <div className="absolute inset-0 hero-grid-wrap pointer-events-none" aria-hidden="true">
-        <div className="absolute inset-0 hero-grid-lines opacity-45" />
+        <div className="absolute inset-0 hero-grid-lines opacity-30" />
         <div className="absolute inset-0 hero-grid-shimmer" />
       </div>
 
+      {/* Soft ambient glow */}
       <div
-        className="hero-glow absolute top-1/4 left-1/2 -translate-x-1/2 w-[650px] h-[650px] rounded-full bg-gradient-to-tr from-orange-500/10 via-amber-500/15 to-sky-500/10 blur-[130px] pointer-events-none"
+        className="hero-glow absolute top-1/3 left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-orange-500/8 via-amber-400/10 to-sky-400/6 blur-[100px] pointer-events-none"
         aria-hidden="true"
       />
-
-      {/* Floating Ambient Tech Badges (Desktop View) */}
-      <div className="hidden lg:block pointer-events-none absolute inset-0 max-w-7xl mx-auto z-10">
-        {/* Badge 1: Top Left */}
-        <motion.div
-          animate={{ y: [0, -10, 0] }}
-          transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-[28%] left-4 xl:left-8 flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-white/90 backdrop-blur-md border border-orange-200/80 shadow-xl shadow-orange-500/10 text-slate-900 text-xs font-black"
-        >
-          <div className="p-1.5 rounded-lg bg-orange-500/10 text-orange-600">
-            <Code2 size={16} />
-          </div>
-          <span>Web &amp; App Development</span>
-        </motion.div>
-
-        {/* Badge 2: Top Right */}
-        <motion.div
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-          className="absolute top-[26%] right-4 xl:right-8 flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-white/90 backdrop-blur-md border border-sky-200/80 shadow-xl shadow-sky-500/10 text-slate-900 text-xs font-black"
-        >
-          <div className="p-1.5 rounded-lg bg-sky-500/10 text-sky-600">
-            <Cpu size={16} />
-          </div>
-          <span>AI &amp; Automation</span>
-        </motion.div>
-
-        {/* Badge 3: Bottom Left - Ecommerce */}
-        <motion.div
-          animate={{ y: [0, -12, 0] }}
-          transition={{ duration: 5.2, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          className="absolute bottom-[28%] left-6 xl:left-12 flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-white/90 backdrop-blur-md border border-amber-200/80 shadow-xl shadow-amber-500/10 text-slate-900 text-xs font-black"
-        >
-          <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-600">
-            <ShoppingCart size={16} />
-          </div>
-          <span>Ecommerce &amp; Shopify</span>
-        </motion.div>
-
-        {/* Badge 4: Bottom Right - Graphics Designing */}
-        <motion.div
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
-          className="absolute bottom-[26%] right-6 xl:right-12 flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-white/90 backdrop-blur-md border border-rose-200/80 shadow-xl shadow-rose-500/10 text-slate-900 text-xs font-black"
-        >
-          <div className="p-1.5 rounded-lg bg-rose-500/10 text-rose-600">
-            <Palette size={16} />
-          </div>
-          <span>Graphics Designing</span>
-        </motion.div>
-      </div>
 
       <div className="container-custom relative z-10 flex flex-col items-center px-4 sm:px-6 lg:px-8 text-center">
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="w-full max-w-[1140px] flex flex-col items-center"
+          className="w-full max-w-3xl flex flex-col items-center"
         >
-          {/* ═══ 3 NEW COURSES FEATURED SHOWCASE ═══ */}
-          <motion.div variants={itemVariants} className="mb-4">
-            <div
-              className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full overflow-hidden text-xs sm:text-sm font-extrabold shadow-sm"
-              style={{
-                background: "linear-gradient(135deg, #fff7ed 0%, #ffedd5 50%, #fef3c7 100%)",
-                border: "1px solid rgba(234,88,12,0.22)",
-                boxShadow: "0 2px 12px rgba(234,88,12,0.08)",
-              }}
-            >
-              <span className="relative flex h-2 w-2 shrink-0">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-500 opacity-60" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-orange-500" />
-              </span>
-              <span
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest text-white shrink-0"
-                style={{
-                  background: "linear-gradient(135deg, #ea580c, #f97316)",
-                  boxShadow: "0 1px 4px rgba(234,88,12,0.3)",
-                }}
-              >
-                <Sparkles size={8} />
-                Now Live
-              </span>
-              <span className="text-slate-900 font-extrabold tracking-tight">
-                3 New Bootcamps Launched for Admissions
-              </span>
+          {/* School Badge */}
+          <motion.div variants={itemVariants} className="mb-5">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-orange-500/8 border border-orange-200/50 text-xs font-bold text-orange-700 tracking-wide">
+              <Sparkles size={12} className="text-orange-500" />
+              Emerging Edge School of Technology
             </div>
           </motion.div>
 
-          {/* 3 Featured Course Cards */}
-          <motion.div
-            variants={itemVariants}
-            className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 w-full max-w-3xl mb-6"
-          >
-            {/* 1. Digital Marketing */}
-            <Link
-              href="/programs/digital-marketing"
-              className="group relative flex items-center gap-3 p-3 rounded-2xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-emerald-300/70 dark:border-emerald-700/60 shadow-md shadow-emerald-500/5 hover:shadow-xl hover:shadow-emerald-500/15 hover:-translate-y-1 transition-all duration-200 text-left"
-            >
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400 group-hover:scale-105 transition-transform">
-                <Megaphone size={18} />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs sm:text-sm font-black text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors truncate">
-                    Digital Marketing
-                  </span>
-                  <span className="px-1.5 py-0.2 rounded-full text-[8px] font-black uppercase tracking-wider bg-emerald-600 text-white shrink-0">
-                    New
-                  </span>
-                </div>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate">
-                  SEO, SMM &amp; AI Tools
-                </p>
-              </div>
-              <ArrowRight size={14} className="text-emerald-500 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0" />
-            </Link>
-
-            {/* 2. Graphics Designing */}
-            <Link
-              href="/programs/graphics-designing"
-              className="group relative flex items-center gap-3 p-3 rounded-2xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-rose-300/70 dark:border-rose-700/60 shadow-md shadow-rose-500/5 hover:shadow-xl hover:shadow-rose-500/15 hover:-translate-y-1 transition-all duration-200 text-left"
-            >
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-500/10 text-rose-600 dark:bg-rose-500/20 dark:text-rose-400 group-hover:scale-105 transition-transform">
-                <Palette size={18} />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs sm:text-sm font-black text-slate-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors truncate">
-                    Graphics Designing
-                  </span>
-                  <span className="px-1.5 py-0.2 rounded-full text-[8px] font-black uppercase tracking-wider bg-rose-600 text-white shrink-0">
-                    New
-                  </span>
-                </div>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate">
-                  Photoshop &amp; Branding
-                </p>
-              </div>
-              <ArrowRight size={14} className="text-rose-500 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0" />
-            </Link>
-
-            {/* 3. Ecommerce */}
-            <Link
-              href="/programs/ecommerce"
-              className="group relative flex items-center gap-3 p-3 rounded-2xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-amber-300/70 dark:border-amber-700/60 shadow-md shadow-amber-500/5 hover:shadow-xl hover:shadow-amber-500/15 hover:-translate-y-1 transition-all duration-200 text-left"
-            >
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400 group-hover:scale-105 transition-transform">
-                <ShoppingCart size={18} />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs sm:text-sm font-black text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors truncate">
-                    Ecommerce
-                  </span>
-                  <span className="px-1.5 py-0.2 rounded-full text-[8px] font-black uppercase tracking-wider bg-amber-600 text-white shrink-0">
-                    New
-                  </span>
-                </div>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate">
-                  Shopify &amp; Store Setup
-                </p>
-              </div>
-              <ArrowRight size={14} className="text-amber-500 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0" />
-            </Link>
-          </motion.div>
-
-
-          <motion.div variants={itemVariants} className="mb-6">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/15 border border-orange-300/70 text-orange-700 text-xs sm:text-sm font-extrabold shadow-sm">
-              <Sparkles size={14} className="text-orange-500 animate-pulse" />
-              <span>Emerging Edge School of Technology</span>
-            </div>
-          </motion.div>
-
-          {/* Animated Headline with Crystal Clear High Contrast */}
+          {/* Headline */}
           <motion.h1
             variants={itemVariants}
             id="hero-heading"
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.15] mb-5 text-balance"
+            className="text-3xl sm:text-4xl md:text-[2.75rem] font-extrabold tracking-tight leading-[1.2] mb-4 text-balance"
           >
-            <span className="text-slate-900 block font-black">Learn Skills Online.</span>
-            <span className="bg-gradient-to-r from-orange-600 via-amber-600 to-orange-500 bg-clip-text text-transparent drop-shadow-sm font-black block mt-1">
-              Course is FREE.
+            <span className="text-slate-900">Learn In-Demand Skills.</span>
+            <br />
+            <span className="bg-gradient-to-r from-orange-600 to-amber-500 bg-clip-text text-transparent">
+              100% Free Tuition.
             </span>
           </motion.h1>
 
-          {/* Animated Subtitle */}
+          {/* Subtitle */}
           <motion.p
             variants={itemVariants}
-            className="text-lg sm:text-xl text-slate-700 max-w-2xl mx-auto mb-6 leading-relaxed font-semibold"
+            className="text-sm sm:text-base text-slate-600 max-w-xl mx-auto mb-6 leading-relaxed"
           >
-            Web, App, AI, Digital Marketing, Graphics Designing &amp; Ecommerce
-            bootcamps. All courses include live interactive classes, assignments, and portal access.
+            Professional bootcamps in Web, App, AI, Digital Marketing, Graphics &amp; Ecommerce
+            with live classes, assignments, and portal access.
           </motion.p>
 
-          {/* Pricing Highlight Pill - Prominent Main Page Pricing */}
-          <motion.div variants={itemVariants} className="mb-8">
-            <div className="inline-flex flex-wrap items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-emerald-500/10 border-2 border-emerald-500/30 backdrop-blur-xs text-slate-900 font-bold text-sm sm:text-base shadow-lg shadow-emerald-500/5">
-              <span className="flex h-3 w-3 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Course Tuition: <span className="text-emerald-600 font-black uppercase">100% FREE</span></span>
-              <span className="text-slate-300 font-normal">|</span>
-              <span><span className="text-orange-600 font-black">Only One-Time Registration: 1000</span></span>
-            </div>
+          {/* Compact Stats Row */}
+          <motion.div variants={itemVariants} className="flex items-center justify-center gap-6 sm:gap-8 mb-7">
+            {STATS.map(({ icon: Icon, label, value }) => (
+              <div key={label} className="flex items-center gap-2 text-xs sm:text-sm">
+                <Icon size={15} className="text-orange-500 shrink-0" />
+                <span className="text-slate-500">{label}:</span>
+                <span className="font-bold text-slate-900">{value}</span>
+              </div>
+            ))}
           </motion.div>
 
-          {/* Animated Action Buttons */}
+          {/* CTA Buttons */}
           <motion.div
             variants={itemVariants}
-            className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3.5 max-w-md sm:max-w-none mx-auto"
+            className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 w-full sm:w-auto mb-8"
           >
             {REGISTRATION_OPEN ? (
-              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
-                <Button size="lg" className="text-base h-14 px-8 shadow-xl shadow-orange-500/25 rounded-xl font-bold" asChild>
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button size="lg" className="text-sm h-11 px-7 shadow-lg shadow-orange-500/20 rounded-xl font-bold" asChild>
                   <Link href="/register" prefetch>
                     Register Now
-                    <ArrowRight className="w-5 h-5 ml-1" aria-hidden="true" />
+                    <ArrowRight className="w-4 h-4 ml-1.5" aria-hidden="true" />
                   </Link>
                 </Button>
               </motion.div>
             ) : (
-              <Button size="lg" disabled className="text-base h-14 px-8 opacity-75 cursor-not-allowed rounded-xl font-bold">
+              <Button size="lg" disabled className="text-sm h-11 px-7 opacity-75 cursor-not-allowed rounded-xl font-bold">
                 Admissions Closed
               </Button>
             )}
 
-            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
-              <Button size="lg" variant="secondary" className="text-base h-14 px-8 rounded-xl font-bold border border-slate-200 dark:border-slate-800" asChild>
-                <Link href="/programs" prefetch>See All Courses</Link>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button size="lg" variant="secondary" className="text-sm h-11 px-7 rounded-xl font-bold border border-slate-200" asChild>
+                <Link href="/programs" prefetch>Explore Programs</Link>
               </Button>
             </motion.div>
           </motion.div>
 
-          <motion.p variants={itemVariants} className="mt-7 text-sm text-slate-500 dark:text-slate-400">
-            Confused? Tap the green <strong className="text-[#25D366] font-bold">Need Help?</strong> button
-            at the bottom right corner.
-          </motion.p>
+          {/* Registration Fee Pill */}
+          <motion.div variants={itemVariants} className="mb-8">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-50 border border-slate-200/80 text-xs sm:text-sm font-semibold text-slate-700">
+              <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              One-Time Registration Fee:
+              <span className="font-black text-orange-600">PKR 1,000</span>
+            </div>
+          </motion.div>
+
+          {/* Programs Grid */}
+          <motion.div
+            variants={itemVariants}
+            className="grid grid-cols-2 sm:grid-cols-3 gap-2 w-full max-w-lg"
+          >
+            {PROGRAMS.map(({ name, icon: Icon, color, href, isNew }) => {
+              const c = colorMap[color];
+              return (
+                <Link
+                  key={name}
+                  href={href}
+                  className={`group relative flex items-center gap-2 px-3 py-2.5 rounded-xl ${c.bg} border ${c.border} hover:shadow-md hover:-translate-y-0.5 transition-all duration-200`}
+                >
+                  <Icon size={15} className={`${c.text} shrink-0`} />
+                  <span className="text-[11px] sm:text-xs font-bold text-slate-800 truncate">{name}</span>
+                  {isNew && (
+                    <span className={`absolute -top-1.5 -right-1.5 px-1.5 py-0.5 rounded-full text-[7px] font-black uppercase tracking-wider ${c.dot} text-white`}>
+                      New
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
+          </motion.div>
         </motion.div>
       </div>
     </section>
