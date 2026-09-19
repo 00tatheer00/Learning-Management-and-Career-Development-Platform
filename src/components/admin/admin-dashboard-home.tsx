@@ -299,8 +299,8 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
         </div>
       </div>
 
-      {/* Registration Phases Overview Cards — 4 Cards Grid */}
-      <div className="shrink-0 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+      {/* Registration Phases Overview Cards — 3 Cards in Row 1, 4th in Next Row */}
+      <div className="shrink-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
         {/* Phase 1 Card */}
         <div
           onClick={() => setPhaseFilter(phaseFilter === "phase-1" ? "all" : "phase-1")}
@@ -312,17 +312,17 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
           )}
         >
           <div className="flex items-center justify-between gap-3 mb-3">
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2.5 min-w-0">
               <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-lg font-bold text-xs", tones.indigo.icon)}>
                 P1
               </div>
-              <div>
+              <div className="min-w-0">
                 <h3 className="text-sm font-semibold tracking-tight text-pt">Phase 1 (Module 1)</h3>
                 <p className="text-xs text-pt-muted">HTML &amp; CSS Module</p>
               </div>
             </div>
             <span className={cn(
-              "rounded-full px-3 py-1 text-xs font-extrabold border shadow-sm transition-all",
+              "rounded-full px-3 py-1 text-xs font-extrabold border shadow-sm transition-all shrink-0 whitespace-nowrap",
               phaseFilter === "phase-1"
                 ? "bg-indigo-600 text-white border-indigo-700"
                 : "bg-indigo-100 text-indigo-950 border-indigo-300 dark:bg-indigo-950 dark:text-indigo-200 dark:border-indigo-700"
@@ -364,17 +364,17 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
           )}
         >
           <div className="flex items-center justify-between gap-3 mb-3">
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2.5 min-w-0">
               <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-lg font-bold text-xs", tones.emerald.icon)}>
                 P2
               </div>
-              <div>
+              <div className="min-w-0">
                 <h3 className="text-sm font-semibold tracking-tight text-pt">Phase 2 (2nd Module)</h3>
                 <p className="text-xs text-pt-muted">Advanced Level Registrations</p>
               </div>
             </div>
             <span className={cn(
-              "rounded-full px-3 py-1 text-xs font-extrabold border shadow-sm transition-all",
+              "rounded-full px-3 py-1 text-xs font-extrabold border shadow-sm transition-all shrink-0 whitespace-nowrap",
               phaseFilter === "phase-2"
                 ? "bg-emerald-600 text-white border-emerald-700"
                 : "bg-emerald-100 text-emerald-950 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-200 dark:border-emerald-700"
@@ -416,17 +416,17 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
           )}
         >
           <div className="flex items-center justify-between gap-3 mb-3">
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2.5 min-w-0">
               <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-lg font-bold text-xs", tones.violet.icon)}>
                 P3
               </div>
-              <div>
+              <div className="min-w-0">
                 <h3 className="text-sm font-semibold tracking-tight text-pt">Phase 3 (Web &amp; App 3rd Module)</h3>
                 <p className="text-xs text-pt-muted">Web Dev (React) &amp; Flutter (Firebase)</p>
               </div>
             </div>
             <span className={cn(
-              "rounded-full px-3 py-1 text-xs font-extrabold border shadow-sm transition-all",
+              "rounded-full px-3 py-1 text-xs font-extrabold border shadow-sm transition-all shrink-0 whitespace-nowrap",
               phaseFilter === "phase-3"
                 ? "bg-violet-600 text-white border-violet-700"
                 : "bg-violet-100 text-violet-950 border-violet-300 dark:bg-violet-950 dark:text-violet-200 dark:border-violet-700"
@@ -468,17 +468,17 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
           )}
         >
           <div className="flex items-center justify-between gap-3 mb-3">
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2.5 min-w-0">
               <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-lg font-bold text-xs", tones.amber.icon)}>
                 P4
               </div>
-              <div>
+              <div className="min-w-0">
                 <h3 className="text-sm font-semibold tracking-tight text-pt">Phase 4 (Marketing, Ecommerce &amp; Graphics)</h3>
                 <p className="text-xs text-pt-muted">Digital Marketing, Ecommerce &amp; Graphics</p>
               </div>
             </div>
             <span className={cn(
-              "rounded-full px-3 py-1 text-xs font-extrabold border shadow-sm transition-all",
+              "rounded-full px-3 py-1 text-xs font-extrabold border shadow-sm transition-all shrink-0 whitespace-nowrap",
               phaseFilter === "phase-4"
                 ? "bg-amber-600 text-white border-amber-700"
                 : "bg-amber-100 text-amber-950 border-amber-300 dark:bg-amber-950 dark:text-amber-200 dark:border-amber-700"
