@@ -18,7 +18,9 @@ import {
   Wallet,
   Copy,
   Check,
+  CheckCircle,
   ArrowCounterClockwise,
+  EnvelopeSimple,
 } from "@phosphor-icons/react";
 import type {
   AdminRevenueStats,
@@ -38,9 +40,15 @@ interface TrainerPayoutRecord {
   amount: number;
   studentCount: number;
   trainerName?: string | null;
+  trainerEmail?: string | null;
   paidAt: string;
   paidBy: string;
+  paymentAccount?: string | null;
+  recipientAccount?: string | null;
+  transactionRef?: string | null;
   note?: string | null;
+  emailSent?: boolean;
+  emailSentAt?: string | null;
 }
 
 type RevenuePeriod = "all" | "week" | "month" | string;
@@ -288,20 +296,498 @@ export function AdminRevenueSidebarCard({
   );
 }
 
+function TrainerPaymentModal({
+  course,
+  studentCount,
+  initialAmount,
+  defaultTrainerEmail,
+  phaseLabel,
+  periodLabel,
+  loading,
+  onClose,
+  onSubmit,
+}: {
+  course: AdminRevenueCourseStats;
+  studentCount: number;
+  initialAmount: number;
+  defaultTrainerEmail?: string;
+  phaseLabel: string;
+  periodLabel: string;
+  loading: boolean;
+  onClose: () => void;
+  onSubmit: (data: {
+    amount: number;
+    paidBy: string;
+    paymentAccount: string;
+    recipientAccount: string;
+    transactionRef: string;
+    paidAt: string;
+    note: string;
+    trainerEmail: string;
+    sendEmail: boolean;
+  }) => Promise<void>;
+}) {
+  const getNowIsoLocal = () => {
+    const now = new Date();
+    const pad = (n: number) => String(n).padStart(2, "0");
+    return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  };
+
+  const [amount, setAmount] = useState<number>(initialAmount);
+  const [paidBy, setPaidBy] = useState("Tatheer");
+  const [paymentAccount, setPaymentAccount] = useState("Meezan Bank");
+  const [recipientAccount, setRecipientAccount] = useState("");
+  const [transactionRef, setTransactionRef] = useState("");
+  const [paidAt, setPaidAt] = useState(getNowIsoLocal());
+  const [note, setNote] = useState("");
+  const [trainerEmail, setTrainerEmail] = useState(defaultTrainerEmail || "");
+  const [sendEmail, setSendEmail] = useState(true);
+
+  const quickAccounts = [
+    "Meezan Bank",
+    "JazzCash",
+    "Easypaisa",
+    "HBL",
+    "Sadapay",
+    "Nayapay",
+    "Bank Transfer",
+    "Cash",
+  ];
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!amount || amount <= 0) {
+      toast.error("Please enter a valid payment amount");
+      return;
+    }
+    if (!paidBy.trim()) {
+      toast.error("Please enter who disbursed the payment");
+      return;
+    }
+    await onSubmit({
+      amount: Number(amount),
+      paidBy: paidBy.trim(),
+      paymentAccount: paymentAccount.trim(),
+      recipientAccount: recipientAccount.trim(),
+      transactionRef: transactionRef.trim(),
+      paidAt,
+      note: note.trim(),
+      trainerEmail: trainerEmail.trim(),
+      sendEmail,
+    });
+  };
+
+  return (
+    <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="payment-modal-title"
+        className="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl border border-slate-200 space-y-4 my-8 max-h-[92vh] overflow-y-auto"
+      >
+        {/* Header */}
+        <div className="flex items-start justify-between gap-3 border-b border-slate-100 pb-3.5">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 shrink-0">
+              <Wallet size={22} weight="duotone" />
+            </div>
+            <div>
+              <h3 id="payment-modal-title" className="text-base font-bold text-slate-900">
+                Disburse Trainer Salary
+              </h3>
+              <p className="text-xs text-slate-500 font-medium">
+                {course.trainerName} · {course.courseTitle} ({phaseLabel})
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-lg p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+          >
+            <X size={18} weight="bold" />
+          </button>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-3.5">
+          {/* Amount & Paid By */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">
+                Amount (PKR) <span className="text-rose-500">*</span>
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-2 text-xs font-bold text-slate-400">
+                  PKR
+                </span>
+                <input
+                  type="number"
+                  min="1"
+                  required
+                  value={amount}
+                  onChange={(e) => setAmount(Number(e.target.value))}
+                  className="w-full pl-12 pr-3 py-1.5 text-sm font-bold text-slate-900 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none"
+                />
+              </div>
+              <p className="text-[10px] text-slate-400 mt-1">
+                {studentCount} students mentored ({periodLabel})
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">
+                Disbursed By <span className="text-rose-500">*</span>
+              </label>
+              <input
+                type="text"
+                required
+                value={paidBy}
+                onChange={(e) => setPaidBy(e.target.value)}
+                placeholder="e.g. Tatheer / Management"
+                className="w-full px-3 py-1.5 text-sm font-medium text-slate-900 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none"
+              />
+            </div>
+          </div>
+
+          {/* Payment Account / Channel */}
+          <div>
+            <label className="block text-xs font-bold text-slate-700 mb-1">
+              Paid From Account / Channel
+            </label>
+            <div className="flex flex-wrap gap-1.5 mb-1.5">
+              {quickAccounts.map((acc) => (
+                <button
+                  key={acc}
+                  type="button"
+                  onClick={() => setPaymentAccount(acc)}
+                  className={cn(
+                    "px-2 py-0.5 text-[11px] font-semibold rounded-lg border transition-all cursor-pointer",
+                    paymentAccount === acc
+                      ? "bg-emerald-600 text-white border-emerald-600 shadow-2xs font-bold"
+                      : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
+                  )}
+                >
+                  {acc}
+                </button>
+              ))}
+            </div>
+            <input
+              type="text"
+              value={paymentAccount}
+              onChange={(e) => setPaymentAccount(e.target.value)}
+              placeholder="e.g. Meezan Bank (A/C ...)"
+              className="w-full px-3 py-1.5 text-xs text-slate-900 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none"
+            />
+          </div>
+
+          {/* Date & Time and Reference */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">
+                Payment Date & Time <span className="text-rose-500">*</span>
+              </label>
+              <input
+                type="datetime-local"
+                required
+                value={paidAt}
+                onChange={(e) => setPaidAt(e.target.value)}
+                className="w-full px-3 py-1.5 text-xs font-medium text-slate-900 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">
+                Transaction / Ref ID <span className="text-slate-400 font-normal">(optional)</span>
+              </label>
+              <input
+                type="text"
+                value={transactionRef}
+                onChange={(e) => setTransactionRef(e.target.value)}
+                placeholder="e.g. TRX-9823412"
+                className="w-full px-3 py-1.5 text-xs text-slate-900 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none"
+              />
+            </div>
+          </div>
+
+          {/* Recipient Account & Remarks */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">
+                Recipient Account <span className="text-slate-400 font-normal">(optional)</span>
+              </label>
+              <input
+                type="text"
+                value={recipientAccount}
+                onChange={(e) => setRecipientAccount(e.target.value)}
+                placeholder="Trainer's bank/wallet"
+                className="w-full px-3 py-1.5 text-xs text-slate-900 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">
+                Remarks / Notes <span className="text-slate-400 font-normal">(optional)</span>
+              </label>
+              <input
+                type="text"
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="Any special remarks..."
+                className="w-full px-3 py-1.5 text-xs text-slate-900 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none"
+              />
+            </div>
+          </div>
+
+          {/* Email Notification Section */}
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50/60 p-3 space-y-2">
+            <label className="flex items-center gap-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={sendEmail}
+                onChange={(e) => setSendEmail(e.target.checked)}
+                className="rounded text-emerald-600 focus:ring-emerald-500 h-4 w-4"
+              />
+              <span className="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
+                <EnvelopeSimple size={15} weight="bold" className="text-emerald-700" />
+                Send automated salary receipt email to trainer
+              </span>
+            </label>
+
+            {sendEmail && (
+              <div className="pt-0.5">
+                <label className="block text-[11px] font-semibold text-emerald-800 mb-1">
+                  Trainer Email Address
+                </label>
+                <input
+                  type="email"
+                  value={trainerEmail}
+                  onChange={(e) => setTrainerEmail(e.target.value)}
+                  placeholder="trainer@example.com"
+                  className="w-full px-3 py-1.5 text-xs bg-white text-slate-900 rounded-lg border border-emerald-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none"
+                />
+                <p className="text-[10px] text-emerald-700 mt-1">
+                  Official EEST remuneration receipt with complete breakdown will be emailed.
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
+            <button
+              type="button"
+              disabled={loading}
+              onClick={onClose}
+              className="px-4 py-1.5 text-xs font-semibold rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition-colors cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="inline-flex items-center gap-2 px-5 py-1.5 text-xs font-bold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <>
+                  <ArrowClockwise size={13} className="animate-spin" />
+                  <span>Processing...</span>
+                </>
+              ) : (
+                <>
+                  <Check size={13} weight="bold" />
+                  <span>Confirm Payment</span>
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function TrainerPaymentDetailModal({
+  payout,
+  course,
+  phaseLabel,
+  periodLabel,
+  loading,
+  onClose,
+  onUnmark,
+}: {
+  payout: TrainerPayoutRecord;
+  course: AdminRevenueCourseStats;
+  phaseLabel: string;
+  periodLabel: string;
+  loading: boolean;
+  onClose: () => void;
+  onUnmark: () => Promise<void>;
+}) {
+  const formattedDate = new Date(payout.paidAt).toLocaleString("en-PK", {
+    dateStyle: "full",
+    timeStyle: "short",
+  });
+
+  return (
+    <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
+      <div
+        role="dialog"
+        aria-modal="true"
+        className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl border border-slate-200 space-y-4 my-8 max-h-[92vh] overflow-y-auto"
+      >
+        {/* Header */}
+        <div className="flex items-start justify-between gap-3 border-b border-slate-100 pb-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 shrink-0">
+              <CheckCircle size={22} weight="fill" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-base font-bold text-slate-900">
+                  {course.trainerName}
+                </h3>
+                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 border border-emerald-200 px-2 py-0.5 rounded-full">
+                  Paid
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 font-medium">
+                {course.courseTitle} · {phaseLabel}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-lg p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+          >
+            <X size={18} weight="bold" />
+          </button>
+        </div>
+
+        {/* Amount Highlight */}
+        <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-3.5 text-center">
+          <p className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider">
+            Disbursed Amount
+          </p>
+          <p className="text-2xl font-black text-emerald-950 mt-0.5">
+            PKR {payout.amount.toLocaleString("en-PK")}
+          </p>
+          <p className="text-xs text-emerald-600 font-semibold mt-1">
+            {payout.studentCount} students mentored ({periodLabel})
+          </p>
+        </div>
+
+        {/* Detailed Breakdown */}
+        <div className="space-y-2 text-xs">
+          <div className="flex justify-between py-1.5 border-b border-slate-100">
+            <span className="text-slate-500 font-semibold">Disbursed By</span>
+            <span className="text-slate-900 font-bold">{payout.paidBy}</span>
+          </div>
+          <div className="flex justify-between py-1.5 border-b border-slate-100">
+            <span className="text-slate-500 font-semibold">Payment Channel</span>
+            <span className="text-slate-900 font-bold">{payout.paymentAccount || "Direct Transfer"}</span>
+          </div>
+          <div className="flex justify-between py-1.5 border-b border-slate-100">
+            <span className="text-slate-500 font-semibold">Date & Time</span>
+            <span className="text-slate-900 font-bold">{formattedDate}</span>
+          </div>
+          {payout.recipientAccount && (
+            <div className="flex justify-between py-1.5 border-b border-slate-100">
+              <span className="text-slate-500 font-semibold">Recipient Account</span>
+              <span className="text-slate-900 font-bold">{payout.recipientAccount}</span>
+            </div>
+          )}
+          {payout.transactionRef && (
+            <div className="flex justify-between py-1.5 border-b border-slate-100">
+              <span className="text-slate-500 font-semibold">Transaction / Ref</span>
+              <span className="text-slate-900 font-mono font-bold">{payout.transactionRef}</span>
+            </div>
+          )}
+          <div className="flex justify-between py-1.5 border-b border-slate-100">
+            <span className="text-slate-500 font-semibold">Email Notification</span>
+            <span className="font-bold">
+              {payout.emailSent ? (
+                <span className="text-emerald-600 inline-flex items-center gap-1">
+                  <EnvelopeSimple size={13} weight="bold" />
+                  Sent ({payout.trainerEmail || "trainer"})
+                </span>
+              ) : (
+                <span className="text-slate-400">Not dispatched</span>
+              )}
+            </span>
+          </div>
+          {payout.note && (
+            <div className="py-1">
+              <span className="text-slate-500 font-semibold block mb-0.5">Remarks</span>
+              <p className="text-slate-700 bg-slate-50 p-2 rounded-lg border border-slate-100 font-medium">
+                {payout.note}
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+          <button
+            type="button"
+            disabled={loading}
+            onClick={onUnmark}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+          >
+            {loading ? (
+              <ArrowClockwise size={13} className="animate-spin" />
+            ) : (
+              <ArrowCounterClockwise size={13} weight="bold" />
+            )}
+            <span>Undo / Mark Unpaid</span>
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-1.5 text-xs font-semibold rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AdminRevenueSidePanel() {
   const { open, setOpen, stats, loading, refresh } = useAdminRevenue();
   const [period, setPeriod] = useState<RevenuePeriod>("all");
   const [selectedPhase, setSelectedPhase] = useState<"all" | "phase-1" | "phase-2" | "phase-3">("all");
   const [copiedPayout, setCopiedPayout] = useState(false);
   const [payouts, setPayouts] = useState<TrainerPayoutRecord[]>([]);
+  const [trainerContacts, setTrainerContacts] = useState<Record<string, { email: string; name: string }>>({});
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
+
+  const [payoutModalCourse, setPayoutModalCourse] = useState<{
+    course: AdminRevenueCourseStats;
+    studentCount: number;
+    amount: number;
+  } | null>(null);
+
+  const [viewPayoutDetail, setViewPayoutDetail] = useState<{
+    payout: TrainerPayoutRecord;
+    course: AdminRevenueCourseStats;
+  } | null>(null);
 
   const fetchPayouts = useCallback(async () => {
     try {
       const res = await fetch("/api/admin/revenue/payout");
       const json = await res.json();
-      if (json.success && Array.isArray(json.data)) {
-        setPayouts(json.data);
+      if (json.success && json.data) {
+        if (Array.isArray(json.data.payouts)) {
+          setPayouts(json.data.payouts);
+        } else if (Array.isArray(json.data)) {
+          setPayouts(json.data);
+        }
+        if (json.data.trainerContacts) {
+          setTrainerContacts(json.data.trainerContacts);
+        }
       }
     } catch (err) {
       console.error("Failed to load payouts:", err);
@@ -314,7 +800,19 @@ function AdminRevenueSidePanel() {
     }
   }, [open, fetchPayouts]);
 
-  const handleMarkPaid = async (course: AdminRevenueCourseStats, studentCount: number, amount: number) => {
+  const handleConfirmPayout = async (formData: {
+    amount: number;
+    paidBy: string;
+    paymentAccount: string;
+    recipientAccount: string;
+    transactionRef: string;
+    paidAt: string;
+    note: string;
+    trainerEmail: string;
+    sendEmail: boolean;
+  }) => {
+    if (!payoutModalCourse) return;
+    const { course, studentCount } = payoutModalCourse;
     setActionInProgress(course.programSlug);
     try {
       const res = await fetch("/api/admin/revenue/payout", {
@@ -324,21 +822,62 @@ function AdminRevenueSidePanel() {
           programSlug: course.programSlug,
           phase: selectedPhase,
           period,
-          amount,
+          amount: formData.amount,
           studentCount,
           trainerName: course.trainerName,
+          trainerEmail: formData.trainerEmail,
+          paidBy: formData.paidBy,
+          paymentAccount: formData.paymentAccount,
+          recipientAccount: formData.recipientAccount,
+          transactionRef: formData.transactionRef,
+          paidAt: formData.paidAt,
+          note: formData.note,
+          sendEmail: formData.sendEmail,
+          courseTitle: course.courseTitle,
+          phaseLabel:
+            selectedPhase === "all"
+              ? "All Phases"
+              : selectedPhase === "phase-1"
+              ? "Phase 1"
+              : selectedPhase === "phase-2"
+              ? "Phase 2"
+              : "Phase 3",
+          periodLabel: periodStats?.label || period,
         }),
       });
       const json = await res.json();
       if (json.success && json.data) {
-        toast.success(`Marked ${course.trainerName} as Paid (PKR ${amount.toLocaleString("en-PK")})`);
+        const payoutRecord: TrainerPayoutRecord = json.data.payout || json.data;
+        const emailStatus = json.data.emailStatus;
+
+        if (emailStatus?.sent) {
+          toast.success(
+            `Marked ${course.trainerName} as Paid!`,
+            `Receipt email sent to ${formData.trainerEmail || "trainer"}`
+          );
+        } else if (formData.sendEmail && emailStatus?.error) {
+          toast.warning(
+            `Marked ${course.trainerName} as Paid (PKR ${formData.amount.toLocaleString("en-PK")})`,
+            `Email notice: ${emailStatus.error}`
+          );
+        } else {
+          toast.success(
+            `Marked ${course.trainerName} as Paid (PKR ${formData.amount.toLocaleString("en-PK")})`
+          );
+        }
+
         setPayouts((prev) => {
           const filtered = prev.filter(
             (p) =>
-              !(p.programSlug === course.programSlug && p.phase === selectedPhase && p.period === period)
+              !(
+                p.programSlug === course.programSlug &&
+                p.phase === selectedPhase &&
+                p.period === period
+              )
           );
-          return [json.data, ...filtered];
+          return [payoutRecord, ...filtered];
         });
+        setPayoutModalCourse(null);
       } else {
         toast.error(json.error || "Failed to mark as paid");
       }
@@ -360,6 +899,7 @@ function AdminRevenueSidePanel() {
       if (json.success) {
         toast.info(`Marked ${trainerName} as unpaid`);
         setPayouts((prev) => prev.filter((p) => p.id !== payoutId));
+        setViewPayoutDetail(null);
       } else {
         toast.error(json.error || "Failed to unmark payout");
       }
@@ -950,13 +1490,15 @@ function AdminRevenueSidePanel() {
 
                           {isPaid ? (
                             <div className="flex items-center gap-1">
-                              <span
-                                className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold rounded-lg bg-emerald-600 text-white shadow-2xs select-none"
-                                title={`Paid on ${new Date(payout.paidAt).toLocaleDateString("en-PK", { day: "numeric", month: "short" })} by ${payout.paidBy}`}
+                              <button
+                                type="button"
+                                onClick={() => setViewPayoutDetail({ payout, course })}
+                                className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white shadow-2xs select-none transition-all cursor-pointer"
+                                title={`Paid by ${payout.paidBy} on ${new Date(payout.paidAt).toLocaleDateString("en-PK", { day: "numeric", month: "short" })} · Click to view record details`}
                               >
                                 <Check size={12} weight="bold" />
                                 Paid
-                              </span>
+                              </button>
                               <button
                                 type="button"
                                 disabled={Boolean(isActing)}
@@ -975,15 +1517,17 @@ function AdminRevenueSidePanel() {
                             <button
                               type="button"
                               disabled={Boolean(isActing) || cp.trainer === 0}
-                              onClick={() => handleMarkPaid(course, studentCount, cp.trainer)}
+                              onClick={() =>
+                                setPayoutModalCourse({
+                                  course,
+                                  studentCount,
+                                  amount: cp.trainer,
+                                })
+                              }
                               className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold rounded-lg border border-emerald-300 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:border-emerald-400 transition-all cursor-pointer shadow-2xs disabled:opacity-50 disabled:cursor-not-allowed"
-                              title="Mark this salary as paid"
+                              title="Record payment details for this trainer"
                             >
-                              {isActing ? (
-                                <ArrowClockwise size={12} className="animate-spin text-emerald-700" />
-                              ) : (
-                                <Check size={12} weight="bold" className="text-emerald-600" />
-                              )}
+                              <Check size={12} weight="bold" className="text-emerald-600" />
                               <span>Mark Paid</span>
                             </button>
                           )}
@@ -1116,6 +1660,53 @@ function AdminRevenueSidePanel() {
           )}
         </div>
       </aside>
+
+      {payoutModalCourse && (
+        <TrainerPaymentModal
+          course={payoutModalCourse.course}
+          studentCount={payoutModalCourse.studentCount}
+          initialAmount={payoutModalCourse.amount}
+          defaultTrainerEmail={trainerContacts[payoutModalCourse.course.programSlug]?.email}
+          phaseLabel={
+            selectedPhase === "all"
+              ? "All Phases"
+              : selectedPhase === "phase-1"
+              ? "Phase 1"
+              : selectedPhase === "phase-2"
+              ? "Phase 2"
+              : "Phase 3"
+          }
+          periodLabel={periodStats?.label || period}
+          loading={actionInProgress === payoutModalCourse.course.programSlug}
+          onClose={() => setPayoutModalCourse(null)}
+          onSubmit={handleConfirmPayout}
+        />
+      )}
+
+      {viewPayoutDetail && (
+        <TrainerPaymentDetailModal
+          payout={viewPayoutDetail.payout}
+          course={viewPayoutDetail.course}
+          phaseLabel={
+            selectedPhase === "all"
+              ? "All Phases"
+              : selectedPhase === "phase-1"
+              ? "Phase 1"
+              : selectedPhase === "phase-2"
+              ? "Phase 2"
+              : "Phase 3"
+          }
+          periodLabel={periodStats?.label || period}
+          loading={actionInProgress === viewPayoutDetail.payout.id}
+          onClose={() => setViewPayoutDetail(null)}
+          onUnmark={() =>
+            handleUnmarkPaid(
+              viewPayoutDetail.payout.id,
+              viewPayoutDetail.course.trainerName
+            )
+          }
+        />
+      )}
     </div>
   );
 }

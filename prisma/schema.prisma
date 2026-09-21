@@ -452,18 +452,24 @@ model SupportTicket {
 }
 
 model TrainerPayout {
-  id           String   @id @map("_id")
-  programSlug  String
-  phase        String
-  period       String   @default("all")
-  amount       Int
-  studentCount Int      @default(0)
-  trainerName  String?
-  paidAt       DateTime @default(now())
-  paidBy       String
-  note         String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id               String    @id @map("_id")
+  programSlug      String
+  phase            String
+  period           String    @default("all")
+  amount           Int
+  studentCount     Int       @default(0)
+  trainerName      String?
+  trainerEmail     String?
+  paidAt           DateTime  @default(now())
+  paidBy           String
+  paymentAccount   String?
+  recipientAccount String?
+  transactionRef   String?
+  note             String?
+  emailSent        Boolean   @default(false)
+  emailSentAt      DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   @@unique([programSlug, phase, period])
   @@index([programSlug])
