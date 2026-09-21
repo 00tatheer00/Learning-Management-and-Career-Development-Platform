@@ -18,6 +18,7 @@ export interface SendTrainerSalaryEmailInput {
   paymentAccount?: string | null;
   recipientAccount?: string | null;
   transactionRef?: string | null;
+  receiptUrl?: string | null;
   paidAt: string | Date;
   note?: string | null;
 }
@@ -43,6 +44,12 @@ export function buildTrainerSalaryEmailHtml(input: SendTrainerSalaryEmailInput):
   }
   if (input.transactionRef) {
     detailRows.push({ label: "Transaction / Ref ID", value: input.transactionRef });
+  }
+  if (input.receiptUrl) {
+    detailRows.push({
+      label: "Proof of Payment",
+      value: `<a href="${input.receiptUrl}" target="_blank" style="display:inline-block;padding:4px 10px;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:6px;color:#047857;font-weight:700;font-size:12px;text-decoration:none;">View Attached Receipt &rarr;</a>`,
+    });
   }
   detailRows.push({ label: "Date & Time", value: formattedDate });
   if (input.note) {
@@ -196,6 +203,9 @@ export function buildTrainerSalaryEmailText(input: SendTrainerSalaryEmailInput):
   }
   if (input.transactionRef) {
     lines.push(`Transaction / Ref ID: ${input.transactionRef}`);
+  }
+  if (input.receiptUrl) {
+    lines.push(`Proof of Payment / Receipt: ${input.receiptUrl}`);
   }
   lines.push(`Date & Time: ${formattedDate}`);
   if (input.note) {

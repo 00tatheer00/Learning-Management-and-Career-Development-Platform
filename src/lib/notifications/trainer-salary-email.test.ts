@@ -17,6 +17,7 @@ describe("Trainer Salary Email Templates", () => {
     paymentAccount: "Meezan Bank",
     recipientAccount: "PK36MEZN000123456789",
     transactionRef: "TRX-9823412",
+    receiptUrl: "https://res.cloudinary.com/demo/image/upload/receipt.jpg",
     paidAt: new Date("2026-09-21T14:30:00Z"),
     note: "Batch 3 remuneration disbursement",
   };
@@ -30,6 +31,7 @@ describe("Trainer Salary Email Templates", () => {
     expect(html).toContain("Meezan Bank");
     expect(html).toContain("PK36MEZN000123456789");
     expect(html).toContain("TRX-9823412");
+    expect(html).toContain("receipt.jpg");
     expect(html).toContain("Batch 3 remuneration disbursement");
   });
 
@@ -39,6 +41,7 @@ describe("Trainer Salary Email Templates", () => {
     expect(text).toContain("PKR 31,500");
     expect(text).toContain("Meezan Bank");
     expect(text).toContain("TRX-9823412");
+    expect(text).toContain("receipt.jpg");
   });
 
   it("handles optional fields gracefully when missing", () => {

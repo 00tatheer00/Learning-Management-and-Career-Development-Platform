@@ -76,6 +76,8 @@ export async function POST(request: Request) {
       paymentAccount,
       recipientAccount,
       transactionRef,
+      receiptUrl,
+      receiptPublicId,
       paidAt,
       note,
       sendEmail = true,
@@ -125,6 +127,8 @@ export async function POST(request: Request) {
         paymentAccount: paymentAccount?.trim() || null,
         recipientAccount: recipientAccount?.trim() || null,
         transactionRef: transactionRef?.trim() || null,
+        receiptUrl: receiptUrl?.trim() || null,
+        receiptPublicId: receiptPublicId?.trim() || null,
         note: note?.trim() || null,
       },
       create: {
@@ -141,6 +145,8 @@ export async function POST(request: Request) {
         paymentAccount: paymentAccount?.trim() || null,
         recipientAccount: recipientAccount?.trim() || null,
         transactionRef: transactionRef?.trim() || null,
+        receiptUrl: receiptUrl?.trim() || null,
+        receiptPublicId: receiptPublicId?.trim() || null,
         note: note?.trim() || null,
       },
     });
@@ -161,6 +167,7 @@ export async function POST(request: Request) {
           paymentAccount: paymentAccount?.trim() || null,
           recipientAccount: recipientAccount?.trim() || null,
           transactionRef: transactionRef?.trim() || null,
+          receiptUrl: receiptUrl?.trim() || null,
           paidAt: paymentDate,
           note: note?.trim() || null,
         });

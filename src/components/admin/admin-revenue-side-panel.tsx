@@ -21,6 +21,7 @@ import {
   CheckCircle,
   ArrowCounterClockwise,
   EnvelopeSimple,
+  ArrowSquareOut,
 } from "@phosphor-icons/react";
 import type {
   AdminRevenueStats,
@@ -31,6 +32,8 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { getProgramsForPhase } from "@/lib/constants/batch";
 import { toast } from "@/lib/ui/toast";
+import { uploadDirectToCloudinary } from "@/lib/cloudinary-client";
+import { ImageLightbox } from "@/components/ui/image-lightbox";
 
 interface TrainerPayoutRecord {
   id: string;
@@ -46,6 +49,8 @@ interface TrainerPayoutRecord {
   paymentAccount?: string | null;
   recipientAccount?: string | null;
   transactionRef?: string | null;
+  receiptUrl?: string | null;
+  receiptPublicId?: string | null;
   note?: string | null;
   emailSent?: boolean;
   emailSentAt?: string | null;
@@ -321,6 +326,8 @@ function TrainerPaymentModal({
     paymentAccount: string;
     recipientAccount: string;
     transactionRef: string;
+    receiptUrl?: string;
+    receiptPublicId?: string;
     paidAt: string;
     note: string;
     trainerEmail: string;
@@ -338,6 +345,10 @@ function TrainerPaymentModal({
   const [paymentAccount, setPaymentAccount] = useState("Meezan Bank");
   const [recipientAccount, setRecipientAccount] = useState("");
   const [transactionRef, setTransactionRef] = useState("");
+  const [receiptUrl, setReceiptUrl] = useState("");
+  const [receiptPublicId, setReceiptPublicId] = useState("");
+  const [uploadingReceipt, setUploadingReceipt] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [paidAt, setPaidAt] = useState(getNowIsoLocal());
   const [note, setNote] = useState("");
   const [trainerEmail, setTrainerEmail] = useState(defaultTrainerEmail || "");
@@ -353,6 +364,44 @@ function TrainerPaymentModal({
     "Bank Transfer",
     "Cash",
   ];
+
+  const handleReceiptUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload an image file (PNG, JPG, WEBP)");
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("File size must be less than 10MB");
+      return;
+    }
+
+    setUploadingReceipt(true);
+    setUploadProgress(0);
+
+    try {
+      const res = await uploadDirectToCloudinary(file, {
+        folder: "eest/trainer-payouts",
+        onProgress: (p) => setUploadProgress(p),
+      });
+      setReceiptUrl(res.url);
+      setReceiptPublicId(res.publicId);
+      toast.success("Payment proof screenshot uploaded successfully!");
+    } catch (err) {
+      console.error("Receipt upload error:", err);
+      toast.error(err instanceof Error ? err.message : "Failed to upload receipt");
+    } finally {
+      setUploadingReceipt(false);
+    }
+  };
+
+  const handleRemoveReceipt = () => {
+    setReceiptUrl("");
+    setReceiptPublicId("");
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -370,6 +419,8 @@ function TrainerPaymentModal({
       paymentAccount: paymentAccount.trim(),
       recipientAccount: recipientAccount.trim(),
       transactionRef: transactionRef.trim(),
+      receiptUrl: receiptUrl.trim() || undefined,
+      receiptPublicId: receiptPublicId.trim() || undefined,
       paidAt,
       note: note.trim(),
       trainerEmail: trainerEmail.trim(),
@@ -539,6 +590,80 @@ function TrainerPaymentModal({
             </div>
           </div>
 
+          {/* Proof of Payment Screenshot Upload */}
+          <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3 space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-slate-800">
+                Proof of Payment / Screenshot <span className="text-slate-400 font-normal">(optional)</span>
+              </label>
+              {receiptUrl && (
+                <button
+                  type="button"
+                  onClick={handleRemoveReceipt}
+                  className="text-[11px] font-semibold text-rose-600 hover:text-rose-700 hover:underline cursor-pointer"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+
+            {receiptUrl ? (
+              <div className="flex items-center gap-3 p-2 bg-white rounded-lg border border-emerald-200">
+                <img
+                  src={receiptUrl}
+                  alt="Payment Proof"
+                  className="h-12 w-12 rounded-md object-cover border border-slate-200 shrink-0"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-bold text-emerald-700 flex items-center gap-1">
+                    <CheckCircle size={14} weight="fill" />
+                    Screenshot Attached
+                  </p>
+                  <a
+                    href={receiptUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[11px] text-slate-500 hover:text-slate-800 underline truncate block mt-0.5"
+                  >
+                    View uploaded image
+                  </a>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-300 hover:border-emerald-500 bg-white rounded-xl p-3.5 text-center cursor-pointer transition-colors group">
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,image/jpg"
+                    disabled={uploadingReceipt}
+                    onChange={handleReceiptUpload}
+                    className="hidden"
+                  />
+                  {uploadingReceipt ? (
+                    <div className="space-y-1 flex flex-col items-center">
+                      <ArrowClockwise size={18} className="animate-spin text-emerald-600" />
+                      <p className="text-xs font-bold text-slate-700">
+                        Uploading screenshot... {uploadProgress > 0 ? `${uploadProgress}%` : ""}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-0.5 flex flex-col items-center">
+                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 group-hover:scale-105 transition-transform">
+                        <Wallet size={16} weight="duotone" />
+                      </div>
+                      <p className="text-xs font-bold text-slate-700">
+                        Click to upload payment screenshot
+                      </p>
+                      <p className="text-[10px] text-slate-400">
+                        PNG, JPG or WEBP (max 10MB)
+                      </p>
+                    </div>
+                  )}
+                </label>
+              </div>
+            )}
+          </div>
+
           {/* Email Notification Section */}
           <div className="rounded-xl border border-emerald-200 bg-emerald-50/60 p-3 space-y-2">
             <label className="flex items-center gap-2 cursor-pointer select-none">
@@ -624,6 +749,8 @@ function TrainerPaymentDetailModal({
   onClose: () => void;
   onUnmark: () => Promise<void>;
 }) {
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+
   const formattedDate = new Date(payout.paidAt).toLocaleString("en-PK", {
     dateStyle: "full",
     timeStyle: "short",
@@ -717,6 +844,35 @@ function TrainerPaymentDetailModal({
               )}
             </span>
           </div>
+
+          {/* Proof of Payment Screenshot in Detail Modal */}
+          {payout.receiptUrl && (
+            <div className="py-2 border-t border-slate-100">
+              <span className="text-slate-500 font-semibold text-xs block mb-1.5">Proof of Payment</span>
+              <div className="flex items-center gap-3 p-2.5 rounded-xl border border-emerald-200 bg-emerald-50/40">
+                <img
+                  src={payout.receiptUrl}
+                  alt="Payment Receipt"
+                  onClick={() => setLightboxOpen(true)}
+                  className="h-14 w-14 rounded-lg object-cover border border-slate-200 cursor-pointer hover:opacity-90 transition-opacity shrink-0"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-bold text-slate-800">
+                    Receipt Screenshot Attached
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setLightboxOpen(true)}
+                    className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 hover:text-emerald-800 hover:underline mt-0.5 cursor-pointer"
+                  >
+                    <span>Click to inspect full image</span>
+                    <ArrowSquareOut size={12} weight="bold" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {payout.note && (
             <div className="py-1">
               <span className="text-slate-500 font-semibold block mb-0.5">Remarks</span>
@@ -751,6 +907,16 @@ function TrainerPaymentDetailModal({
           </button>
         </div>
       </div>
+
+      {payout.receiptUrl && lightboxOpen && (
+        <ImageLightbox
+          open={lightboxOpen}
+          onClose={() => setLightboxOpen(false)}
+          src={payout.receiptUrl}
+          alt="Payment Receipt Screenshot"
+          caption={`Payment Proof: ${course.trainerName} — PKR ${payout.amount.toLocaleString("en-PK")}`}
+        />
+      )}
     </div>
   );
 }
@@ -806,6 +972,8 @@ function AdminRevenueSidePanel() {
     paymentAccount: string;
     recipientAccount: string;
     transactionRef: string;
+    receiptUrl?: string;
+    receiptPublicId?: string;
     paidAt: string;
     note: string;
     trainerEmail: string;
@@ -830,6 +998,8 @@ function AdminRevenueSidePanel() {
           paymentAccount: formData.paymentAccount,
           recipientAccount: formData.recipientAccount,
           transactionRef: formData.transactionRef,
+          receiptUrl: formData.receiptUrl,
+          receiptPublicId: formData.receiptPublicId,
           paidAt: formData.paidAt,
           note: formData.note,
           sendEmail: formData.sendEmail,

@@ -465,6 +465,8 @@ model TrainerPayout {
   paymentAccount   String?
   recipientAccount String?
   transactionRef   String?
+  receiptUrl       String?
+  receiptPublicId  String?
   note             String?
   emailSent        Boolean   @default(false)
   emailSentAt      DateTime?
