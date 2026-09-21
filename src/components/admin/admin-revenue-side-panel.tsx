@@ -18,6 +18,7 @@ import {
   Wallet,
   Copy,
   Check,
+  ArrowCounterClockwise,
 } from "@phosphor-icons/react";
 import type {
   AdminRevenueStats,
@@ -27,6 +28,20 @@ import type {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { getProgramsForPhase } from "@/lib/constants/batch";
+import { toast } from "@/lib/ui/toast";
+
+interface TrainerPayoutRecord {
+  id: string;
+  programSlug: string;
+  phase: string;
+  period: string;
+  amount: number;
+  studentCount: number;
+  trainerName?: string | null;
+  paidAt: string;
+  paidBy: string;
+  note?: string | null;
+}
 
 type RevenuePeriod = "all" | "week" | "month" | string;
 
@@ -278,6 +293,82 @@ function AdminRevenueSidePanel() {
   const [period, setPeriod] = useState<RevenuePeriod>("all");
   const [selectedPhase, setSelectedPhase] = useState<"all" | "phase-1" | "phase-2" | "phase-3">("all");
   const [copiedPayout, setCopiedPayout] = useState(false);
+  const [payouts, setPayouts] = useState<TrainerPayoutRecord[]>([]);
+  const [actionInProgress, setActionInProgress] = useState<string | null>(null);
+
+  const fetchPayouts = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/revenue/payout");
+      const json = await res.json();
+      if (json.success && Array.isArray(json.data)) {
+        setPayouts(json.data);
+      }
+    } catch (err) {
+      console.error("Failed to load payouts:", err);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (open) {
+      void fetchPayouts();
+    }
+  }, [open, fetchPayouts]);
+
+  const handleMarkPaid = async (course: AdminRevenueCourseStats, studentCount: number, amount: number) => {
+    setActionInProgress(course.programSlug);
+    try {
+      const res = await fetch("/api/admin/revenue/payout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          programSlug: course.programSlug,
+          phase: selectedPhase,
+          period,
+          amount,
+          studentCount,
+          trainerName: course.trainerName,
+        }),
+      });
+      const json = await res.json();
+      if (json.success && json.data) {
+        toast.success(`Marked ${course.trainerName} as Paid (PKR ${amount.toLocaleString("en-PK")})`);
+        setPayouts((prev) => {
+          const filtered = prev.filter(
+            (p) =>
+              !(p.programSlug === course.programSlug && p.phase === selectedPhase && p.period === period)
+          );
+          return [json.data, ...filtered];
+        });
+      } else {
+        toast.error(json.error || "Failed to mark as paid");
+      }
+    } catch {
+      toast.error("An error occurred while saving payout");
+    } finally {
+      setActionInProgress(null);
+    }
+  };
+
+  const handleUnmarkPaid = async (payoutId: string, trainerName: string) => {
+    if (!confirm(`Are you sure you want to mark ${trainerName} as unpaid?`)) return;
+    setActionInProgress(payoutId);
+    try {
+      const res = await fetch(`/api/admin/revenue/payout?id=${payoutId}`, {
+        method: "DELETE",
+      });
+      const json = await res.json();
+      if (json.success) {
+        toast.info(`Marked ${trainerName} as unpaid`);
+        setPayouts((prev) => prev.filter((p) => p.id !== payoutId));
+      } else {
+        toast.error(json.error || "Failed to unmark payout");
+      }
+    } catch {
+      toast.error("An error occurred while reverting payout");
+    } finally {
+      setActionInProgress(null);
+    }
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -382,7 +473,11 @@ function AdminRevenueSidePanel() {
     for (const course of coursesToDisplay) {
       const cp = getCoursePeriodStats(course, period);
       const studentCount = period === "all" ? course.uniqueStudents : cp.students;
-      lines.push(`${course.trainerName} (${course.courseTitle}): ${studentCount} students × PKR ${rate} = PKR ${cp.trainer.toLocaleString("en-PK")}`);
+      const payout = payouts.find(
+        (p) => p.programSlug === course.programSlug && p.phase === selectedPhase && p.period === period
+      );
+      const statusSuffix = payout ? " [PAID]" : "";
+      lines.push(`${course.trainerName} (${course.courseTitle}): ${studentCount} students × PKR ${rate} = PKR ${cp.trainer.toLocaleString("en-PK")}${statusSuffix}`);
     }
     lines.push(`----------------------------------------`);
     lines.push(`Total Trainer Salaries Payable: PKR ${periodStats.trainer.toLocaleString("en-PK")}`);
@@ -799,10 +894,24 @@ function AdminRevenueSidePanel() {
                     const cp = getCoursePeriodStats(course, period);
                     const studentCount = period === "all" ? course.uniqueStudents : cp.students;
                     const subtitle = getCoursePhaseModuleSubtitle(course.programSlug, selectedPhase);
+                    const payout = payouts.find(
+                      (p) =>
+                        p.programSlug === course.programSlug &&
+                        p.phase === selectedPhase &&
+                        p.period === period
+                    );
+                    const isPaid = !!payout;
+                    const isActing =
+                      actionInProgress === course.programSlug ||
+                      (payout && actionInProgress === payout.id);
+
                     return (
                       <div
                         key={course.programSlug}
-                        className="flex items-center justify-between p-3 transition-colors hover:bg-white"
+                        className={cn(
+                          "flex items-center justify-between p-3 transition-colors",
+                          isPaid ? "bg-emerald-50/40 hover:bg-emerald-50/60" : "hover:bg-white"
+                        )}
                       >
                         <div className="min-w-0 pr-2">
                           <div className="flex items-center gap-2">
@@ -812,18 +921,72 @@ function AdminRevenueSidePanel() {
                             <span className="text-[10px] font-semibold px-2 py-0.5 bg-slate-100 border border-slate-200 rounded-md text-slate-600">
                               {course.shortLabel}
                             </span>
+                            {isPaid && (
+                              <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-emerald-700 bg-emerald-100 border border-emerald-200 px-1.5 py-0.5 rounded-md">
+                                <Check size={10} weight="bold" />
+                                Paid
+                              </span>
+                            )}
                           </div>
                           <p className="text-[11px] text-slate-500 truncate mt-0.5">
                             {subtitle ?? course.courseTitle} · <span className="font-semibold text-slate-700">{studentCount} students</span>
                           </p>
                         </div>
-                        <div className="text-right shrink-0">
-                          <p className="text-xs sm:text-sm font-black text-slate-900 tabular-nums">
-                            {formatMoney(cp.trainer, stats.currency)}
-                          </p>
-                          <p className="text-[10px] text-emerald-600 font-semibold">
-                            Payable Salary
-                          </p>
+
+                        <div className="flex items-center gap-2.5 shrink-0">
+                          <div className="text-right">
+                            <p
+                              className={cn(
+                                "text-xs sm:text-sm font-black tabular-nums",
+                                isPaid ? "text-slate-400 line-through" : "text-slate-900"
+                              )}
+                            >
+                              {formatMoney(cp.trainer, stats.currency)}
+                            </p>
+                            <p className="text-[10px] text-emerald-600 font-semibold">
+                              {isPaid ? "Paid" : "Payable Salary"}
+                            </p>
+                          </div>
+
+                          {isPaid ? (
+                            <div className="flex items-center gap-1">
+                              <span
+                                className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold rounded-lg bg-emerald-600 text-white shadow-2xs select-none"
+                                title={`Paid on ${new Date(payout.paidAt).toLocaleDateString("en-PK", { day: "numeric", month: "short" })} by ${payout.paidBy}`}
+                              >
+                                <Check size={12} weight="bold" />
+                                Paid
+                              </span>
+                              <button
+                                type="button"
+                                disabled={Boolean(isActing)}
+                                onClick={() => handleUnmarkPaid(payout.id, course.trainerName)}
+                                className="inline-flex items-center justify-center h-7 w-7 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 transition-colors cursor-pointer"
+                                title="Undo / Mark as Unpaid"
+                              >
+                                {isActing ? (
+                                  <ArrowClockwise size={12} className="animate-spin text-rose-500" />
+                                ) : (
+                                  <ArrowCounterClockwise size={12} weight="bold" />
+                                )}
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              type="button"
+                              disabled={Boolean(isActing) || cp.trainer === 0}
+                              onClick={() => handleMarkPaid(course, studentCount, cp.trainer)}
+                              className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold rounded-lg border border-emerald-300 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:border-emerald-400 transition-all cursor-pointer shadow-2xs disabled:opacity-50 disabled:cursor-not-allowed"
+                              title="Mark this salary as paid"
+                            >
+                              {isActing ? (
+                                <ArrowClockwise size={12} className="animate-spin text-emerald-700" />
+                              ) : (
+                                <Check size={12} weight="bold" className="text-emerald-600" />
+                              )}
+                              <span>Mark Paid</span>
+                            </button>
+                          )}
                         </div>
                       </div>
                     );
@@ -899,6 +1062,16 @@ function AdminRevenueSidePanel() {
                               <p className="text-xs sm:text-sm font-black text-slate-900 mt-0.5 tabular-nums">
                                 {formatMoney(cp.trainer, stats.currency)}
                               </p>
+                              {payouts.some(
+                                (p) =>
+                                  p.programSlug === course.programSlug &&
+                                  p.phase === selectedPhase &&
+                                  p.period === period
+                              ) && (
+                                <span className="inline-block mt-0.5 text-[9px] font-bold text-emerald-700 bg-emerald-100 border border-emerald-200 px-1.5 py-0.5 rounded">
+                                  Paid
+                                </span>
+                              )}
                             </div>
                             <div className="rounded-xl border border-emerald-200/70 bg-emerald-50/70 p-2.5 text-center">
                               <p className="text-[9px] font-bold uppercase text-emerald-700">
