@@ -8,10 +8,7 @@ export const PHASE_2_START_ISO = "2026-07-23T19:00:00.000Z";
 // Date when Phase 3 admissions officially opened (29th August 2026 00:00 PKT)
 export const PHASE_3_START_ISO = "2026-08-28T19:00:00.000Z";
 
-// Date when Phase 4 admissions officially opened (19th September 2026 00:00 PKT)
-export const PHASE_4_START_ISO = "2026-09-18T19:00:00.000Z";
-
-export type RegistrationPhase = "phase-1" | "phase-2" | "phase-3" | "phase-4";
+export type RegistrationPhase = "phase-1" | "phase-2" | "phase-3";
 
 export function getProgramsForPhase(phase: "all" | RegistrationPhase): readonly string[] {
   switch (phase) {
@@ -20,9 +17,7 @@ export function getProgramsForPhase(phase: "all" | RegistrationPhase): readonly 
     case "phase-2":
       return ["web-development", "app-development", "artificial-intelligence"] as const;
     case "phase-3":
-      return ["web-development", "app-development", "artificial-intelligence"] as const;
-    case "phase-4":
-      return ["digital-marketing", "ecommerce", "graphics-designing"] as const;
+      return ["web-development", "app-development", "artificial-intelligence", "digital-marketing", "ecommerce", "graphics-designing"] as const;
     case "all":
     default:
       return ENROLLABLE_PROGRAM_SLUGS;
@@ -61,7 +56,7 @@ export function getRegistrationPhase(item?: {
 } | Date | string | null): RegistrationPhase {
   if (!item) return "phase-1";
 
-  // 1. Check if Digital Marketing, Ecommerce, or Graphics Designing (strictly Phase 4 courses)
+  // 1. Check if Digital Marketing, Ecommerce, or Graphics Designing (Phase 3 courses)
   if (typeof item === "object" && !(item instanceof Date)) {
     const rawProgram = (item.program || item.programSlug || "").trim().toLowerCase();
     const rawLevel = (item.level || item.module || "").trim().toLowerCase();
@@ -73,12 +68,9 @@ export function getRegistrationPhase(item?: {
       rawProgram === "graphics-designing" ||
       rawProgram.includes("digital marketing") ||
       rawProgram.includes("ecommerce") ||
-      rawProgram.includes("graphic") ||
-      rawBatch.includes("phase 4") ||
-      rawBatch.includes("4th module") ||
-      rawLevel.includes("4th module")
+      rawProgram.includes("graphic")
     ) {
-      return "phase-4";
+      return "phase-3";
     }
 
     // 2. Check Phase 3: Web & App 3rd module, and AI 2nd module ONLY
@@ -135,7 +127,6 @@ export function getRegistrationPhase(item?: {
     const time = dateVal.getTime();
     const p2Time = new Date(PHASE_2_START_ISO).getTime();
     const p3Time = new Date(PHASE_3_START_ISO).getTime();
-    const p4Time = new Date(PHASE_4_START_ISO).getTime();
 
     if (time < p2Time) {
       return "phase-1";
@@ -144,7 +135,7 @@ export function getRegistrationPhase(item?: {
       return "phase-2";
     }
 
-    // If an object with explicit level reached here without matching Phase 3/4
+    // If an object with explicit level reached here without matching Phase 3
     if (typeof item === "object" && !(item instanceof Date)) {
       const rawLevel = (item.level || item.module || "").trim().toLowerCase();
 
@@ -167,11 +158,7 @@ export function getRegistrationPhase(item?: {
       }
     }
 
-    if (time >= p4Time) {
-      return "phase-4";
-    }
-
-    // Fallback for date-only calls
+    // Everything from Phase 3 start onwards is Phase 3 (open-ended)
     return "phase-3";
   }
 
@@ -194,21 +181,12 @@ export function getRegistrationPhase(item?: {
 }
 
 export function getPhaseInfo(phase: RegistrationPhase) {
-  if (phase === "phase-4") {
-    return {
-      id: "phase-4" as const,
-      label: "Phase 4 (Marketing, Ecommerce, Graphics)",
-      shortLabel: "Phase 4",
-      subtitle: "Digital Marketing, Ecommerce & Graphics Designing",
-      badgeClass: "bg-orange-500/15 text-orange-700 dark:text-orange-300 border-orange-500/30",
-    };
-  }
   if (phase === "phase-3") {
     return {
       id: "phase-3" as const,
-      label: "Phase 3 (Web & App 3rd, AI 2nd Module)",
+      label: "Phase 3 (Web/App 3rd, AI 2nd, Marketing, Ecommerce & Graphics)",
       shortLabel: "Phase 3",
-      subtitle: "Web Dev (React), Flutter (Firebase) & AI (Data to ML)",
+      subtitle: "Web Dev (React), Flutter (Firebase), AI (Data to ML), Digital Marketing, Ecommerce & Graphics",
       badgeClass: "bg-purple-500/15 text-purple-700 dark:text-purple-300 border-purple-500/30",
     };
   }

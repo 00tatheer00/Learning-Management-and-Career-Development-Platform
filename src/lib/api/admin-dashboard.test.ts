@@ -39,7 +39,6 @@ vi.mock("@/lib/services/phase-service", () => ({
     phase1: { totalEnrollments: 50, approvedEnrollments: 40, pendingEnrollments: 5, rejectedEnrollments: 5, estimatedRevenue: 100000 },
     phase2: { totalEnrollments: 50, approvedEnrollments: 40, pendingEnrollments: 5, rejectedEnrollments: 5, estimatedRevenue: 100000 },
     phase3: { totalEnrollments: 50, approvedEnrollments: 35, pendingEnrollments: 10, rejectedEnrollments: 5, estimatedRevenue: 125000 },
-    phase4: { totalEnrollments: 50, approvedEnrollments: 35, pendingEnrollments: 10, rejectedEnrollments: 5, estimatedRevenue: 125000 },
   }),
 }));
 

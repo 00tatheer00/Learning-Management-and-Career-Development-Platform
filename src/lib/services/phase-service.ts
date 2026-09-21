@@ -9,11 +9,8 @@ export const PHASE_2_START_DATE = new Date(PHASE_2_START_ISO);
 export const PHASE_3_START_ISO = "2026-08-28T19:00:00.000Z";
 export const PHASE_3_START_DATE = new Date(PHASE_3_START_ISO);
 
-export const PHASE_4_START_ISO = "2026-09-18T19:00:00.000Z";
-export const PHASE_4_START_DATE = new Date(PHASE_4_START_ISO);
-
-export type RegistrationPhase = "phase-1" | "phase-2" | "phase-3" | "phase-4";
-export type PhaseFilter = "all" | "phase-1" | "phase-2" | "phase-3" | "phase-4";
+export type RegistrationPhase = "phase-1" | "phase-2" | "phase-3";
+export type PhaseFilter = "all" | "phase-1" | "phase-2" | "phase-3";
 
 export function getProgramsForPhase(phase: PhaseFilter): readonly string[] {
   switch (phase) {
@@ -22,9 +19,7 @@ export function getProgramsForPhase(phase: PhaseFilter): readonly string[] {
     case "phase-2":
       return ["web-development", "app-development", "artificial-intelligence"] as const;
     case "phase-3":
-      return ["web-development", "app-development", "artificial-intelligence"] as const;
-    case "phase-4":
-      return ["digital-marketing", "ecommerce", "graphics-designing"] as const;
+      return ["web-development", "app-development", "artificial-intelligence", "digital-marketing", "ecommerce", "graphics-designing"] as const;
     case "all":
     default:
       return ENROLLABLE_PROGRAM_SLUGS;
@@ -40,7 +35,7 @@ export function getProgramsForPhase(phase: PhaseFilter): readonly string[] {
  *
  * Phase 1: registrations before 24 July 2026 00:00 PKT
  * Phase 2: registrations from 24 July 2026 00:00 PKT to before 29 August 2026 00:00 PKT
- * Phase 3: registrations on or after 29 August 2026 00:00 PKT
+ * Phase 3: registrations on or after 29 August 2026 00:00 PKT (open-ended, includes all future registrations)
  */
 export function getRegistrationPhase(item: {
   createdAt?: string | Date | null;
@@ -53,7 +48,7 @@ export function getRegistrationPhase(item: {
 } | Date | string | null | undefined): RegistrationPhase {
   if (!item) return "phase-1";
 
-  // 1. If program is Digital Marketing, Ecommerce, or Graphics Designing, it is strictly Phase 4
+  // 1. If program is Digital Marketing, Ecommerce, or Graphics Designing, it is Phase 3
   if (typeof item === "object" && !(item instanceof Date)) {
     const rawProgram = (item.program || item.programSlug || "").trim().toLowerCase();
     const rawLevel = (item.level || item.module || "").trim().toLowerCase();
@@ -65,12 +60,9 @@ export function getRegistrationPhase(item: {
       rawProgram === "graphics-designing" ||
       rawProgram.includes("digital marketing") ||
       rawProgram.includes("ecommerce") ||
-      rawProgram.includes("graphic") ||
-      rawBatch.includes("phase 4") ||
-      rawBatch.includes("4th module") ||
-      rawLevel.includes("4th module")
+      rawProgram.includes("graphic")
     ) {
-      return "phase-4";
+      return "phase-3";
     }
 
     // 2. Phase 3: Web & App 3rd module, and AI 2nd module ONLY
@@ -127,7 +119,6 @@ export function getRegistrationPhase(item: {
     const time = dateVal.getTime();
     const p2Time = PHASE_2_START_DATE.getTime();
     const p3Time = PHASE_3_START_DATE.getTime();
-    const p4Time = PHASE_4_START_DATE.getTime();
 
     if (time < p2Time) {
       return "phase-1";
@@ -136,7 +127,7 @@ export function getRegistrationPhase(item: {
       return "phase-2";
     }
 
-    // If an object with explicit level reached here without matching Phase 3/4
+    // If an object with explicit level reached here without matching Phase 3
     if (typeof item === "object" && !(item instanceof Date)) {
       const rawLevel = (item.level || item.module || "").trim().toLowerCase();
 
@@ -159,11 +150,7 @@ export function getRegistrationPhase(item: {
       }
     }
 
-    if (time >= p4Time) {
-      return "phase-4";
-    }
-
-    // Fallback for date-only calls
+    // Everything from Phase 3 start onwards is Phase 3 (open-ended)
     return "phase-3";
   }
 
@@ -190,11 +177,8 @@ export function getRegistrationPhase(item: {
  */
 export function getPhaseCreatedAtFilter(phase?: PhaseFilter) {
   if (!phase || phase === "all") return undefined;
-  if (phase === "phase-4") {
-    return { gte: PHASE_4_START_DATE };
-  }
   if (phase === "phase-3") {
-    return { gte: PHASE_3_START_DATE, lt: PHASE_4_START_DATE };
+    return { gte: PHASE_3_START_DATE };
   }
   if (phase === "phase-2") {
     return { gte: PHASE_2_START_DATE, lt: PHASE_3_START_DATE };
@@ -303,7 +287,6 @@ export async function getAllPhaseMetrics(): Promise<{
   phase1: CentralPhaseMetrics;
   phase2: CentralPhaseMetrics;
   phase3: CentralPhaseMetrics;
-  phase4: CentralPhaseMetrics;
 }> {
   const [enrollments, allStudentUsers] = await Promise.all([
     prisma.enrollment.findMany({
@@ -331,14 +314,12 @@ export async function getAllPhaseMetrics(): Promise<{
   const phase1Enrollments = enrollments.filter((e) => getRegistrationPhase(e) === "phase-1");
   const phase2Enrollments = enrollments.filter((e) => getRegistrationPhase(e) === "phase-2");
   const phase3Enrollments = enrollments.filter((e) => getRegistrationPhase(e) === "phase-3");
-  const phase4Enrollments = enrollments.filter((e) => getRegistrationPhase(e) === "phase-4");
 
   return {
     all: computeMetricsFromData(enrollments, allStudentUsers, false),
     phase1: computeMetricsFromData(phase1Enrollments, allStudentUsers, true),
     phase2: computeMetricsFromData(phase2Enrollments, allStudentUsers, true),
     phase3: computeMetricsFromData(phase3Enrollments, allStudentUsers, true),
-    phase4: computeMetricsFromData(phase4Enrollments, allStudentUsers, true),
   };
 }
 
@@ -350,6 +331,5 @@ export async function getCentralPhaseMetrics(phase: PhaseFilter): Promise<Centra
   if (phase === "phase-1") return allMetrics.phase1;
   if (phase === "phase-2") return allMetrics.phase2;
   if (phase === "phase-3") return allMetrics.phase3;
-  if (phase === "phase-4") return allMetrics.phase4;
   return allMetrics.all;
 }

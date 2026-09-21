@@ -127,7 +127,7 @@ export function AdminDashboardLoader() {
 }
 
 function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
-  const [phaseFilter, setPhaseFilter] = useState<"all" | "phase-1" | "phase-2" | "phase-3" | "phase-4">("all");
+  const [phaseFilter, setPhaseFilter] = useState<"all" | "phase-1" | "phase-2" | "phase-3">("all");
 
   const metrics = useMemo(() => {
     if (phaseFilter === "phase-1" && data.phaseBreakdown?.phase1) {
@@ -138,9 +138,6 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
     }
     if (phaseFilter === "phase-3" && data.phaseBreakdown?.phase3) {
       return data.phaseBreakdown.phase3;
-    }
-    if (phaseFilter === "phase-4" && data.phaseBreakdown?.phase4) {
-      return data.phaseBreakdown.phase4;
     }
     return {
       totalEnrollments: data.totalEnrollments,
@@ -195,17 +192,13 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
                   ? "bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border-indigo-500/30"
                   : phaseFilter === "phase-2"
                     ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30"
-                    : phaseFilter === "phase-4"
-                      ? "bg-orange-500/15 text-orange-700 dark:text-orange-300 border-orange-500/30"
-                      : "bg-violet-500/15 text-violet-700 dark:text-violet-300 border-violet-500/30"
+                    : "bg-violet-500/15 text-violet-700 dark:text-violet-300 border-violet-500/30"
               )}>
                 {phaseFilter === "phase-1"
                   ? "Phase 1 (Module 1)"
                   : phaseFilter === "phase-2"
                     ? "Phase 2 (2nd Module)"
-                    : phaseFilter === "phase-4"
-                      ? "Phase 4 (Marketing, Ecommerce & Graphics)"
-                      : "Phase 3 (Web/App 3rd & AI 2nd Module)"}
+                    : "Phase 3 (All Courses)"}
               </span>
             )}
           </h1>
@@ -268,19 +261,6 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
             >
               <span className="h-2 w-2 rounded-full bg-violet-400" />
               Phase 3 ({data.phaseBreakdown?.phase3?.totalEnrollments ?? 0})
-            </button>
-            <button
-              type="button"
-              onClick={() => setPhaseFilter("phase-4")}
-              className={cn(
-                "rounded-md px-3 py-1.5 transition-all flex items-center gap-1.5",
-                phaseFilter === "phase-4"
-                  ? "bg-orange-600 text-white shadow-sm"
-                  : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
-              )}
-            >
-              <span className="h-2 w-2 rounded-full bg-orange-400" />
-              Phase 4 ({data.phaseBreakdown?.phase4?.totalEnrollments ?? 0})
             </button>
           </div>
 
@@ -451,58 +431,6 @@ function AdminDashboardHome({ data }: { data: AdminDashboardData }) {
             <div>
               <p className="text-lg font-semibold tabular-nums text-pt">
                 <CountUp end={data.phaseBreakdown?.phase3?.students ?? 0} duration={1} />
-              </p>
-              <p className="text-[11px] font-medium text-pt-secondary">Active Students</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Phase 4 Card */}
-        <div
-          onClick={() => setPhaseFilter(phaseFilter === "phase-4" ? "all" : "phase-4")}
-          className={cn(
-            pressable,
-            "group relative rounded-xl border p-4 sm:p-5 transition-all",
-            tones.amber.card,
-            phaseFilter === "phase-4" ? "ring-2 ring-amber-500 shadow-pt-md" : ""
-          )}
-        >
-          <div className="flex items-center justify-between gap-3 mb-3">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-lg font-bold text-xs", tones.amber.icon)}>
-                P4
-              </div>
-              <div className="min-w-0">
-                <h3 className="text-sm font-semibold tracking-tight text-pt">Phase 4 (Marketing, Ecommerce &amp; Graphics)</h3>
-                <p className="text-xs text-pt-muted">Digital Marketing, Ecommerce &amp; Graphics</p>
-              </div>
-            </div>
-            <span className={cn(
-              "rounded-full px-3 py-1 text-xs font-extrabold border shadow-sm transition-all shrink-0 whitespace-nowrap",
-              phaseFilter === "phase-4"
-                ? "bg-amber-600 text-white border-amber-700"
-                : "bg-amber-100 text-amber-950 border-amber-300 dark:bg-amber-950 dark:text-amber-200 dark:border-amber-700"
-            )}>
-              {data.phaseBreakdown?.phase4?.totalEnrollments ?? 0} Registrations
-            </span>
-          </div>
-
-          <div className="grid grid-cols-3 gap-2 py-2.5 px-3 rounded-lg border border-pt-subtle bg-pt-surface/70 text-center">
-            <div>
-              <p className="text-lg font-semibold tabular-nums text-pt">
-                <CountUp end={data.phaseBreakdown?.phase4?.approvedEnrollments ?? 0} duration={1} />
-              </p>
-              <p className="text-[11px] font-medium text-emerald-700 dark:text-emerald-400">Approved</p>
-            </div>
-            <div>
-              <p className="text-lg font-semibold tabular-nums text-pt">
-                <CountUp end={data.phaseBreakdown?.phase4?.pendingEnrollments ?? 0} duration={1} />
-              </p>
-              <p className="text-[11px] font-medium text-amber-600 dark:text-amber-400">Pending</p>
-            </div>
-            <div>
-              <p className="text-lg font-semibold tabular-nums text-pt">
-                <CountUp end={data.phaseBreakdown?.phase4?.students ?? 0} duration={1} />
               </p>
               <p className="text-[11px] font-medium text-pt-secondary">Active Students</p>
             </div>

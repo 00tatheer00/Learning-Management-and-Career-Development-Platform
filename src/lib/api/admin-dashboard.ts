@@ -56,7 +56,6 @@ export interface AdminDashboardData {
     phase1: PhaseMetrics;
     phase2: PhaseMetrics;
     phase3: PhaseMetrics;
-    phase4: PhaseMetrics;
   };
 }
 
@@ -130,7 +129,6 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   const phase1Metrics = phaseMetrics.phase1;
   const phase2Metrics = phaseMetrics.phase2;
   const phase3Metrics = phaseMetrics.phase3;
-  const phase4Metrics = phaseMetrics.phase4;
 
   const today = now.toISOString().split("T")[0];
   const upcomingSessions = sessions.filter((s) => s.date >= today).length;
@@ -187,7 +185,6 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
       phase1: phase1Metrics,
       phase2: phase2Metrics,
       phase3: phase3Metrics,
-      phase4: phase4Metrics,
     },
   };
 }

@@ -47,7 +47,7 @@ function formatMoney(amount: number, currency: string) {
 function getPeriodStats(
   stats: AdminRevenuePhaseStats,
   period: RevenuePeriod,
-  selectedPhase: "all" | "phase-1" | "phase-2" | "phase-3" | "phase-4"
+  selectedPhase: "all" | "phase-1" | "phase-2" | "phase-3"
 ) {
   if (period === "week") {
     return {
@@ -94,10 +94,8 @@ function getPeriodStats(
         : selectedPhase === "phase-2"
           ? "Phase 2 (Web & App 2nd, AI 1st Module)"
           : selectedPhase === "phase-3"
-            ? "Phase 3 (Web & App 3rd, AI 2nd Module)"
-            : selectedPhase === "phase-4"
-              ? "Phase 4 (Marketing, Ecommerce & Graphics)"
-              : "All Time (All Phases)",
+            ? "Phase 3 (All Courses)"
+            : "All Time (All Phases)",
   };
 }
 
@@ -106,11 +104,9 @@ function getCoursePhaseModuleSubtitle(programSlug: string, selectedPhase: string
     if (programSlug === "web-development") return "Module 3 · React.js & Modern Frontend";
     if (programSlug === "app-development") return "Module 3 · Flutter, Firebase & Cloud APIs";
     if (programSlug === "artificial-intelligence") return "Module 2 · Python Data Science to ML";
-  }
-  if (selectedPhase === "phase-4") {
-    if (programSlug === "digital-marketing") return "Phase 4 · Social Media, Ads & AI Marketing";
-    if (programSlug === "ecommerce") return "Phase 4 · Shopify, Stores & Digital Commerce";
-    if (programSlug === "graphics-designing") return "Phase 4 · Visual Identity, Branding & UI";
+    if (programSlug === "digital-marketing") return "Phase 3 · Social Media, Ads & AI Marketing";
+    if (programSlug === "ecommerce") return "Phase 3 · Shopify, Stores & Digital Commerce";
+    if (programSlug === "graphics-designing") return "Phase 3 · Visual Identity, Branding & UI";
   }
   if (selectedPhase === "phase-2") {
     if (programSlug === "web-development") return "Module 2 · JavaScript & Modern Web";
@@ -280,7 +276,7 @@ export function AdminRevenueSidebarCard({
 function AdminRevenueSidePanel() {
   const { open, setOpen, stats, loading, refresh } = useAdminRevenue();
   const [period, setPeriod] = useState<RevenuePeriod>("all");
-  const [selectedPhase, setSelectedPhase] = useState<"all" | "phase-1" | "phase-2" | "phase-3" | "phase-4">("all");
+  const [selectedPhase, setSelectedPhase] = useState<"all" | "phase-1" | "phase-2" | "phase-3">("all");
   const [copiedPayout, setCopiedPayout] = useState(false);
 
   useEffect(() => {
@@ -296,7 +292,7 @@ function AdminRevenueSidePanel() {
     };
   }, [open, setOpen]);
 
-  const handlePhaseChange = (phase: "all" | "phase-1" | "phase-2" | "phase-3" | "phase-4") => {
+  const handlePhaseChange = (phase: "all" | "phase-1" | "phase-2" | "phase-3") => {
     setSelectedPhase(phase);
     // Auto-reset period to 'all' so earlier phase data is not masked
     setPeriod("all");
@@ -311,9 +307,7 @@ function AdminRevenueSidePanel() {
         ? stats.phases?.phase2 ?? stats
         : selectedPhase === "phase-3"
           ? stats.phases?.phase3 ?? stats
-          : selectedPhase === "phase-4"
-            ? stats.phases?.phase4 ?? stats
-            : stats
+          : stats
     : null;
 
   const periodStats = activeStats ? getPeriodStats(activeStats, period, selectedPhase) : null;
@@ -358,19 +352,6 @@ function AdminRevenueSidePanel() {
         }
       }
       options.push({ key: "week", label: `This week (${stats.phases.phase3?.thisWeekApproved ?? 0})` });
-      return options;
-    }
-
-    if (selectedPhase === "phase-4") {
-      const options: Array<{ key: string; label: string }> = [
-        { key: "all", label: `All Phase 4 (${stats.phases.phase4?.totalApproved ?? 0})` },
-      ];
-      if (stats.phases.phase4?.monthlyBreakdown) {
-        for (const m of stats.phases.phase4.monthlyBreakdown) {
-          options.push({ key: m.monthKey, label: `${m.label.split(" ")[0]} (${m.approvedCount})` });
-        }
-      }
-      options.push({ key: "week", label: `This week (${stats.phases.phase4?.thisWeekApproved ?? 0})` });
       return options;
     }
 
@@ -505,23 +486,9 @@ function AdminRevenueSidePanel() {
                 PKR 1,000 → <strong className="text-slate-900">PKR 200</strong> Mgmt (Komal) · <strong className="text-purple-700 font-bold">PKR 700</strong> Trainer (Tatheer / Talha / Faiza) · <strong className="text-slate-900">PKR 100</strong> School
               </p>
             </div>
-          ) : selectedPhase === "phase-4" ? (
-            <div className="bg-orange-50/80 border border-orange-200/80 text-xs text-slate-700 leading-relaxed rounded-xl p-3.5 shadow-2xs">
-              <div className="flex items-center justify-between gap-2 mb-1">
-                <span className="font-bold text-orange-700 uppercase text-[10px] tracking-wider bg-orange-100 border border-orange-200 px-2 py-0.5 rounded-md">
-                  Phase 4 Model (Digital Marketing · Ecommerce · Graphics)
-                </span>
-                <span className="text-[11px] font-semibold text-orange-800">
-                  Rs 700 / student
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-600">
-                PKR 1,000 → <strong className="text-slate-900">PKR 200</strong> Mgmt (Komal) · <strong className="text-orange-700 font-bold">PKR 700</strong> Trainer (Zunira / Usman / Faisal) · <strong className="text-slate-900">PKR 100</strong> School
-              </p>
-            </div>
           ) : (
             <div className="bg-slate-50 border border-slate-200 text-xs text-slate-600 leading-relaxed rounded-xl p-3.5 shadow-2xs">
-              <span className="font-bold text-indigo-600">Phase 1:</span> Rs 200 Mgmt / Rs 800 Trainer · <span className="font-bold text-emerald-600">Phase 2:</span> Rs 200 Mgmt / Rs 700 Trainer / Rs 100 School · <span className="font-bold text-purple-600">Phase 3:</span> Rs 200 Mgmt / Rs 700 Trainer / Rs 100 School · <span className="font-bold text-orange-600">Phase 4:</span> Rs 200 Mgmt / Rs 700 Trainer / Rs 100 School
+              <span className="font-bold text-indigo-600">Phase 1:</span> Rs 200 Mgmt / Rs 800 Trainer · <span className="font-bold text-emerald-600">Phase 2:</span> Rs 200 Mgmt / Rs 700 Trainer / Rs 100 School · <span className="font-bold text-purple-600">Phase 3:</span> Rs 200 Mgmt / Rs 700 Trainer / Rs 100 School
             </div>
           )}
         </div>
@@ -581,19 +548,7 @@ function AdminRevenueSidePanel() {
               >
                 Phase 3 ({stats.phases.phase3?.totalApproved ?? 0})
               </button>
-              <button
-                type="button"
-                onClick={() => handlePhaseChange("phase-4")}
-                className={cn(
-                  "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer",
-                  selectedPhase === "phase-4"
-                    ? "bg-orange-600 text-white shadow-xs font-bold"
-                    : "text-slate-600 hover:text-slate-900"
-                )}
-              >
-                Phase 4 ({stats.phases.phase4?.totalApproved ?? 0})
-              </button>
-            </div>
+          </div>
           </div>
         )}
 
@@ -639,12 +594,10 @@ function AdminRevenueSidePanel() {
                             ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                             : selectedPhase === "phase-3"
                               ? "bg-purple-50 text-purple-700 border-purple-200"
-                              : selectedPhase === "phase-4"
-                                ? "bg-orange-50 text-orange-700 border-orange-200"
-                                : "bg-slate-100 text-slate-700 border-slate-200"
+                              : "bg-slate-100 text-slate-700 border-slate-200"
                       )}
                     >
-                      {selectedPhase === "phase-1" ? "P1" : selectedPhase === "phase-2" ? "P2" : selectedPhase === "phase-3" ? "P3" : selectedPhase === "phase-4" ? "P4" : "ALL"}
+                      {selectedPhase === "phase-1" ? "P1" : selectedPhase === "phase-2" ? "P2" : selectedPhase === "phase-3" ? "P3" : "ALL"}
                     </div>
                     <div>
                       <h3 className="text-sm font-bold tracking-tight text-slate-900">
@@ -677,9 +630,7 @@ function AdminRevenueSidePanel() {
                           ? stats.phases.phase2.totalApproved
                           : selectedPhase === "phase-3"
                             ? (stats.phases.phase3?.totalApproved ?? 0)
-                            : selectedPhase === "phase-4"
-                              ? (stats.phases.phase4?.totalApproved ?? 0)
-                              : periodStats.students}
+                            : periodStats.students}
                     </p>
                     <p className="text-[11px] font-semibold text-slate-500">Active Students</p>
                   </div>

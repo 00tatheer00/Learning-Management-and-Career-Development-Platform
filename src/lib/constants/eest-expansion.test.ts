@@ -131,6 +131,6 @@ describe("EEST Portal Course Expansion & Phase 4 Verification", () => {
     expect(getRegistrationPhase("2026-07-20T00:00:00.000Z")).toBe("phase-1");
     expect(getRegistrationPhase("2026-08-10T00:00:00.000Z")).toBe("phase-2");
     expect(getRegistrationPhase("2026-09-05T00:00:00.000Z")).toBe("phase-3");
-    expect(getRegistrationPhase("2026-09-20T00:00:00.000Z")).toBe("phase-4");
+    expect(getRegistrationPhase("2026-09-20T00:00:00.000Z")).toBe("phase-3");
   });
 });
