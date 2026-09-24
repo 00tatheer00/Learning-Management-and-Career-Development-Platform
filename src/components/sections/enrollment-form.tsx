@@ -36,6 +36,7 @@ import { EnrollmentFeeSummary } from "@/components/enrollment/enrollment-fee-sum
 import { useEnrollmentDraft } from "@/components/enrollment/use-enrollment-draft";
 import { EnrollmentSuccessView } from "@/components/enrollment/enrollment-success-view";
 import { uploadDirectToCloudinary } from "@/lib/cloudinary-client";
+import { trackTikTokCompleteRegistration } from "@/lib/analytics/tiktok";
 
 function FormSection({
   title,
@@ -449,8 +450,24 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
         email: data.email,
         whatsapp: data.whatsapp,
       });
-      setSubmittedApplicationNumber(result.data?.applicationNumber ?? 1);
+      const appNumber = result.data?.applicationNumber ?? 1;
+      setSubmittedApplicationNumber(appNumber);
       setIsSuccess(true);
+
+      // Track TikTok conversion event exactly once after verified server success
+      const receiptNumber = `EEST-2026-REG-${String(appNumber).padStart(4, "0")}`;
+      const programInfo = programs.find((p) => p.slug === data.program);
+      const regFee = getProgramRegistrationFee(data.program);
+
+      void trackTikTokCompleteRegistration({
+        contentId: data.program,
+        contentName: programInfo?.title ?? data.program,
+        value: regFee,
+        currency: "PKR",
+        email: data.email,
+        phone: data.whatsapp,
+        externalId: receiptNumber,
+      });
       toast.success(
         result.data?.applicationNumber && result.data.applicationNumber > 1
           ? `Application #${result.data.applicationNumber} submitted!`

@@ -8,10 +8,12 @@ import { ModuleCertificateBadge } from "@/components/shared/module-certificate-b
 import { ModuleCertificateCallout } from "@/components/shared/module-certificate-callout";
 import { TrainerCard } from "@/components/shared/trainer-card";
 import { BreadcrumbSchema, CourseSchema } from "@/components/seo/json-ld";
+import { TikTokViewContent } from "@/components/analytics/tiktok-view-content";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { createMetadata } from "@/lib/seo/metadata";
 import { SITE_CONFIG, REGISTRATION_OPEN } from "@/lib/constants";
+import { getProgramRegistrationFee } from "@/lib/constants/payment";
 import { programs, getProgramBySlug, getProgramTopicCount, programHasSyllabus } from "@/lib/data/programs";
 import { getTrainersByProgramSlug } from "@/lib/data/trainers";
 
@@ -51,6 +53,12 @@ export default async function ProgramDetailPage({ params }: ProgramPageProps) {
         name={program.title}
         description={program.description}
         slug={program.slug}
+      />
+      <TikTokViewContent
+        contentId={program.slug}
+        contentName={program.title}
+        value={getProgramRegistrationFee(program.slug)}
+        currency="PKR"
       />
       <BreadcrumbSchema
         items={[

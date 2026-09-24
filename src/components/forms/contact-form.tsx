@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { SITE_CONFIG } from "@/lib/constants";
 import { getOfficialTelHref } from "@/lib/constants/contact";
 import { toast } from "@/lib/ui/toast";
+import { trackTikTokContact } from "@/lib/analytics/tiktok";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -52,6 +53,11 @@ export function ContactContent() {
       }
       setIsSuccess(true);
       toast.success("Message sent!", "We will reply within 1–2 business days.");
+      void trackTikTokContact({
+        contentId: "contact_inquiry",
+        contentName: data.subject || "Contact Inquiry",
+        email: data.email,
+      });
       reset();
     } catch {
       toast.error("Something went wrong", "Please try again.");
