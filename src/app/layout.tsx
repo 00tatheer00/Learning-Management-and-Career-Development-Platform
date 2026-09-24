@@ -59,10 +59,13 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
         <link rel="preconnect" href="https://res.cloudinary.com" />
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+        <link rel="preconnect" href="https://analytics.tiktok.com" />
+        <link rel="dns-prefetch" href="https://analytics.tiktok.com" />
         <OrganizationSchema />
         <WebSiteSchema />
         <IdentitySchema />
         <LocalBusinessSchema />
+        <TikTokPixel />
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem("${PORTAL_THEME_STORAGE_KEY}");if(t==="dark")document.documentElement.dataset.portalThemeInit="dark"}catch(e){}})();`,
@@ -94,9 +97,6 @@ export default function RootLayout({
             `,
           }}
         />
-
-        {/* TikTok Pixel */}
-        <TikTokPixel />
 
         <AuthSessionProvider>
           <ChunkErrorHandler />

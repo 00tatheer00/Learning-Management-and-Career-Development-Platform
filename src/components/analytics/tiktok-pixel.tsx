@@ -1,4 +1,3 @@
-import Script from "next/script";
 
 declare global {
   interface Window {
@@ -26,9 +25,8 @@ export function TikTokPixel() {
   }
 
   return (
-    <Script
+    <script
       id="tiktok-pixel"
-      strategy="afterInteractive"
       dangerouslySetInnerHTML={{
         __html: `
 !function (w, d, t) {
