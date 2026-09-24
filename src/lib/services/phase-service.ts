@@ -48,61 +48,7 @@ export function getRegistrationPhase(item: {
 } | Date | string | null | undefined): RegistrationPhase {
   if (!item) return "phase-1";
 
-  // 1. If program is Digital Marketing, Ecommerce, or Graphics Designing, it is Phase 3
-  if (typeof item === "object" && !(item instanceof Date)) {
-    const rawProgram = (item.program || item.programSlug || "").trim().toLowerCase();
-    const rawLevel = (item.level || item.module || "").trim().toLowerCase();
-    const rawBatch = (item.batch || "").trim().toLowerCase();
-
-    if (
-      rawProgram === "digital-marketing" ||
-      rawProgram === "ecommerce" ||
-      rawProgram === "graphics-designing" ||
-      rawProgram.includes("digital marketing") ||
-      rawProgram.includes("ecommerce") ||
-      rawProgram.includes("graphic")
-    ) {
-      return "phase-3";
-    }
-
-    // 2. Phase 3: Web & App 3rd module, and AI 2nd module ONLY
-    const isWeb =
-      rawProgram === "web-development" ||
-      rawProgram.includes("web");
-    const isWeb3rd =
-      isWeb &&
-      (rawLevel.includes("react") ||
-        rawLevel.includes("3rd module") ||
-        rawLevel.includes("module 3"));
-
-    const isApp =
-      rawProgram === "app-development" ||
-      rawProgram.includes("app") ||
-      rawProgram.includes("flutter");
-    const isApp3rd =
-      isApp &&
-      (rawLevel.includes("firebase") ||
-        rawLevel.includes("api") ||
-        rawLevel.includes("3rd module") ||
-        rawLevel.includes("module 3"));
-
-    const isAI =
-      rawProgram === "artificial-intelligence" ||
-      rawProgram.includes("ai") ||
-      rawProgram.includes("artificial");
-    const isAI2nd =
-      isAI &&
-      (rawLevel.includes("module 2") ||
-        rawLevel.includes("data to ml") ||
-        rawLevel.includes("ml engineer") ||
-        rawLevel.includes("2nd module"));
-
-    if (isWeb3rd || isApp3rd || isAI2nd || rawBatch.includes("phase 3") || rawBatch.includes("3rd module")) {
-      return "phase-3";
-    }
-  }
-
-  // Extract date if available
+  // 1. Primary Source of Truth: Registration Date
   let dateVal: Date | null = null;
   if (item instanceof Date) {
     dateVal = item;
@@ -120,44 +66,50 @@ export function getRegistrationPhase(item: {
     const p2Time = PHASE_2_START_DATE.getTime();
     const p3Time = PHASE_3_START_DATE.getTime();
 
+    // Module 1 (Phase 1): All registrations before 24 July 2026
     if (time < p2Time) {
       return "phase-1";
     }
+    // Module 2 (Phase 2): All registrations from 24 July to before 29 August 2026
     if (time < p3Time) {
       return "phase-2";
     }
-
-    // If an object with explicit level reached here without matching Phase 3
-    if (typeof item === "object" && !(item instanceof Date)) {
-      const rawLevel = (item.level || item.module || "").trim().toLowerCase();
-
-      if (
-        rawLevel.includes("javascript") ||
-        rawLevel.includes("flutter frontend") ||
-        rawLevel.includes("2nd module")
-      ) {
-        return "phase-2";
-      }
-
-      if (
-        rawLevel.includes("html") ||
-        rawLevel.includes("dart") ||
-        rawLevel.includes("launchpad") ||
-        rawLevel.includes("1st module") ||
-        rawLevel.includes("module 1")
-      ) {
-        return "phase-1";
-      }
-    }
-
-    // Everything from Phase 3 start onwards is Phase 3 (open-ended)
+    // Module 3 (Phase 3): All registrations on or after 29 August 2026
     return "phase-3";
   }
 
-  // Fallback for mock objects without dates
+  // 2. Fallback Heuristics for mock objects or items without dates
   if (typeof item === "object" && !(item instanceof Date)) {
-    const rawBatch = (item.batch || "").trim().toLowerCase();
+    const rawProgram = (item.program || item.programSlug || "").trim().toLowerCase();
     const rawLevel = (item.level || item.module || "").trim().toLowerCase();
+    const rawBatch = (item.batch || "").trim().toLowerCase();
+
+    if (
+      rawProgram === "digital-marketing" ||
+      rawProgram === "ecommerce" ||
+      rawProgram === "graphics-designing" ||
+      rawProgram.includes("digital marketing") ||
+      rawProgram.includes("ecommerce") ||
+      rawProgram.includes("graphic")
+    ) {
+      return "phase-3";
+    }
+
+    const isWeb3rd =
+      (rawProgram === "web-development" || rawProgram.includes("web")) &&
+      (rawLevel.includes("react") || rawLevel.includes("3rd module") || rawLevel.includes("module 3"));
+
+    const isApp3rd =
+      (rawProgram === "app-development" || rawProgram.includes("app") || rawProgram.includes("flutter")) &&
+      (rawLevel.includes("firebase") || rawLevel.includes("api") || rawLevel.includes("3rd module") || rawLevel.includes("module 3"));
+
+    const isAI2nd =
+      (rawProgram === "artificial-intelligence" || rawProgram.includes("ai") || rawProgram.includes("artificial")) &&
+      (rawLevel.includes("module 2") || rawLevel.includes("data to ml") || rawLevel.includes("ml engineer") || rawLevel.includes("2nd module"));
+
+    if (isWeb3rd || isApp3rd || isAI2nd || rawBatch.includes("phase 3") || rawBatch.includes("3rd module")) {
+      return "phase-3";
+    }
 
     if (
       rawBatch.includes("phase 2") ||

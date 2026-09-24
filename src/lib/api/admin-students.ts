@@ -28,6 +28,7 @@ export interface AdminStudentRow {
   isActive: boolean;
   joinedAt: string;
   appliedAt: string;
+  reviewedAt?: string | null;
 }
 
 export async function getAdminStudentRows(options?: {
@@ -73,6 +74,10 @@ export async function getAdminStudentRows(options?: {
     const programSlug = enrollment.program;
     const course = getProgramBySlug(programSlug)?.title ?? programSlug;
 
+    const reviewedAtIso = enrollment.reviewedAt ? enrollment.reviewedAt.toISOString() : null;
+    const appliedAtIso = enrollment.createdAt.toISOString();
+    const joinedAtIso = reviewedAtIso ?? appliedAtIso;
+
     rows.push({
       id: enrollment.id,
       studentId: student?.id ?? enrollment.id,
@@ -91,8 +96,9 @@ export async function getAdminStudentRows(options?: {
       hasLaptop: enrollment.hasLaptop ?? "—",
       internetAvailable: enrollment.internetAvailable ?? "—",
       isActive: student?.isActive ?? true,
-      joinedAt: student?.createdAt.toISOString() ?? enrollment.createdAt.toISOString(),
-      appliedAt: enrollment.createdAt.toISOString(),
+      joinedAt: joinedAtIso,
+      appliedAt: appliedAtIso,
+      reviewedAt: reviewedAtIso,
     });
   }
 

@@ -25,7 +25,7 @@ import {
   type RegistrationPhase,
 } from "@/lib/constants/batch";
 import { getProgramBySlug } from "@/lib/data/programs";
-import { formatAppliedDate, cn } from "@/lib/utils";
+import { formatAppliedDate, formatAppliedTime, cn } from "@/lib/utils";
 import { toast } from "@/lib/ui/toast";
 import { useAdminPermissions } from "@/components/admin/admin-permissions";
 import { OpenStudentProfileButton, AdminStudentProfileButton } from "@/components/admin/admin-student-profile-drawer";
@@ -545,6 +545,14 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
               })()}
             </div>
             <p className="mt-2 text-xs text-muted font-mono break-all">{student.cnic}</p>
+            <div className="mt-2 flex flex-wrap items-center justify-between gap-1 text-xs text-muted">
+              <span>Applied {formatAppliedDate(student.appliedAt)}</span>
+              {student.reviewedAt && (
+                <span className="text-emerald-700 dark:text-emerald-400 font-medium">
+                  Approved {formatAppliedDate(student.reviewedAt)}
+                </span>
+              )}
+            </div>
             <div className="mt-3 flex flex-wrap gap-2 border-t border-border pt-3">
               <AdminStudentProfileButton target={{ enrollmentId: student.id }} compact />
               {canWrite && (
@@ -683,9 +691,11 @@ export function AdminStudentsTable({ students: initialStudents }: AdminStudentsT
                     </span>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
-                    <p>{formatAppliedDate(student.appliedAt)}</p>
+                    <p className="font-medium text-foreground">{formatAppliedDate(student.appliedAt)}</p>
                     <p className="mt-1 text-xs text-muted">
-                      Joined {formatAppliedDate(student.joinedAt)}
+                      {student.reviewedAt
+                        ? `Approved ${formatAppliedDate(student.reviewedAt)}`
+                        : `Applied ${formatAppliedTime(student.appliedAt)}`}
                     </p>
                   </td>
                   <td className="px-4 py-4">

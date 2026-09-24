@@ -41,7 +41,8 @@ describe("PhaseService - Centralized Phase Classification", () => {
     expect(getRegistrationPhase({ createdAt: futureDate })).toBe("phase-3");
   });
 
-  it("keeps Web 3rd module, App 3rd module, and AI 2nd module strictly in Phase 3 regardless of registration date", () => {
+  it("classifies Web 3rd module, App 3rd module, and AI 2nd module as Phase 3 when date is on/after Aug 29 or when no date is provided", () => {
+    // With Phase 3 dates
     const web3rdModule = {
       program: "web-development",
       level: "React",
@@ -56,12 +57,18 @@ describe("PhaseService - Centralized Phase Classification", () => {
     };
     expect(getRegistrationPhase(app3rdModule)).toBe("phase-3");
 
-    const ai2ndModule = {
+    // Fallback without dates (e.g. curriculum / mock objects)
+    expect(getRegistrationPhase({ program: "web-development", level: "React" })).toBe("phase-3");
+    expect(getRegistrationPhase({ program: "app-development", level: "Firebase & APIs" })).toBe("phase-3");
+    expect(getRegistrationPhase({ program: "artificial-intelligence", level: "Module 2: Data to ML Engineer" })).toBe("phase-3");
+
+    // Advance applications before Aug 29 stay in Phase 1 or 2 so salary isn't counted in Phase 3
+    const advanceP2 = {
       program: "artificial-intelligence",
       level: "Module 2: Data to ML Engineer",
       createdAt: "2026-07-30T16:02:16.363Z",
     };
-    expect(getRegistrationPhase(ai2ndModule)).toBe("phase-3");
+    expect(getRegistrationPhase(advanceP2)).toBe("phase-2");
   });
 
   it("classifies Digital Marketing, Ecommerce, and Graphics Designing as Phase 3", () => {

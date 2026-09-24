@@ -11,6 +11,19 @@ import { getProgramBySlug } from "@/lib/data/programs";
 import { trainers } from "@/lib/data/trainers";
 import { getRegistrationPhase } from "@/lib/services/phase-service";
 
+export interface AdminRevenueStudent {
+  id: string;
+  fullName: string;
+  email: string;
+  whatsapp: string;
+  programSlug: string;
+  courseTitle: string;
+  level: string;
+  batch: string;
+  appliedAt: string;
+  reviewedAt?: string | null;
+}
+
 export interface AdminRevenueCourseStats {
   programSlug: string;
   courseTitle: string;
@@ -34,6 +47,7 @@ export interface AdminRevenueCourseStats {
   thisMonthTrainer: number;
   thisMonthSchool: number;
   monthlyBreakdown?: AdminRevenueMonthBreakdown[];
+  students?: AdminRevenueStudent[];
 }
 
 export interface AdminRevenueMonthBreakdown {
@@ -64,6 +78,7 @@ export interface AdminRevenuePhaseStats {
   thisMonthSchool: number;
   byCourse: AdminRevenueCourseStats[];
   monthlyBreakdown: AdminRevenueMonthBreakdown[];
+  students?: AdminRevenueStudent[];
 }
 
 export interface AdminRevenueStats extends AdminRevenuePhaseStats {
@@ -107,8 +122,16 @@ function startOfMonth(date: Date): Date {
   return new Date(date.getFullYear(), date.getMonth(), 1);
 }
 
+type RevenueRow = RevenueSplitItem & {
+  id: string;
+  fullName: string;
+  whatsapp: string;
+  at: Date;
+  email: string;
+};
+
 function buildStatsForRows(
-  rows: Array<RevenueSplitItem & { at: Date; email: string }>,
+  rows: RevenueRow[],
   weekStart: Date,
   monthStart: Date
 ): AdminRevenuePhaseStats {
@@ -138,7 +161,26 @@ function buildStatsForRows(
       courseRows.map((r) => r.email.trim().toLowerCase())
     ).size;
 
-    const courseMonthMap = new Map<string, Array<RevenueSplitItem & { at: Date; email: string }>>();
+    const courseStudents: AdminRevenueStudent[] = courseRows
+      .map((r) => ({
+        id: r.id,
+        fullName: r.fullName || "Student",
+        email: r.email,
+        whatsapp: r.whatsapp || "—",
+        programSlug,
+        courseTitle: getProgramBySlug(programSlug)?.title ?? programSlug,
+        level: r.level || "—",
+        batch: r.batch || "Batch 1",
+        appliedAt: r.at instanceof Date ? r.at.toISOString() : new Date(r.at).toISOString(),
+        reviewedAt: r.reviewedAt
+          ? r.reviewedAt instanceof Date
+            ? r.reviewedAt.toISOString()
+            : new Date(r.reviewedAt).toISOString()
+          : null,
+      }))
+      .sort((a, b) => new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime());
+
+    const courseMonthMap = new Map<string, RevenueRow[]>();
     for (const row of courseRows) {
       const d = new Date(row.at);
       const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
@@ -189,11 +231,12 @@ function buildStatsForRows(
       thisMonthTrainer: month.trainer,
       thisMonthSchool: month.school,
       monthlyBreakdown: courseMonthlyBreakdown,
+      students: courseStudents,
     };
   });
 
   // Calculate monthly breakdown
-  const monthMap = new Map<string, Array<RevenueSplitItem & { at: Date; email: string }>>();
+  const monthMap = new Map<string, RevenueRow[]>();
   for (const row of rows) {
     const d = new Date(row.at);
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
@@ -221,6 +264,25 @@ function buildStatsForRows(
     };
   });
 
+  const allStudents: AdminRevenueStudent[] = rows
+    .map((r) => ({
+      id: r.id,
+      fullName: r.fullName || "Student",
+      email: r.email,
+      whatsapp: r.whatsapp || "—",
+      programSlug: (r.program || r.programSlug || "") as string,
+      courseTitle: getProgramBySlug((r.program || r.programSlug || "") as string)?.title ?? (r.program || ""),
+      level: r.level || "—",
+      batch: r.batch || "Batch 1",
+      appliedAt: r.at instanceof Date ? r.at.toISOString() : new Date(r.at).toISOString(),
+      reviewedAt: r.reviewedAt
+        ? r.reviewedAt instanceof Date
+          ? r.reviewedAt.toISOString()
+          : new Date(r.reviewedAt).toISOString()
+        : null,
+    }))
+    .sort((a, b) => new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime());
+
   return {
     totalApproved,
     totalGross: totalSplit.gross,
@@ -239,6 +301,7 @@ function buildStatsForRows(
     thisMonthSchool: monthSplit.school,
     byCourse,
     monthlyBreakdown,
+    students: allStudents,
   };
 }
 
@@ -251,17 +314,23 @@ export async function getAdminRevenueStats(): Promise<AdminRevenueStats> {
     where: { status: "approved" },
     select: {
       id: true,
+      fullName: true,
       program: true,
       createdAt: true,
       reviewedAt: true,
       email: true,
+      whatsapp: true,
       batch: true,
       level: true,
     },
+    orderBy: { createdAt: "desc" },
   });
 
   const paidApproved = excludeDemoEnrollments(approved);
-  const dated: Array<RevenueSplitItem & { at: Date; email: string }> = paidApproved.map((row) => ({
+  const dated: RevenueRow[] = paidApproved.map((row) => ({
+    id: row.id,
+    fullName: row.fullName,
+    whatsapp: row.whatsapp,
     program: row.program,
     programSlug: row.program,
     createdAt: row.createdAt,
