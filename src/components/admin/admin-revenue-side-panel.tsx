@@ -39,6 +39,7 @@ import { getProgramsForPhase } from "@/lib/constants/batch";
 import { toast } from "@/lib/ui/toast";
 import { uploadDirectToCloudinary } from "@/lib/cloudinary-client";
 import { ImageLightbox } from "@/components/ui/image-lightbox";
+import Image from "next/image";
 
 interface TrainerPayoutRecord {
   id: string;
@@ -614,9 +615,12 @@ function TrainerPaymentModal({
 
             {receiptUrl ? (
               <div className="flex items-center gap-3 p-2 bg-white rounded-lg border border-emerald-200">
-                <img
+                <Image
                   src={receiptUrl}
                   alt="Payment Proof"
+                  width={48}
+                  height={48}
+                  unoptimized
                   className="h-12 w-12 rounded-md object-cover border border-slate-200 shrink-0"
                 />
                 <div className="min-w-0 flex-1">
@@ -855,9 +859,12 @@ function TrainerPaymentDetailModal({
             <div className="py-2 border-t border-slate-100">
               <span className="text-slate-500 font-semibold text-xs block mb-1.5">Proof of Payment</span>
               <div className="flex items-center gap-3 p-2.5 rounded-xl border border-emerald-200 bg-emerald-50/40">
-                <img
+                <Image
                   src={payout.receiptUrl}
                   alt="Payment Receipt"
+                  width={56}
+                  height={56}
+                  unoptimized
                   onClick={() => setLightboxOpen(true)}
                   className="h-14 w-14 rounded-lg object-cover border border-slate-200 cursor-pointer hover:opacity-90 transition-opacity shrink-0"
                 />
