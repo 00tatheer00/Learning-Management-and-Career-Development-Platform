@@ -35,6 +35,7 @@ import { EnrollmentDropzone } from "@/components/enrollment/enrollment-dropzone"
 import { EnrollmentFeeSummary } from "@/components/enrollment/enrollment-fee-summary";
 import { useEnrollmentDraft } from "@/components/enrollment/use-enrollment-draft";
 import { EnrollmentSuccessView } from "@/components/enrollment/enrollment-success-view";
+import { uploadDirectToCloudinary } from "@/lib/cloudinary-client";
 import {
   trackTikTokCompleteRegistration,
   trackTikTokInitiateCheckout,
