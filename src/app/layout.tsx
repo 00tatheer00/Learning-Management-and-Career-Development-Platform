@@ -6,6 +6,7 @@ import { AuthSessionProvider } from "@/components/providers/session-provider";
 import { ToastProvider } from "@/components/providers/toast-provider";
 import { ChunkErrorHandler } from "@/components/providers/chunk-error-handler";
 import { OrganizationSchema, WebSiteSchema, IdentitySchema, LocalBusinessSchema } from "@/components/seo/json-ld";
+import { TikTokPixel } from "@/components/analytics/tiktok-pixel";
 import { createMetadata } from "@/lib/seo/metadata";
 import { SITE_CONFIG } from "@/lib/constants";
 import { PORTAL_THEME_STORAGE_KEY } from "@/lib/constants/portal-theme";
@@ -93,6 +94,9 @@ export default function RootLayout({
             `,
           }}
         />
+
+        {/* TikTok Pixel */}
+        <TikTokPixel />
 
         <AuthSessionProvider>
           <ChunkErrorHandler />
