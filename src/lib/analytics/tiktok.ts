@@ -39,8 +39,46 @@ export interface TikTokContactOptions {
 export interface TikTokLeadOptions {
   contentId?: string;
   contentName?: string;
+  contentType?: string;
   value?: number;
   currency?: string;
+  email?: string;
+  phone?: string;
+}
+
+export interface TikTokClickButtonOptions {
+  contentId?: string;
+  contentName?: string;
+  contentType?: string;
+  value?: number;
+  currency?: string;
+}
+
+export interface TikTokAddToWishlistOptions {
+  contentId: string;
+  contentName: string;
+  contentType?: string;
+  value?: number;
+  currency?: string;
+}
+
+export interface TikTokInitiateCheckoutOptions {
+  contentId: string;
+  contentName: string;
+  contentType?: string;
+  value?: number;
+  currency?: string;
+}
+
+export interface TikTokPaymentOptions {
+  contentId: string;
+  contentName: string;
+  contentType?: string;
+  value?: number;
+  currency?: string;
+  email?: string;
+  phone?: string;
+  externalId?: string;
 }
 
 export interface TikTokSearchOptions {
@@ -270,9 +308,16 @@ export async function trackTikTokContact(options?: TikTokContactOptions): Promis
 /**
  * Tracks Lead event.
  */
-export function trackTikTokLead(options?: TikTokLeadOptions): void {
+export async function trackTikTokLead(options?: TikTokLeadOptions): Promise<void> {
   if (typeof window === "undefined" || !window.ttq || typeof window.ttq.track !== "function") {
     return;
+  }
+
+  if (options?.email || options?.phone) {
+    await trackTikTokIdentify({
+      email: options.email,
+      phone: options.phone,
+    });
   }
 
   try {
@@ -280,12 +325,120 @@ export function trackTikTokLead(options?: TikTokLeadOptions): void {
       contents: [
         {
           content_id: options?.contentId || "lead_capture",
-          content_type: "product",
+          content_type: options?.contentType || "product",
           content_name: options?.contentName || "Lead",
         },
       ],
       value: options?.value ?? 0,
       currency: options?.currency || "PKR",
+    });
+  } catch {
+    // Graceful suppression
+  }
+}
+
+/**
+ * Tracks ClickButton event when interactive CTA buttons are clicked.
+ */
+export function trackTikTokClickButton(options?: TikTokClickButtonOptions): void {
+  if (typeof window === "undefined" || !window.ttq || typeof window.ttq.track !== "function") {
+    return;
+  }
+
+  try {
+    window.ttq.track("ClickButton", {
+      contents: [
+        {
+          content_id: options?.contentId || "cta_button",
+          content_type: options?.contentType || "product",
+          content_name: options?.contentName || "Button Click",
+        },
+      ],
+      value: options?.value ?? 0,
+      currency: options?.currency || "PKR",
+    });
+  } catch {
+    // Graceful suppression
+  }
+}
+
+/**
+ * Tracks AddToWishlist event when bookmarking or saving courses.
+ */
+export function trackTikTokAddToWishlist(options: TikTokAddToWishlistOptions): void {
+  if (typeof window === "undefined" || !window.ttq || typeof window.ttq.track !== "function") {
+    return;
+  }
+
+  try {
+    window.ttq.track("AddToWishlist", {
+      contents: [
+        {
+          content_id: options.contentId,
+          content_type: options.contentType || "product",
+          content_name: options.contentName,
+        },
+      ],
+      value: options.value ?? 0,
+      currency: options.currency || "PKR",
+    });
+  } catch {
+    // Graceful suppression
+  }
+}
+
+/**
+ * Tracks InitiateCheckout event when student begins enrollment / registration checkout flow.
+ */
+export function trackTikTokInitiateCheckout(options: TikTokInitiateCheckoutOptions): void {
+  if (typeof window === "undefined" || !window.ttq || typeof window.ttq.track !== "function") {
+    return;
+  }
+
+  try {
+    window.ttq.track("InitiateCheckout", {
+      contents: [
+        {
+          content_id: options.contentId,
+          content_type: options.contentType || "product",
+          content_name: options.contentName,
+        },
+      ],
+      value: options.value ?? 1000,
+      currency: options.currency || "PKR",
+    });
+  } catch {
+    // Graceful suppression
+  }
+}
+
+/**
+ * Tracks CompletePayment event upon verified payment / registration fee confirmation.
+ */
+export async function trackTikTokPayment(options: TikTokPaymentOptions): Promise<void> {
+  if (typeof window === "undefined" || !window.ttq || typeof window.ttq.track !== "function") {
+    return;
+  }
+
+  if (options.email || options.phone || options.externalId) {
+    await trackTikTokIdentify({
+      email: options.email,
+      phone: options.phone,
+      externalId: options.externalId,
+    });
+  }
+
+  try {
+    window.ttq.track("CompletePayment", {
+      contents: [
+        {
+          content_id: options.contentId,
+          content_type: options.contentType || "product",
+          content_name: options.contentName,
+        },
+      ],
+      value: options.value ?? 1000,
+      currency: options.currency || "PKR",
     });
   } catch {
     // Graceful suppression

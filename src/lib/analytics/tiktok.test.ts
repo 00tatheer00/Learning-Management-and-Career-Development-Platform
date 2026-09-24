@@ -7,6 +7,10 @@ import {
   trackTikTokContact,
   trackTikTokIdentify,
   trackTikTokViewContent,
+  trackTikTokClickButton,
+  trackTikTokAddToWishlist,
+  trackTikTokInitiateCheckout,
+  trackTikTokPayment,
 } from "./tiktok";
 
 describe("TikTok Analytics Utilities", () => {
@@ -195,6 +199,94 @@ describe("TikTok Analytics Utilities", () => {
           },
         ],
         value: 0,
+        currency: "PKR",
+      });
+    });
+
+    it("trackTikTokClickButton calls ttq.track with ClickButton", () => {
+      trackTikTokClickButton({
+        contentId: "hero_register_now",
+        contentName: "Hero Register Now",
+      });
+
+      expect(mockTrack).toHaveBeenCalledTimes(1);
+      expect(mockTrack).toHaveBeenCalledWith("ClickButton", {
+        contents: [
+          {
+            content_id: "hero_register_now",
+            content_type: "product",
+            content_name: "Hero Register Now",
+          },
+        ],
+        value: 0,
+        currency: "PKR",
+      });
+    });
+
+    it("trackTikTokAddToWishlist calls ttq.track with AddToWishlist", () => {
+      trackTikTokAddToWishlist({
+        contentId: "full-stack-web-dev",
+        contentName: "Full Stack Web Development",
+      });
+
+      expect(mockTrack).toHaveBeenCalledTimes(1);
+      expect(mockTrack).toHaveBeenCalledWith("AddToWishlist", {
+        contents: [
+          {
+            content_id: "full-stack-web-dev",
+            content_type: "product",
+            content_name: "Full Stack Web Development",
+          },
+        ],
+        value: 0,
+        currency: "PKR",
+      });
+    });
+
+    it("trackTikTokInitiateCheckout calls ttq.track with InitiateCheckout", () => {
+      trackTikTokInitiateCheckout({
+        contentId: "artificial-intelligence",
+        contentName: "AI & Machine Learning",
+        value: 1000,
+        currency: "PKR",
+      });
+
+      expect(mockTrack).toHaveBeenCalledTimes(1);
+      expect(mockTrack).toHaveBeenCalledWith("InitiateCheckout", {
+        contents: [
+          {
+            content_id: "artificial-intelligence",
+            content_type: "product",
+            content_name: "AI & Machine Learning",
+          },
+        ],
+        value: 1000,
+        currency: "PKR",
+      });
+    });
+
+    it("trackTikTokPayment identifies and tracks CompletePayment event", async () => {
+      await trackTikTokPayment({
+        contentId: "flutter-app-dev",
+        contentName: "Flutter Mobile App Development",
+        value: 1000,
+        currency: "PKR",
+        email: "payer@eest.tech",
+        phone: "0311-1234567",
+        externalId: "EEST-REC-1234",
+      });
+
+      expect(mockIdentify).toHaveBeenCalledTimes(1);
+      expect(mockTrack).toHaveBeenCalledTimes(1);
+      expect(mockTrack).toHaveBeenCalledWith("CompletePayment", {
+        contents: [
+          {
+            content_id: "flutter-app-dev",
+            content_type: "product",
+            content_name: "Flutter Mobile App Development",
+          },
+        ],
+        value: 1000,
         currency: "PKR",
       });
     });

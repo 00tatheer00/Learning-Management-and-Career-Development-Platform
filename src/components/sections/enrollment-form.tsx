@@ -35,8 +35,11 @@ import { EnrollmentDropzone } from "@/components/enrollment/enrollment-dropzone"
 import { EnrollmentFeeSummary } from "@/components/enrollment/enrollment-fee-summary";
 import { useEnrollmentDraft } from "@/components/enrollment/use-enrollment-draft";
 import { EnrollmentSuccessView } from "@/components/enrollment/enrollment-success-view";
-import { uploadDirectToCloudinary } from "@/lib/cloudinary-client";
-import { trackTikTokCompleteRegistration } from "@/lib/analytics/tiktok";
+import {
+  trackTikTokCompleteRegistration,
+  trackTikTokInitiateCheckout,
+  trackTikTokPayment,
+} from "@/lib/analytics/tiktok";
 
 function FormSection({
   title,
@@ -246,6 +249,20 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
       setValue("program", defaultProgram as EnrollmentFormData["program"]);
     }
   }, [defaultProgram, setValue]);
+
+  const checkoutTrackedRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (selectedProgram && checkoutTrackedRef.current !== selectedProgram) {
+      checkoutTrackedRef.current = selectedProgram;
+      const prog = programs.find((p) => p.slug === selectedProgram);
+      trackTikTokInitiateCheckout({
+        contentId: selectedProgram,
+        contentName: prog?.title ?? selectedProgram,
+        value: selectedFee,
+        currency: "PKR",
+      });
+    }
+  }, [selectedProgram, selectedFee]);
 
   useEffect(() => {
     const email = watchedEmail?.trim().toLowerCase() ?? "";
@@ -460,6 +477,15 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
       const regFee = getProgramRegistrationFee(data.program);
 
       void trackTikTokCompleteRegistration({
+        contentId: data.program,
+        contentName: programInfo?.title ?? data.program,
+        value: regFee,
+        currency: "PKR",
+        email: data.email,
+        phone: data.whatsapp,
+        externalId: receiptNumber,
+      });
+      void trackTikTokPayment({
         contentId: data.program,
         contentName: programInfo?.title ?? data.program,
         value: regFee,

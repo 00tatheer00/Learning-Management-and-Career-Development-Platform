@@ -10,6 +10,7 @@ import { NAV_LINKS, REGISTRATION_OPEN } from "@/lib/constants";
 import { isNavLinkActive } from "@/lib/nav-active";
 import { cn } from "@/lib/utils";
 import { TopTickerBanner } from "@/components/layout/top-ticker-banner";
+import { trackTikTokClickButton } from "@/lib/analytics/tiktok";
 
 function useLocationHash(pathname: string) {
   const [hash, setHash] = useState("");
@@ -92,7 +93,16 @@ export function Navbar() {
           </Button>
           {REGISTRATION_OPEN ? (
             <Button size="sm" asChild>
-              <Link href="/register" prefetch>
+              <Link
+                href="/register"
+                prefetch
+                onClick={() =>
+                  trackTikTokClickButton({
+                    contentId: "nav_apply_now",
+                    contentName: "Navbar Apply Now",
+                  })
+                }
+              >
                 Apply Now
               </Link>
             </Button>
@@ -151,7 +161,17 @@ export function Navbar() {
                 </Button>
                 {REGISTRATION_OPEN ? (
                   <Button asChild>
-                    <Link href="/register" prefetch onClick={() => setIsMobileOpen(false)}>
+                    <Link
+                      href="/register"
+                      prefetch
+                      onClick={() => {
+                        setIsMobileOpen(false);
+                        trackTikTokClickButton({
+                          contentId: "nav_apply_now_mobile",
+                          contentName: "Mobile Nav Apply Now",
+                        });
+                      }}
+                    >
                       Apply Now
                     </Link>
                   </Button>

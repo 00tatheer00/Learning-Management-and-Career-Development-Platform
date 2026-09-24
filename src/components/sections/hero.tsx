@@ -7,6 +7,7 @@ import { motion, type Variants } from "framer-motion";
 import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import { REGISTRATION_OPEN } from "@/lib/constants";
+import { trackTikTokClickButton } from "@/lib/analytics/tiktok";
 
 const HeroParticleCanvas = dynamic(
   () => import("@/components/ui/hero-particle-canvas").then((m) => m.HeroParticleCanvas),
@@ -152,7 +153,16 @@ export function HeroSection() {
             {REGISTRATION_OPEN ? (
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Button size="lg" className="text-sm h-11 px-7 shadow-lg shadow-orange-500/20 rounded-xl font-bold" asChild>
-                  <Link href="/register" prefetch>
+                  <Link
+                    href="/register"
+                    prefetch
+                    onClick={() =>
+                      trackTikTokClickButton({
+                        contentId: "hero_register_now",
+                        contentName: "Hero Register Now",
+                      })
+                    }
+                  >
                     Register Now
                     <ArrowRight className="w-4 h-4 ml-1.5" aria-hidden="true" />
                   </Link>
