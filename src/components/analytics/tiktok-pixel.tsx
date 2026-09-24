@@ -12,7 +12,7 @@ declare global {
 }
 
 const TIKTOK_PIXEL_ID =
-  process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID || "DAQCSVJC77U88MSO3UH0";
+  process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID || "DAQPGJBC77UCICERMVE0";
 
 /**
  * TikTok Pixel base integration component.
