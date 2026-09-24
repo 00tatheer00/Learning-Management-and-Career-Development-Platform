@@ -738,4 +738,84 @@ body {
   transform: scale(0.98);
 }
 
+/* ── Global Print Isolation Styles ── */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 8mm 12mm;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Completely suppress all website headers, navbars, footers, and sidebars */
+  header,
+  footer,
+  nav,
+  aside,
+  .print\:hidden,
+  [data-print-hidden="true"],
+  .fixed,
+  #navigation-progress,
+  [role="contentinfo"],
+  [aria-label="Main navigation"],
+  .sonner-toast,
+  [data-sonner-toaster] {
+    display: none !important;
+  }
+
+  /* Reset main layout wrappers so no grid or sidebar column remains */
+  #main-content,
+  section,
+  main,
+  .container-custom {
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  #register-form,
+  #register-form-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Printable receipt slip styling */
+  .printable-receipt-container {
+    display: block !important;
+    visibility: visible !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    padding: 20px !important;
+    border: 2px solid #0284c7 !important;
+    border-radius: 12px !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    box-shadow: none !important;
+    page-break-before: avoid !important;
+    page-break-after: avoid !important;
+    page-break-inside: avoid !important;
+    break-before: avoid !important;
+    break-after: avoid !important;
+    break-inside: avoid !important;
+  }
+}
+
 

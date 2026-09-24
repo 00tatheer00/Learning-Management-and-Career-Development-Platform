@@ -502,7 +502,7 @@ export function EnrollmentForm({ defaultProgram }: EnrollmentFormProps) {
           email={submittedDetails.email}
           whatsapp={submittedDetails.whatsapp}
         />
-        <div className="text-center pt-6">
+        <div className="text-center pt-6 print:hidden">
           <Button
             variant="ghost"
             size="sm"

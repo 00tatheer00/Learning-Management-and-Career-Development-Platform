@@ -15,14 +15,14 @@ export function RegistrationPageContent({
   defaultProgram,
 }: RegistrationPageContentProps) {
   return (
-    <section className="section-padding section-alt" aria-labelledby="register-heading">
-      <div className="container-custom max-w-6xl">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 lg:gap-12 items-start">
-          <div className="order-1 lg:order-1 lg:col-span-2">
+    <section className="section-padding section-alt print:p-0 print:m-0 print:bg-white" aria-labelledby="register-heading">
+      <div className="container-custom max-w-6xl print:max-w-none print:w-full print:p-0">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 lg:gap-12 items-start print:block">
+          <div className="order-1 lg:order-1 lg:col-span-2 print:hidden">
             <RegistrationDetailsSidebar />
           </div>
 
-          <div className="order-2 lg:order-2 lg:col-span-3 scroll-mt-24" id="register-form">
+          <div className="order-2 lg:order-2 lg:col-span-3 scroll-mt-24 print:w-full print:p-0" id="register-form">
             {REGISTRATION_OPEN ? (
               <EnrollmentForm defaultProgram={defaultProgram} />
             ) : (
