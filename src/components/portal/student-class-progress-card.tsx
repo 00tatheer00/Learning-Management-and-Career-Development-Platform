@@ -19,10 +19,9 @@ export async function StudentClassProgressCard({
   const progress = getClassProgress(programSlug);
   const allRecordings = await getClassRecordings(programSlug);
   const targetCanonical = studentLevel ? resolveCanonicalModule(programSlug, studentLevel) : null;
-  const moduleRecordings = targetCanonical
+  const recordings = targetCanonical
     ? allRecordings.filter((r) => resolveCanonicalModule(programSlug, r.level) === targetCanonical)
     : allRecordings;
-  const recordings = moduleRecordings.length > 0 ? moduleRecordings : allRecordings;
   const category = getProgramCategory(programSlug);
 
   if (!progress.config) return null;

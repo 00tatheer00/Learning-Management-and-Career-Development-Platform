@@ -61,13 +61,8 @@ export default async function StudentRecordingsPage() {
             : [];
   } catch (err) {
     console.error("[StudentRecordingsPage] Error loading recordings:", err);
-    try {
-      recordings = await getClassRecordings(primarySlug);
-      enrolledModules = studentModule ? [studentModule] : [];
-    } catch {
-      recordings = [];
-      enrolledModules = [];
-    }
+    recordings = [];
+    enrolledModules = studentModule ? [studentModule] : [];
   }
 
   return (
