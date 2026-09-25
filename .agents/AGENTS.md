@@ -3,6 +3,7 @@
 - **Automatic Git Push**: Whenever fixes, features, or tasks are completed and committed, automatically run `git push origin main` (or the active branch) without asking for user confirmation.
 - **Persistent Project Memory**: Maintain full awareness of this project's architecture, database schema, user roles, API endpoints, and configuration across all sessions.
 - **Zero Data Loss & Strict Historical Preservation**: From Day 1 of EEST onwards, NEVER delete, overwrite, corrupt, or destructively alter any existing production data — including student accounts, enrollment applications, module progression, payment screenshots, logs, or financial figures. All database operations, migrations, and feature updates MUST be strictly additive, backward-compatible, and non-destructive.
+- **Strict Module Isolation (NEVER BYPASS)**: Students MUST only see content (recordings, lectures, classes, assignments) for modules they have EXPLICITLY enrolled in and been approved for. NEVER auto-grant Module 1 or any default module to students who did not admit in it. The single source of truth is `getApprovedEnrollmentLevels()` in `src/lib/auth/student-module-sync.ts` — this function must NEVER inject `order[0]` or any fallback module that the student did not enroll in.
 
 ## Project Memory & Context Summary
 
