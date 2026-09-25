@@ -92,23 +92,17 @@ export async function getApprovedEnrollmentLevels(
 
   const matched = order.filter((moduleName) => lowerLevels.has(moduleName.trim().toLowerCase()));
 
-  // Ensure foundational Module 1 is always accessible for any student enrolled in this course
-  if (
-    order.length > 0 &&
-    (matched.length > 0 ||
-      studentEnrollmentRows.length > 0 ||
-      studentModuleRows.length > 0 ||
-      isUserInProgram)
-  ) {
-    if (!matched.includes(order[0])) {
-      matched.unshift(order[0]);
-    }
+  // STRICT ACCESS CONTROL:
+  // Only unlock modules the student has explicitly enrolled in and been approved for.
+  // Never automatically grant Module 1 or un-enrolled modules to students who did not admit in them.
+  if (matched.length > 0) {
     return matched;
   }
 
-  // Fallback: if student has an approved enrollment for this program but string didn't match directly, default to first module
-  if ((studentEnrollmentRows.length > 0 || isUserInProgram) && order.length > 0) {
-    return [order[0]];
+  // If the student enrolled in an explicit level string that didn't match canonical order,
+  // return only the explicitly enrolled level(s). Never grant default access to un-enrolled modules.
+  if (lowerLevels.size > 0) {
+    return Array.from(lowerLevels);
   }
 
   return [];
