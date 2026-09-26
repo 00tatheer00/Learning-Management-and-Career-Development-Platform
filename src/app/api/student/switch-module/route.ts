@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { isDemoPortalStudent } from "@/lib/constants/demo-student";
 import { getApprovedEnrollmentLevels } from "@/lib/auth/student-module-sync";
 import { getApprovedProgramSlugs } from "@/lib/student-portal/program-scope";
+import { resolveTrainerIdForProgram } from "@/lib/auth/program-assignment";
 
 export async function POST(req: Request) {
   try {
@@ -22,7 +23,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const targetProgram = programSlug || user.programSlug || "web-development";
+    let targetProgram = programSlug || user.programSlug || "web-development";
 
     // Verify student is approved for this module in any enrolled program
     if (!isDemoPortalStudent(user.email)) {
@@ -40,6 +41,7 @@ export async function POST(req: Request) {
           const levels = await getApprovedEnrollmentLevels(user.email, slug);
           if (levels.some((l) => l.trim().toLowerCase() === moduleName.trim().toLowerCase())) {
             isApproved = true;
+            targetProgram = slug;
             break;
           }
         }
@@ -53,11 +55,14 @@ export async function POST(req: Request) {
       }
     }
 
+    const trainerId = await resolveTrainerIdForProgram(targetProgram);
+
     await prisma.user.update({
       where: { id: user.id },
       data: {
         level: moduleName.trim(),
         programSlug: targetProgram,
+        ...(trainerId ? { trainerId } : {}),
       },
     });
 

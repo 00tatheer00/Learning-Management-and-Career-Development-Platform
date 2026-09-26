@@ -5,10 +5,10 @@ import {
   resolveCanonicalModule,
 } from "@/lib/modules/student-module-access";
 import { isDemoPortalStudent } from "@/lib/constants/demo-student";
-import { DEMO_STUDENT_PROGRAM_SLUGS } from "@/lib/student-portal/program-scope";
+import { DEMO_STUDENT_PROGRAM_SLUGS, getApprovedProgramSlugs } from "@/lib/student-portal/program-scope";
 import { isAllModulesLevel } from "@/lib/modules/student-module-content";
 
-import { normalizeProgramSlug } from "@/lib/auth/program-assignment";
+import { normalizeProgramSlug, resolveTrainerIdForProgram } from "@/lib/auth/program-assignment";
 
 export async function getApprovedEnrollmentLevels(
   email: string,
@@ -140,6 +140,31 @@ export async function syncStudentActiveModuleFromEnrollments(
   }
 
   const approvedLevels = await getApprovedEnrollmentLevels(user.email, user.programSlug);
+  const userLevelNorm = user.level?.trim().toLowerCase();
+  const isLevelInCurrentProgram =
+    userLevelNorm &&
+    approvedLevels.some((l) => l.trim().toLowerCase() === userLevelNorm);
+
+  // If user's level is not in the current program's approved levels, check if it belongs to another approved program
+  if (!isLevelInCurrentProgram && userLevelNorm) {
+    const allSlugs = await getApprovedProgramSlugs(user.email);
+    for (const slug of allSlugs) {
+      if (slug === user.programSlug) continue;
+      const otherLevels = await getApprovedEnrollmentLevels(user.email, slug);
+      if (otherLevels.some((l) => l.trim().toLowerCase() === userLevelNorm)) {
+        const trainerId = await resolveTrainerIdForProgram(slug);
+        await prisma.user.update({
+          where: { id: userId },
+          data: {
+            programSlug: slug,
+            ...(trainerId ? { trainerId } : {}),
+          },
+        });
+        return user.level;
+      }
+    }
+  }
+
   if (approvedLevels.length === 0) {
     return user.level;
   }

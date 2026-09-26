@@ -457,6 +457,16 @@ export function StudentRecordingsContent({
                         <span className="text-[10px] font-extrabold uppercase tracking-widest text-primary bg-primary/10 px-2 py-0.5 rounded-md border border-primary/20">
                           Class {recording.classNumber}
                         </span>
+                        {recording.programSlug && (
+                          <span className={cn(
+                            "text-[9px] font-bold px-1.5 py-0.5 rounded border",
+                            recording.programSlug.includes("app") || recording.programSlug.includes("flutter")
+                              ? "bg-sky-500/10 text-sky-700 dark:text-sky-300 border-sky-500/20"
+                              : "bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/20"
+                          )}>
+                            {recording.programSlug.includes("app") || recording.programSlug.includes("flutter") ? "Flutter" : "Web Dev"}
+                          </span>
+                        )}
                         {recording.level && (
                           <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
                             {recording.level}

@@ -26,7 +26,10 @@ export default async function StudentRecordingsPage() {
 
   try {
     const programSlugs = await getStudentPortalProgramSlugs(user);
-    primarySlug = programSlugs[0] ?? user.programSlug ?? "web-development";
+    primarySlug =
+      user.programSlug && programSlugs.includes(user.programSlug)
+        ? user.programSlug
+        : programSlugs[0] ?? "web-development";
     const moduleContext = await getStudentModuleContentContext(user);
     studentModule = moduleContext.studentLevel || user.level?.trim() || undefined;
 

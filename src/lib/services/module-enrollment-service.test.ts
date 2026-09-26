@@ -44,5 +44,19 @@ describe("ModuleEnrollmentService - Backward Compatible Multi-Module Tracking", 
     expect(approved).not.toContain("HTML & CSS");
     expect(approved).not.toContain("JavaScript");
   });
+
+  it("fetchMergedByProgram invokes fetcher with only programSlug, avoiding index argument leaks", async () => {
+    const { fetchMergedByProgram } = await import("@/lib/student-portal/program-scope");
+    const mockFetcher = vi.fn().mockImplementation(async (slug: string, ...extraArgs: any[]) => {
+      expect(extraArgs.length).toBe(0);
+      return [`item-${slug}`];
+    });
+
+    const res = await fetchMergedByProgram(["web-development", "app-development"], mockFetcher);
+    expect(res).toEqual(["item-web-development", "item-app-development"]);
+    expect(mockFetcher).toHaveBeenCalledTimes(2);
+    expect(mockFetcher).toHaveBeenNthCalledWith(1, "web-development");
+    expect(mockFetcher).toHaveBeenNthCalledWith(2, "app-development");
+  });
 });
 

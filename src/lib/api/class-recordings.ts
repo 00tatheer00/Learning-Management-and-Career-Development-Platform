@@ -73,7 +73,7 @@ export async function getClassRecordings(
       };
     });
 
-    if (level && level.trim() !== "" && level.trim().toLowerCase() !== "all") {
+    if (typeof level === "string" && level.trim() !== "" && level.trim().toLowerCase() !== "all") {
       const targetCanonical = resolveCanonicalModule(normSlug, level);
       return mapped.filter((r) => {
         const itemCanonical = resolveCanonicalModule(normSlug, r.level);

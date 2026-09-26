@@ -18,19 +18,30 @@ export const DEMO_STUDENT_PROGRAM_SLUGS = [
  * derived from their approved Enrollment records.
  */
 export async function getApprovedProgramSlugs(email: string): Promise<string[]> {
-  const rows = await prisma.enrollment.findMany({
-    where: {
-      status: "approved",
-    },
-    select: { program: true, email: true },
-  });
-
   const normalizedEmail = email.trim().toLowerCase();
-  const studentRows = rows.filter(
-    (row) => row.email && row.email.trim().toLowerCase() === normalizedEmail
-  );
+  const [rows, moduleRows] = await Promise.all([
+    prisma.enrollment.findMany({
+      where: {
+        status: "approved",
+        email: { equals: normalizedEmail, mode: "insensitive" },
+      },
+      select: { program: true },
+    }),
+    prisma.moduleEnrollment.findMany({
+      where: {
+        status: "active",
+        email: { equals: normalizedEmail, mode: "insensitive" },
+      },
+      select: { programSlug: true },
+    }),
+  ]);
 
-  const slugs = [...new Set(studentRows.map((row) => normalizeProgramSlug(row.program)))];
+  const slugs = [
+    ...new Set([
+      ...rows.map((row) => normalizeProgramSlug(row.program)),
+      ...moduleRows.map((row) => normalizeProgramSlug(row.programSlug)),
+    ]),
+  ];
   return slugs.length > 0 ? slugs : [];
 }
 
@@ -75,6 +86,6 @@ export async function fetchMergedByProgram<T>(
   programSlugs: string[],
   fetcher: (programSlug: string) => Promise<T[]>
 ): Promise<T[]> {
-  const results = await Promise.all(programSlugs.map(fetcher));
+  const results = await Promise.all(programSlugs.map((slug) => fetcher(slug)));
   return results.flat();
 }
