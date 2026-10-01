@@ -47,7 +47,7 @@ describe("ModuleEnrollmentService - Backward Compatible Multi-Module Tracking", 
 
   it("fetchMergedByProgram invokes fetcher with only programSlug, avoiding index argument leaks", async () => {
     const { fetchMergedByProgram } = await import("@/lib/student-portal/program-scope");
-    const mockFetcher = vi.fn().mockImplementation(async (slug: string, ...extraArgs: any[]) => {
+    const mockFetcher = vi.fn().mockImplementation(async (slug: string, ...extraArgs: unknown[]) => {
       expect(extraArgs.length).toBe(0);
       return [`item-${slug}`];
     });
