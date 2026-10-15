@@ -13,7 +13,7 @@ export interface AIChatConfig {
 
 export function getAIChatConfig(): AIChatConfig {
   const apiKey = process.env.GEMINI_API_KEY?.trim() || null;
-  const model = process.env.GEMINI_MODEL?.trim() || "gemini-2.5-flash";
+  const model = process.env.GEMINI_MODEL?.trim() || "gemini-3.8-flash";
   const enabled = process.env.AI_CHAT_ENABLED !== "false" && process.env.AI_CHAT_ENABLED !== "0";
 
   const dailyLimitRaw = parseInt(process.env.AI_CHAT_DAILY_LIMIT || "20", 10);

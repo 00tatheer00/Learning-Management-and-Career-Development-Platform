@@ -188,10 +188,13 @@ export function AIChatWidget() {
             "fixed z-50 flex flex-col overflow-hidden",
             "bg-card text-card-foreground border border-border shadow-2xl rounded-2xl",
             "transition-all duration-300 ease-out animate-in fade-in zoom-in-95",
-            // Desktop dimensions
-            "sm:right-6 sm:bottom-6 sm:w-[420px] sm:h-[580px] sm:max-h-[85vh]",
-            // Mobile dimensions (comfortable full-width bottom sheet)
-            "inset-x-3 bottom-3 top-auto h-[82vh] sm:inset-x-auto sm:top-auto"
+            // Always anchored strictly to the bottom-right corner
+            "right-4 sm:right-6",
+            isStudentPortal ? "bottom-24 sm:bottom-6" : "bottom-4 sm:bottom-6",
+            // Responsive width: max 410px, adapts on smaller viewports
+            "w-[calc(100vw-2rem)] max-w-[410px]",
+            // Height: 580px or safe viewport height
+            "h-[580px] max-h-[calc(100dvh-5rem)]"
           )}
         >
           {/* Header */}
@@ -210,7 +213,7 @@ export function AIChatWidget() {
                   </h3>
                   <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    Gemini 2.5
+                    Gemini AI
                   </span>
                 </div>
                 <p className="text-[11px] text-muted-foreground truncate">

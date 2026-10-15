@@ -75,22 +75,42 @@ export async function callGeminiChat(params: {
     return Promise.race([callPromise, timeoutPromise]);
   };
 
+  const candidateModels = [
+    config.model,
+    "gemini-3.8-flash",
+    "gemini-2.5-flash",
+    "gemini-1.5-flash",
+    "gemini-2.0-flash",
+  ].filter((m, i, arr) => arr.indexOf(m) === i);
+
   try {
-    let result;
-    try {
-      result = await generateWithModel(config.model);
-    } catch (firstErr: unknown) {
-      const errStr = String(firstErr);
-      // Fallback model if primary model is 404 or unsupported
-      if (
-        (errStr.includes("not found") || errStr.includes("404") || errStr.includes("unsupported")) &&
-        config.model !== "gemini-2.0-flash"
-      ) {
-        console.warn(`[AIChat] Primary model ${config.model} failed, falling back to gemini-2.0-flash`);
-        result = await generateWithModel("gemini-2.0-flash");
-      } else {
-        throw firstErr;
+    let result = null;
+    let lastError: unknown = null;
+
+    for (const modelCandidate of candidateModels) {
+      try {
+        result = await generateWithModel(modelCandidate);
+        if (result?.text) break;
+      } catch (err: unknown) {
+        lastError = err;
+        const errStr = String(err);
+        // Only try next candidate if model is 404/deprecated/unsupported
+        if (
+          errStr.includes("not found") ||
+          errStr.includes("404") ||
+          errStr.includes("unsupported") ||
+          errStr.includes("no longer available")
+        ) {
+          console.warn(`[AIChat] Model ${modelCandidate} unavailable, trying next candidate...`);
+          continue;
+        }
+        // If it's permission denied or quota, don't loop needlessly
+        throw err;
       }
+    }
+
+    if (!result?.text && lastError) {
+      throw lastError;
     }
 
     const reply = result?.text?.trim();
@@ -107,10 +127,46 @@ export async function callGeminiChat(params: {
       text: reply,
     };
   } catch (error: unknown) {
-    const errorMsg = String(error);
+    const errAny = error as Record<string, unknown>;
+    const status = (errAny?.status as number) || (errAny?.code as number);
+    const errorObj = (errAny?.error as Record<string, unknown>) || {};
+    const code = (errorObj?.code as number) || status;
+    const rawMsg = String(errorObj?.message || errAny?.message || error || "");
 
-    // Timeout
-    if (errorMsg.includes("REQUEST_TIMEOUT")) {
+    // 1. Quota Exceeded (429 / RESOURCE_EXHAUSTED)
+    if (
+      code === 429 ||
+      rawMsg.includes("429") ||
+      rawMsg.includes("RESOURCE_EXHAUSTED") ||
+      rawMsg.includes("quota") ||
+      rawMsg.includes("Quota") ||
+      rawMsg.includes("rate-limits")
+    ) {
+      return {
+        success: false,
+        error: "Google Gemini API quota limit reached for this API key. Please check your account quota at https://ai.google.dev/gemini-api/docs/rate-limits.",
+        statusCode: 429,
+      };
+    }
+
+    // 2. Permission Denied / Project Denied / Invalid API key (403)
+    if (
+      code === 403 ||
+      code === 401 ||
+      rawMsg.includes("403") ||
+      rawMsg.includes("PERMISSION_DENIED") ||
+      rawMsg.includes("denied access") ||
+      rawMsg.includes("API_KEY_INVALID")
+    ) {
+      return {
+        success: false,
+        error: "Google Gemini API project access denied (PERMISSION_DENIED). Please generate a fresh API key at https://aistudio.google.com and update GEMINI_API_KEY.",
+        statusCode: 403,
+      };
+    }
+
+    // 3. Timeout (504)
+    if (rawMsg.includes("REQUEST_TIMEOUT")) {
       return {
         success: false,
         error: "The request took too long to complete. Please try asking again.",
@@ -118,21 +174,21 @@ export async function callGeminiChat(params: {
       };
     }
 
-    // Rate Limit / Quota Exceeded (429, RESOURCE_EXHAUSTED)
+    // 4. Model not found (404)
     if (
-      errorMsg.includes("429") ||
-      errorMsg.includes("RESOURCE_EXHAUSTED") ||
-      errorMsg.includes("quota") ||
-      errorMsg.includes("Quota")
+      code === 404 ||
+      rawMsg.includes("404") ||
+      rawMsg.includes("NOT_FOUND") ||
+      rawMsg.includes("no longer available")
     ) {
       return {
         success: false,
-        error: "The AI assistant is experiencing high traffic right now (quota limit reached). Please try again in a few moments.",
-        statusCode: 429,
+        error: "The configured Gemini model is not available for this account. Please update GEMINI_MODEL.",
+        statusCode: 404,
       };
     }
 
-    console.error("[AIChat] Gemini API generation error:", errorMsg);
+    console.error("[AIChat] Gemini API generation error:", rawMsg);
 
     return {
       success: false,

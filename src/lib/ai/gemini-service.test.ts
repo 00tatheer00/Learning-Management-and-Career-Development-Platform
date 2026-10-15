@@ -100,4 +100,22 @@ describe("Gemini Service (callGeminiChat)", () => {
     expect(result.statusCode).toBe(504);
     expect(result.error).toContain("took too long");
   });
+
+  it("handles 403 PERMISSION_DENIED error safely without leaking key", async () => {
+    mockGenerateContent.mockRejectedValueOnce({
+      status: 403,
+      message: '{"error":{"code":403,"message":"Your project has been denied access. Please contact support.","status":"PERMISSION_DENIED"}}',
+    });
+
+    const result = await callGeminiChat({
+      systemInstruction: "test",
+      history: [],
+      message: "test query",
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.statusCode).toBe(403);
+    expect(result.error).toContain("PERMISSION_DENIED");
+    expect(result.error).not.toContain("test-fake-key-12345");
+  });
 });
