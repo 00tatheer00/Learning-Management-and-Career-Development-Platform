@@ -37,8 +37,8 @@ export function getAIChatConfig(): AIChatConfig {
   const dailyLimitRaw = parseInt(process.env.AI_CHAT_DAILY_LIMIT || "20", 10);
   const dailyLimit = Number.isFinite(dailyLimitRaw) && dailyLimitRaw > 0 ? dailyLimitRaw : 20;
 
-  const maxTokensRaw = parseInt(process.env.AI_CHAT_MAX_OUTPUT_TOKENS || "500", 10);
-  const maxOutputTokens = Number.isFinite(maxTokensRaw) && maxTokensRaw > 0 ? maxTokensRaw : 500;
+  const maxTokensRaw = parseInt(process.env.AI_CHAT_MAX_OUTPUT_TOKENS || "1200", 10);
+  const maxOutputTokens = Number.isFinite(maxTokensRaw) && maxTokensRaw > 0 ? maxTokensRaw : 1200;
 
   const maxHistoryRaw = parseInt(process.env.AI_CHAT_MAX_HISTORY || "8", 10);
   const maxHistory = Number.isFinite(maxHistoryRaw) && maxHistoryRaw > 0 ? maxHistoryRaw : 8;
