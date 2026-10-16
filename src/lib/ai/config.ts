@@ -11,9 +11,27 @@ export interface AIChatConfig {
   timeoutMs: number;
 }
 
+/**
+ * Strips surrounding single or double quotes and whitespace from environment values.
+ * Useful when credentials or models are entered into hosting dashboards (e.g. Vercel)
+ * or env files with surrounding quotes.
+ */
+function cleanEnvValue(value: string | undefined): string | null {
+  if (!value) return null;
+  const trimmed = value.trim();
+  const unquoted = trimmed.replace(/^["']|["']$/g, "").trim();
+  return unquoted || null;
+}
+
 export function getAIChatConfig(): AIChatConfig {
-  const apiKey = process.env.GEMINI_API_KEY?.trim() || null;
-  const model = process.env.GEMINI_MODEL?.trim() || "gemini-3.8-flash";
+  // Support standard GEMINI_API_KEY as primary, with GOOGLE_API_KEY / GOOGLE_GENAI_API_KEY as fallbacks
+  const apiKey =
+    cleanEnvValue(process.env.GEMINI_API_KEY) ||
+    cleanEnvValue(process.env.GOOGLE_API_KEY) ||
+    cleanEnvValue(process.env.GOOGLE_GENAI_API_KEY) ||
+    null;
+
+  const model = cleanEnvValue(process.env.GEMINI_MODEL) || "gemini-3.8-flash";
   const enabled = process.env.AI_CHAT_ENABLED !== "false" && process.env.AI_CHAT_ENABLED !== "0";
 
   const dailyLimitRaw = parseInt(process.env.AI_CHAT_DAILY_LIMIT || "20", 10);

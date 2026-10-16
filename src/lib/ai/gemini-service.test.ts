@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { callGeminiChat } from "./gemini-service";
+import { callGeminiChat, parseGeminiError } from "./gemini-service";
 
 // Mock @google/genai
 const mockGenerateContent = vi.fn();
@@ -116,6 +116,119 @@ describe("Gemini Service (callGeminiChat)", () => {
     expect(result.success).toBe(false);
     expect(result.statusCode).toBe(403);
     expect(result.error).toContain("PERMISSION_DENIED");
+    expect(result.error).toContain("Google Gemini API project access denied");
     expect(result.error).not.toContain("test-fake-key-12345");
+  });
+
+  it("handles 401 UNAUTHENTICATED / invalid API key error distinctly from 403", async () => {
+    mockGenerateContent.mockRejectedValueOnce({
+      status: 401,
+      message: '{"error":{"code":401,"message":"API key not valid. Please pass a valid API key.","status":"UNAUTHENTICATED"}}',
+    });
+
+    const result = await callGeminiChat({
+      systemInstruction: "test",
+      history: [],
+      message: "test query",
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.statusCode).toBe(401);
+    expect(result.error).toContain("authentication failed");
+    expect(result.error).not.toContain("PERMISSION_DENIED");
+  });
+
+  it("handles 404 NOT_FOUND error for unavailable/deprecated models", async () => {
+    mockGenerateContent.mockRejectedValue({
+      status: 404,
+      message: '{"error":{"code":404,"message":"models/gemini-old is not found for API version v1beta","status":"NOT_FOUND"}}',
+    });
+
+    const result = await callGeminiChat({
+      systemInstruction: "test",
+      history: [],
+      message: "test query",
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.statusCode).toBe(404);
+    expect(result.error).toContain("not available");
+  });
+
+  it("handles 503 PROVIDER_UNAVAILABLE service outage gracefully", async () => {
+    mockGenerateContent.mockRejectedValueOnce({
+      status: 503,
+      message: '{"error":{"code":503,"message":"The model is overloaded. Please try again later.","status":"UNAVAILABLE"}}',
+    });
+
+    const result = await callGeminiChat({
+      systemInstruction: "test",
+      history: [],
+      message: "test query",
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.statusCode).toBe(503);
+    expect(result.error).toContain("temporarily unavailable");
+  });
+
+  it("supports GOOGLE_API_KEY when GEMINI_API_KEY is not defined", async () => {
+    delete process.env.GEMINI_API_KEY;
+    process.env.GOOGLE_API_KEY = "fallback-google-key";
+
+    mockGenerateContent.mockResolvedValueOnce({
+      text: "Reply using fallback GOOGLE_API_KEY",
+    });
+
+    const result = await callGeminiChat({
+      systemInstruction: "test",
+      history: [],
+      message: "test query",
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.text).toBe("Reply using fallback GOOGLE_API_KEY");
+  });
+
+  it("strips quotes from GEMINI_API_KEY and GEMINI_MODEL", async () => {
+    process.env.GEMINI_API_KEY = '"quoted-api-key"';
+    process.env.GEMINI_MODEL = '"gemini-3.8-flash"';
+
+    mockGenerateContent.mockResolvedValueOnce({
+      text: "Reply with unquoted config",
+    });
+
+    const result = await callGeminiChat({
+      systemInstruction: "test",
+      history: [],
+      message: "test query",
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.text).toBe("Reply with unquoted config");
+  });
+});
+
+describe("parseGeminiError diagnostic sanitizer", () => {
+  it("redacts Google API keys and bearer tokens from diagnostic details", () => {
+    const rawError = {
+      status: 403,
+      message:
+        "Request to https://generativelanguage.googleapis.com/v1beta/models?key=AIzaSyDUMMYKEY12345678901234567890123 failed with Authorization: Bearer secret-token-xyz",
+    };
+
+    const classified = parseGeminiError(rawError);
+
+    expect(classified.category).toBe("PERMISSION_DENIED");
+    expect(classified.statusCode).toBe(403);
+    expect(classified.diagnosticDetail).not.toContain("AIzaSyDUMMYKEY12345678901234567890123");
+    expect(classified.diagnosticDetail).not.toContain("secret-token-xyz");
+    expect(classified.diagnosticDetail).toContain("[REDACTED");
+  });
+
+  it("safely handles non-object errors or empty errors", () => {
+    const classified = parseGeminiError(null);
+    expect(classified.category).toBe("UNEXPECTED_PROVIDER_ERROR");
+    expect(classified.statusCode).toBe(500);
   });
 });
