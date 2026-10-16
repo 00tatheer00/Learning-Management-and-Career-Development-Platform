@@ -136,12 +136,57 @@ export const EEST_KNOWLEDGE_BASE: KnowledgeSnippet[] = [
     keywords: ["policy", "rules", "single device", "fee", "cost", "plagiarism", "isolation"],
     link: "https://school.emergingedge.tech/terms",
   },
+  {
+    id: "fees-payment-verification",
+    category: "admissions",
+    title: "100% Free Tuition & Registration Fee",
+    content:
+      "Tuition across all bootcamps is 100% FREE! EEST only charges a one-time minimal registration/admission fee of PKR 1,000 to cover portal operations, cloud hosting, and certificate verification. Payment can be made via Easypaisa, JazzCash, or Bank Transfer. After uploading the payment screenshot during registration at /register, admin approval takes 24–48 hours.",
+    keywords: ["fee", "fees", "cost", "free", "price", "pkr 1000", "tuition", "payment", "easypaisa", "jazzcash", "bank transfer", "screenshot", "verification"],
+    link: "https://school.emergingedge.tech/register",
+  },
+  {
+    id: "attendance-and-recordings-policy",
+    category: "portal",
+    title: "Attendance & Missed Classes Policy",
+    content:
+      "Attendance is automatically recorded whenever a student clicks 'Join Class' in the student portal (/student/classes). Students must maintain at least 75% attendance to qualify for the final certificate. If you miss a live class due to an emergency or power outage, full lecture recordings with session notes are uploaded to /student/recordings on Google Drive within 24 hours.",
+    keywords: ["attendance", "absent", "missed class", "late", "percentage", "75%", "attendance requirement", "recordings"],
+    link: "https://school.emergingedge.tech/student/attendance",
+  },
+  {
+    id: "module-progression-switching",
+    category: "modules",
+    title: "Level Progression & Module Switching",
+    content:
+      "EEST follows a level-by-level journey (Foundations -> Intermediate -> Advanced). Students enroll and complete one module at a time. To proceed to the next module or switch active modules, visit /student/modules in your student portal. Once your trainer approves your previous assignments, your new module becomes active with updated classes, recordings, and assignments.",
+    keywords: ["module", "switch module", "next module", "level", "progression", "module 2", "module 3", "upgrade", "advance"],
+    link: "https://school.emergingedge.tech/student/modules",
+  },
+  {
+    id: "assignments-and-grading",
+    category: "portal",
+    title: "Assignment Submission & Feedback Guidelines",
+    content:
+      "All homework and practical tasks are found under /student/assignments. For coding assignments, submit your GitHub repository link along with a live deployed URL (e.g., Vercel, Netlify, or GitHub Pages). For design or video tasks, submit shareable Google Drive links. Trainers review each submission and post scores with written feedback directly in the portal within 3–5 days.",
+    keywords: ["assignment", "grading", "marks", "github link", "vercel link", "submission", "score", "feedback", "homework"],
+    link: "https://school.emergingedge.tech/student/assignments",
+  },
+  {
+    id: "contact-community-whatsapp",
+    category: "academy",
+    title: "Official Community & Contact Channels",
+    content:
+      "Official Contact:\n- Website: https://school.emergingedge.tech\n- Email: eeschooltech@gmail.com\n- Campus: University Road, Hayatabad, Peshawar, Khyber Pakhtunkhwa, Pakistan\n- Student Community: Registered students receive access to official WhatsApp announcement groups and support channels upon admission approval. For technical disputes, open a ticket at /student/support.",
+    keywords: ["contact", "whatsapp", "email", "phone", "community", "group", "campus", "location", "address", "support"],
+    link: "https://school.emergingedge.tech/contact",
+  },
 ];
 
 /**
  * Deterministic keyword-based retriever that selects up to 3 most relevant passages.
  */
-export function getRelevantKnowledge(query: string, maxResults = 3): KnowledgeSnippet[] {
+export function getRelevantKnowledge(query: string, maxResults = 4): KnowledgeSnippet[] {
   const normalized = query.toLowerCase().replace(/[^\w\s]/g, " ");
   const queryTokens = normalized.split(/\s+/).filter((t) => t.length > 2);
 

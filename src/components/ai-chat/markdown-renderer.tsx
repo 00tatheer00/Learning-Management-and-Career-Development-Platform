@@ -12,7 +12,7 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
   const parts = splitByCodeBlocks(content);
 
   return (
-    <div className="space-y-2 text-sm leading-relaxed break-words">
+    <div className="space-y-2 text-sm leading-relaxed break-words [overflow-wrap:anywhere] max-w-full">
       {parts.map((part, idx) => {
         if (part.type === "code") {
           return (
@@ -161,31 +161,51 @@ function TextMarkdown({ text }: { text: string }) {
 }
 
 /**
- * Parses inline formatting: bold (**text**), code (`code`), links ([text](url))
+ * Parses inline formatting: bold (**text**), code (`code`), markdown links ([text](url)), and raw URLs
  */
 function renderFormattedInline(text: string): React.ReactNode {
-  // Regex to split by bold, inline code, and links
-  const tokenRegex = /(\*\*[^*]+\*\*|`[^`]+`|\[[^\]]+\]\([^)]+\))/g;
+  // Regex to split by bold, inline code, markdown links, and raw URLs
+  const tokenRegex = /(\*\*[^*]+\*\*|`[^`]+`|\[[^\]]+\]\([^)]+\)|https?:\/\/[^\s<)\]]+)/g;
   const parts = text.split(tokenRegex);
 
   return parts.map((part, i) => {
+    // Bold text (**text**)
     if (part.startsWith("**") && part.endsWith("**")) {
+      const inner = part.slice(2, -2).trim();
+      // If the bold text is actually a URL, render it as a bold clickable link
+      if (inner.startsWith("http://") || inner.startsWith("https://")) {
+        return (
+          <a
+            key={i}
+            href={inner}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-primary underline underline-offset-2 break-all hover:text-primary/80 transition-colors"
+          >
+            {inner}
+          </a>
+        );
+      }
       return (
         <strong key={i} className="font-semibold text-foreground">
-          {part.slice(2, -2)}
+          {inner}
         </strong>
       );
     }
+
+    // Inline code (`code`)
     if (part.startsWith("`") && part.endsWith("`")) {
       return (
         <code
           key={i}
-          className="px-1.5 py-0.5 rounded-md bg-muted/60 text-primary font-mono text-[12px] font-medium border border-border/50"
+          className="px-1.5 py-0.5 rounded-md bg-muted text-primary font-mono text-[12px] font-medium border border-border/50 break-all"
         >
           {part.slice(1, -1)}
         </code>
       );
     }
+
+    // Markdown link: [Title](url)
     const linkMatch = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
     if (linkMatch) {
       const href = linkMatch[2];
@@ -196,9 +216,24 @@ function renderFormattedInline(text: string): React.ReactNode {
           href={href}
           target={isInternal ? "_self" : "_blank"}
           rel={isInternal ? undefined : "noopener noreferrer"}
-          className="text-primary hover:underline font-medium inline-flex items-center gap-0.5"
+          className="text-primary hover:underline font-medium inline-flex items-center gap-0.5 break-all underline-offset-2"
         >
           {linkMatch[1]}
+        </a>
+      );
+    }
+
+    // Raw URL: https://...
+    if (part.startsWith("http://") || part.startsWith("https://")) {
+      return (
+        <a
+          key={i}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary hover:underline font-medium break-all underline-offset-2"
+        >
+          {part}
         </a>
       );
     }

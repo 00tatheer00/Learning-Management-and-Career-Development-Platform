@@ -191,10 +191,10 @@ export function AIChatWidget() {
             // Always anchored strictly to the bottom-right corner
             "right-4 sm:right-6",
             isStudentPortal ? "bottom-24 sm:bottom-6" : "bottom-4 sm:bottom-6",
-            // Responsive width: max 410px, adapts on smaller viewports
-            "w-[calc(100vw-2rem)] max-w-[410px]",
-            // Height: 580px or safe viewport height
-            "h-[580px] max-h-[calc(100dvh-5rem)]"
+            // Responsive width: max 430px, adapts smoothly on mobile
+            "w-[calc(100vw-2rem)] sm:w-[420px] max-w-[430px]",
+            // Height: 600px or safe viewport height
+            "h-[600px] max-h-[calc(100dvh-5rem)]"
           )}
         >
           {/* Header */}
@@ -247,7 +247,7 @@ export function AIChatWidget() {
           </div>
 
           {/* Messages Scroll Area */}
-          <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4 bg-muted/20 scrollbar-thin">
+          <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 space-y-4 bg-muted/20 scrollbar-thin">
             {/* Empty State */}
             {messages.length === 0 && (
               <div className="my-auto py-6 px-2 text-center space-y-4 animate-in fade-in duration-300">
@@ -304,7 +304,7 @@ export function AIChatWidget() {
 
                 <div
                   className={cn(
-                    "max-w-[85%] rounded-2xl px-3.5 py-2.5 shadow-2xs text-sm",
+                    "max-w-[85%] rounded-2xl px-3.5 py-2.5 shadow-2xs text-sm min-w-0 [overflow-wrap:anywhere] break-words",
                     msg.role === "user"
                       ? "bg-gradient-to-r from-orange-600 to-amber-600 text-white rounded-br-xs"
                       : "bg-card border border-border/80 text-card-foreground rounded-bl-xs"
